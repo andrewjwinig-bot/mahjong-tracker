@@ -44,7 +44,7 @@ export interface TablePhoto {
 export interface Table {
   id: string;
   name: string;
-  emoji: string;
+  icon: TileAvatar;
   inviteCode: string;
   members: TableMember[];
   messages: ChatMsg[];
@@ -52,7 +52,7 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v1';
+const K_TABLES = 'tables.v2';
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -69,7 +69,7 @@ function seed(): Table[] {
     {
       id: 't_tuesday',
       name: 'Tuesday Game',
-      emoji: '🀄',
+      icon: A('crack', '#D23B4E'),
       inviteCode: 'MAHJ-2026',
       members: [
         { name: 'Sandra', avatar: A('flower', '#E8455F') },
@@ -95,7 +95,7 @@ function seed(): Table[] {
     {
       id: 't_moms',
       name: 'Mahjong Moms',
-      emoji: '🌸',
+      icon: A('flower', '#E84C8A'),
       inviteCode: 'MOMS-7788',
       members: [
         { name: 'Diane', avatar: A('crack', '#E8455F') },

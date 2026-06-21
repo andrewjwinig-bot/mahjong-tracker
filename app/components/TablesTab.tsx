@@ -8,10 +8,25 @@ import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
 import { downscaleImage } from '../lib/image';
 import { track } from '../lib/analytics';
 import Avatar from './Avatar';
+import Tile from './Tile';
 import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
+import type { TileAvatar } from '../lib/social';
+import type { TileFace } from '../lib/tileArt';
 
 type View = 'chat' | 'dates' | 'photos';
+
+// Custom tile icons a table can pick from.
+const TABLE_ICONS: TileAvatar[] = [
+  { face: 'crack' as TileFace, color: '#D23B4E' },
+  { face: 'bam', color: '#2E9E50' },
+  { face: 'dot', color: '#1E73C4' },
+  { face: 'flower', color: '#E84C8A' },
+  { face: 'dragon', char: '中', color: '#D23B4E' },
+  { face: 'dragon', char: '發', color: '#1FA85B' },
+  { face: 'wind', char: '東', color: '#2C3A57' },
+  { face: 'joker', color: '#7C5CE0' },
+];
 
 export default function TablesTab({ profile }: { profile: Profile }) {
   const [tables, setTables] = useState<Table[] | null>(null);
@@ -83,6 +98,7 @@ function TablesList({
 }) {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
+  const [iconIdx, setIconIdx] = useState(0);
 
   function create() {
     const n = name.trim();
@@ -91,7 +107,7 @@ function TablesList({
     onCreate({
       id: `t_${Date.now()}`,
       name: n,
-      emoji: '🀄',
+      icon: TABLE_ICONS[iconIdx],
       inviteCode: code,
       members: [{ name: profile.name, avatar: profile.avatar }],
       messages: [],
@@ -101,6 +117,7 @@ function TablesList({
     void track('table_created');
     setCreating(false);
     setName('');
+    setIconIdx(0);
   }
 
   return (
@@ -120,7 +137,7 @@ function TablesList({
           const last = t.messages[t.messages.length - 1];
           return (
             <button key={t.id} className="table-row" onClick={() => onOpen(t.id)}>
-              <span className="table-emoji">{t.emoji}</span>
+              <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={44} />
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <span className="table-name">{t.name}</span>
                 <span className="table-meta">
@@ -142,7 +159,7 @@ function TablesList({
         <div className="modal-scrim" onClick={() => setCreating(false)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
             <div className="grab" />
-            <h2>New Table 🀄</h2>
+            <h2>New Table</h2>
             <p className="sheet-sub">Start a private group with your crew.</p>
             <label className="lbl">Table name</label>
             <input
@@ -154,7 +171,24 @@ function TablesList({
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && create()}
             />
-            <div className="row">
+
+            <label className="lbl" style={{ marginTop: 14 }}>
+              Table icon
+            </label>
+            <div className="avatar-grid">
+              {TABLE_ICONS.map((t, i) => (
+                <button
+                  key={i}
+                  className="avatar-opt"
+                  data-active={iconIdx === i}
+                  onClick={() => setIconIdx(i)}
+                >
+                  <Tile face={t.face} char={t.char} color={t.color} size={42} />
+                </button>
+              ))}
+            </div>
+
+            <div className="row" style={{ marginTop: 16 }}>
               <button className="btn ghost" onClick={() => setCreating(false)}>
                 Cancel
               </button>
@@ -191,10 +225,9 @@ function TableDetail({
         <button className="icon-btn" onClick={onBack} aria-label="Back to tables">
           ‹
         </button>
+        <Tile face={table.icon.face} char={table.icon.char} color={table.icon.color} size={38} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="detail-title">
-            {table.emoji} {table.name}
-          </div>
+          <div className="detail-title">{table.name}</div>
           <div className="detail-sub">{table.members.length + 1} players</div>
         </div>
         <button className="btn green" style={{ width: 'auto', padding: '9px 14px' }} onClick={() => setInviteOpen(true)}>
