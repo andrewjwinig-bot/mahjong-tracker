@@ -101,8 +101,9 @@ export default function AppShell() {
     });
   }, []);
 
-  // Checking a hand off the card = an instant mahj: bump progress + auto-post
-  // it to the feed, and hand back a Win so the celebration can offer sharing.
+  // Checking a hand off the card = an instant mahj: bump progress, log it to
+  // your Mahjs journal, auto-post it to the feed, and hand back the Win so the
+  // celebration can offer sharing.
   const cardMahj = useCallback(
     (hand: Hand): Win => {
       const win: Win = {
@@ -114,10 +115,11 @@ export default function AppShell() {
         createdAt: Date.now(),
       };
       bumpHand(hand.id, +1);
+      addWin(win);
       postToGroup(win);
       return win;
     },
-    [bumpHand, postToGroup],
+    [bumpHand, addWin, postToGroup],
   );
 
   const toggleLike = useCallback((id: string, liked: boolean) => {
@@ -236,6 +238,7 @@ export default function AppShell() {
                 feed={socialState.feed}
                 profile={socialState.profile}
                 youStats={youStats}
+                handCounts={handCounts}
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
