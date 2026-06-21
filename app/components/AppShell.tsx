@@ -12,8 +12,16 @@ import GroupTab from './GroupTab';
 import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
+import Onboarding from './Onboarding';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
+import {
+  getAccount,
+  getExperience,
+  setExperience as persistExperience,
+  type Account,
+  type Experience,
+} from '../lib/account';
 
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('card');
@@ -24,6 +32,9 @@ export default function AppShell() {
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [theme, setThemeState] = useState<ThemeId>('jade');
+  const [account, setAccount] = useState<Account | null>(null);
+  const [experience, setExperienceState] = useState<Experience>('beginner');
+  const [accountChecked, setAccountChecked] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -31,6 +42,9 @@ export default function AppShell() {
     const t = getStoredTheme();
     setThemeState(t);
     applyTheme(t);
+    setAccount(getAccount());
+    setExperienceState(getExperience());
+    setAccountChecked(true);
     (async () => {
       const [counts, notes, w, s] = await Promise.all([
         db.loadHandCounts(),
@@ -196,6 +210,38 @@ export default function AppShell() {
     setThemeState(id);
   }, []);
 
+  const changeExperience = useCallback((e: Experience) => {
+    persistExperience(e);
+    setExperienceState(e);
+  }, []);
+
+  const finishOnboarding = useCallback((a: Account) => {
+    setAccount(a);
+    setExperienceState(a.experience);
+    // Adopt the chosen username as the profile name.
+    setSocialState((prev) => {
+      if (!prev) return prev;
+      const profile: social.Profile = {
+        ...prev.profile,
+        name: a.username,
+        avatar: { ...prev.profile.avatar, char: a.username.trim().charAt(0).toUpperCase() || 'Y' },
+      };
+      void social.saveProfile(profile);
+      return {
+        ...prev,
+        profile,
+        members: prev.members.map((m) =>
+          m.isYou ? { ...m, name: profile.name, avatar: profile.avatar } : m,
+        ),
+      };
+    });
+  }, []);
+
+  // First launch → onboarding (account + experience level).
+  if (accountChecked && !account) {
+    return <Onboarding onDone={finishOnboarding} />;
+  }
+
   return (
     <ConfettiProvider>
       <div className="app">
@@ -218,6 +264,7 @@ export default function AppShell() {
                 handCounts={handCounts}
                 onBump={bumpHand}
                 onMahj={cardMahj}
+                experience={experience}
               />
             )}
             {tab === 'wins' && (
@@ -245,7 +292,7 @@ export default function AppShell() {
               />
             )}
             {tab === 'tables' && socialState && <TablesTab profile={socialState.profile} />}
-            {tab === 'learn' && <LearnTab />}
+            {tab === 'learn' && <LearnTab experience={experience} />}
           </>
         )}
         <BottomNav tab={tab} onChange={setTab} />
@@ -255,8 +302,10 @@ export default function AppShell() {
         <SettingsSheet
           profile={socialState.profile}
           theme={theme}
+          experience={experience}
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
+          onExperience={changeExperience}
           onClose={() => setSettingsOpen(false)}
         />
       )}

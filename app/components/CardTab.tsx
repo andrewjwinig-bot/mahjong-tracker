@@ -11,6 +11,7 @@ import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
+import type { Experience } from '../lib/account';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
@@ -20,9 +21,10 @@ interface Props {
   onBump: (handId: string, delta: number) => void;
   /** First-time clear of a hand: posts to the feed, returns the Win to share. */
   onMahj: (hand: Hand) => Win;
+  experience: Experience;
 }
 
-export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
+export default function CardTab({ card, handCounts, onBump, onMahj, experience }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
@@ -160,7 +162,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
       </div>
 
       <div style={{ marginTop: 14 }}>
-        <TipCard />
+        <TipCard experience={experience} />
       </div>
 
       <div className="segmented" style={{ marginTop: 16 }}>

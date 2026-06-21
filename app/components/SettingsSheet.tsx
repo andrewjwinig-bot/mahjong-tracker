@@ -6,14 +6,19 @@ import type { Profile, TileAvatar } from '../lib/social';
 import { initialOf } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
+import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 
 interface Props {
   profile: Profile;
   theme: ThemeId;
+  experience: Experience;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
+  onExperience: (e: Experience) => void;
   onClose: () => void;
 }
+
+const LEVELS: Experience[] = ['beginner', 'intermediate', 'expert'];
 
 // Avatar choices: your initial + a favorite tile + a couple of jokers/dragons.
 const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string }[] = [
@@ -30,7 +35,15 @@ const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: s
 
 const COLOR_SWATCHES = ['#0EAD96', '#E8455F', '#2F80ED', '#7C5CE0', '#E59A2B', '#1FA85B', '#2C3A57'];
 
-export default function SettingsSheet({ profile, theme, onSaveProfile, onTheme, onClose }: Props) {
+export default function SettingsSheet({
+  profile,
+  theme,
+  experience,
+  onSaveProfile,
+  onTheme,
+  onExperience,
+  onClose,
+}: Props) {
   const [name, setName] = useState(profile.name);
   const [handle, setHandle] = useState(profile.handle);
   const [bio, setBio] = useState(profile.bio);
@@ -161,6 +174,21 @@ export default function SettingsSheet({ profile, theme, onSaveProfile, onTheme, 
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
+
+        {/* Experience level */}
+        <label className="lbl" style={{ marginTop: 18 }}>
+          Experience level
+        </label>
+        <div className="segmented">
+          {LEVELS.map((l) => (
+            <button key={l} data-active={experience === l} onClick={() => onExperience(l)}>
+              {EXPERIENCE_LABEL[l]}
+            </button>
+          ))}
+        </div>
+        <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
+          Tailors your rules &amp; tips.
+        </p>
 
         {/* Theme picker */}
         <label className="lbl" style={{ marginTop: 18 }}>
