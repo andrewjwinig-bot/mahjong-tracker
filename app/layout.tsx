@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next';
-import { Archivo } from 'next/font/google';
+import { Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
 
-// Solid, sharp, clean — bold without the rounded/bubbly feel.
-const archivo = Archivo({
+// Considered, editorial grotesque — sharp + characterful, not generic.
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-app',
   display: 'swap',
 });
@@ -36,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={archivo.variable}>
+    <html lang="en" className={display.variable}>
       <body>
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script

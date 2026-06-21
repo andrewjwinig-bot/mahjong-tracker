@@ -102,7 +102,7 @@ export function tileSVG(face: TileFace, opts: { char?: string; color?: string } 
   </svg>`;
 }
 
-/** Faces used for celebratory confetti (tiles + the letters of MAHJ). */
+/** Faces used for celebratory confetti — real mahjong tiles only. */
 export const CONFETTI_FACES: { face: TileFace; char?: string; color?: string }[] = [
   { face: 'crack' },
   { face: 'bam' },
@@ -110,10 +110,8 @@ export const CONFETTI_FACES: { face: TileFace; char?: string; color?: string }[]
   { face: 'flower' },
   { face: 'dragon', char: '中', color: CRACK },
   { face: 'dragon', char: '發', color: BAM },
+  { face: 'dragon', char: '白', color: DOT },
   { face: 'wind', char: '東' },
+  { face: 'wind', char: '南' },
   { face: 'joker' },
-  { face: 'letter', char: 'M', color: CRACK },
-  { face: 'letter', char: 'A', color: BAM },
-  { face: 'letter', char: 'H', color: DOT },
-  { face: 'letter', char: 'J', color: GOLD },
 ];
