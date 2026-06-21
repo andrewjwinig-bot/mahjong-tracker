@@ -10,6 +10,7 @@ import ShareModal from './ShareModal';
 import TileStrip from './TileStrip';
 import Avatar from './Avatar';
 import Tile from './Tile';
+import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts } from './uiIcons';
 
 interface Props {
   members: GroupMember[];
@@ -102,11 +103,19 @@ export default function GroupTab({
       </header>
 
       <div className="row" style={{ marginTop: 14 }}>
-        <button className="btn" onClick={() => setAddOpen(true)}>
-          ＋ Add Friend
+        <button
+          className="btn"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={() => setAddOpen(true)}
+        >
+          <IconPlus size={17} /> Add Friend
         </button>
-        <button className="btn green" onClick={() => setInviteOpen(true)}>
-          ↗ Invite
+        <button
+          className="btn green"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={() => setInviteOpen(true)}
+        >
+          <IconShare size={17} /> Invite
         </button>
       </div>
 
@@ -133,8 +142,11 @@ export default function GroupTab({
 
       {/* Leaderboard */}
       <div className="cat-head" style={{ marginTop: 22 }}>
-        <span className="pill" style={{ background: '#FFF1D9', color: '#E59A2B' }}>
-          🏅 Friends Leaderboard
+        <span
+          className="pill"
+          style={{ background: '#FFF1D9', color: '#E59A2B', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+        >
+          <IconMedal size={15} /> Friends Leaderboard
         </span>
         <span className="count">{ranked.length} players</span>
       </div>
@@ -187,8 +199,11 @@ export default function GroupTab({
 
       {/* Feed */}
       <div className="cat-head">
-        <span className="pill" style={{ background: '#D5F1E9', color: '#23B196' }}>
-          📣 The Feed
+        <span
+          className="pill"
+          style={{ background: '#D5F1E9', color: '#23B196', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+        >
+          <IconFeed size={15} /> The Feed
         </span>
         <span className="count">{feed.length} mahjs</span>
       </div>
@@ -274,11 +289,11 @@ function FeedCard({
             data-on={post.likedByMe}
             onClick={() => onToggleLike(post.id, !post.likedByMe)}
           >
-            <span className="ic">{post.likedByMe ? '❤️' : '🤍'}</span>
+            <span className="ic"><IconHeart size={18} fill={post.likedByMe} /></span>
             {post.likes > 0 ? post.likes : ''} {post.likes === 1 ? 'Like' : 'Likes'}
           </button>
           <button className="social-btn" onClick={() => setShowComments((v) => !v)}>
-            <span className="ic">💬</span>
+            <span className="ic"><IconComment size={18} /></span>
             {post.comments.length > 0 ? post.comments.length : ''}{' '}
             {post.comments.length === 1 ? 'Comment' : 'Comments'}
           </button>
@@ -461,8 +476,12 @@ function AddFriendSheet({
         <h2>Find Friends 👀</h2>
         <p className="sheet-sub">Invite your contacts, or add someone to your board.</p>
 
-        <button className="btn" onClick={inviteContacts}>
-          📇 Invite From Contacts
+        <button
+          className="btn"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={inviteContacts}
+        >
+          <IconContacts size={18} /> Invite From Contacts
         </button>
         <p
           style={{

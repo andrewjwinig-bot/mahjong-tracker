@@ -9,6 +9,7 @@ import { recordShare, track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
 import TileStrip from './TileStrip';
+import { IconShare, IconTrash, IconCamera } from './uiIcons';
 
 interface Props {
   card: MahjongCard;
@@ -155,11 +156,15 @@ function WinCard({
         )}
         {win.note && <p className="note">{win.note}</p>}
         <div className="actions">
-          <button className="btn coral" onClick={openShare}>
-            ↗ Share
+          <button
+            className="btn coral"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+            onClick={openShare}
+          >
+            <IconShare size={17} /> Share
           </button>
           <button className="btn ghost" onClick={onRemove} aria-label="Delete mahj">
-            🗑
+            <IconTrash size={18} />
           </button>
         </div>
       </div>
@@ -287,11 +292,11 @@ function LogWinSheet({
         ) : null}
         <button
           className="btn ghost"
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
           onClick={() => fileRef.current?.click()}
           disabled={busy}
         >
-          {busy ? 'Processing…' : previewUrl ? 'Change photo' : '📷 Add photo'}
+          {busy ? 'Processing…' : previewUrl ? 'Change photo' : <><IconCamera size={17} /> Add photo</>}
         </button>
 
         <button

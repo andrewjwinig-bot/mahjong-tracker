@@ -12,6 +12,7 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
+import { IconCamera } from './uiIcons';
 
 export default function CardEditor({
   current,
@@ -119,7 +120,9 @@ export default function CardEditor({
             <img src={photoUrl} alt="Your card reference" />
           </button>
           <div className="card-photo-actions">
-            <div className="card-photo-label">📷 Reference photo</div>
+            <div className="card-photo-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <IconCamera size={15} /> Reference photo
+            </div>
             <button className="btn ghost" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
               {photoBusy ? 'Saving…' : 'Replace'}
             </button>
@@ -129,8 +132,13 @@ export default function CardEditor({
           </div>
         </div>
       ) : (
-        <button className="btn ghost" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
-          {photoBusy ? 'Saving…' : '📷 Add a photo of your card to copy from'}
+        <button
+          className="btn ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={() => fileRef.current?.click()}
+          disabled={photoBusy}
+        >
+          {photoBusy ? 'Saving…' : <><IconCamera size={17} /> Add a photo of your card to copy from</>}
         </button>
       )}
 

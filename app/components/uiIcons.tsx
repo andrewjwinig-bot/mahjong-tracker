@@ -98,3 +98,118 @@ export const IconPlus = ({ size }: P) =>
 
 export const IconSend = ({ size }: P) =>
   S(<path d="M5 12l15-7-7 15-2.5-5.5L5 12z" />, size);
+
+export const IconShare = ({ size }: P) =>
+  S(
+    <>
+      <path d="M12 16V4" />
+      <path d="M8 7.5 12 3.5l4 4" />
+      <path d="M6 12v6a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6" />
+    </>,
+    size,
+  );
+
+export const IconTrash = ({ size }: P) =>
+  S(
+    <>
+      <path d="M5 7h14" />
+      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M6.5 7l.8 11a1 1 0 0 0 1 .9h7.4a1 1 0 0 0 1-.9l.8-11" />
+      <path d="M10 11v5M14 11v5" />
+    </>,
+    size,
+  );
+
+// Heart — outline by default; pass `fill` to render it solid (liked state).
+export const IconHeart = ({ size, fill }: P & { fill?: boolean }) =>
+  S(
+    <path
+      d="M12 20s-7-4.5-9.2-9C1.3 8 2.8 4.8 6 4.8c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.2 0 4.7 3.2 3.2 6.2C19 15.5 12 20 12 20z"
+      fill={fill ? 'currentColor' : 'none'}
+    />,
+    size,
+  );
+
+export const IconComment = ({ size }: P) =>
+  S(<path d="M5 5h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H10l-4 3.5V15H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />, size);
+
+export const IconMedal = ({ size }: P) =>
+  S(
+    <>
+      <path d="M8 3l2.5 6M16 3l-2.5 6" />
+      <circle cx="12" cy="15" r="5" />
+      <path d="M12 12.5l.9 1.8 2 .3-1.45 1.4.35 2L12 17l-1.8.95.35-2L9.1 14.6l2-.3.9-1.8z" fill="currentColor" stroke="none" />
+    </>,
+    size,
+  );
+
+export const IconFeed = ({ size }: P) =>
+  S(
+    <>
+      <path d="M4 11v2a1 1 0 0 0 1 1h2l8 4V6L7 10H5a1 1 0 0 0-1 1z" />
+      <path d="M18 9a4 4 0 0 1 0 6" />
+    </>,
+    size,
+  );
+
+export const IconBell = ({ size }: P) =>
+  S(
+    <>
+      <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2.5h-15L6 16z" />
+      <path d="M10 19a2 2 0 0 0 4 0" />
+    </>,
+    size,
+  );
+
+export const IconDownload = ({ size }: P) =>
+  S(
+    <>
+      <path d="M12 4v10" />
+      <path d="M8 10.5l4 4 4-4" />
+      <path d="M5 19h14" />
+    </>,
+    size,
+  );
+
+export const IconSignOut = ({ size }: P) =>
+  S(
+    <>
+      <path d="M14 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8" />
+      <path d="M11 12h9M16.5 8.5 20 12l-3.5 3.5" />
+    </>,
+    size,
+  );
+
+export const IconSound = ({ size }: P) =>
+  S(
+    <>
+      <path d="M4 9v6h3.5L13 19V5L7.5 9H4z" />
+      <path d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10" />
+    </>,
+    size,
+  );
+
+export const IconContacts = ({ size }: P) =>
+  S(
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="2.5" />
+      <circle cx="12" cy="10" r="2.4" />
+      <path d="M8.5 16.5a3.5 3.5 0 0 1 7 0" />
+    </>,
+    size,
+  );
+
+export const IconLock = ({ size }: P) =>
+  S(
+    <>
+      <rect x="5" y="10" width="14" height="10" rx="2.2" />
+      <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+    </>,
+    size,
+  );
+
+export const IconCheck = ({ size }: P) =>
+  S(<path d="M5 12.5l4.5 4.5L19 7" />, size);
+
+export const IconArrowRight = ({ size }: P) =>
+  S(<path d="M5 12h14M13 6l6 6-6 6" />, size);

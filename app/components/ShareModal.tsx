@@ -14,6 +14,7 @@ import {
   IconCopy,
   IconFriends,
 } from './brandIcons';
+import { IconArrowRight } from './uiIcons';
 
 export interface SharePayload {
   /** Sheet title, e.g. "SHARE YOUR MAHJ! 🀄" */
@@ -141,7 +142,7 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
               </span>
               <span className="s">Drop it in your group&rsquo;s feed</span>
             </span>
-            <span style={{ fontSize: 22 }}>→</span>
+            <span style={{ display: 'inline-flex', color: 'var(--muted)' }}><IconArrowRight size={20} /></span>
           </button>
         )}
 

@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { tileSVG, CONFETTI_FACES } from '../lib/tileArt';
 import { playMahjChime, playFanfare, buzz, fxOn } from '../lib/sound';
+import { IconShare, IconFeed } from './uiIcons';
 
 export interface CelebrateOpts {
   title?: string;
@@ -229,23 +230,25 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
           {opts.onShare && (
             <button
               className="btn coral"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
               onClick={() => {
                 onClose();
                 opts.onShare?.();
               }}
             >
-              ↗ Share It
+              <IconShare size={17} /> Share It
             </button>
           )}
           {opts.onPost && !posted && (
             <button
               className="btn green"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
               onClick={() => {
                 opts.onPost?.();
                 setPosted(true);
               }}
             >
-              📣 Post to Feed
+              <IconFeed size={17} /> Post to Feed
             </button>
           )}
           <button className="btn ghost" onClick={onClose}>

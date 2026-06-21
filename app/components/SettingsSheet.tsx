@@ -10,7 +10,7 @@ import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
-import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown } from './uiIcons';
+import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown, IconSound, IconLock } from './uiIcons';
 import { isPro, setPro } from '../lib/pro';
 
 interface Props {
@@ -230,8 +230,8 @@ export default function SettingsSheet({
             setFx(next);
           }}
         >
-          <span style={{ fontSize: 20 }} aria-hidden>
-            🔊
+          <span style={{ display: 'inline-flex' }} aria-hidden>
+            <IconSound size={20} />
           </span>
           <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
             Sound &amp; haptics
@@ -258,7 +258,7 @@ export default function SettingsSheet({
               onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
             >
               {theme === t.id && <span className="tick">✓</span>}
-              {locked && <span className="theme-lock">🔒</span>}
+              {locked && <span className="theme-lock"><IconLock size={15} /></span>}
               <Tile face={t.tile.face} char={t.tile.char} color={t.tile.color} size={52} />
               <span className="tname" style={{ color: t.dark ? '#fff' : '#243240' }}>
                 {t.name}
