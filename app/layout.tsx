@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Baloo_2, Hanken_Grotesk } from 'next/font/google';
+import { Space_Grotesk, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
 
-// Two-font pairing: a chunky rounded display for headers/branding (the printed
-// "Hand Tracker" vibe) + a clean grotesque for body text.
-const display = Baloo_2({
+// Two-font pairing: a sharp, modern grotesque for headers/branding + a clean
+// grotesque for body text.
+const display = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['600', '700', '800'],
+  weight: ['500', '600', '700'],
   variable: '--font-display',
   display: 'swap',
 });
