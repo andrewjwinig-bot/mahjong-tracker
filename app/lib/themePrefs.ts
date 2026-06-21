@@ -12,6 +12,8 @@ export type ThemeId =
   | 'joker'
   | 'midnight';
 
+import type { TileFace } from './tileArt';
+
 export interface ThemeDef {
   id: ThemeId;
   name: string;
@@ -19,6 +21,8 @@ export interface ThemeDef {
   dark?: boolean;
   /** Premium theme — gated behind Pro. */
   pro?: boolean;
+  /** The mahjong tile that represents this theme in the picker. */
+  tile: { face: TileFace; char?: string; color?: string };
   /** Preview swatch + the browser status-bar (theme-color) page tone. */
   swatch: { brand: string; green: string; accent: string; page: string };
 }
@@ -30,24 +34,28 @@ export const THEMES: ThemeDef[] = [
     id: 'jade',
     name: 'Jade',
     tagline: 'Clean & neutral',
+    tile: { face: 'wind', char: '東', color: '#0EAD96' },
     swatch: { brand: '#0EAD96', green: '#2BB673', accent: '#FF6B5C', page: '#F7F5EF' },
   },
   {
     id: 'bam',
     name: 'Bam',
     tagline: 'Bamboo green',
+    tile: { face: 'bam' },
     swatch: { brand: '#2E9E50', green: '#2BB673', accent: '#F2784B', page: '#F0F5E9' },
   },
   {
     id: 'dot',
     name: 'Dot',
     tagline: 'Circle blue',
+    tile: { face: 'dot' },
     swatch: { brand: '#1E73C4', green: '#1FB7A6', accent: '#FF7A4D', page: '#EEF4FB' },
   },
   {
     id: 'crak',
     name: 'Crak',
     tagline: 'Character red',
+    tile: { face: 'crack' },
     swatch: { brand: '#D23B4E', green: '#23B196', accent: '#E0A02B', page: '#FCEDEC' },
   },
   {
@@ -55,12 +63,14 @@ export const THEMES: ThemeDef[] = [
     name: 'Dragon',
     tagline: 'Emerald & gold',
     pro: true,
+    tile: { face: 'dragon', char: '中', color: '#D23B4E' },
     swatch: { brand: '#0F8F6E', green: '#2BB673', accent: '#D23B4E', page: '#F4EFE1' },
   },
   {
     id: 'flower',
     name: 'Flower',
     tagline: 'Petal pink',
+    tile: { face: 'flower' },
     swatch: { brand: '#E84C8A', green: '#2BBE9E', accent: '#F2A93C', page: '#FFF0F6' },
   },
   {
@@ -68,6 +78,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Joker',
     tagline: 'Wild violet',
     pro: true,
+    tile: { face: 'joker' },
     swatch: { brand: '#7C4DE0', green: '#18C39A', accent: '#F5478B', page: '#F5F2FD' },
   },
   {
@@ -76,6 +87,7 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Dark & neon',
     dark: true,
     pro: true,
+    tile: { face: 'dragon', char: '白', color: '#5AA2FF' },
     swatch: { brand: '#2DD4BF', green: '#34D399', accent: '#FF6B81', page: '#141826' },
   },
 ];
