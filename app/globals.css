@@ -1,24 +1,139 @@
-:root {
-  --brand: #e8455f; /* coral-red (logo) */
-  --brand-deep: #d0344e;
-  --green: #23b196;
-  --blue: #3b7dd8;
-  --navy: #2c3a57;
+/* ===========================================================================
+   THEME TOKENS
+   Default = "Jade" (bold but gender-neutral). Other themes override these
+   tokens via [data-theme="…"] blocks below. Components only ever read tokens,
+   so flipping data-theme reskins the entire app at once.
+   ========================================================================== */
 
-  --primary: var(--brand);
-  --secondary: var(--green);
-  --accent: var(--brand);
-  --ink: #2c3a57;
-  --page: #fce7ec; /* soft pink */
-  --pink: #fbd9e0; /* pill / tint */
-  --pink-deep: #f7becb;
-  --card: #ffffff;
-  --muted: #ab8d97;
-  --hairline: #f3d7df;
-  --shadow: 0 8px 24px rgba(214, 52, 78, 0.12);
-  --shadow-sm: 0 3px 12px rgba(214, 52, 78, 0.1);
+:root {
+  --brand: #0ead96; /* teal-jade — primary actions */
+  --brand-deep: #0b8c7b;
+  --green: #2bb673; /* "got it" / win */
+  --accent: #ff6b5c; /* coral pop — I GOT MAHJ / Share */
+
+  --ink: #243240;
+  --ink-soft: #56616e;
+  --muted: #7e8a93;
+
+  --page: #fbf8f1; /* warm cream */
+  --card: #ffffff; /* elevated surfaces */
+  --tint: #dcf2ec; /* pill / chip tint */
+  --tint-deep: #bbe6dc;
+  --hairline: #e7e0d4;
+  --dot: rgba(36, 50, 64, 0.045); /* polka dots */
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --on-brand: #ffffff; /* text on colored buttons */
+
+  /* decorative notation colors */
+  --n0: #243240;
+  --n1: #2bb673;
+  --n2: #ff6b5c;
+  --n3: #2f80ed;
+
+  --shadow: 0 8px 24px rgba(36, 50, 64, 0.1);
+  --shadow-sm: 0 3px 12px rgba(36, 50, 64, 0.08);
   --nav-h: 66px;
 }
+
+[data-theme="bubblegum"] {
+  --brand: #e8455f;
+  --brand-deep: #ce2f4a;
+  --green: #23b196;
+  --accent: #f0654f;
+  --ink: #3a2a33;
+  --ink-soft: #5a5566;
+  --muted: #a98e98;
+  --page: #fce7ec;
+  --card: #ffffff;
+  --tint: #fbd9e0;
+  --tint-deep: #f7becb;
+  --hairline: #f3d7df;
+  --dot: rgba(255, 255, 255, 0.85);
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --on-brand: #ffffff;
+  --n0: #2c3a57;
+  --n1: #23b196;
+  --n2: #e8455f;
+  --n3: #3b7dd8;
+  --shadow: 0 8px 24px rgba(214, 52, 78, 0.12);
+  --shadow-sm: 0 3px 12px rgba(214, 52, 78, 0.1);
+}
+
+[data-theme="electric"] {
+  --brand: #6c4ce0;
+  --brand-deep: #573bc0;
+  --green: #18c39a;
+  --accent: #f5478b;
+  --ink: #241d3a;
+  --ink-soft: #514a66;
+  --muted: #8a84a6;
+  --page: #f5f4fc;
+  --card: #ffffff;
+  --tint: #e7e2fb;
+  --tint-deep: #d3c9f8;
+  --hairline: #e7e3f5;
+  --dot: rgba(108, 76, 224, 0.06);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --on-brand: #ffffff;
+  --n0: #241d3a;
+  --n1: #18c39a;
+  --n2: #f5478b;
+  --n3: #3e8bff;
+  --shadow: 0 8px 24px rgba(108, 76, 224, 0.14);
+  --shadow-sm: 0 3px 12px rgba(108, 76, 224, 0.1);
+}
+
+[data-theme="sunset"] {
+  --brand: #f2682c;
+  --brand-deep: #dd571e;
+  --green: #2db39a;
+  --accent: #e63462;
+  --ink: #3a2a22;
+  --ink-soft: #5e4a3e;
+  --muted: #9c8478;
+  --page: #fff6ec;
+  --card: #ffffff;
+  --tint: #ffe2cc;
+  --tint-deep: #ffc9a3;
+  --hairline: #f2e0d0;
+  --dot: rgba(242, 104, 44, 0.06);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --on-brand: #ffffff;
+  --n0: #3a2a22;
+  --n1: #2db39a;
+  --n2: #e63462;
+  --n3: #2f80ed;
+  --shadow: 0 8px 24px rgba(242, 104, 44, 0.14);
+  --shadow-sm: 0 3px 12px rgba(242, 104, 44, 0.1);
+}
+
+[data-theme="midnight"] {
+  --brand: #2dd4bf;
+  --brand-deep: #16b6a3;
+  --green: #34d399;
+  --accent: #ff6b81;
+  --ink: #eaedf7;
+  --ink-soft: #c2c9e0;
+  --muted: #8a93b2;
+  --page: #141826;
+  --card: #1e2336;
+  --tint: #262c44;
+  --tint-deep: #333a57;
+  --hairline: #2c3350;
+  --dot: rgba(255, 255, 255, 0.035);
+  --nav-bg: rgba(20, 24, 38, 0.92);
+  --on-brand: #10202a;
+  --n0: #c9d2f0;
+  --n1: #34d399;
+  --n2: #ff6b81;
+  --n3: #5aa2ff;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ===========================================================================
+   BASE
+   ========================================================================== */
 
 * {
   box-sizing: border-box;
@@ -31,9 +146,8 @@ body {
 }
 
 body {
-  /* soft pink with white polka dots — the sticker / planner backdrop */
   background-color: var(--page);
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.85) 3px, transparent 3.5px);
+  background-image: radial-gradient(circle, var(--dot) 3px, transparent 3.5px);
   background-size: 26px 26px;
   background-attachment: fixed;
   color: var(--ink);
@@ -95,53 +209,62 @@ select {
   font-weight: 700;
 }
 
-/* Decorative tile chips — used under headers + in empty states. */
+/* ---- Custom tile artwork ------------------------------------------------- */
+
+.tile {
+  display: inline-block;
+  line-height: 0;
+}
+.tile .mj-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 3px 4px rgba(20, 24, 38, 0.18));
+}
+.mj-body {
+  fill: var(--card);
+  stroke: var(--tint-deep);
+  stroke-width: 1;
+}
+.mj-edge {
+  fill: var(--tint-deep);
+}
+.nav-tile .mj-svg {
+  filter: none;
+}
+
+/* Decorative tile parade under headers. */
 .tile-strip {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 14px;
+  align-items: flex-end;
+  gap: 5px;
+  margin-top: 16px;
 }
-.tile-strip span {
-  width: 30px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  font-size: 21px;
-  line-height: 1;
+.tile-strip .tile:nth-child(odd) {
+  transform: rotate(-6deg);
 }
-.tile-strip span:nth-child(odd) {
-  transform: rotate(-4deg);
-}
-.tile-strip span:nth-child(even) {
-  transform: rotate(4deg);
+.tile-strip .tile:nth-child(even) {
+  transform: rotate(6deg) translateY(-2px);
 }
 
-/* Chunky sticker logo block (the "2026 MAHJONG HAND TRACKER" feel). */
-.logo {
-  display: inline-block;
-  background: var(--brand);
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  line-height: 0.92;
-  padding: 14px 20px;
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  transform: rotate(-2deg);
+/* Settings gear (top-right of the app column). */
+.gear {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  place-items: center;
+  font-size: 19px;
 }
-.logo .big {
-  display: block;
-  font-size: 30px;
-}
-.logo .small {
-  display: block;
-  font-size: 18px;
-  color: var(--pink);
+.gear:active {
+  transform: scale(0.92);
 }
 
 /* ---- Cards --------------------------------------------------------------- */
@@ -180,7 +303,7 @@ select {
   font-size: 10px;
   font-weight: 800;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .tag {
@@ -224,8 +347,8 @@ select {
 .progress {
   height: 12px;
   border-radius: 999px;
-  background: #fff;
-  box-shadow: inset 0 0 0 2px var(--pink-deep);
+  background: var(--card);
+  box-shadow: inset 0 0 0 2px var(--tint-deep);
   overflow: hidden;
   margin-top: 12px;
 }
@@ -233,7 +356,7 @@ select {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--brand), var(--green));
+  background: linear-gradient(90deg, var(--brand), var(--accent));
   transition: width 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
@@ -241,7 +364,7 @@ select {
 
 .segmented {
   display: flex;
-  background: var(--pink);
+  background: var(--tint);
   border-radius: 16px;
   padding: 5px;
   gap: 5px;
@@ -257,7 +380,7 @@ select {
   color: var(--brand-deep);
 }
 .segmented button[data-active="true"] {
-  background: #fff;
+  background: var(--card);
   color: var(--brand);
   box-shadow: var(--shadow-sm);
 }
@@ -271,7 +394,7 @@ select {
   margin: 24px 2px 12px;
 }
 .cat-head .pill {
-  background: var(--pink);
+  background: var(--tint);
   color: var(--brand);
 }
 .cat-head .count {
@@ -294,7 +417,6 @@ select {
   margin-top: 8px;
 }
 .hand.won {
-  background: #fff;
   box-shadow: 0 0 0 2.5px var(--green), var(--shadow-sm);
 }
 .hand .notation {
@@ -309,14 +431,22 @@ select {
 .hand.won .notation {
   opacity: 0.55;
 }
-.hand .meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 5px;
+
+/* decorative notation colors (theme-aware) */
+.nc0 {
+  color: var(--n0);
+}
+.nc1 {
+  color: var(--n1);
+}
+.nc2 {
+  color: var(--n2);
+}
+.nc3 {
+  color: var(--n3);
 }
 
-/* Point chip — ×25 / C30 style from the card */
+/* Point chip — ×25 / C30 */
 .pts {
   font-size: 13px;
   font-weight: 800;
@@ -324,7 +454,7 @@ select {
   letter-spacing: 0.02em;
 }
 
-/* ---- Big tappable checkbox (primary "I got it" action) ------------------- */
+/* ---- Big tappable checkbox ----------------------------------------------- */
 
 .check {
   position: relative;
@@ -332,8 +462,8 @@ select {
   height: 40px;
   flex: 0 0 auto;
   border-radius: 12px;
-  background: #fff;
-  box-shadow: inset 0 0 0 2.5px var(--pink-deep);
+  background: var(--card);
+  box-shadow: inset 0 0 0 2.5px var(--tint-deep);
   display: grid;
   place-items: center;
   font-size: 22px;
@@ -348,7 +478,6 @@ select {
   box-shadow: inset 0 0 0 2.5px var(--green);
   color: #fff;
 }
-/* win count badge for multi-wins */
 .check .count-badge {
   position: absolute;
   top: -7px;
@@ -358,7 +487,7 @@ select {
   padding: 0 5px;
   border-radius: 999px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   font-size: 11px;
   font-weight: 800;
   display: grid;
@@ -370,7 +499,7 @@ select {
   height: 30px;
   flex: 0 0 auto;
   border-radius: 9px;
-  background: var(--pink);
+  background: var(--tint);
   color: var(--brand);
   font-size: 18px;
   font-weight: 800;
@@ -395,20 +524,20 @@ select {
   padding: 14px 18px;
   border-radius: 16px;
   background: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
   box-shadow: var(--shadow-sm);
   width: 100%;
   transition: transform 0.08s ease;
 }
 .btn.coral,
 .btn.accent {
-  background: var(--brand);
+  background: var(--accent);
 }
 .btn.green {
   background: var(--green);
 }
 .btn.ghost {
-  background: var(--pink);
+  background: var(--tint);
   color: var(--brand);
   box-shadow: none;
 }
@@ -426,7 +555,7 @@ select {
   display: grid;
   place-items: center;
   color: var(--brand);
-  background: var(--pink);
+  background: var(--tint);
   font-size: 15px;
 }
 
@@ -439,7 +568,7 @@ select {
   padding: 12px 14px;
   font-size: 15px;
   font-weight: 600;
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
 }
 .field:focus {
@@ -472,7 +601,7 @@ label.lbl {
   display: block;
   max-height: 320px;
   object-fit: cover;
-  background: var(--pink);
+  background: var(--tint);
 }
 .win .body {
   padding: 14px 16px;
@@ -500,6 +629,95 @@ label.lbl {
   flex: 1;
   padding: 11px 14px;
   font-size: 14px;
+}
+
+/* ---- Social: likes + comments ------------------------------------------- */
+
+.mahj-tag {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--brand);
+  background: var(--tint);
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+
+.social-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1.5px solid var(--hairline);
+}
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--tint);
+}
+.social-btn .ic {
+  font-size: 15px;
+}
+.social-btn[data-on="true"] {
+  color: var(--brand);
+}
+.social-btn:active {
+  transform: scale(0.95);
+}
+
+.comments {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.comment .bubble {
+  background: var(--tint);
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.comment .cauthor {
+  display: block;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: var(--brand);
+  margin-bottom: 1px;
+}
+.comment-compose {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comment-compose .field {
+  flex: 1;
+}
+.post-btn {
+  flex: 0 0 auto;
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--brand);
+  padding: 8px 10px;
+}
+.post-btn:disabled {
+  opacity: 0.4;
 }
 
 .empty {
@@ -546,7 +764,7 @@ label.lbl {
   padding: 0 16px 16px;
   font-size: 14.5px;
   line-height: 1.5;
-  color: #5a5566;
+  color: var(--ink-soft);
   font-weight: 500;
 }
 .acc .acc-body p {
@@ -569,9 +787,9 @@ label.lbl {
   bottom: 0;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--nav-bg);
   backdrop-filter: saturate(1.5) blur(12px);
-  border-top: 2px solid var(--pink);
+  border-top: 2px solid var(--tint);
   display: flex;
   z-index: 50;
 }
@@ -608,7 +826,7 @@ label.lbl {
 .modal-scrim {
   position: fixed;
   inset: 0;
-  background: rgba(44, 58, 87, 0.45);
+  background: rgba(20, 24, 38, 0.5);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -655,7 +873,7 @@ label.lbl {
   width: 44px;
   height: 5px;
   border-radius: 999px;
-  background: var(--pink-deep);
+  background: var(--tint-deep);
   margin: 0 auto 12px;
 }
 .row {
@@ -693,7 +911,7 @@ label.lbl {
   display: grid;
   place-items: center;
   font-size: 26px;
-  background: #fff;
+  background: var(--card);
   box-shadow: var(--shadow-sm);
   transition: transform 0.08s ease;
 }
@@ -701,7 +919,6 @@ label.lbl {
   transform: scale(0.92);
 }
 
-/* big in-app highlight option */
 .share-hero {
   display: flex;
   align-items: center;
@@ -729,7 +946,94 @@ label.lbl {
   opacity: 0.9;
 }
 
-/* ---- Confetti ------------------------------------------------------------ */
+/* ---- Avatar + theme pickers (settings) ---------------------------------- */
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.avatar-opt {
+  display: grid;
+  place-items: center;
+  padding: 8px 4px;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border: 2.5px solid transparent;
+}
+.avatar-opt[data-active="true"] {
+  border-color: var(--brand);
+}
+
+.swatch-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.swatch-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 3px solid var(--card);
+  box-shadow: 0 0 0 1.5px var(--hairline);
+}
+.swatch-dot[data-active="true"] {
+  box-shadow: 0 0 0 3px var(--brand);
+}
+
+/* ---- Theme picker (settings) -------------------------------------------- */
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 6px;
+}
+.theme-card {
+  position: relative;
+  border-radius: 18px;
+  padding: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border: 2.5px solid transparent;
+  text-align: left;
+  overflow: hidden;
+}
+.theme-card[data-active="true"] {
+  border-color: var(--brand);
+}
+.theme-card .swatch {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.theme-card .swatch i {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: block;
+}
+.theme-card .tname {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.theme-card .ttag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.theme-card .tick {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 16px;
+  color: var(--brand);
+}
+
+/* ---- Confetti + celebration --------------------------------------------- */
 
 .confetti-layer {
   position: fixed;
@@ -740,17 +1044,74 @@ label.lbl {
 }
 .confetti-tile {
   position: absolute;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 45px;
+  will-change: transform, opacity;
+}
+.confetti-tile .mj-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 6px rgba(20, 24, 38, 0.25));
+}
+
+.celebrate-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 38, 0.4);
+  backdrop-filter: blur(2px);
   display: grid;
   place-items: center;
-  background: #fff;
-  border-radius: 9px;
-  box-shadow: 0 4px 10px rgba(44, 58, 87, 0.2);
-  font-family: var(--font-baloo), system-ui, sans-serif;
+  z-index: 200;
+  padding: 24px;
+  animation: scrim-in 0.18s ease;
+}
+.celebrate-card {
+  background: var(--card);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 26px 22px 22px;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  animation: pop-in 0.36s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+@keyframes pop-in {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+}
+.celebrate-card .boom {
+  font-size: 56px;
+  line-height: 1;
+  animation: boom 0.6s ease;
+}
+@keyframes boom {
+  0% {
+    transform: scale(0.3) rotate(-20deg);
+  }
+  60% {
+    transform: scale(1.25) rotate(8deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+.celebrate-card h2 {
+  margin: 10px 0 4px;
+  font-size: 26px;
   font-weight: 800;
-  font-size: 19px;
-  will-change: transform, opacity;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+.celebrate-card .cele-hand {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

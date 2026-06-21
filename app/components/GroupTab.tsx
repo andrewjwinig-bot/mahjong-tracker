@@ -1,42 +1,23 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { FeedPost, GroupMember, Group } from '../lib/social';
-import { YOU_ID } from '../lib/social';
+import type { Comment, FeedPost, GroupMember, Group, Profile } from '../lib/social';
+import { YOU_ID, initialOf } from '../lib/social';
 import { TOTAL_HANDS } from '../lib/cardData';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import TileStrip from './TileStrip';
+import Avatar from './Avatar';
 
 interface Props {
   group: Group;
   members: GroupMember[];
   feed: FeedPost[];
-  youName: string;
+  profile: Profile;
   /** Live stats for the local user, computed from their tracker. */
   youStats: { handsCleared: number; points: number };
-  onHidePost: (id: string) => void;
-}
-
-function Avatar({ name, color, size = 38 }: { name: string; color: string; size?: number }) {
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: 999,
-        background: color,
-        color: '#fff',
-        display: 'grid',
-        placeItems: 'center',
-        fontWeight: 900,
-        fontSize: size * 0.42,
-        flex: '0 0 auto',
-      }}
-    >
-      {name.trim().charAt(0).toUpperCase() || '?'}
-    </div>
-  );
+  onToggleLike: (id: string, liked: boolean) => void;
+  onAddComment: (id: string, text: string) => void;
 }
 
 function timeAgo(ts: number): string {
@@ -50,7 +31,15 @@ function timeAgo(ts: number): string {
   return d === 1 ? 'yesterday' : `${d}d ago`;
 }
 
-export default function GroupTab({ group, members, feed, youName, youStats, onHidePost }: Props) {
+export default function GroupTab({
+  group,
+  members,
+  feed,
+  profile,
+  youStats,
+  onToggleLike,
+  onAddComment,
+}: Props) {
   // Track a feed view once per mount (core-loop metric).
   useEffect(() => {
     void track('feed_viewed', { posts: feed.length });
@@ -60,17 +49,21 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
   const [copied, setCopied] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  // Merge live "you" stats into the leaderboard, then rank.
+  // Merge live "you" identity + stats into the leaderboard, then rank.
   const ranked = useMemo(() => {
     const withYou = members.map((m) =>
       m.id === YOU_ID
-        ? { ...m, name: youName, handsCleared: youStats.handsCleared, points: youStats.points }
+        ? {
+            ...m,
+            name: profile.name,
+            avatar: profile.avatar,
+            handsCleared: youStats.handsCleared,
+            points: youStats.points,
+          }
         : m,
     );
     return withYou.sort((a, b) => b.handsCleared - a.handsCleared || b.points - a.points);
-  }, [members, youName, youStats]);
-
-  const visibleFeed = feed.filter((p) => !p.hidden);
+  }, [members, profile, youStats]);
 
   function copyCode() {
     navigator.clipboard?.writeText(group.inviteCode).then(
@@ -115,7 +108,7 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
         <ShareModal
           payload={{
             title: 'Invite Your Crew 👯',
-            text: `Join my mahjong group “${group.name}” and let's race to clear all 70 hands! Invite code: ${group.inviteCode}`,
+            text: `Join my mahjong table “${group.name}” and let's race to clear all 70 hands! Invite code: ${group.inviteCode}`,
             url: typeof window !== 'undefined' ? window.location.origin : '',
           }}
           onClose={() => setInviteOpen(false)}
@@ -142,13 +135,13 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
                 gap: 12,
                 padding: '10px 8px',
                 borderRadius: 14,
-                background: m.id === YOU_ID ? '#E4ECFF' : 'transparent',
+                background: m.id === YOU_ID ? 'var(--tint)' : 'transparent',
               }}
             >
               <div style={{ width: 26, textAlign: 'center', fontWeight: 900, fontSize: 16 }}>
                 {medals[i] ?? i + 1}
               </div>
-              <Avatar name={m.name} color={m.avatarColor} />
+              <Avatar avatar={m.avatar} size={36} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 15 }}>
                   {m.name}
@@ -175,28 +168,47 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
         <span className="pill" style={{ background: '#D5F1E9', color: '#23B196' }}>
           📣 The Feed
         </span>
-        <span className="count">{visibleFeed.length} mahjs</span>
+        <span className="count">{feed.length} mahjs</span>
       </div>
 
-      {visibleFeed.length === 0 ? (
+      {feed.length === 0 ? (
         <div className="empty">
           <div className="big">🀄🀅🀆</div>
           No mahjs called yet. Be the first to call “Mahjong!”
         </div>
       ) : (
-        visibleFeed.map((p) => <FeedCard key={p.id} post={p} onHide={() => onHidePost(p.id)} />)
+        feed.map((p) => (
+          <FeedCard
+            key={p.id}
+            post={p}
+            profile={profile}
+            onToggleLike={onToggleLike}
+            onAddComment={onAddComment}
+          />
+        ))
       )}
 
       <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 24 }}>
-        Demo group — group-mates are simulated on-device. Real shared groups arrive with accounts (v2).
+        Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).
       </p>
     </div>
   );
 }
 
-function FeedCard({ post, onHide }: { post: FeedPost; onHide: () => void }) {
+function FeedCard({
+  post,
+  profile,
+  onToggleLike,
+  onAddComment,
+}: {
+  post: FeedPost;
+  profile: Profile;
+  onToggleLike: (id: string, liked: boolean) => void;
+  onAddComment: (id: string, text: string) => void;
+}) {
   const [url, setUrl] = useState<string | null>(null);
-  const [menu, setMenu] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [draft, setDraft] = useState('');
 
   useEffect(() => {
     if (!post.photo) return;
@@ -205,45 +217,81 @@ function FeedCard({ post, onHide }: { post: FeedPost; onHide: () => void }) {
     return () => URL.revokeObjectURL(u);
   }, [post.photo]);
 
+  function submitComment() {
+    const text = draft.trim();
+    if (!text) return;
+    onAddComment(post.id, text);
+    setDraft('');
+    setShowComments(true);
+  }
+
   return (
     <div className="win">
-      {url && <img className="photo" src={url} alt="Win photo" />}
+      {url && <img className="photo" src={url} alt="Mahj photo" />}
       <div className="body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar name={post.memberName} color={post.avatarColor} size={34} />
+          <Avatar avatar={post.avatar} size={38} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 800, fontSize: 15 }}>{post.memberName}</div>
             <div className="when">{timeAgo(post.createdAt)}</div>
           </div>
-          <div style={{ position: 'relative' }}>
-            <button className="icon-btn" onClick={() => setMenu((v) => !v)} aria-label="Post options">
-              ⋯
-            </button>
-            {menu && (
-              <div
-                className="card"
-                style={{ position: 'absolute', right: 0, top: 38, padding: 6, zIndex: 5, minWidth: 130 }}
-              >
-                <button
-                  className="btn ghost"
-                  style={{ fontSize: 13, padding: '8px 10px' }}
-                  onClick={() => {
-                    onHide();
-                    setMenu(false);
-                  }}
-                >
-                  🚫 Report & hide
-                </button>
-              </div>
-            )}
-          </div>
+          <span className="mahj-tag">🀄 MAHJ</span>
         </div>
+
         {post.handLabel && (
-          <p className="note" style={{ fontWeight: 800, marginTop: 10 }}>
-            🀄 {post.handLabel}
+          <p className="note" style={{ fontWeight: 800, marginTop: 10, letterSpacing: '0.02em' }}>
+            {post.handLabel}
           </p>
         )}
         {post.note && <p className="note">{post.note}</p>}
+
+        {/* Like + comment bar */}
+        <div className="social-bar">
+          <button
+            className="social-btn"
+            data-on={post.likedByMe}
+            onClick={() => onToggleLike(post.id, !post.likedByMe)}
+          >
+            <span className="ic">{post.likedByMe ? '❤️' : '🤍'}</span>
+            {post.likes > 0 ? post.likes : ''} {post.likes === 1 ? 'Like' : 'Likes'}
+          </button>
+          <button className="social-btn" onClick={() => setShowComments((v) => !v)}>
+            <span className="ic">💬</span>
+            {post.comments.length > 0 ? post.comments.length : ''}{' '}
+            {post.comments.length === 1 ? 'Comment' : 'Comments'}
+          </button>
+        </div>
+
+        {showComments && (
+          <div className="comments">
+            {post.comments.map((c: Comment) => (
+              <div className="comment" key={c.id}>
+                <Avatar avatar={c.avatar} size={28} />
+                <div className="bubble">
+                  <span className="cauthor">{c.author}</span>
+                  {c.text}
+                </div>
+              </div>
+            ))}
+            <div className="comment-compose">
+              <Avatar avatar={profile.avatar} size={28} />
+              <input
+                className="field"
+                style={{ padding: '9px 12px', borderRadius: 999 }}
+                placeholder="Add a comment…"
+                value={draft}
+                maxLength={140}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') submitComment();
+                }}
+              />
+              <button className="post-btn" onClick={submitComment} disabled={!draft.trim()}>
+                Post
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

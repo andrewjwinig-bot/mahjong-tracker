@@ -1,32 +1,57 @@
-// Local social layer (prototype). Models a group, its members, and a shared
-// feed entirely on-device — seeded with a few demo group-mates so the feed +
-// leaderboard feel alive. This is the swap point for a real backend (v2):
-// replace these reads/writes with Supabase queries and the UI stays identical.
+// Local social layer (prototype). Models a group, its members, a shared feed
+// (with likes + comments), and the local user's profile — entirely on-device,
+// seeded with a few demo group-mates so the feed + leaderboard feel alive.
+// This is the swap point for a real backend (v2): replace these reads/writes
+// with Supabase queries + auth and the UI stays identical.
 
 import { getMeta, setMeta } from './storage';
-import { CATEGORY_THEMES } from './theme';
+import type { TileFace } from './tileArt';
+
+/** A mahjong-tile avatar: your initial on a tile, a favorite suit, or a joker. */
+export interface TileAvatar {
+  face: TileFace;
+  char?: string;
+  /** Motif color (letters/dragons) + the member's accent color. */
+  color: string;
+}
+
+export interface Profile {
+  name: string;
+  handle: string;
+  bio: string;
+  avatar: TileAvatar;
+}
 
 export interface GroupMember {
   id: string;
   name: string;
-  avatarColor: string;
+  avatar: TileAvatar;
   isYou: boolean;
   /** Seeded stats for demo members; for "you" these are computed live. */
   handsCleared: number;
   points: number;
 }
 
+export interface Comment {
+  id: string;
+  author: string;
+  avatar: TileAvatar;
+  text: string;
+  createdAt: number;
+}
+
 export interface FeedPost {
   id: string;
   memberId: string;
   memberName: string;
-  avatarColor: string;
+  avatar: TileAvatar;
   handLabel: string | null;
   note: string;
   photo: Blob | null;
   createdAt: number;
-  /** Local moderation: hidden posts are kept but not shown. */
-  hidden?: boolean;
+  likes: number;
+  likedByMe: boolean;
+  comments: Comment[];
 }
 
 export interface Group {
@@ -35,20 +60,42 @@ export interface Group {
   inviteCode: string;
 }
 
-const K_SEEDED = 'social.seeded';
+export interface SocialState {
+  group: Group;
+  members: GroupMember[];
+  feed: FeedPost[];
+  profile: Profile;
+}
+
+const K_SEEDED = 'social.seeded.v2';
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
-const K_FEED = 'social.feed';
-const K_YOU_NAME = 'social.youName';
+const K_FEED = 'social.feed.v2';
+const K_PROFILE = 'social.profile';
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
-function color(i: number) {
-  return CATEGORY_THEMES[i % CATEGORY_THEMES.length].accent;
+export const YOU_ID = 'you';
+
+/** First letter of a name, for initial-style tile avatars. */
+export function initialOf(name: string): string {
+  return (name.trim().charAt(0) || '?').toUpperCase();
 }
 
-export const YOU_ID = 'you';
+export const DEFAULT_PROFILE: Profile = {
+  name: 'You',
+  handle: 'you',
+  bio: '',
+  avatar: { face: 'letter', char: 'Y', color: '#0EAD96' },
+};
+
+const DEMO_AVATARS: Record<string, TileAvatar> = {
+  m_sandra: { face: 'flower', color: '#E8455F' },
+  m_bev: { face: 'dragon', char: '發', color: '#1FA85B' },
+  m_marsha: { face: 'bam', color: '#1FA85B' },
+  m_lois: { face: 'dot', color: '#2F80ED' },
+};
 
 async function seedIfNeeded(): Promise<void> {
   if (await getMeta<boolean>(K_SEEDED, false)) return;
@@ -56,34 +103,43 @@ async function seedIfNeeded(): Promise<void> {
 
   const group: Group = { id: 'grp_demo', name: 'Tuesday Game', inviteCode: 'MAHJ-2026' };
 
+  const profile = await getMeta<Profile>(K_PROFILE, DEFAULT_PROFILE);
+
   const members: GroupMember[] = [
-    { id: YOU_ID, name: 'You', avatarColor: color(0), isYou: true, handsCleared: 0, points: 0 },
-    { id: 'm_sandra', name: 'Sandra', avatarColor: color(3), isYou: false, handsCleared: 31, points: 845 },
-    { id: 'm_bev', name: 'Bev', avatarColor: color(1), isYou: false, handsCleared: 27, points: 720 },
-    { id: 'm_marsha', name: 'Marsha', avatarColor: color(4), isYou: false, handsCleared: 24, points: 610 },
-    { id: 'm_lois', name: 'Lois', avatarColor: color(2), isYou: false, handsCleared: 19, points: 505 },
+    { id: YOU_ID, name: profile.name, avatar: profile.avatar, isYou: true, handsCleared: 0, points: 0 },
+    { id: 'm_sandra', name: 'Sandra', avatar: DEMO_AVATARS.m_sandra, isYou: false, handsCleared: 31, points: 845 },
+    { id: 'm_bev', name: 'Bev', avatar: DEMO_AVATARS.m_bev, isYou: false, handsCleared: 27, points: 720 },
+    { id: 'm_marsha', name: 'Marsha', avatar: DEMO_AVATARS.m_marsha, isYou: false, handsCleared: 24, points: 610 },
+    { id: 'm_lois', name: 'Lois', avatar: DEMO_AVATARS.m_lois, isYou: false, handsCleared: 19, points: 505 },
   ];
 
   const feed: FeedPost[] = [
     {
-      id: 'f1', memberId: 'm_sandra', memberName: 'Sandra', avatarColor: color(3),
+      id: 'f1', memberId: 'm_sandra', memberName: 'Sandra', avatar: DEMO_AVATARS.m_sandra,
       handLabel: 'FFF 2026 222 6666', note: 'Cleared another 2026 — only 4 to go!', photo: null,
-      createdAt: now - 2 * HOUR,
+      createdAt: now - 2 * HOUR, likes: 5, likedByMe: false,
+      comments: [
+        { id: 'c1', author: 'Bev', avatar: DEMO_AVATARS.m_bev, text: 'Get it girl! 🔥', createdAt: now - 1.5 * HOUR },
+        { id: 'c2', author: 'Lois', avatar: DEMO_AVATARS.m_lois, text: 'Teach me your ways', createdAt: now - 1 * HOUR },
+      ],
     },
     {
-      id: 'f2', memberId: 'm_bev', memberName: 'Bev', avatarColor: color(1),
+      id: 'f2', memberId: 'm_bev', memberName: 'Bev', avatar: DEMO_AVATARS.m_bev,
       handLabel: '11 333 55 777 9999', note: 'Singles night came through 🎉', photo: null,
-      createdAt: now - 6 * HOUR,
+      createdAt: now - 6 * HOUR, likes: 3, likedByMe: false,
+      comments: [
+        { id: 'c3', author: 'Marsha', avatar: DEMO_AVATARS.m_marsha, text: 'Big points!! 👏', createdAt: now - 5 * HOUR },
+      ],
     },
     {
-      id: 'f3', memberId: 'm_marsha', memberName: 'Marsha', avatarColor: color(4),
+      id: 'f3', memberId: 'm_marsha', memberName: 'Marsha', avatar: DEMO_AVATARS.m_marsha,
       handLabel: 'NNNN EEE WWW SSSS', note: '', photo: null,
-      createdAt: now - 1 * DAY - 3 * HOUR,
+      createdAt: now - 1 * DAY - 3 * HOUR, likes: 2, likedByMe: false, comments: [],
     },
     {
-      id: 'f4', memberId: 'm_lois', memberName: 'Lois', avatarColor: color(2),
+      id: 'f4', memberId: 'm_lois', memberName: 'Lois', avatar: DEMO_AVATARS.m_lois,
       handLabel: '333 666 6666 9999', note: 'Finally got 369!', photo: null,
-      createdAt: now - 2 * DAY,
+      createdAt: now - 2 * DAY, likes: 7, likedByMe: false, comments: [],
     },
   ];
 
@@ -95,23 +151,20 @@ async function seedIfNeeded(): Promise<void> {
   ]);
 }
 
-export interface SocialState {
-  group: Group;
-  members: GroupMember[];
-  feed: FeedPost[];
-  youName: string;
-}
-
 export async function loadSocial(): Promise<SocialState> {
   await seedIfNeeded();
-  const [group, members, feed, youName] = await Promise.all([
+  const [group, members, feed, profile] = await Promise.all([
     getMeta<Group>(K_GROUP, { id: 'grp_demo', name: 'Tuesday Game', inviteCode: 'MAHJ-2026' }),
     getMeta<GroupMember[]>(K_MEMBERS, []),
     getMeta<FeedPost[]>(K_FEED, []),
-    getMeta<string>(K_YOU_NAME, 'You'),
+    getMeta<Profile>(K_PROFILE, DEFAULT_PROFILE),
   ]);
   feed.sort((a, b) => b.createdAt - a.createdAt);
-  return { group, members, feed, youName };
+  return { group, members, feed, profile };
+}
+
+export async function saveProfile(profile: Profile): Promise<void> {
+  await setMeta(K_PROFILE, profile);
 }
 
 export async function addFeedPost(post: FeedPost): Promise<void> {
@@ -120,13 +173,19 @@ export async function addFeedPost(post: FeedPost): Promise<void> {
   await setMeta(K_FEED, feed.slice(0, 200));
 }
 
-export async function setFeedHidden(id: string, hidden: boolean): Promise<void> {
+export async function toggleLike(id: string, liked: boolean): Promise<void> {
   const feed = await getMeta<FeedPost[]>(K_FEED, []);
   const p = feed.find((x) => x.id === id);
-  if (p) p.hidden = hidden;
+  if (p) {
+    p.likedByMe = liked;
+    p.likes = Math.max(0, p.likes + (liked ? 1 : -1));
+  }
   await setMeta(K_FEED, feed);
 }
 
-export async function setYouName(name: string): Promise<void> {
-  await setMeta(K_YOU_NAME, name || 'You');
+export async function addComment(id: string, comment: Comment): Promise<void> {
+  const feed = await getMeta<FeedPost[]>(K_FEED, []);
+  const p = feed.find((x) => x.id === id);
+  if (p) p.comments.push(comment);
+  await setMeta(K_FEED, feed);
 }

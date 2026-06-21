@@ -16,7 +16,7 @@ interface Props {
 
 export default function CardTab({ card, handCounts, onBump }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
-  const fireConfetti = useConfetti();
+  const { celebrate } = useConfetti();
 
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
 
@@ -42,12 +42,11 @@ export default function CardTab({ card, handCounts, onBump }: Props) {
 
   const pct = Math.round((stats.cleared / card.hands.length) * 100);
 
-  function gotIt(h: Hand, e: React.MouseEvent<HTMLButtonElement>) {
+  function gotIt(h: Hand) {
     const was = countOf(h);
-    const r = e.currentTarget.getBoundingClientRect();
     onBump(h.id, +1);
-    // First clear of this hand → celebrate with a MAHJ tile burst.
-    if (was === 0) fireConfetti({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+    // First clear of this hand → full-screen MAHJ celebration.
+    if (was === 0) celebrate({ title: 'I Got Mahj! 🎉', subtitle: h.notation });
   }
 
   return (
@@ -114,7 +113,7 @@ export default function CardTab({ card, handCounts, onBump }: Props) {
                   <button
                     className="check"
                     data-checked={count > 0}
-                    onClick={(e) => gotIt(h, e)}
+                    onClick={() => gotIt(h)}
                     aria-label={`Mark "${h.notation}" as won`}
                   >
                     {count > 0 ? '✓' : ''}
@@ -122,10 +121,10 @@ export default function CardTab({ card, handCounts, onBump }: Props) {
                   </button>
 
                   <div className="notation">
-                    {colorNotation(h.notation).map((g, i) => (
-                      <span key={i} style={{ color: g.color }}>
+                    {colorNotation(h.notation).map((g, i, arr) => (
+                      <span key={i} className={g.cls}>
                         {g.text}
-                        {i < colorNotation(h.notation).length - 1 ? ' ' : ''}
+                        {i < arr.length - 1 ? ' ' : ''}
                       </span>
                     ))}
                   </div>
