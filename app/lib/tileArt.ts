@@ -30,6 +30,35 @@ function dotMotif(): string {
     <circle cx="24" cy="31" r="4.5" fill="${DOT}"/>`;
 }
 
+// A single ornate "circle" dot (concentric ring + core), like the 1-dot tile.
+function ringDot(cx: number, cy: number, r: number, color: string): string {
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${(r * 0.42).toFixed(1)}"/>
+    <circle cx="${cx}" cy="${cy}" r="${(r * 0.34).toFixed(1)}" fill="${color}"/>`;
+}
+
+// An n-dot ("bing") tile: 1–9 circles laid out in canonical arrangements. Used
+// for festive leaderboard ranks (1st = one dot, 2nd = two dots, …).
+function dotsMotif(count: number, color = DOT): string {
+  const n = Math.max(1, Math.min(9, Math.round(count)));
+  if (n === 1) return ringDot(24, 31, 13, color);
+
+  // Three-column / three-row grid the smaller dots snap to.
+  const C = { L: 14, M: 24, R: 34 };
+  const R = { T: 20, M: 31, B: 42 };
+  const layouts: Record<number, [number, number][]> = {
+    2: [[C.M, R.T], [C.M, R.B]],
+    3: [[C.L, R.T], [C.M, R.M], [C.R, R.B]],
+    4: [[C.L, R.T], [C.R, R.T], [C.L, R.B], [C.R, R.B]],
+    5: [[C.L, R.T], [C.R, R.T], [C.M, R.M], [C.L, R.B], [C.R, R.B]],
+    6: [[C.L, R.T], [C.R, R.T], [C.L, R.M], [C.R, R.M], [C.L, R.B], [C.R, R.B]],
+    7: [[C.L, R.T], [C.M, R.T], [C.R, R.T], [C.M, R.M], [C.L, R.B], [C.M, R.B], [C.R, R.B]],
+    8: [[C.L, R.T], [C.R, R.T], [C.L, R.M], [C.R, R.M], [C.L, R.B], [C.R, R.B], [C.M, 25.5], [C.M, 36.5]],
+    9: [[C.L, R.T], [C.M, R.T], [C.R, R.T], [C.L, R.M], [C.M, R.M], [C.R, R.M], [C.L, R.B], [C.M, R.B], [C.R, R.B]],
+  };
+  const r = n <= 4 ? 5 : 4.2;
+  return layouts[n].map(([x, y]) => ringDot(x, y, r, color)).join('');
+}
+
 function bamMotif(): string {
   const stick = (x: number) =>
     `<rect x="${x - 3}" y="17" width="6" height="28" rx="3" fill="${BAM}"/>
@@ -73,10 +102,10 @@ function charMotif(char: string, color: string, size = 30): string {
     font-family="${color === CRACK || color === NAVY ? CJK : `var(--font-display), ${CJK}`}">${char}</text>`;
 }
 
-function motifFor(face: TileFace, char?: string, color?: string): string {
+function motifFor(face: TileFace, char?: string, color?: string, count?: number): string {
   switch (face) {
     case 'dot':
-      return dotMotif();
+      return count != null ? dotsMotif(count, color) : dotMotif();
     case 'bam':
       return bamMotif();
     case 'flower':
@@ -94,13 +123,16 @@ function motifFor(face: TileFace, char?: string, color?: string): string {
   }
 }
 
-export function tileSVG(face: TileFace, opts: { char?: string; color?: string } = {}): string {
+export function tileSVG(
+  face: TileFace,
+  opts: { char?: string; color?: string; count?: number } = {},
+): string {
   return `<svg viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg" class="mj-svg">
     <rect class="mj-edge" x="2" y="4.5" width="44" height="57.5" rx="11"/>
     <rect class="mj-body" x="2" y="2" width="44" height="58" rx="11"/>
     <ellipse cx="24" cy="11" rx="19" ry="8.5" fill="#ffffff" fill-opacity="0.22"/>
     <ellipse cx="24" cy="57" rx="18" ry="5" fill="#000000" fill-opacity="0.05"/>
-    ${motifFor(face, opts.char, opts.color)}
+    ${motifFor(face, opts.char, opts.color, opts.count)}
   </svg>`;
 }
 

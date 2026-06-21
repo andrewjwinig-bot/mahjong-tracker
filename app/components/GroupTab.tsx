@@ -92,7 +92,9 @@ export default function GroupTab({
     return withYou.sort((a, b) => b.handsCleared - a.handsCleared || b.points - a.points);
   }, [members, profile, youStats]);
 
-  const medals = ['🥇', '🥈', '🥉'];
+  // Podium tint for the dot-tile ranks: gold / silver / bronze, then standard
+  // dot-blue for everyone below the medals.
+  const rankColor = (i: number) => ['#E0A12B', '#8FA1B6', '#C77B43'][i] ?? '#2F80ED';
 
   return (
     <div className="screen">
@@ -164,8 +166,12 @@ export default function GroupTab({
               }}
               style={{ background: m.id === YOU_ID ? 'var(--tint)' : 'transparent' }}
             >
-              <div style={{ width: 26, textAlign: 'center', fontWeight: 900, fontSize: 16 }}>
-                {medals[i] ?? i + 1}
+              <div style={{ width: 34, display: 'grid', placeItems: 'center' }} aria-label={`Rank ${i + 1}`}>
+                {i < 9 ? (
+                  <Tile face="dot" count={i + 1} color={rankColor(i)} size={30} />
+                ) : (
+                  <span style={{ fontWeight: 900, fontSize: 16 }}>{i + 1}</span>
+                )}
               </div>
               <Avatar avatar={m.avatar} size={36} />
               <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
