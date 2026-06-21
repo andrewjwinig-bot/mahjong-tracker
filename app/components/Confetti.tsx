@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { tileSVG, CONFETTI_FACES } from '../lib/tileArt';
+import { playMahjChime, buzz } from '../lib/sound';
 
 export interface CelebrateOpts {
   title?: string;
@@ -16,6 +17,11 @@ export interface CelebrateOpts {
   onShare?: () => void;
   /** Surface a "Post to feed" action (when not already posted). */
   onPost?: () => void;
+  /** Override the boom emoji + hype line. */
+  emoji?: string;
+  hype?: string;
+  /** Bigger, longer confetti storm (section / card-complete moments). */
+  big?: boolean;
 }
 
 const HYPE = [
@@ -144,11 +150,26 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
   const celebrate = useCallback(
     (opts?: CelebrateOpts) => {
       setCelebration(opts ?? { title: 'I Got Mahj! 🎉' });
+      buzz();
       if (reduced()) return;
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight * 0.42;
-      spawnBurst(cx, cy, 40, Math.min(window.innerWidth, 460));
-      spawnRain(26);
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      if (opts?.big) {
+        // Major moment — a full storm: staggered bursts + heavy rain + fanfare.
+        for (let k = 0; k < 4; k++) {
+          const x = W * (0.2 + Math.random() * 0.6);
+          const y = H * (0.25 + Math.random() * 0.35);
+          setTimeout(() => spawnBurst(x, y, 38, W), k * 320);
+        }
+        spawnRain(70);
+        playMahjChime();
+        setTimeout(playMahjChime, 340);
+        setTimeout(playMahjChime, 680);
+      } else {
+        spawnBurst(W / 2, H * 0.42, 40, Math.min(W, 460));
+        spawnRain(26);
+        playMahjChime();
+      }
     },
     [spawnBurst, spawnRain],
   );
@@ -168,8 +189,9 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
   const [posted, setPosted] = useState(!!opts.posted);
   // Pick a hype line once per celebration; upgrade to a milestone when earned.
   const hype = useMemo(() => {
+    if (opts.hype) return opts.hype;
     if (opts.cleared != null && opts.total != null) {
-      if (opts.cleared >= opts.total) return 'YOU CLEARED THE CARD!! 🎉🀄';
+      if (opts.cleared >= opts.total) return 'ALL 70 HANDS — LEGENDARY 👑';
       if (opts.cleared > 0 && opts.cleared % 10 === 0) return `${opts.cleared} hands down! 🙌`;
     }
     return HYPE[Math.floor(Math.random() * HYPE.length)];
@@ -178,8 +200,8 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
 
   return (
     <div className="celebrate-scrim" onClick={onClose}>
-      <div className="celebrate-card" onClick={(e) => e.stopPropagation()}>
-        <div className="boom">🀄</div>
+      <div className={`celebrate-card${opts.big ? ' big' : ''}`} onClick={(e) => e.stopPropagation()}>
+        <div className="boom">{opts.emoji ?? '🀄'}</div>
         <p className="cele-hype">{hype}</p>
         <h2>{opts.title ?? 'I Got Mahj! 🎉'}</h2>
         {opts.handLabel && <p className="cele-hand">{opts.handLabel}</p>}
