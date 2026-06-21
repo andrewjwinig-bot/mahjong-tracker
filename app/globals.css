@@ -1389,6 +1389,20 @@ label.lbl {
   opacity: 0.9;
 }
 
+/* ---- Settings sections --------------------------------------------------- */
+
+.set-section {
+  margin: 22px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--hairline);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
 /* ---- Avatar + theme pickers (settings) ---------------------------------- */
 
 .avatar-grid {
