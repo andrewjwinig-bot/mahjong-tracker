@@ -50,8 +50,70 @@ function circle(c, cx, cy, r, col) {
 const JADE_TOP = [18, 184, 158]; // brand jade, lighter
 const JADE_BOT = [11, 124, 107]; // deeper jade
 const IVORY = [253, 251, 245, 255]; // bone tile
-const CORAL = [232, 69, 95, 255]; // dot motif
 const SHEEN = [255, 255, 255, 46]; // soft top highlight
+// Joker star gradient stops + outline.
+const CORAL = [232, 69, 95];
+const GOLD = [229, 154, 43];
+const VIOLET = [124, 92, 224];
+const NAVY = [44, 58, 87];
+
+function lerp(a, b, t) {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
+  ];
+}
+
+// 5-point star vertices (point up), alternating outer/inner radius.
+function starPoints(cx, cy, rOuter, rInner) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = (Math.PI / 5) * i - Math.PI / 2;
+    const r = i % 2 === 0 ? rOuter : rInner;
+    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+  }
+  return pts;
+}
+
+function inPoly(px_, py_, pts) {
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const xi = pts[i][0];
+    const yi = pts[i][1];
+    const xj = pts[j][0];
+    const yj = pts[j][1];
+    if (yi > py_ !== yj > py_ && px_ < ((xj - xi) * (py_ - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+// Anti-aliased polygon fill; colFn(x, y) -> [r, g, b].
+function fillPoly(c, pts, colFn) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of pts) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  for (let y = Math.floor(minY); y <= Math.ceil(maxY); y++) {
+    for (let x = Math.floor(minX); x <= Math.ceil(maxX); x++) {
+      let cov = 0;
+      for (let sy = 0; sy < 3; sy++) {
+        for (let sx = 0; sx < 3; sx++) {
+          if (inPoly(x + (sx + 0.5) / 3, y + (sy + 0.5) / 3, pts)) cov++;
+        }
+      }
+      if (cov === 0) continue;
+      const col = colFn(x, y);
+      px(c, x, y, [col[0], col[1], col[2], Math.round((cov / 9) * 255)]);
+    }
+  }
+}
 
 // Vertical gradient background fill.
 function gradientV(c, top, bot) {
@@ -87,11 +149,20 @@ function draw(size, { maskable }) {
   // soft top sheen on the tile
   roundRect(c, tx, ty, tw, Math.round(tw * 0.42), r, SHEEN);
 
-  // centered "dot" suit motif: coral ring + center pip
-  const mx = Math.round(size / 2);
-  const my = Math.round(ty + tw * 0.5);
-  ring(c, mx, my, Math.round(tw * 0.3), Math.round(tw * 0.19), CORAL, IVORY);
-  circle(c, mx, my, Math.round(tw * 0.1), CORAL);
+  // centered joker star: navy outline + coral→gold→violet gradient
+  const mx = size / 2;
+  const my = ty + tw * 0.5;
+  const R = tw * 0.37;
+  fillPoly(c, starPoints(mx, my, R, R * 0.42), () => NAVY);
+
+  const sR = R * 0.9;
+  const top = my - sR;
+  const grad = (x, y) => {
+    let t = (y - top) / (sR * 2);
+    t = Math.max(0, Math.min(1, t));
+    return t < 0.5 ? lerp(CORAL, GOLD, t * 2) : lerp(GOLD, VIOLET, (t - 0.5) * 2);
+  };
+  fillPoly(c, starPoints(mx, my, sR, sR * 0.42), grad);
 
   return c;
 }
