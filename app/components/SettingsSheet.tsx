@@ -247,18 +247,21 @@ export default function SettingsSheet({
               className="theme-card"
               data-active={theme === t.id}
               data-locked={locked}
+              style={{ background: `linear-gradient(160deg, ${t.swatch.page}, ${t.swatch.brand}30)` }}
               onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
             >
               {theme === t.id && <span className="tick">✓</span>}
               {locked && <span className="theme-lock">🔒</span>}
-              <span className="swatch">
-                <i style={{ background: t.swatch.brand }} />
-                <i style={{ background: t.swatch.green }} />
-                <i style={{ background: t.swatch.accent }} />
-                <i style={{ background: t.swatch.page, boxShadow: 'inset 0 0 0 1.5px rgba(0,0,0,0.08)' }} />
+              <Tile face={t.tile.face} char={t.tile.char} color={t.tile.color} size={52} />
+              <span className="tname" style={{ color: t.dark ? '#fff' : '#243240' }}>
+                {t.name}
               </span>
-              <span className="tname">{t.name}</span>
-              <span className="ttag">{t.tagline}</span>
+              <span
+                className="ttag"
+                style={{ color: t.dark ? 'rgba(255,255,255,0.72)' : undefined }}
+              >
+                {t.tagline}
+              </span>
             </button>
             );
           })}
