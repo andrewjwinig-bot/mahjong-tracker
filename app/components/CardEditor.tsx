@@ -1,8 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MahjongCard } from '../lib/types';
-import { buildCard, saveCustomCard, rowsFromCard, type HandRow } from '../lib/customCard';
+import {
+  buildCard,
+  saveCustomCard,
+  rowsFromCard,
+  loadCardPhoto,
+  saveCardPhoto,
+  clearCardPhoto,
+  type HandRow,
+} from '../lib/customCard';
+import { downscaleImage } from '../lib/image';
 
 export default function CardEditor({
   current,
@@ -21,6 +30,48 @@ export default function CardEditor({
       ? rowsFromCard(current)
       : [{ category: '', notation: '', points: 25, concealed: false }],
   );
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let url: string | null = null;
+    void loadCardPhoto().then((blob) => {
+      if (blob) {
+        url = URL.createObjectURL(blob);
+        setPhotoUrl(url);
+      }
+    });
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  async function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoBusy(true);
+    try {
+      const blob = await downscaleImage(file, 1600, 0.85);
+      await saveCardPhoto(blob);
+      setPhotoUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(blob);
+      });
+    } finally {
+      setPhotoBusy(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  async function removePhoto() {
+    await clearCardPhoto();
+    setPhotoUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }
 
   function update(i: number, patch: Partial<HandRow>) {
     setRows((r) => r.map((row, n) => (n === i ? { ...row, ...patch } : row)));
@@ -60,6 +111,28 @@ export default function CardEditor({
         Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
         if it must be concealed. Group hands by giving them the same category name.
       </p>
+
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+      {photoUrl ? (
+        <div className="card-photo">
+          <button className="card-photo-thumb" onClick={() => setLightbox(true)} aria-label="View card photo">
+            <img src={photoUrl} alt="Your card reference" />
+          </button>
+          <div className="card-photo-actions">
+            <div className="card-photo-label">📷 Reference photo</div>
+            <button className="btn ghost" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
+              {photoBusy ? 'Saving…' : 'Replace'}
+            </button>
+            <button className="btn ghost" onClick={() => void removePhoto()}>
+              Remove
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="btn ghost" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
+          {photoBusy ? 'Saving…' : '📷 Add a photo of your card to copy from'}
+        </button>
+      )}
 
       <div className="editor-year">
         <label className="lbl">Card year</label>
@@ -120,6 +193,7 @@ export default function CardEditor({
         className="btn ghost"
         style={{ marginTop: 10 }}
         onClick={() => {
+          void clearCardPhoto();
           onUseSample();
           onClose();
         }}
@@ -131,6 +205,15 @@ export default function CardEditor({
         Entering your own card keeps it private to your device and ensures the app never ships a copy
         of any official card.
       </p>
+
+      {lightbox && photoUrl && (
+        <div className="photo-lightbox" onClick={() => setLightbox(false)}>
+          <img src={photoUrl} alt="Your card reference" />
+          <button className="lightbox-close" aria-label="Close photo">
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }
