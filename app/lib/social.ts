@@ -167,6 +167,12 @@ export async function saveProfile(profile: Profile): Promise<void> {
   await setMeta(K_PROFILE, profile);
 }
 
+export async function addMember(member: GroupMember): Promise<void> {
+  const members = await getMeta<GroupMember[]>(K_MEMBERS, []);
+  members.push(member);
+  await setMeta(K_MEMBERS, members);
+}
+
 export async function addFeedPost(post: FeedPost): Promise<void> {
   const feed = await getMeta<FeedPost[]>(K_FEED, []);
   feed.unshift(post);

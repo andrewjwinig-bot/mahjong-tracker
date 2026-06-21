@@ -153,6 +153,22 @@ export default function AppShell() {
     });
   }, []);
 
+  const addFriend = useCallback((name: string, avatar: social.TileAvatar) => {
+    setSocialState((prev) => {
+      if (!prev) return prev;
+      const member: social.GroupMember = {
+        id: `fr_${Date.now()}`,
+        name,
+        avatar,
+        isYou: false,
+        handsCleared: 0,
+        points: 0,
+      };
+      void social.addMember(member);
+      return { ...prev, members: [...prev.members, member] };
+    });
+  }, []);
+
   const saveProfile = useCallback((profile: social.Profile) => {
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -222,6 +238,7 @@ export default function AppShell() {
                 youStats={youStats}
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
+                onAddFriend={addFriend}
               />
             )}
             {tab === 'tables' && socialState && <TablesTab profile={socialState.profile} />}

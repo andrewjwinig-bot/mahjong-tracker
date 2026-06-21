@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { Comment, FeedPost, GroupMember, Profile } from '../lib/social';
-import { YOU_ID } from '../lib/social';
+import type { Comment, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
+import { YOU_ID, initialOf } from '../lib/social';
 import { TOTAL_HANDS } from '../lib/cardData';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import TileStrip from './TileStrip';
 import Avatar from './Avatar';
+import Tile from './Tile';
 
 interface Props {
   members: GroupMember[];
@@ -17,6 +18,7 @@ interface Props {
   youStats: { handsCleared: number; points: number };
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
+  onAddFriend: (name: string, avatar: TileAvatar) => void;
 }
 
 function timeAgo(ts: number): string {
@@ -37,6 +39,7 @@ export default function GroupTab({
   youStats,
   onToggleLike,
   onAddComment,
+  onAddFriend,
 }: Props) {
   // Track a feed view once per mount (core-loop metric).
   useEffect(() => {
@@ -45,6 +48,7 @@ export default function GroupTab({
   }, []);
 
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
 
   // Merge live "you" identity + stats into the leaderboard, then rank.
   const ranked = useMemo(() => {
@@ -72,9 +76,24 @@ export default function GroupTab({
         <TileStrip count={7} />
       </header>
 
-      <button className="btn green" style={{ marginTop: 14 }} onClick={() => setInviteOpen(true)}>
-        ↗ Invite Friends
-      </button>
+      <div className="row" style={{ marginTop: 14 }}>
+        <button className="btn" onClick={() => setAddOpen(true)}>
+          ＋ Add Friend
+        </button>
+        <button className="btn green" onClick={() => setInviteOpen(true)}>
+          ↗ Invite
+        </button>
+      </div>
+
+      {addOpen && (
+        <AddFriendSheet
+          onAdd={(name, avatar) => {
+            onAddFriend(name, avatar);
+            setAddOpen(false);
+          }}
+          onClose={() => setAddOpen(false)}
+        />
+      )}
 
       {inviteOpen && (
         <ShareModal
@@ -264,6 +283,140 @@ function FeedCard({
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Add friend ---------------------------------------------------------- */
+
+const FRIEND_TILES: TileAvatar[] = [
+  { face: 'crack', color: '#E8455F' },
+  { face: 'bam', color: '#1FA85B' },
+  { face: 'dot', color: '#2F80ED' },
+  { face: 'flower', color: '#E8455F' },
+  { face: 'dragon', char: '發', color: '#1FA85B' },
+  { face: 'joker', color: '#7C5CE0' },
+  { face: 'wind', char: '東', color: '#2C3A57' },
+];
+
+interface NavWithContacts extends Navigator {
+  contacts?: { select: (props: string[], opts?: { multiple?: boolean }) => Promise<{ tel?: string[] }[]> };
+}
+
+async function inviteContacts() {
+  void track('invite_contacts_opened');
+  const url = typeof window !== 'undefined' ? window.location.origin : '';
+  const text = `Come track mahjong with me on Mahjong Tracker — let's clear all 70 hands! 🀄 ${url}`;
+  const nav = navigator as NavWithContacts;
+  // Android Chrome: real contact picker → prefill an SMS invite.
+  if (nav.contacts?.select) {
+    try {
+      const picked = await nav.contacts.select(['tel'], { multiple: true });
+      const nums = picked.flatMap((c) => c.tel ?? []).join(',');
+      if (nums) {
+        window.location.href = `sms:${nums}?&body=${encodeURIComponent(text)}`;
+        return;
+      }
+    } catch {
+      /* cancelled / unsupported — fall through */
+    }
+  }
+  // Everywhere else (incl. iOS): native share sheet → pick contacts there.
+  if (navigator.share) {
+    try {
+      await navigator.share({ text, url });
+      return;
+    } catch {
+      /* cancelled */
+      return;
+    }
+  }
+  window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
+}
+
+function AddFriendSheet({
+  onAdd,
+  onClose,
+}: {
+  onAdd: (name: string, avatar: TileAvatar) => void;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [idx, setIdx] = useState(-1); // -1 = initial-letter tile
+
+  const avatar: TileAvatar =
+    idx === -1 ? { face: 'letter', char: initialOf(name || '?'), color: '#0EAD96' } : FRIEND_TILES[idx];
+
+  function add() {
+    const n = name.trim();
+    if (!n) return;
+    onAdd(n, idx === -1 ? { ...avatar, char: initialOf(n) } : avatar);
+  }
+
+  return (
+    <div className="modal-scrim" onClick={onClose}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="grab" />
+        <h2>Find Friends 👀</h2>
+        <p className="sheet-sub">Invite your contacts, or add someone to your board.</p>
+
+        <button className="btn" onClick={inviteContacts}>
+          📇 Invite From Contacts
+        </button>
+        <p
+          style={{
+            textAlign: 'center',
+            color: 'var(--muted)',
+            fontSize: 11.5,
+            fontWeight: 700,
+            margin: '8px 0 4px',
+          }}
+        >
+          Finding friends who already have accounts unlocks with sign-in (coming soon).
+        </p>
+
+        <div
+          style={{
+            height: 1.5,
+            background: 'var(--hairline)',
+            margin: '14px 0 16px',
+          }}
+        />
+
+        <label className="lbl">Add by name</label>
+        <input
+          className="field"
+          value={name}
+          autoFocus
+          maxLength={24}
+          placeholder="e.g. Aunt Carol"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && add()}
+        />
+
+        <label className="lbl" style={{ marginTop: 14 }}>
+          Their tile
+        </label>
+        <div className="avatar-grid">
+          <button className="avatar-opt" data-active={idx === -1} onClick={() => setIdx(-1)}>
+            <Tile face="letter" char={initialOf(name || '?')} color="#0EAD96" size={42} />
+          </button>
+          {FRIEND_TILES.map((t, i) => (
+            <button key={i} className="avatar-opt" data-active={idx === i} onClick={() => setIdx(i)}>
+              <Tile face={t.face} char={t.char} color={t.color} size={42} />
+            </button>
+          ))}
+        </div>
+
+        <div className="row" style={{ marginTop: 16 }}>
+          <button className="btn ghost" onClick={onClose}>
+            Cancel
+          </button>
+          <button className="btn" onClick={add} disabled={!name.trim()}>
+            Add Friend
+          </button>
+        </div>
       </div>
     </div>
   );
