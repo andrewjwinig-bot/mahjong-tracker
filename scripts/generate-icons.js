@@ -57,25 +57,6 @@ const GOLD = [229, 154, 43];
 const VIOLET = [124, 92, 224];
 const NAVY = [44, 58, 87];
 
-function lerp(a, b, t) {
-  return [
-    Math.round(a[0] + (b[0] - a[0]) * t),
-    Math.round(a[1] + (b[1] - a[1]) * t),
-    Math.round(a[2] + (b[2] - a[2]) * t),
-  ];
-}
-
-// 5-point star vertices (point up), alternating outer/inner radius.
-function starPoints(cx, cy, rOuter, rInner) {
-  const pts = [];
-  for (let i = 0; i < 10; i++) {
-    const a = (Math.PI / 5) * i - Math.PI / 2;
-    const r = i % 2 === 0 ? rOuter : rInner;
-    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
-  }
-  return pts;
-}
-
 function inPoly(px_, py_, pts) {
   let inside = false;
   for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
@@ -148,12 +129,6 @@ function gradientV(c, top, bot) {
     ];
     for (let x = 0; x < c.size; x++) px(c, x, y, col);
   }
-}
-
-// A ring = filled disk minus an inner disk of the tile color.
-function ring(c, cx, cy, rOuter, rInner, col, fill) {
-  circle(c, cx, cy, rOuter, col);
-  circle(c, cx, cy, rInner, fill);
 }
 
 function draw(size, { maskable }) {
