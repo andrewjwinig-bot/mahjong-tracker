@@ -10,6 +10,7 @@ import CardTab from './CardTab';
 import WinsTab from './WinsTab';
 import GroupTab from './GroupTab';
 import LearnTab from './LearnTab';
+import { ConfettiProvider } from './Confetti';
 
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('card');
@@ -61,13 +62,6 @@ export default function AppShell() {
     });
   }, []);
 
-  const saveNotation = useCallback((handId: string, notation: string) => {
-    setHandNotes((prev) => {
-      void db.setHandNote(handId, notation);
-      return { ...prev, [handId]: notation };
-    });
-  }, []);
-
   const addWin = useCallback((win: Win) => {
     setWins((prev) => [win, ...prev]);
     void db.saveWin(win);
@@ -85,7 +79,7 @@ export default function AppShell() {
         id: crypto.randomUUID(),
         memberId: social.YOU_ID,
         memberName: prev.youName,
-        avatarColor: prev.members.find((m) => m.isYou)?.avatarColor ?? '#2F6BFF',
+        avatarColor: prev.members.find((m) => m.isYou)?.avatarColor ?? '#E8455F',
         handLabel: win.handLabel,
         note: win.note,
         photo: win.photo,
@@ -105,26 +99,21 @@ export default function AppShell() {
   }, []);
 
   return (
-    <div className="app">
-      {!loaded ? (
-        <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
-          <div className="empty">
-            <div className="big">🀄</div>
-            Loading your card…
+    <ConfettiProvider>
+      <div className="app">
+        {!loaded ? (
+          <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
+            <div className="empty">
+              <div className="big">🀄🀫🀐</div>
+              Stacking the wall…
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {tab === 'card' && (
-            <CardTab
-              card={SAMPLE_CARD}
-              handCounts={handCounts}
-              handNotes={handNotes}
-              onBump={bumpHand}
-              onSaveNotation={saveNotation}
-            />
-          )}
-          {tab === 'wins' && (
+        ) : (
+          <>
+            {tab === 'card' && (
+              <CardTab card={SAMPLE_CARD} handCounts={handCounts} onBump={bumpHand} />
+            )}
+            {tab === 'wins' && (
             <WinsTab
               card={SAMPLE_CARD}
               handNotes={handNotes}
@@ -148,8 +137,9 @@ export default function AppShell() {
           )}
           {tab === 'learn' && <LearnTab />}
         </>
-      )}
-      <BottomNav tab={tab} onChange={setTab} />
-    </div>
+        )}
+        <BottomNav tab={tab} onChange={setTab} />
+      </div>
+    </ConfettiProvider>
   );
 }

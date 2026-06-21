@@ -1,6 +1,15 @@
 import type { Metadata, Viewport } from 'next';
+import { Baloo_2 } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
+
+// Chunky, rounded, playful — the planner/sticker vibe.
+const baloo = Baloo_2({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-baloo',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Mahjong Tracker',
@@ -27,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={baloo.variable}>
       <body>
         {children}
         <SWRegister />

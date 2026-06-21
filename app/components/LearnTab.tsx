@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import TileStrip from './TileStrip';
 
 interface Section {
   title: string;
@@ -108,12 +109,13 @@ export default function LearnTab() {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <div className="screen">
-      <header className="app-header" style={{ padding: '12px 2px 4px' }}>
-        <h1>Learn</h1>
-        <p className="sub">New to the card? Start here.</p>
+      <header className="app-header">
+        <h1>The Rules</h1>
+        <p className="sub">New to the tiles? Start here, bam-beginner. 🀐</p>
+        <TileStrip count={7} />
       </header>
 
-      <div style={{ marginTop: 14 }}>
+      <div style={{ marginTop: 18 }}>
         {SECTIONS.map((s, i) => (
           <div className="acc" key={i} data-open={open === i}>
             <button onClick={() => setOpen(open === i ? null : i)}>
