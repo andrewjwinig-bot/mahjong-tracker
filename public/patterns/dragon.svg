@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <g font-family="'PingFang SC','Hiragino Sans GB','Heiti SC','Microsoft YaHei',sans-serif" font-weight="700" text-anchor="middle">
+    <text x="36" y="50" font-size="42" fill="#D23B4E" fill-opacity="0.08">中</text>
+    <text x="120" y="130" font-size="42" fill="#0F8F6E" fill-opacity="0.09">發</text>
+    <text x="120" y="50" font-size="30" fill="#C9952B" fill-opacity="0.1">發</text>
+    <text x="40" y="132" font-size="30" fill="#C9952B" fill-opacity="0.1">中</text>
+  </g>
+</svg>

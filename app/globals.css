@@ -6,105 +6,162 @@
    ========================================================================== */
 
 :root {
-  --brand: #0ead96; /* teal-jade — primary actions */
+  /* Jade — neutral default */
+  --brand: #0ead96;
   --brand-deep: #0b8c7b;
-  --green: #2bb673; /* "got it" / win */
-  --accent: #ff6b5c; /* coral pop — I GOT MAHJ / Share */
-
+  --green: #2bb673;
+  --accent: #ff6b5c;
   --ink: #243240;
   --ink-soft: #56616e;
   --muted: #7e8a93;
-
-  --page: #fbf8f1; /* warm cream */
-  --card: #ffffff; /* elevated surfaces */
-  --tint: #dcf2ec; /* pill / chip tint */
+  --page: #f7f5ef;
+  --card: #ffffff;
+  --tint: #dcf2ec;
   --tint-deep: #bbe6dc;
   --hairline: #e7e0d4;
-  --dot: rgba(36, 50, 64, 0.045); /* polka dots */
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --on-brand: #ffffff; /* text on colored buttons */
-
-  /* decorative notation colors */
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --on-brand: #ffffff;
   --n0: #243240;
   --n1: #2bb673;
   --n2: #ff6b5c;
   --n3: #2f80ed;
-
+  --bg-pattern: url("/patterns/jade.svg");
   --shadow: 0 8px 24px rgba(36, 50, 64, 0.1);
   --shadow-sm: 0 3px 12px rgba(36, 50, 64, 0.08);
   --nav-h: 66px;
 }
 
-[data-theme="bubblegum"] {
-  --brand: #e8455f;
-  --brand-deep: #ce2f4a;
-  --green: #23b196;
-  --accent: #f0654f;
-  --ink: #3a2a33;
-  --ink-soft: #5a5566;
-  --muted: #a98e98;
-  --page: #fce7ec;
-  --card: #ffffff;
-  --tint: #fbd9e0;
-  --tint-deep: #f7becb;
-  --hairline: #f3d7df;
-  --dot: rgba(255, 255, 255, 0.85);
-  --nav-bg: rgba(255, 255, 255, 0.94);
-  --on-brand: #ffffff;
-  --n0: #2c3a57;
-  --n1: #23b196;
-  --n2: #e8455f;
-  --n3: #3b7dd8;
-  --shadow: 0 8px 24px rgba(214, 52, 78, 0.12);
-  --shadow-sm: 0 3px 12px rgba(214, 52, 78, 0.1);
+[data-theme="bam"] {
+  --brand: #2e9e50;
+  --brand-deep: #247e40;
+  --green: #2bb673;
+  --accent: #f2784b;
+  --ink: #21311f;
+  --ink-soft: #47553f;
+  --muted: #7d9078;
+  --page: #f0f5e9;
+  --tint: #dbedcf;
+  --tint-deep: #bfe0a8;
+  --hairline: #e0e8d2;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --n0: #21311f;
+  --n1: #2e9e50;
+  --n2: #f2784b;
+  --n3: #2f80ed;
+  --bg-pattern: url("/patterns/bam.svg");
+  --shadow: 0 8px 24px rgba(33, 49, 31, 0.1);
+  --shadow-sm: 0 3px 12px rgba(33, 49, 31, 0.08);
 }
 
-[data-theme="electric"] {
-  --brand: #6c4ce0;
-  --brand-deep: #573bc0;
+[data-theme="dot"] {
+  --brand: #1e73c4;
+  --brand-deep: #185fa3;
+  --green: #1fb7a6;
+  --accent: #ff7a4d;
+  --ink: #1b2a3a;
+  --ink-soft: #46566a;
+  --muted: #7e8ea0;
+  --page: #eef4fb;
+  --tint: #d6e6f7;
+  --tint-deep: #b3d2f0;
+  --hairline: #dce6f2;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --n0: #1b2a3a;
+  --n1: #1fb7a6;
+  --n2: #ff7a4d;
+  --n3: #1e73c4;
+  --bg-pattern: url("/patterns/dot.svg");
+  --shadow: 0 8px 24px rgba(27, 42, 58, 0.12);
+  --shadow-sm: 0 3px 12px rgba(27, 42, 58, 0.09);
+}
+
+[data-theme="crak"] {
+  --brand: #d23b4e;
+  --brand-deep: #b92d40;
+  --green: #23b196;
+  --accent: #e0a02b;
+  --ink: #3a222a;
+  --ink-soft: #5e424a;
+  --muted: #a98e95;
+  --page: #fceded;
+  --tint: #fad9dc;
+  --tint-deep: #f4bcc1;
+  --hairline: #f1d8da;
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --n0: #3a222a;
+  --n1: #23b196;
+  --n2: #d23b4e;
+  --n3: #2f80ed;
+  --bg-pattern: url("/patterns/crak.svg");
+  --shadow: 0 8px 24px rgba(210, 59, 78, 0.12);
+  --shadow-sm: 0 3px 12px rgba(210, 59, 78, 0.09);
+}
+
+[data-theme="dragon"] {
+  --brand: #0f8f6e;
+  --brand-deep: #0b7459;
+  --green: #2bb673;
+  --accent: #d23b4e;
+  --ink: #1a2a26;
+  --ink-soft: #44544e;
+  --muted: #7e918a;
+  --page: #f4efe1;
+  --tint: #dcede5;
+  --tint-deep: #bbe0d0;
+  --hairline: #e8e0cc;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --on-brand: #ffffff;
+  --n0: #1a2a26;
+  --n1: #0f8f6e;
+  --n2: #d23b4e;
+  --n3: #c9952b;
+  --bg-pattern: url("/patterns/dragon.svg");
+  --shadow: 0 8px 24px rgba(26, 42, 38, 0.12);
+  --shadow-sm: 0 3px 12px rgba(26, 42, 38, 0.09);
+}
+
+[data-theme="flower"] {
+  --brand: #e84c8a;
+  --brand-deep: #d13a77;
+  --green: #2bbe9e;
+  --accent: #f2a93c;
+  --ink: #3a2740;
+  --ink-soft: #614a66;
+  --muted: #b08aa0;
+  --page: #fff0f6;
+  --tint: #fcddec;
+  --tint-deep: #f8c2dd;
+  --hairline: #f3d7e5;
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --n0: #6d2c57;
+  --n1: #2bbe9e;
+  --n2: #e84c8a;
+  --n3: #a06ce0;
+  --bg-pattern: url("/patterns/flower.svg");
+  --shadow: 0 8px 24px rgba(232, 76, 138, 0.12);
+  --shadow-sm: 0 3px 12px rgba(232, 76, 138, 0.09);
+}
+
+[data-theme="joker"] {
+  --brand: #7c4de0;
+  --brand-deep: #6438c8;
   --green: #18c39a;
   --accent: #f5478b;
-  --ink: #241d3a;
-  --ink-soft: #514a66;
-  --muted: #8a84a6;
-  --page: #f5f4fc;
-  --card: #ffffff;
-  --tint: #e7e2fb;
-  --tint-deep: #d3c9f8;
-  --hairline: #e7e3f5;
-  --dot: rgba(108, 76, 224, 0.06);
+  --ink: #261b3c;
+  --ink-soft: #4f4566;
+  --muted: #8a82a6;
+  --page: #f5f2fd;
+  --tint: #e7defb;
+  --tint-deep: #d3c4f8;
+  --hairline: #e7e0f5;
   --nav-bg: rgba(255, 255, 255, 0.92);
-  --on-brand: #ffffff;
-  --n0: #241d3a;
+  --n0: #261b3c;
   --n1: #18c39a;
   --n2: #f5478b;
   --n3: #3e8bff;
-  --shadow: 0 8px 24px rgba(108, 76, 224, 0.14);
-  --shadow-sm: 0 3px 12px rgba(108, 76, 224, 0.1);
-}
-
-[data-theme="sunset"] {
-  --brand: #f2682c;
-  --brand-deep: #dd571e;
-  --green: #2db39a;
-  --accent: #e63462;
-  --ink: #3a2a22;
-  --ink-soft: #5e4a3e;
-  --muted: #9c8478;
-  --page: #fff6ec;
-  --card: #ffffff;
-  --tint: #ffe2cc;
-  --tint-deep: #ffc9a3;
-  --hairline: #f2e0d0;
-  --dot: rgba(242, 104, 44, 0.06);
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --on-brand: #ffffff;
-  --n0: #3a2a22;
-  --n1: #2db39a;
-  --n2: #e63462;
-  --n3: #2f80ed;
-  --shadow: 0 8px 24px rgba(242, 104, 44, 0.14);
-  --shadow-sm: 0 3px 12px rgba(242, 104, 44, 0.1);
+  --bg-pattern: url("/patterns/joker.svg");
+  --shadow: 0 8px 24px rgba(124, 77, 224, 0.14);
+  --shadow-sm: 0 3px 12px rgba(124, 77, 224, 0.1);
 }
 
 [data-theme="midnight"] {
@@ -120,13 +177,13 @@
   --tint: #262c44;
   --tint-deep: #333a57;
   --hairline: #2c3350;
-  --dot: rgba(255, 255, 255, 0.035);
   --nav-bg: rgba(20, 24, 38, 0.92);
   --on-brand: #10202a;
   --n0: #c9d2f0;
   --n1: #34d399;
   --n2: #ff6b81;
   --n3: #5aa2ff;
+  --bg-pattern: url("/patterns/midnight.svg");
   --shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
   --shadow-sm: 0 3px 12px rgba(0, 0, 0, 0.4);
 }
@@ -147,8 +204,8 @@ body {
 
 body {
   background-color: var(--page);
-  background-image: radial-gradient(circle, var(--dot) 3px, transparent 3.5px);
-  background-size: 26px 26px;
+  background-image: var(--bg-pattern);
+  background-size: 150px 150px;
   background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-app), "Helvetica Neue", system-ui, -apple-system, sans-serif;

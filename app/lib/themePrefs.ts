@@ -2,7 +2,15 @@
 // `data-theme` attribute on <html>, so switching reskins the whole app at once.
 // Default is the gender-neutral "Jade" scheme.
 
-export type ThemeId = 'jade' | 'bubblegum' | 'electric' | 'sunset' | 'midnight';
+export type ThemeId =
+  | 'jade'
+  | 'bam'
+  | 'dot'
+  | 'crak'
+  | 'dragon'
+  | 'flower'
+  | 'joker'
+  | 'midnight';
 
 export interface ThemeDef {
   id: ThemeId;
@@ -19,26 +27,44 @@ export const THEMES: ThemeDef[] = [
   {
     id: 'jade',
     name: 'Jade',
-    tagline: 'Bold & neutral',
-    swatch: { brand: '#0EAD96', green: '#2BB673', accent: '#FF6B5C', page: '#FBF8F1' },
+    tagline: 'Clean & neutral',
+    swatch: { brand: '#0EAD96', green: '#2BB673', accent: '#FF6B5C', page: '#F7F5EF' },
   },
   {
-    id: 'electric',
-    name: 'Electric',
-    tagline: 'Punchy violet',
-    swatch: { brand: '#6C4CE0', green: '#18C39A', accent: '#F5478B', page: '#F5F4FC' },
+    id: 'bam',
+    name: 'Bam',
+    tagline: 'Bamboo green',
+    swatch: { brand: '#2E9E50', green: '#2BB673', accent: '#F2784B', page: '#F0F5E9' },
   },
   {
-    id: 'sunset',
-    name: 'Sunset',
-    tagline: 'Warm & toasty',
-    swatch: { brand: '#F2682C', green: '#2DB39A', accent: '#E63462', page: '#FFF6EC' },
+    id: 'dot',
+    name: 'Dot',
+    tagline: 'Circle blue',
+    swatch: { brand: '#1E73C4', green: '#1FB7A6', accent: '#FF7A4D', page: '#EEF4FB' },
   },
   {
-    id: 'bubblegum',
-    name: 'Bubblegum',
-    tagline: 'Sweet & pink',
-    swatch: { brand: '#E8455F', green: '#23B196', accent: '#F0654F', page: '#FCE7EC' },
+    id: 'crak',
+    name: 'Crak',
+    tagline: 'Character red',
+    swatch: { brand: '#D23B4E', green: '#23B196', accent: '#E0A02B', page: '#FCEDEC' },
+  },
+  {
+    id: 'dragon',
+    name: 'Dragon',
+    tagline: 'Emerald & gold',
+    swatch: { brand: '#0F8F6E', green: '#2BB673', accent: '#D23B4E', page: '#F4EFE1' },
+  },
+  {
+    id: 'flower',
+    name: 'Flower',
+    tagline: 'Petal pink',
+    swatch: { brand: '#E84C8A', green: '#2BBE9E', accent: '#F2A93C', page: '#FFF0F6' },
+  },
+  {
+    id: 'joker',
+    name: 'Joker',
+    tagline: 'Wild violet',
+    swatch: { brand: '#7C4DE0', green: '#18C39A', accent: '#F5478B', page: '#F5F2FD' },
   },
   {
     id: 'midnight',
