@@ -78,6 +78,11 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
     const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
     const cardDone = newCleared >= total;
 
+    // Season-challenge flair when the cleared hand counts toward the active season.
+    const bonus = challenge.match(h)
+      ? `${challenge.emoji} ${challenge.season} season bonus!`
+      : undefined;
+
     if (cardDone) {
       celebrate({
         title: 'You Cleared The Card!!',
@@ -87,6 +92,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         total,
         posted: true,
         big: true,
+        bonus,
         onShare: () => setShareWin(win),
       });
     } else if (catDone) {
@@ -100,6 +106,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         total,
         posted: true,
         big: true,
+        bonus,
         onShare: () => setShareWin(win),
       });
     } else {
@@ -110,6 +117,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         cleared: newCleared,
         total,
         posted: true,
+        bonus,
         onShare: () => setShareWin(win),
       });
     }

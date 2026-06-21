@@ -22,6 +22,8 @@ export interface CelebrateOpts {
   hype?: string;
   /** Bigger, longer confetti storm (section / card-complete moments). */
   big?: boolean;
+  /** Season-challenge bonus flair, e.g. "☀️ Summer season bonus!". */
+  bonus?: string;
 }
 
 const HYPE = [
@@ -224,6 +226,7 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
           </div>
         )}
 
+        {opts.bonus && <p className="cele-bonus">{opts.bonus}</p>}
         {posted && <p className="cele-posted">✓ Posted to your feed</p>}
 
         <div className="cele-actions">

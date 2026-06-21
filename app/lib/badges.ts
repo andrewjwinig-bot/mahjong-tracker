@@ -20,6 +20,25 @@ export interface Badge {
   earned: boolean;
 }
 
+const K_SEEN = 'mahj.badges';
+
+export function loadSeenBadges(): string[] {
+  try {
+    const raw = localStorage.getItem(K_SEEN);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveSeenBadges(ids: string[]): void {
+  try {
+    localStorage.setItem(K_SEEN, JSON.stringify(ids));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function computeStats(card: MahjongCard, handCounts: Record<string, number>): Stats {
   let cleared = 0;
   let mahjs = 0;
