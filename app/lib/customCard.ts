@@ -2,6 +2,20 @@
 // card so the app never ships a copy of it. Stored locally as plain JSON.
 
 import type { Hand, MahjongCard } from './types';
+import * as db from './storage';
+
+const PHOTO_KEY = 'customCard.photo';
+
+/** Optional reference photo of the user's physical card (stored in IndexedDB). */
+export function loadCardPhoto(): Promise<Blob | null> {
+  return db.getMeta<Blob | null>(PHOTO_KEY, null);
+}
+export function saveCardPhoto(blob: Blob): Promise<void> {
+  return db.setMeta(PHOTO_KEY, blob);
+}
+export function clearCardPhoto(): Promise<void> {
+  return db.setMeta(PHOTO_KEY, null);
+}
 
 export interface HandRow {
   category: string;
