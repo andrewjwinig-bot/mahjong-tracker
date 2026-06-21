@@ -185,6 +185,16 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         ))}
       </div>
 
+      {stats.totalWins === 0 && filter === 'all' && (
+        <div className="coach">
+          <span className="coach-emoji">👆</span>
+          <span>
+            <strong>Win a hand?</strong> Tap its checkbox to log your first MAHJ — your card fills in
+            with a tile celebration.
+          </span>
+        </div>
+      )}
+
       {card.categories.map((category) => {
         const hands = card.hands.filter((h) => h.category === category && visible(h));
         if (hands.length === 0) return null;

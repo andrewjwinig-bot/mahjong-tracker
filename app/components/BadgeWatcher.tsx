@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MahjongCard } from '../lib/types';
 import { computeBadges, loadSeenBadges, saveSeenBadges, type Badge } from '../lib/badges';
+import { playTrophy } from '../lib/sound';
 
 /** Watches progress and pops a toast whenever a new trophy is earned. */
 export default function BadgeWatcher({
@@ -34,6 +35,7 @@ export default function BadgeWatcher({
       fresh.forEach((b) => seen.current!.add(b.id));
       saveSeenBadges([...seen.current]);
       setToast(fresh[0]); // show the first; others persist as earned
+      playTrophy();
     }
   }, [card, handCounts, bestStreak]);
 

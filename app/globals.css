@@ -1103,6 +1103,36 @@ label.lbl {
   color: var(--brand);
 }
 
+/* ---- New-player coaching ------------------------------------------------- */
+
+.coach {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--tint);
+  color: var(--ink);
+  box-shadow: 0 0 0 2px var(--tint-deep);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.coach .coach-emoji {
+  font-size: 24px;
+  flex: 0 0 auto;
+  animation: coach-bob 1.4s ease-in-out infinite;
+}
+.coach strong {
+  color: var(--brand);
+}
+@keyframes coach-bob {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
 /* ---- Seasonal challenges ------------------------------------------------- */
 
 .challenge {
@@ -1683,6 +1713,37 @@ label.lbl {
   background: rgba(20, 24, 38, 0.55);
   padding: 2px 7px;
   border-radius: 999px;
+}
+
+/* ---- Profile header (trophies sheet) ------------------------------------ */
+
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 8px;
+}
+.profile-name {
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-handle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.profile-bio {
+  margin: 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-soft);
 }
 
 /* ---- Trophies + stats ---------------------------------------------------- */

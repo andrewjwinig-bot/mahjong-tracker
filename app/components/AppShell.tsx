@@ -356,12 +356,13 @@ export default function AppShell() {
         />
       )}
 
-      {trophyOpen && (
+      {trophyOpen && socialState && (
         <TrophyShelf
           card={card}
           handCounts={handCounts}
           bestStreak={bestStreak}
           memberSince={account?.createdAt}
+          profile={socialState.profile}
           onClose={() => setTrophyOpen(false)}
         />
       )}
