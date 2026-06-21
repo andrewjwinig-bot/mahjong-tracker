@@ -296,6 +296,9 @@ function LogWinSheet({
 
         <button
           type="button"
+          role="switch"
+          aria-checked={shareToGroup}
+          aria-label="Share to your table"
           onClick={() => setShareToGroup((v) => !v)}
           style={{
             display: 'flex',

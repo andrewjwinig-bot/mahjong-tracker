@@ -214,13 +214,18 @@ export default function SettingsSheet({
         <button
           type="button"
           className="fx-row"
+          role="switch"
+          aria-checked={fx}
+          aria-label="Sound and haptics"
           onClick={() => {
             const next = !fx;
             setFxState(next);
             setFx(next);
           }}
         >
-          <span style={{ fontSize: 20 }}>🔊</span>
+          <span style={{ fontSize: 20 }} aria-hidden>
+            🔊
+          </span>
           <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
             Sound &amp; haptics
           </span>
