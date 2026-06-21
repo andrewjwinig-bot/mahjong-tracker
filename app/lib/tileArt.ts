@@ -70,7 +70,7 @@ function jokerMotif(): string {
 function charMotif(char: string, color: string, size = 30): string {
   return `<text x="24" y="31" text-anchor="middle" dominant-baseline="central"
     font-size="${size}" font-weight="800" fill="${color}"
-    font-family="${color === CRACK || color === NAVY ? CJK : `var(--font-app), ${CJK}`}">${char}</text>`;
+    font-family="${color === CRACK || color === NAVY ? CJK : `var(--font-display), ${CJK}`}">${char}</text>`;
 }
 
 function motifFor(face: TileFace, char?: string, color?: string): string {

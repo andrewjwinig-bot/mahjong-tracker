@@ -3,6 +3,17 @@
 import { useState } from 'react';
 import { downloadBlob } from '../lib/shareCard';
 import { track } from '../lib/analytics';
+import {
+  IconShare,
+  IconSave,
+  IconMessages,
+  IconWhatsApp,
+  IconX,
+  IconFacebook,
+  IconInstagram,
+  IconCopy,
+  IconFriends,
+} from './brandIcons';
 
 export interface SharePayload {
   /** Sheet title, e.g. "SHARE YOUR MAHJ! 🀄" */
@@ -25,16 +36,20 @@ interface Props {
 
 function Opt({
   label,
-  emoji,
+  icon,
+  bg,
   onClick,
 }: {
   label: string;
-  emoji: string;
+  icon: React.ReactNode;
+  bg: string;
   onClick: () => void;
 }) {
   return (
     <button className="share-opt" onClick={onClick}>
-      <span className="bubble">{emoji}</span>
+      <span className="bubble" style={{ background: bg }}>
+        {icon}
+      </span>
       {label}
     </button>
   );
@@ -117,7 +132,9 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
               flash(`Posted to ${groupName}! 👯`);
             }}
           >
-            <span className="emoji">👯</span>
+            <span className="hero-icon">
+              <IconFriends size={26} />
+            </span>
             <span style={{ flex: 1 }}>
               <span className="t" style={{ display: 'block' }}>
                 Share to {groupName}
@@ -131,42 +148,49 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
         {/* Social + system destinations */}
         <div className="share-grid">
           {typeof navigator !== 'undefined' && 'share' in navigator && (
-            <Opt label="Share" emoji="📲" onClick={nativeShare} />
+            <Opt label="Share" icon={<IconShare />} bg="var(--ink)" onClick={nativeShare} />
           )}
-          {payload.image && <Opt label="Save" emoji="📸" onClick={saveImage} />}
+          {payload.image && (
+            <Opt label="Save" icon={<IconSave />} bg="var(--ink)" onClick={saveImage} />
+          )}
           <Opt
             label="Messages"
-            emoji="💬"
+            icon={<IconMessages />}
+            bg="#34C759"
             onClick={() => openIntent(`sms:?&body=${enc(caption)}`, 'sms')}
           />
           <Opt
             label="WhatsApp"
-            emoji="🟢"
+            icon={<IconWhatsApp />}
+            bg="#25D366"
             onClick={() => openIntent(`https://wa.me/?text=${enc(caption)}`, 'whatsapp')}
           />
           <Opt
             label="X"
-            emoji="✖️"
+            icon={<IconX />}
+            bg="#000000"
             onClick={() =>
               openIntent(`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`, 'x')
             }
           />
           <Opt
             label="Facebook"
-            emoji="📘"
+            icon={<IconFacebook />}
+            bg="#1877F2"
             onClick={() =>
               openIntent(`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`, 'facebook')
             }
           />
           <Opt
-            label="Insta"
-            emoji="📷"
+            label="Instagram"
+            icon={<IconInstagram />}
+            bg="linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)"
             onClick={() => {
               if (payload.image) void saveImage();
               else void copyLink();
             }}
           />
-          <Opt label="Copy link" emoji="🔗" onClick={copyLink} />
+          <Opt label="Copy link" icon={<IconCopy />} bg="var(--tint)" onClick={copyLink} />
         </div>
 
         {status && (

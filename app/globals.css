@@ -158,6 +158,32 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Chunky display face for headers, branding, buttons + loud labels. */
+.app-header h1,
+.logo,
+.cat-bar,
+.pill,
+.cat-head .pill,
+.stat .num,
+.stat .lab,
+.btn,
+.sheet h2,
+.celebrate-card h2,
+.cele-hype,
+.cele-hand,
+.cele-chip,
+.detail-title,
+.table-name,
+.bottom-nav button,
+.segmented button,
+.mahj-tag,
+.tag,
+.lbl,
+.tname,
+.lead-tag {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
@@ -1053,13 +1079,26 @@ label.lbl {
   border-radius: 18px;
   display: grid;
   place-items: center;
-  font-size: 26px;
   background: var(--card);
   box-shadow: var(--shadow-sm);
   transition: transform 0.08s ease;
+  color: var(--brand); /* drives currentColor glyphs (e.g. Copy) */
+}
+.share-opt .bubble svg {
+  display: block;
 }
 .share-opt:active .bubble {
   transform: scale(0.92);
+}
+
+.share-hero .hero-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
 }
 
 .share-hero {
