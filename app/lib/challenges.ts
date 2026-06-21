@@ -15,46 +15,45 @@ export interface Challenge {
   match: (h: Hand) => boolean;
 }
 
-// The four seasons partition the card into non-overlapping category sets, so
-// completing all four challenges completes the whole card.
-const inCats = (cats: string[]) => (h: Hand) => cats.includes(h.category);
-
+// Each season chases a *symbol* that recurs across the whole card (the year,
+// flowers, number kongs, dragons), so a challenge pulls hands from many
+// sections and keeps you playing the full card.
 export const CHALLENGES: Challenge[] = [
   {
     id: 'newyear',
     name: 'New Year, New Card',
     emoji: '🎆',
     season: 'Winter',
-    blurb: 'New-year showstoppers — clear 2026, Singles + Pairs, and Quints.',
+    blurb: 'Ring in 2026 — win any hand featuring the year, from any section.',
     months: [11, 0, 1],
-    match: inCats(['2026', 'Singles + Pairs', 'Quints']),
+    match: (h) => /2026/.test(h.notation),
   },
   {
     id: 'flowers',
     name: 'Flower Festival',
     emoji: '🌸',
     season: 'Spring',
-    blurb: 'Watch your runs bloom — clear Consecutive Run + Any Like Numbers.',
+    blurb: 'Bloom season — win any flower-forward hand (the F’s) across the card.',
     months: [2, 3, 4],
-    match: inCats(['Consecutive Run', 'Any Like Numbers']),
+    match: (h) => /F/.test(h.notation),
   },
   {
     id: 'summer',
-    name: 'Summer Numbers',
+    name: 'Summer Kongs',
     emoji: '☀️',
     season: 'Summer',
-    blurb: 'Sunny multiples — clear the 2468 and 369 hands.',
+    blurb: 'Go big — win any hand with a number kong (four-of-a-kind), anywhere.',
     months: [5, 6, 7],
-    match: inCats(['2468', '369']),
+    match: (h) => /(\d)\1\1\1/.test(h.notation),
   },
   {
     id: 'dragons',
     name: 'Dragon Days',
     emoji: '🐉',
     season: 'Autumn',
-    blurb: 'Honors & odds — clear Winds + Dragons and 13579.',
+    blurb: 'Chase the dragons — win any hand with a Dragon (D), wherever it lives.',
     months: [8, 9, 10],
-    match: inCats(['Winds + Dragons', '13579']),
+    match: (h) => /D/.test(h.notation),
   },
 ];
 
