@@ -1,0 +1,69 @@
+// User-entered card. Lets players type the hands from their own (official)
+// card so the app never ships a copy of it. Stored locally as plain JSON.
+
+import type { Hand, MahjongCard } from './types';
+
+export interface HandRow {
+  category: string;
+  notation: string;
+  points: number;
+  concealed: boolean;
+}
+
+const K = 'mahj.customCard';
+
+export function buildCard(year: number, rows: HandRow[]): MahjongCard {
+  const categories: string[] = [];
+  const counters: Record<string, number> = {};
+  const hands: Hand[] = [];
+  for (const r of rows) {
+    const notation = r.notation.trim().toUpperCase();
+    if (!notation) continue;
+    const category = r.category.trim() || 'My Hands';
+    if (!categories.includes(category)) categories.push(category);
+    const i = counters[category] ?? 0;
+    counters[category] = i + 1;
+    hands.push({
+      id: `${category}-${i}`,
+      category,
+      notation,
+      points: Number.isFinite(r.points) && r.points > 0 ? Math.round(r.points) : 25,
+      concealed: !!r.concealed,
+    });
+  }
+  return { year, source: 'custom', categories, hands };
+}
+
+export function loadCustomCard(): MahjongCard | null {
+  try {
+    const raw = localStorage.getItem(K);
+    return raw ? (JSON.parse(raw) as MahjongCard) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveCustomCard(card: MahjongCard): void {
+  try {
+    localStorage.setItem(K, JSON.stringify(card));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearCustomCard(): void {
+  try {
+    localStorage.removeItem(K);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function rowsFromCard(card: MahjongCard): HandRow[] {
+  return card.hands.map((h) => ({
+    category: h.category,
+    notation: h.notation,
+    points: h.points,
+    concealed: h.concealed,
+  }));
+}

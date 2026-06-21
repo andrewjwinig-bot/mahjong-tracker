@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
-import type { Hand, Win } from '../lib/types';
+import type { Hand, Win, MahjongCard } from '../lib/types';
+import { loadCustomCard } from '../lib/customCard';
 import * as db from '../lib/storage';
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
@@ -16,6 +17,8 @@ import Onboarding from './Onboarding';
 import TrophyShelf from './TrophyShelf';
 import Tutorial from './Tutorial';
 import BadgeWatcher from './BadgeWatcher';
+import CardEditor from './CardEditor';
+import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
@@ -45,6 +48,8 @@ export default function AppShell() {
   const [bestStreak, setBestStreak] = useState(0);
   const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -57,6 +62,8 @@ export default function AppShell() {
     setExperienceState(getExperience());
     setAccountChecked(true);
     if (acc && !tutorialSeen()) setShowTutorial(true);
+    const cc = loadCustomCard();
+    if (cc) setCard(cc);
     const sd = recordPlay();
     setStreak(sd.current);
     setBestStreak(sd.best);
@@ -83,13 +90,13 @@ export default function AppShell() {
   const youStats = useMemo(() => {
     let handsCleared = 0;
     let points = 0;
-    for (const h of SAMPLE_CARD.hands) {
+    for (const h of card.hands) {
       const c = handCounts[h.id] ?? 0;
       if (c > 0) handsCleared += 1;
       points += c * h.points;
     }
     return { handsCleared, points };
-  }, [handCounts]);
+  }, [handCounts, card]);
 
   const bumpHand = useCallback((handId: string, delta: number) => {
     setHandCounts((prev) => {
@@ -265,7 +272,7 @@ export default function AppShell() {
           ⚙️
         </button>
 
-        <BadgeWatcher card={SAMPLE_CARD} handCounts={handCounts} bestStreak={bestStreak} />
+        <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />
 
         {!loaded ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
@@ -278,7 +285,7 @@ export default function AppShell() {
           <>
             {tab === 'card' && (
               <CardTab
-                card={SAMPLE_CARD}
+                card={card}
                 handCounts={handCounts}
                 onBump={bumpHand}
                 onMahj={cardMahj}
@@ -288,7 +295,7 @@ export default function AppShell() {
             )}
             {tab === 'wins' && (
               <WinsTab
-                card={SAMPLE_CARD}
+                card={card}
                 handNotes={handNotes}
                 wins={wins}
                 groupName={socialState?.group.name ?? 'your table'}
@@ -329,13 +336,29 @@ export default function AppShell() {
             setSettingsOpen(false);
             setTrophyOpen(true);
           }}
+          onEditCard={() => {
+            setSettingsOpen(false);
+            setEditorOpen(true);
+          }}
           onClose={() => setSettingsOpen(false)}
+        />
+      )}
+
+      {editorOpen && (
+        <CardEditor
+          current={card}
+          onSave={(c) => setCard(c)}
+          onUseSample={() => {
+            clearCustomCard();
+            setCard(SAMPLE_CARD);
+          }}
+          onClose={() => setEditorOpen(false)}
         />
       )}
 
       {trophyOpen && (
         <TrophyShelf
-          card={SAMPLE_CARD}
+          card={card}
           handCounts={handCounts}
           bestStreak={bestStreak}
           memberSince={account?.createdAt}
