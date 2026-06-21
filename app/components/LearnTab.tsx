@@ -4,10 +4,13 @@ import { useState } from 'react';
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
+import type { Experience } from '../lib/account';
 
 interface Section {
   title: string;
   body: React.ReactNode;
+  /** Which experience levels see this section (undefined = everyone). */
+  levels?: Experience[];
 }
 
 /* ---- Visual tile guide ---------------------------------------------------- */
@@ -253,12 +256,40 @@ const SECTIONS: Section[] = [
     ),
   },
   {
+    title: '🧠 Strategy: reading the table',
+    levels: ['intermediate', 'expert'],
+    body: (
+      <ul>
+        <li>Stay flexible through the Charleston — commit to one hand only once your tiles point clearly one way.</li>
+        <li>Count your <strong>tiles-away</strong> every turn and chase the fastest hand, not the prettiest.</li>
+        <li>Grab jokers whenever offered — flexibility beats points early.</li>
+        <li>Read exposures: what opponents pung/kong tells you which hand they’re building.</li>
+        <li>Remember there are only 4 of each tile — if three are gone, that wait is nearly dead.</li>
+      </ul>
+    ),
+  },
+  {
+    title: '🛡️ Defensive play',
+    levels: ['expert'],
+    body: (
+      <>
+        <ul>
+          <li>When you can’t win, switch to defense — don’t feed the table leader’s exposed hand.</li>
+          <li>Discard tiles already on the table or in others’ exposures; they’re safest.</li>
+          <li>Watch for joker-redemption: an exposed pung/kong with a joker can be swapped — plan around it.</li>
+          <li>Hold a “bait” tile to disguise your direction before the discard you actually need.</li>
+          <li>Against Singles &amp; Pairs hands (no jokers), single tiles are dangerous — hold them late.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
     title: '❓ FAQ',
     body: (
       <>
         <p>
-          <strong>Is my data private?</strong> Yes — everything lives only on this device. No account,
-          no cloud, nothing leaves your phone.
+          <strong>Is my data private?</strong> Yes — for now everything lives on this device. Cloud
+          accounts &amp; sync arrive with the App Store release.
         </p>
         <p>
           <strong>Is this the official NMJL card?</strong> No. This is a sample card so you can try the
@@ -284,18 +315,25 @@ const SECTIONS: Section[] = [
   },
 ];
 
-export default function LearnTab() {
+const SUBTITLE: Record<Experience, string> = {
+  beginner: 'New to the tiles? Start here, bam-beginner. 🀐',
+  intermediate: 'Sharpen up — rules, the Charleston & strategy. 🀄',
+  expert: 'Deep cuts — strategy & defense for sharks. 🐉',
+};
+
+export default function LearnTab({ experience }: { experience: Experience }) {
   const [open, setOpen] = useState<number | null>(0);
+  const sections = SECTIONS.filter((s) => !s.levels || s.levels.includes(experience));
   return (
     <div className="screen">
       <header className="app-header">
         <h1>The Rules</h1>
-        <p className="sub">New to the tiles? Start here, bam-beginner. 🀐</p>
+        <p className="sub">{SUBTITLE[experience]}</p>
         <TileStrip count={7} />
       </header>
 
       <div style={{ marginTop: 18 }}>
-        {SECTIONS.map((s, i) => (
+        {sections.map((s, i) => (
           <div className="acc" key={i} data-open={open === i}>
             <button onClick={() => setOpen(open === i ? null : i)}>
               <span>{s.title}</span>

@@ -1616,6 +1616,100 @@ label.lbl {
   border-radius: 999px;
 }
 
+/* ---- Onboarding ---------------------------------------------------------- */
+
+.onboard {
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.onboard-card {
+  width: 100%;
+  max-width: 460px;
+}
+.onboard-head {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.onboard-head h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.onboard-head .sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+.level-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.level-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border: 2.5px solid transparent;
+  text-align: left;
+}
+.level-opt[data-active="true"] {
+  border-color: var(--brand);
+}
+.level-emoji {
+  font-size: 24px;
+  flex: 0 0 auto;
+}
+.level-name {
+  display: block;
+  font-weight: 800;
+  font-size: 15px;
+  text-transform: uppercase;
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.level-blurb {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.level-check {
+  flex: 0 0 auto;
+  color: var(--brand);
+  font-size: 16px;
+}
+.onboard-note {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.onboard-error {
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 13px;
+}
+.onboard-fine {
+  margin: 12px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* ---- Confetti + celebration --------------------------------------------- */
 
 .confetti-layer {
