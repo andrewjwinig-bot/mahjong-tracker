@@ -386,6 +386,33 @@ select {
 
 /* ---- Category headers + hand rows ---------------------------------------- */
 
+/* Full-width category header bar (Card tab) */
+.cat-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin: 26px 0 12px;
+  padding: 11px 16px;
+  border-radius: 13px;
+  background: var(--tint);
+  color: var(--brand);
+}
+.cat-bar .cat-name {
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.cat-bar .cat-count {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
 .cat-head {
   display: flex;
   align-items: center;

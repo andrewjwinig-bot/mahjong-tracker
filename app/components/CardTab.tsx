@@ -157,9 +157,9 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
         const totalInCat = card.hands.filter((h) => h.category === category).length;
         return (
           <section key={category}>
-            <div className="cat-head">
-              <span className="pill">{category}</span>
-              <span className="count">
+            <div className="cat-bar">
+              <span className="cat-name">{category}</span>
+              <span className="cat-count">
                 {wonInCat}/{totalInCat} got
               </span>
             </div>
