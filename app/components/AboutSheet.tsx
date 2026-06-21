@@ -2,15 +2,35 @@
 
 import { useState } from 'react';
 import { exportData, deleteAllData } from '../lib/dataExport';
+import { isCloudEnabled, cloudSignOut, cloudDeleteAccount } from '../lib/cloudAuth';
 
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const cloud = isCloudEnabled();
 
   async function doDelete() {
     setBusy(true);
+    if (cloud) {
+      try {
+        await cloudDeleteAccount();
+      } catch {
+        /* fall through to local wipe */
+      }
+    }
     await deleteAllData();
     // Reset to a clean first-launch state.
+    window.location.reload();
+  }
+
+  async function signOut() {
+    setBusy(true);
+    try {
+      await cloudSignOut();
+    } catch {
+      /* ignore */
+    }
+    await deleteAllData(); // clear the on-device mirror, return to onboarding
     window.location.reload();
   }
 
@@ -54,6 +74,12 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
         <button className="btn ghost" onClick={() => void exportData()}>
           ⬇️ Export my data
         </button>
+
+        {cloud && (
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => void signOut()} disabled={busy}>
+            ↩︎ Sign out
+          </button>
+        )}
 
         {!confirming ? (
           <button className="btn danger" style={{ marginTop: 10 }} onClick={() => setConfirming(true)}>
