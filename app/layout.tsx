@@ -1,10 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Bricolage_Grotesque } from 'next/font/google';
+import { Baloo_2, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
 
-// Considered, editorial grotesque — sharp + characterful, not generic.
-const display = Bricolage_Grotesque({
+// Two-font pairing: a chunky rounded display for headers/branding (the printed
+// "Hand Tracker" vibe) + a clean grotesque for body text.
+const display = Baloo_2({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const body = Hanken_Grotesk({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-app',
@@ -36,7 +44,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={display.variable}>
+    <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script
