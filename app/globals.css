@@ -1686,6 +1686,21 @@ label.lbl {
   line-height: 1.25;
 }
 
+/* ---- About / legal ------------------------------------------------------- */
+
+.legal p {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+.legal .legal-fine {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 /* ---- Streak chip --------------------------------------------------------- */
 
 .streak-chip {

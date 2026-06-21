@@ -8,6 +8,7 @@ import type { TileFace } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
+import AboutSheet from './AboutSheet';
 
 interface Props {
   profile: Profile;
@@ -52,6 +53,7 @@ export default function SettingsSheet({
   const [bio, setBio] = useState(profile.bio);
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
   const [fx, setFxState] = useState(fxOn());
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const letter = initialOf(name);
   // For the letter tile, the displayed character always tracks the name.
@@ -242,7 +244,11 @@ export default function SettingsSheet({
           ))}
         </div>
 
-        <div className="row" style={{ marginTop: 18 }}>
+        <button className="btn ghost" style={{ marginTop: 16 }} onClick={() => setAboutOpen(true)}>
+          ℹ️ About &amp; Legal
+        </button>
+
+        <div className="row" style={{ marginTop: 14 }}>
           <button className="btn ghost" onClick={onClose}>
             Cancel
           </button>
@@ -251,6 +257,8 @@ export default function SettingsSheet({
           </button>
         </div>
       </div>
+
+      {aboutOpen && <AboutSheet onClose={() => setAboutOpen(false)} />}
     </div>
   );
 }
