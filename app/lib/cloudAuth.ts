@@ -20,8 +20,8 @@ export interface CloudProfile {
   avatar: { face: string; char?: string; color: string };
 }
 
-function client() {
-  const sb = getSupabase();
+async function client() {
+  const sb = await getSupabase();
   if (!sb) throw new Error(CLOUD_DISABLED);
   return sb;
 }
@@ -34,7 +34,8 @@ export async function cloudSignUp(
   username: string,
   experience: Experience,
 ): Promise<CloudUser> {
-  const { data, error } = await client().auth.signUp({
+  const sb = await client();
+  const { data, error } = await sb.auth.signUp({
     email,
     password,
     options: { data: { username, handle: username.toLowerCase(), experience } },
@@ -45,17 +46,18 @@ export async function cloudSignUp(
 }
 
 export async function cloudSignIn(email: string, password: string): Promise<CloudUser> {
-  const { data, error } = await client().auth.signInWithPassword({ email, password });
+  const sb = await client();
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return { id: data.user.id, email: data.user.email ?? null };
 }
 
 export async function cloudSignOut(): Promise<void> {
-  await client().auth.signOut();
+  await (await client()).auth.signOut();
 }
 
 export async function cloudCurrentUser(): Promise<CloudUser | null> {
-  const sb = getSupabase();
+  const sb = await getSupabase();
   if (!sb) return null;
   const { data } = await sb.auth.getUser();
   return data.user ? { id: data.user.id, email: data.user.email ?? null } : null;
@@ -63,7 +65,7 @@ export async function cloudCurrentUser(): Promise<CloudUser | null> {
 
 /** Read the signed-in user's profile row. */
 export async function cloudGetProfile(): Promise<CloudProfile | null> {
-  const sb = getSupabase();
+  const sb = await getSupabase();
   if (!sb) return null;
   const { data: u } = await sb.auth.getUser();
   if (!u.user) return null;
@@ -82,7 +84,7 @@ export async function cloudGetProfile(): Promise<CloudProfile | null> {
  * deleting the profile row cascades and removes all of the user's content.
  */
 export async function cloudDeleteAccount(): Promise<void> {
-  const sb = client();
+  const sb = await client();
   const { data } = await sb.auth.getUser();
   if (data.user) await sb.from('profiles').delete().eq('id', data.user.id);
   await sb.auth.signOut();
