@@ -777,6 +777,69 @@ label.lbl {
   margin-bottom: 6px;
 }
 
+/* ---- Tile guide (Rules) -------------------------------------------------- */
+
+.tile-guide {
+  display: flex;
+  flex-direction: column;
+}
+.tg-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1.5px solid var(--hairline);
+}
+.tg-row:last-child {
+  border-bottom: none;
+}
+.tg-tiles {
+  display: flex;
+  gap: 4px;
+  flex: 0 0 auto;
+  align-items: center;
+}
+.tg-text {
+  min-width: 0;
+}
+.tg-name {
+  font-weight: 800;
+  font-size: 13.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.tg-desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  line-height: 1.32;
+  margin-top: 1px;
+}
+
+.charleston-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.charleston-step .cs-num {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-weight: 800;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+}
+.charleston-step .cs-dir {
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
 /* ---- Bottom nav ---------------------------------------------------------- */
 
 .bottom-nav {
