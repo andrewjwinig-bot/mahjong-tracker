@@ -299,6 +299,54 @@ select {
   font-family: inherit;
 }
 
+/* ---- Accessibility ------------------------------------------------------- */
+
+/* Visible keyboard focus everywhere (mouse/touch taps don't trigger this). */
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+button:focus-visible,
+a:focus-visible,
+.check:focus-visible,
+.theme-card:focus-visible,
+.avatar-opt:focus-visible,
+.level-opt:focus-visible,
+.swatch-dot:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+.field:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* Respect "reduce motion": calm all animations + transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen-reader-only helper. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---- Layout shell -------------------------------------------------------- */
 
 .app {
