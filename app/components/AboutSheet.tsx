@@ -1,6 +1,19 @@
 'use client';
 
+import { useState } from 'react';
+import { exportData, deleteAllData } from '../lib/dataExport';
+
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function doDelete() {
+    setBusy(true);
+    await deleteAllData();
+    // Reset to a clean first-launch state.
+    window.location.reload();
+  }
+
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -23,13 +36,7 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
             <strong>Your privacy.</strong> For now everything lives on this device — no account,
             nothing leaves your phone. Cloud accounts &amp; sync arrive with the App Store release.
           </p>
-          <p>
-            American Mahjong is a public-domain game enjoyed for nearly a century. This app helps you
-            track wins, learn the tiles, and play with friends.
-          </p>
-          <p className="legal-fine">
-            Read our policies: these open in your browser.
-          </p>
+          <p className="legal-fine">Read our policies (they open in your browser):</p>
           <div className="row">
             <a className="btn ghost" href="/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
@@ -39,6 +46,35 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
             </a>
           </div>
         </div>
+
+        {/* Manage your data */}
+        <label className="lbl" style={{ marginTop: 20 }}>
+          Your data
+        </label>
+        <button className="btn ghost" onClick={() => void exportData()}>
+          ⬇️ Export my data
+        </button>
+
+        {!confirming ? (
+          <button className="btn danger" style={{ marginTop: 10 }} onClick={() => setConfirming(true)}>
+            🗑 Delete all my data
+          </button>
+        ) : (
+          <div className="card" style={{ marginTop: 10, padding: 14 }}>
+            <p style={{ margin: '0 0 12px', fontWeight: 700, fontSize: 13.5, color: 'var(--ink-soft)' }}>
+              This permanently erases everything stored on this device — your account, progress, wins,
+              tables, and settings. This can’t be undone.
+            </p>
+            <div className="row" style={{ marginTop: 0 }}>
+              <button className="btn ghost" onClick={() => setConfirming(false)} disabled={busy}>
+                Cancel
+              </button>
+              <button className="btn danger" onClick={doDelete} disabled={busy}>
+                {busy ? 'Deleting…' : 'Delete everything'}
+              </button>
+            </div>
+          </div>
+        )}
 
         <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
           Done
