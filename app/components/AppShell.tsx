@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
-import type { Win } from '../lib/types';
+import type { Hand, Win } from '../lib/types';
 import * as db from '../lib/storage';
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
 import WinsTab from './WinsTab';
 import GroupTab from './GroupTab';
+import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import { ConfettiProvider } from './Confetti';
@@ -100,6 +101,25 @@ export default function AppShell() {
     });
   }, []);
 
+  // Checking a hand off the card = an instant mahj: bump progress + auto-post
+  // it to the feed, and hand back a Win so the celebration can offer sharing.
+  const cardMahj = useCallback(
+    (hand: Hand): Win => {
+      const win: Win = {
+        id: crypto.randomUUID(),
+        handId: hand.id,
+        handLabel: hand.notation,
+        note: '',
+        photo: null,
+        createdAt: Date.now(),
+      };
+      bumpHand(hand.id, +1);
+      postToGroup(win);
+      return win;
+    },
+    [bumpHand, postToGroup],
+  );
+
   const toggleLike = useCallback((id: string, liked: boolean) => {
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -175,7 +195,12 @@ export default function AppShell() {
         ) : (
           <>
             {tab === 'card' && (
-              <CardTab card={SAMPLE_CARD} handCounts={handCounts} onBump={bumpHand} />
+              <CardTab
+                card={SAMPLE_CARD}
+                handCounts={handCounts}
+                onBump={bumpHand}
+                onMahj={cardMahj}
+              />
             )}
             {tab === 'wins' && (
               <WinsTab
@@ -191,7 +216,6 @@ export default function AppShell() {
             )}
             {tab === 'group' && socialState && (
               <GroupTab
-                group={socialState.group}
                 members={socialState.members}
                 feed={socialState.feed}
                 profile={socialState.profile}
@@ -200,6 +224,7 @@ export default function AppShell() {
                 onAddComment={addCommentToPost}
               />
             )}
+            {tab === 'tables' && socialState && <TablesTab profile={socialState.profile} />}
             {tab === 'learn' && <LearnTab />}
           </>
         )}

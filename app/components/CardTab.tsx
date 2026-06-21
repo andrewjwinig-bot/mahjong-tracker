@@ -1,10 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { MahjongCard, Hand } from '../lib/types';
+import type { MahjongCard, Hand, Win } from '../lib/types';
 import { colorNotation } from '../lib/theme';
+import { buildShareCard } from '../lib/shareCard';
+import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import TileStrip from './TileStrip';
+import ShareModal from './ShareModal';
 
 type Filter = 'all' | 'remaining' | 'won';
 
@@ -12,10 +15,13 @@ interface Props {
   card: MahjongCard;
   handCounts: Record<string, number>;
   onBump: (handId: string, delta: number) => void;
+  /** First-time clear of a hand: posts to the feed, returns the Win to share. */
+  onMahj: (hand: Hand) => Win;
 }
 
-export default function CardTab({ card, handCounts, onBump }: Props) {
+export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [shareWin, setShareWin] = useState<Win | null>(null);
   const { celebrate } = useConfetti();
 
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
@@ -44,9 +50,21 @@ export default function CardTab({ card, handCounts, onBump }: Props) {
 
   function gotIt(h: Hand) {
     const was = countOf(h);
-    onBump(h.id, +1);
-    // First clear of this hand → full-screen MAHJ celebration.
-    if (was === 0) celebrate({ title: 'I Got Mahj! 🎉', subtitle: h.notation });
+    if (was === 0) {
+      // First clear → post to feed + full-screen celebration with a share prompt.
+      const win = onMahj(h);
+      celebrate({
+        title: 'I Got Mahj! 🎉',
+        handLabel: h.notation,
+        points: h.points,
+        cleared: stats.cleared + 1,
+        total: card.hands.length,
+        posted: true,
+        onShare: () => setShareWin(win),
+      });
+    } else {
+      onBump(h.id, +1);
+    }
   }
 
   return (
@@ -160,6 +178,18 @@ export default function CardTab({ card, handCounts, onBump }: Props) {
       >
         Sample card — illustrative notations, not the official NMJL card.
       </p>
+
+      {shareWin && (
+        <ShareModal
+          payload={{
+            title: 'Share Your Mahj! 🀄',
+            text: captionFor(shareWin),
+            url: appUrl(),
+            image: () => buildShareCard(shareWin, shareWin.handLabel),
+          }}
+          onClose={() => setShareWin(null)}
+        />
+      )}
     </div>
   );
 }
