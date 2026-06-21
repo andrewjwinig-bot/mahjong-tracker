@@ -131,6 +131,39 @@ function gradientV(c, top, bot) {
   }
 }
 
+const GREEN = [31, 168, 91];
+
+// 5x7 block glyphs (each row is 5 bits, MSB = leftmost column).
+const FONT = {
+  M: [0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001],
+  A: [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+  H: [0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+  J: [0b00111, 0b00010, 0b00010, 0b00010, 0b10010, 0b10010, 0b01100],
+};
+
+function drawGlyph(c, rows, x0, y0, cell, col) {
+  for (let r = 0; r < 7; r++) {
+    for (let k = 0; k < 5; k++) {
+      if (rows[r] & (1 << (4 - k))) {
+        fillRect(c, Math.round(x0 + k * cell), Math.round(y0 + r * cell),
+          Math.ceil(cell), Math.ceil(cell), [...col, 255]);
+      }
+    }
+  }
+}
+
+// Centered word; each letter takes its own color from `cols`.
+function drawWord(c, word, cx, yTop, cell, cols) {
+  const lw = 5 * cell;
+  const gap = cell;
+  const total = word.length * lw + (word.length - 1) * gap;
+  let x = cx - total / 2;
+  for (let i = 0; i < word.length; i++) {
+    drawGlyph(c, FONT[word[i]], x, yTop, cell, cols[i % cols.length]);
+    x += lw + gap;
+  }
+}
+
 function draw(size, { maskable }) {
   const c = canvas(size);
   gradientV(c, JADE_TOP, JADE_BOT); // full-bleed jade gradient
@@ -145,21 +178,20 @@ function draw(size, { maskable }) {
   // soft top sheen on the tile
   roundRect(c, tx, ty, tw, Math.round(tw * 0.42), r, SHEEN);
 
-  // centered joker emblem: a jester's hat with three belled points
+  // joker-tile style: three jester bells over the "MAHJ" wordmark
   const mx = size / 2;
-  const by = ty + tw * 0.64; // hat band baseline
-  const bw = tw * 0.5;
-  const bh = tw * 0.13;
-  const half = tw * 0.12;
+  const bellY = Math.round(ty + tw * 0.26);
+  const bellR = Math.round(tw * 0.07);
+  const bellCols = [CORAL, GOLD, VIOLET];
+  [-1, 0, 1].forEach((d, i) => {
+    const bx = Math.round(mx + d * tw * 0.26);
+    circle(c, bx, bellY, bellR + 2, [...NAVY, 255]);
+    circle(c, bx, bellY, bellR, [...bellCols[i], 255]);
+  });
 
-  // three floppy points rising from the band
-  lobe(c, mx - bw * 0.34, by, mx - tw * 0.31, by - tw * 0.34, half, CORAL);
-  lobe(c, mx + bw * 0.34, by, mx + tw * 0.31, by - tw * 0.34, half, VIOLET);
-  lobe(c, mx, by, mx, by - tw * 0.46, half, GOLD);
-
-  // hat band (navy outline + ivory face so points read on top)
-  roundRect(c, mx - bw / 2 - 3, by - 3, bw + 6, bh + 6, (bh + 6) * 0.5, [...NAVY, 255]);
-  roundRect(c, mx - bw / 2, by, bw, bh, bh * 0.5, [...CORAL, 255]);
+  // wordmark
+  const cell = tw / 26;
+  drawWord(c, 'MAHJ', mx, ty + tw * 0.46, cell, [CORAL, GOLD, VIOLET, GREEN]);
 
   return c;
 }
