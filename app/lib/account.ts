@@ -58,3 +58,21 @@ export const EXPERIENCE_LABEL: Record<Experience, string> = {
   intermediate: 'Intermediate',
   expert: 'Expert',
 };
+
+const K_TUT = 'mahj.tut';
+
+export function tutorialSeen(): boolean {
+  try {
+    return localStorage.getItem(K_TUT) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function setTutorialSeen(): void {
+  try {
+    localStorage.setItem(K_TUT, '1');
+  } catch {
+    /* ignore */
+  }
+}

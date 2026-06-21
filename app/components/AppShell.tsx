@@ -14,12 +14,15 @@ import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
 import TrophyShelf from './TrophyShelf';
+import Tutorial from './Tutorial';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
   getAccount,
   getExperience,
   setExperience as persistExperience,
+  tutorialSeen,
+  setTutorialSeen,
   type Account,
   type Experience,
 } from '../lib/account';
@@ -40,6 +43,7 @@ export default function AppShell() {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [trophyOpen, setTrophyOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -47,9 +51,11 @@ export default function AppShell() {
     const t = getStoredTheme();
     setThemeState(t);
     applyTheme(t);
-    setAccount(getAccount());
+    const acc = getAccount();
+    setAccount(acc);
     setExperienceState(getExperience());
     setAccountChecked(true);
+    if (acc && !tutorialSeen()) setShowTutorial(true);
     const sd = recordPlay();
     setStreak(sd.current);
     setBestStreak(sd.best);
@@ -226,6 +232,7 @@ export default function AppShell() {
   const finishOnboarding = useCallback((a: Account) => {
     setAccount(a);
     setExperienceState(a.experience);
+    if (!tutorialSeen()) setShowTutorial(true);
     // Adopt the chosen username as the profile name.
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -330,6 +337,15 @@ export default function AppShell() {
           bestStreak={bestStreak}
           memberSince={account?.createdAt}
           onClose={() => setTrophyOpen(false)}
+        />
+      )}
+
+      {showTutorial && (
+        <Tutorial
+          onDone={() => {
+            setTutorialSeen();
+            setShowTutorial(false);
+          }}
         />
       )}
     </ConfettiProvider>
