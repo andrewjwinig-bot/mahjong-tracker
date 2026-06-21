@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { tileSVG, CONFETTI_FACES } from '../lib/tileArt';
-import { playMahjChime, buzz, fxOn } from '../lib/sound';
+import { playMahjChime, playFanfare, buzz, fxOn } from '../lib/sound';
 
 export interface CelebrateOpts {
   title?: string;
@@ -165,11 +165,7 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
           setTimeout(() => spawnBurst(x, y, 38, W), k * 320);
         }
         spawnRain(70);
-        if (fx) {
-          playMahjChime();
-          setTimeout(playMahjChime, 340);
-          setTimeout(playMahjChime, 680);
-        }
+        if (fx) playFanfare();
       } else {
         spawnBurst(W / 2, H * 0.42, 40, Math.min(W, 460));
         spawnRain(26);

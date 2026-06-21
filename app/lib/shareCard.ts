@@ -86,6 +86,90 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
   );
 }
 
+export interface TrophyCardData {
+  name: string;
+  cleared: number;
+  total: number;
+  mahjs: number;
+  points: number;
+  bestStreak: number;
+  earned: number;
+  totalBadges: number;
+  emojis: string[];
+}
+
+/** A shareable "my stats" card PNG. */
+export async function buildTrophyCard(d: TrophyCardData): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, COLORS.primary);
+  g.addColorStop(1, COLORS.secondary);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = '800 40px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText('🀄  MY MAHJONG STATS', 64, 110);
+
+  const cardX = 56;
+  const cardY = 160;
+  const cardW = W - cardX * 2;
+  const cardH = H - cardY - 120;
+  roundRect(ctx, cardX, cardY, cardW, cardH, 44);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  const pad = 64;
+  ctx.fillStyle = COLORS.ink;
+  ctx.font = '900 72px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText(d.name, cardX + pad, cardY + 130);
+
+  // 2x2 stat grid
+  const stats: [string, string][] = [
+    [`${d.cleared}/${d.total}`, 'CLEARED'],
+    [`${d.mahjs}`, 'MAHJS'],
+    [`${d.points}`, 'POINTS'],
+    [`${d.bestStreak}d`, 'BEST STREAK'],
+  ];
+  const gx = cardX + pad;
+  const gy = cardY + 210;
+  const gw = (cardW - pad * 2 - 24) / 2;
+  const gh = 180;
+  stats.forEach(([num, lab], i) => {
+    const x = gx + (i % 2) * (gw + 24);
+    const y = gy + Math.floor(i / 2) * (gh + 20);
+    roundRect(ctx, x, y, gw, gh, 28);
+    ctx.fillStyle = '#f4f3ee';
+    ctx.fill();
+    ctx.fillStyle = COLORS.primary;
+    ctx.font = '900 70px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+    ctx.fillText(num, x + 28, y + 96);
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = '800 26px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+    ctx.fillText(lab, x + 28, y + 140);
+  });
+
+  // Trophies row
+  const ty = gy + gh * 2 + 60;
+  ctx.fillStyle = COLORS.accent;
+  ctx.font = '800 34px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText(`🏆 ${d.earned}/${d.totalBadges} TROPHIES`, cardX + pad, ty);
+  ctx.font = '60px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText(d.emojis.slice(0, 8).join(' '), cardX + pad, ty + 80);
+
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = '700 30px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText('Tracked with Mahjong Tracker', cardX + pad, cardY + cardH - 48);
+
+  return await new Promise<Blob>((resolve) =>
+    canvas.toBlob((b) => resolve(b ?? new Blob()), 'image/png'),
+  );
+}
+
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
