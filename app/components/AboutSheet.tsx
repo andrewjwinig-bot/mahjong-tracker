@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { exportData, deleteAllData } from '../lib/dataExport';
 import { isCloudEnabled, cloudSignOut, cloudDeleteAccount } from '../lib/cloudAuth';
+import { IconDownload, IconSignOut, IconTrash } from './uiIcons';
 
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
   const [confirming, setConfirming] = useState(false);
@@ -71,19 +72,32 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
         <label className="lbl" style={{ marginTop: 20 }}>
           Your data
         </label>
-        <button className="btn ghost" onClick={() => void exportData()}>
-          ⬇️ Export my data
+        <button
+          className="btn ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={() => void exportData()}
+        >
+          <IconDownload size={18} /> Export my data
         </button>
 
         {cloud && (
-          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => void signOut()} disabled={busy}>
-            ↩︎ Sign out
+          <button
+            className="btn ghost"
+            style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            onClick={() => void signOut()}
+            disabled={busy}
+          >
+            <IconSignOut size={18} /> Sign out
           </button>
         )}
 
         {!confirming ? (
-          <button className="btn danger" style={{ marginTop: 10 }} onClick={() => setConfirming(true)}>
-            🗑 Delete all my data
+          <button
+            className="btn danger"
+            style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            onClick={() => setConfirming(true)}
+          >
+            <IconTrash size={18} /> Delete all my data
           </button>
         ) : (
           <div className="card" style={{ marginTop: 10, padding: 14 }}>

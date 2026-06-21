@@ -11,7 +11,7 @@ import Avatar from './Avatar';
 import Tile from './Tile';
 import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
-import { IconChat, IconCalendar, IconCamera } from './uiIcons';
+import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus } from './uiIcons';
 import type { TileAvatar } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 
@@ -231,8 +231,12 @@ function TableDetail({
           <div className="detail-title">{table.name}</div>
           <div className="detail-sub">{table.members.length + 1} players</div>
         </div>
-        <button className="btn green" style={{ width: 'auto', padding: '9px 14px' }} onClick={() => setInviteOpen(true)}>
-          ↗ Invite
+        <button
+          className="btn green"
+          style={{ width: 'auto', padding: '9px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          onClick={() => setInviteOpen(true)}
+        >
+          <IconShare size={16} /> Invite
         </button>
       </div>
 
@@ -433,7 +437,7 @@ function DatesView({
         return (
           <div key={o.id} className={`poll-opt${isLeader ? ' lead' : ''}`}>
             <button className="vote-btn" data-on={voted} onClick={() => toggleVote(o.id)}>
-              {voted ? '✓' : ''}
+              {voted ? <IconCheck size={16} /> : ''}
             </button>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 800, fontSize: 14 }}>
@@ -445,7 +449,7 @@ function DatesView({
               </div>
             </div>
             <button className="icon-btn" aria-label="Add to calendar" onClick={() => setCalFor(o)}>
-              📅
+              <IconCalendar size={18} />
             </button>
           </div>
         );
@@ -457,8 +461,13 @@ function DatesView({
           <input className="field" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           <input className="field" type="time" value={time} style={{ maxWidth: 130 }} onChange={(e) => setTime(e.target.value)} />
         </div>
-        <button className="btn green" style={{ marginTop: 10 }} onClick={addOption} disabled={!date}>
-          ＋ Add date
+        <button
+          className="btn green"
+          style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={addOption}
+          disabled={!date}
+        >
+          <IconPlus size={17} /> Add date
         </button>
       </div>
 
@@ -470,24 +479,25 @@ function DatesView({
             <p className="sheet-sub">{prettyDate(calFor.date, calFor.time)} · {table.name}</p>
             <button
               className="btn"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
               onClick={() => {
                 downloadICS(eventFor(table, calFor));
                 void track('calendar_added', { kind: 'apple' });
                 setCalFor(null);
               }}
             >
-               Apple Calendar
+              <IconCalendar size={18} /> Apple Calendar
             </button>
             <button
               className="btn green"
-              style={{ marginTop: 10 }}
+              style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
               onClick={() => {
                 window.open(googleCalUrl(eventFor(table, calFor)), '_blank', 'noopener,noreferrer');
                 void track('calendar_added', { kind: 'google' });
                 setCalFor(null);
               }}
             >
-              📆 Google Calendar
+              <IconCalendar size={18} /> Google Calendar
             </button>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setCalFor(null)}>
               Cancel
@@ -537,8 +547,13 @@ function PhotosView({
   return (
     <div style={{ marginTop: 14 }}>
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
-      <button className="btn coral" onClick={() => fileRef.current?.click()} disabled={busy}>
-        {busy ? 'Adding…' : '📷 Add Photo'}
+      <button
+        className="btn coral"
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+        onClick={() => fileRef.current?.click()}
+        disabled={busy}
+      >
+        {busy ? 'Adding…' : <><IconCamera size={17} /> Add Photo</>}
       </button>
 
       {table.photos.length === 0 ? (

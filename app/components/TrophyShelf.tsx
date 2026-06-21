@@ -8,6 +8,7 @@ import { buildTrophyCard } from '../lib/shareCard';
 import { appUrl } from '../lib/share';
 import Avatar from './Avatar';
 import ShareModal from './ShareModal';
+import { IconShare, IconLock } from './uiIcons';
 
 export default function TrophyShelf({
   card,
@@ -52,8 +53,12 @@ export default function TrophyShelf({
             <div className="profile-name">{profile.name}</div>
             <div className="profile-handle">@{profile.handle}</div>
           </div>
-          <button className="btn coral" style={{ width: 'auto', padding: '9px 14px' }} onClick={() => setShareOpen(true)}>
-            ↗ Share
+          <button
+            className="btn coral"
+            style={{ width: 'auto', padding: '9px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            onClick={() => setShareOpen(true)}
+          >
+            <IconShare size={16} /> Share
           </button>
         </div>
         {profile.bio && <p className="profile-bio">{profile.bio}</p>}
@@ -73,7 +78,7 @@ export default function TrophyShelf({
         <div className="trophy-grid">
           {badges.map((b) => (
             <div className="trophy" data-earned={b.earned} key={b.id} title={b.desc}>
-              <span className="trophy-emoji">{b.earned ? b.emoji : '🔒'}</span>
+              <span className="trophy-emoji">{b.earned ? b.emoji : <IconLock size={22} />}</span>
               <span className="trophy-name">{b.name}</span>
               <span className="trophy-desc">{b.desc}</span>
             </div>
