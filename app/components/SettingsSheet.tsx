@@ -16,6 +16,7 @@ interface Props {
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
+  onTrophies: () => void;
   onClose: () => void;
 }
 
@@ -43,6 +44,7 @@ export default function SettingsSheet({
   onSaveProfile,
   onTheme,
   onExperience,
+  onTrophies,
   onClose,
 }: Props) {
   const [name, setName] = useState(profile.name);
@@ -176,6 +178,10 @@ export default function SettingsSheet({
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
+
+        <button className="btn ghost" style={{ marginTop: 16 }} onClick={onTrophies}>
+          🏆 Trophies &amp; Stats
+        </button>
 
         {/* Experience level */}
         <label className="lbl" style={{ marginTop: 18 }}>

@@ -13,6 +13,7 @@ import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
+import TrophyShelf from './TrophyShelf';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
@@ -37,6 +38,8 @@ export default function AppShell() {
   const [experience, setExperienceState] = useState<Experience>('beginner');
   const [accountChecked, setAccountChecked] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [trophyOpen, setTrophyOpen] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -47,7 +50,9 @@ export default function AppShell() {
     setAccount(getAccount());
     setExperienceState(getExperience());
     setAccountChecked(true);
-    setStreak(recordPlay().current);
+    const sd = recordPlay();
+    setStreak(sd.current);
+    setBestStreak(sd.best);
     (async () => {
       const [counts, notes, w, s] = await Promise.all([
         db.loadHandCounts(),
@@ -310,7 +315,21 @@ export default function AppShell() {
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
           onExperience={changeExperience}
+          onTrophies={() => {
+            setSettingsOpen(false);
+            setTrophyOpen(true);
+          }}
           onClose={() => setSettingsOpen(false)}
+        />
+      )}
+
+      {trophyOpen && (
+        <TrophyShelf
+          card={SAMPLE_CARD}
+          handCounts={handCounts}
+          bestStreak={bestStreak}
+          memberSince={account?.createdAt}
+          onClose={() => setTrophyOpen(false)}
         />
       )}
     </ConfettiProvider>
