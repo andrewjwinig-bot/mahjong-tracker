@@ -1,12 +1,23 @@
 'use client';
 
-const PERKS: { emoji: string; text: string }[] = [
-  { emoji: '🎨', text: 'All premium themes — Dragon, Joker & Midnight' },
-  { emoji: '🀄', text: 'Custom tile wallpapers & avatar packs' },
-  { emoji: '👯', text: 'Unlimited tables & friends' },
-  { emoji: '☁️', text: 'Cloud sync across devices (with accounts)' },
-  { emoji: '🔔', text: 'Push notifications for likes, comments & games' },
-  { emoji: '💛', text: 'Supporter badge — and you keep the lights on' },
+import type { ReactNode } from 'react';
+import {
+  IconPalette,
+  IconCard,
+  IconUsers,
+  IconCloud,
+  IconBell,
+  IconHeart,
+  IconCrown,
+} from './uiIcons';
+
+const PERKS: { icon: ReactNode; text: string }[] = [
+  { icon: <IconPalette size={20} />, text: 'All premium themes — Dragon, Joker & Midnight' },
+  { icon: <IconCard size={20} />, text: 'Custom tile wallpapers & avatar packs' },
+  { icon: <IconUsers size={20} />, text: 'Unlimited tables & friends' },
+  { icon: <IconCloud size={20} />, text: 'Cloud sync across devices (with accounts)' },
+  { icon: <IconBell size={20} />, text: 'Push notifications for likes, comments & games' },
+  { icon: <IconHeart size={20} fill />, text: 'Supporter badge — and you keep the lights on' },
 ];
 
 export default function Paywall({
@@ -20,13 +31,15 @@ export default function Paywall({
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
-        <h2>Mahjong Tracker Pro 👑</h2>
+        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          Mahjong Tracker Pro <IconCrown size={20} />
+        </h2>
         <p className="sheet-sub">Unlock the full table.</p>
 
         <div className="perks">
           {PERKS.map((p) => (
             <div className="perk" key={p.text}>
-              <span className="perk-emoji">{p.emoji}</span>
+              <span className="perk-emoji">{p.icon}</span>
               <span>{p.text}</span>
             </div>
           ))}

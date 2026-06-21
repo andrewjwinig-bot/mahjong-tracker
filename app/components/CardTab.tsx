@@ -11,6 +11,7 @@ import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
+import { IconFlame, IconTap } from './uiIcons';
 import type { Experience } from '../lib/account';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -134,7 +135,9 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
         <TileStrip count={7} />
         {streak > 1 && (
-          <div className="streak-chip">🔥 {streak}-day streak</div>
+          <div className="streak-chip">
+            <IconFlame size={15} /> {streak}-day streak
+          </div>
         )}
       </header>
 
@@ -187,7 +190,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
 
       {stats.totalWins === 0 && filter === 'all' && (
         <div className="coach">
-          <span className="coach-emoji">👆</span>
+          <span className="coach-emoji"><IconTap size={20} /></span>
           <span>
             <strong>Win a hand?</strong> Tap its checkbox to log your first MAHJ — your card fills in
             with a tile celebration.

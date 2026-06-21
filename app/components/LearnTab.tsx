@@ -1,12 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
+import {
+  IconTarget,
+  IconShuffle,
+  IconUsers,
+  IconUser,
+  IconCard,
+  IconBook,
+  IconBulb,
+  IconShield,
+  IconHelp,
+  IconSparkle,
+  IconCheck,
+  IconStar,
+} from './uiIcons';
 
 interface Section {
+  icon: ReactNode;
   title: string;
   body: React.ReactNode;
   /** Which experience levels see this section (undefined = everyone). */
@@ -145,11 +160,13 @@ function Charleston() {
 
 const SECTIONS: Section[] = [
   {
-    title: '🀄 Understanding the tiles',
+    icon: <IconCard size={18} />,
+    title: 'Understanding the tiles',
     body: <TileGuide />,
   },
   {
-    title: '🎯 How to play (the 60-second version)',
+    icon: <IconTarget size={18} />,
+    title: 'How to play (the 60-second version)',
     body: (
       <>
         <p>
@@ -166,11 +183,13 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '🔄 The Charleston (step-by-step)',
+    icon: <IconShuffle size={18} />,
+    title: 'The Charleston (step-by-step)',
     body: <Charleston />,
   },
   {
-    title: '👥 Playing with 3 players',
+    icon: <IconUsers size={18} />,
+    title: 'Playing with 3 players',
     body: (
       <>
         <p>
@@ -190,7 +209,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '👤 Playing with 2 players',
+    icon: <IconUser size={18} />,
+    title: 'Playing with 2 players',
     body: (
       <>
         <p>Two-player mahjong is a quick, punchy version — perfect for practice:</p>
@@ -210,7 +230,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '🎴 What does “clearing the card” mean?',
+    icon: <IconCheck size={18} />,
+    title: 'What does “clearing the card” mean?',
     body: (
       <>
         <p>
@@ -225,7 +246,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '📖 Reading the notation',
+    icon: <IconBook size={18} />,
+    title: 'Reading the notation',
     body: (
       <>
         <p>Hands are written in shorthand. A few common symbols:</p>
@@ -244,7 +266,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '💡 Tips',
+    icon: <IconBulb size={18} />,
+    title: 'Tips',
     body: (
       <ul>
         <li>Log the win the moment it happens — before the tiles get scooped up for the next hand.</li>
@@ -256,7 +279,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '🧠 Strategy: reading the table',
+    icon: <IconStar size={18} />,
+    title: 'Strategy: reading the table',
     levels: ['intermediate', 'expert'],
     body: (
       <ul>
@@ -269,7 +293,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '🛡️ Defensive play',
+    icon: <IconShield size={18} />,
+    title: 'Defensive play',
     levels: ['expert'],
     body: (
       <>
@@ -284,7 +309,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '❓ FAQ',
+    icon: <IconHelp size={18} />,
+    title: 'FAQ',
     body: (
       <>
         <p>
@@ -303,7 +329,8 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    title: '🎉 Fun facts',
+    icon: <IconSparkle size={18} />,
+    title: 'Fun facts',
     body: (
       <ul>
         <li>The National Mah Jongg League was founded in 1937 and still issues a new card every year.</li>
@@ -336,7 +363,10 @@ export default function LearnTab({ experience }: { experience: Experience }) {
         {sections.map((s, i) => (
           <div className="acc" key={i} data-open={open === i}>
             <button onClick={() => setOpen(open === i ? null : i)}>
-              <span>{s.title}</span>
+              <span className="acc-ico" aria-hidden>
+                {s.icon}
+              </span>
+              <span style={{ flex: 1 }}>{s.title}</span>
               <span className="chev">▶</span>
             </button>
             {open === i && <div className="acc-body">{s.body}</div>}

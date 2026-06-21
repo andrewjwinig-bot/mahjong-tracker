@@ -1017,6 +1017,18 @@ label.lbl {
   font-weight: 800;
   text-align: left;
 }
+.acc .acc-ico {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 10px;
+  border-radius: 10px;
+  background: var(--tint);
+  color: var(--brand);
+}
 .acc .chev {
   color: var(--brand);
   transition: transform 0.2s ease;
@@ -1125,6 +1137,9 @@ label.lbl {
 .coach .coach-emoji {
   font-size: 24px;
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  color: var(--brand);
   animation: coach-bob 1.4s ease-in-out infinite;
 }
 .coach strong {
@@ -2093,6 +2108,9 @@ label.lbl {
 .perk-emoji {
   font-size: 22px;
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  color: var(--brand);
 }
 .paywall-fine {
   margin: 10px 2px 0;
@@ -2121,7 +2139,9 @@ label.lbl {
 /* ---- Streak chip --------------------------------------------------------- */
 
 .streak-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 12px;
   padding: 6px 14px;
   border-radius: 999px;
@@ -2296,6 +2316,9 @@ label.lbl {
 .level-emoji {
   font-size: 24px;
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  color: var(--brand);
 }
 .level-name {
   display: block;
