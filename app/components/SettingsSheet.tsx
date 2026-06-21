@@ -9,6 +9,8 @@ import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
 import AboutSheet from './AboutSheet';
+import Paywall from './Paywall';
+import { isPro, setPro } from '../lib/pro';
 
 interface Props {
   profile: Profile;
@@ -56,6 +58,8 @@ export default function SettingsSheet({
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
   const [fx, setFxState] = useState(fxOn());
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [pro, setProState] = useState(isPro());
+  const [paywall, setPaywall] = useState(false);
 
   const letter = initialOf(name);
   // For the letter tile, the displayed character always tracks the name.
@@ -230,14 +234,18 @@ export default function SettingsSheet({
           Color theme
         </label>
         <div className="theme-grid">
-          {THEMES.map((t) => (
+          {THEMES.map((t) => {
+            const locked = !!t.pro && !pro;
+            return (
             <button
               key={t.id}
               className="theme-card"
               data-active={theme === t.id}
-              onClick={() => onTheme(t.id)}
+              data-locked={locked}
+              onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
             >
               {theme === t.id && <span className="tick">✓</span>}
+              {locked && <span className="theme-lock">🔒</span>}
               <span className="swatch">
                 <i style={{ background: t.swatch.brand }} />
                 <i style={{ background: t.swatch.green }} />
@@ -247,10 +255,17 @@ export default function SettingsSheet({
               <span className="tname">{t.name}</span>
               <span className="ttag">{t.tagline}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
 
-        <button className="btn ghost" style={{ marginTop: 16 }} onClick={() => setAboutOpen(true)}>
+        {!pro && (
+          <button className="btn" style={{ marginTop: 16 }} onClick={() => setPaywall(true)}>
+            👑 Go Pro
+          </button>
+        )}
+
+        <button className="btn ghost" style={{ marginTop: pro ? 16 : 10 }} onClick={() => setAboutOpen(true)}>
           ℹ️ About &amp; Legal
         </button>
 
@@ -265,6 +280,16 @@ export default function SettingsSheet({
       </div>
 
       {aboutOpen && <AboutSheet onClose={() => setAboutOpen(false)} />}
+      {paywall && (
+        <Paywall
+          onUnlock={() => {
+            setPro(true);
+            setProState(true);
+            setPaywall(false);
+          }}
+          onClose={() => setPaywall(false)}
+        />
+      )}
     </div>
   );
 }
