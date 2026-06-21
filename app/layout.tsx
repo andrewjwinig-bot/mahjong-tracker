@@ -38,6 +38,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={baloo.variable}>
       <body>
+        {/* Apply the saved color theme before paint (no flash on reload). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('mahj.theme');if(t&&t!=='jade'){document.documentElement.setAttribute('data-theme',t);var d={bubblegum:'#FCE7EC',electric:'#F5F4FC',sunset:'#FFF6EC',midnight:'#141826'}[t];if(d){var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d);}}}catch(e){}})();`,
+          }}
+        />
         {children}
         <SWRegister />
       </body>

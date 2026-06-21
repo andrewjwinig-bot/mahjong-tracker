@@ -39,7 +39,8 @@ export default function WinsTab({
   onPostToGroup,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const fireConfetti = useConfetti();
+  const [shareWin, setShareWin] = useState<Win | null>(null);
+  const { celebrate } = useConfetti();
 
   return (
     <div className="screen">
@@ -84,9 +85,27 @@ export default function WinsTab({
             if (win.handId) onBump(win.handId, +1);
             // …and optionally lands in the group feed.
             if (opts.shareToGroup) onPostToGroup(win);
-            fireConfetti();
             setOpen(false);
+            celebrate({
+              title: 'I Got Mahj! 🎉',
+              subtitle: win.handLabel,
+              onShare: () => setShareWin(win),
+            });
           }}
+        />
+      )}
+
+      {shareWin && (
+        <ShareModal
+          payload={{
+            title: 'Share Your Mahj! 🀄',
+            text: captionFor(shareWin),
+            url: appUrl(),
+            image: () => buildShareCard(shareWin, shareWin.handLabel),
+          }}
+          groupName={groupName}
+          onShareToGroup={() => onPostToGroup(shareWin)}
+          onClose={() => setShareWin(null)}
         />
       )}
     </div>

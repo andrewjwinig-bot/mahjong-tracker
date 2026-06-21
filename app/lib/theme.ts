@@ -13,12 +13,6 @@ export const COLORS = {
   hairline: '#F3D7DF',
 } as const;
 
-/**
- * Decorative per-group notation colors — the navy / green / coral / blue mix
- * from the card. Positional & decorative only (no suit meaning).
- */
-export const NOTATION_COLORS = ['#2C3A57', '#23B196', '#E8455F', '#3B7DD8'];
-
 /** Rotating per-category accent themes (used for avatars + the social feed). */
 export interface CategoryTheme {
   /** Soft pill / tint background. */
@@ -44,13 +38,10 @@ export function themeForCategory(categories: string[], category: string): Catego
 
 /**
  * Decorative per-group coloring for a notation string. Splits on whitespace and
- * cycles accent colors by group position. This is POSITIONAL/decorative only —
- * it is not suit-accurate and carries no game meaning.
+ * cycles a theme-aware color *class* (nc0–nc3) by group position. Positional /
+ * decorative only — not suit-accurate, carries no game meaning.
  */
-export function colorNotation(notation: string): { text: string; color: string }[] {
+export function colorNotation(notation: string): { text: string; cls: string }[] {
   const groups = notation.trim().split(/\s+/);
-  return groups.map((text, i) => ({
-    text,
-    color: NOTATION_COLORS[i % NOTATION_COLORS.length],
-  }));
+  return groups.map((text, i) => ({ text, cls: `nc${i % 4}` }));
 }

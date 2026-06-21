@@ -1,78 +1,175 @@
 'use client';
 
-import { createContext, useCallback, useContext, useRef } from 'react';
+import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { tileSVG, CONFETTI_FACES } from '../lib/tileArt';
 
-/** Fire a celebratory tile burst, optionally from a screen point. */
-export type Burst = (origin?: { x: number; y: number }) => void;
+export interface CelebrateOpts {
+  title?: string;
+  subtitle?: string | null;
+  /** Optional share action surfaced in the celebration modal. */
+  onShare?: () => void;
+}
 
-const ConfettiContext = createContext<Burst>(() => {});
+interface ConfettiApi {
+  /** Quick tile burst from a point (e.g. a checkbox). */
+  burst: (origin?: { x: number; y: number }) => void;
+  /** Full-screen tile celebration + the "I Got Mahj!" modal. */
+  celebrate: (opts?: CelebrateOpts) => void;
+}
 
-/** Trigger the "MAHJ" tile confetti from anywhere inside the provider. */
-export function useConfetti(): Burst {
+const ConfettiContext = createContext<ConfettiApi>({ burst: () => {}, celebrate: () => {} });
+
+export function useConfetti(): ConfettiApi {
   return useContext(ConfettiContext);
 }
 
-// Tile faces: the letters of MAHJ plus a few real mahjong tile glyphs.
-const FACES = ['M', 'A', 'H', 'J', '🀄', '🀇', '🀐', '🀙', '🀚', 'M', 'A', 'H', 'J'];
-const LETTER_COLORS = ['#E8455F', '#23B196', '#3B7DD8', '#7C6BE6', '#E59A2B'];
-const isGlyph = (s: string) => s.codePointAt(0)! > 0x2000;
+const reduced = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+function makeTile(): HTMLDivElement {
+  const pick = CONFETTI_FACES[Math.floor(Math.random() * CONFETTI_FACES.length)];
+  const el = document.createElement('div');
+  el.className = 'confetti-tile';
+  el.innerHTML = tileSVG(pick.face, { char: pick.char, color: pick.color });
+  return el;
+}
 
 export function ConfettiProvider({ children }: { children: React.ReactNode }) {
   const layerRef = useRef<HTMLDivElement>(null);
+  const [celebration, setCelebration] = useState<CelebrateOpts | null>(null);
 
-  const burst: Burst = useCallback((origin) => {
+  // A burst of tiles flying out from (x, y), then drifting down under gravity.
+  const spawnBurst = useCallback((x: number, y: number, count: number, spread: number) => {
     const layer = layerRef.current;
     if (!layer) return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-
-    const x = origin?.x ?? window.innerWidth / 2;
-    const y = origin?.y ?? window.innerHeight * 0.4;
-    const COUNT = 30;
-
-    for (let i = 0; i < COUNT; i++) {
-      const el = document.createElement('div');
-      const face = FACES[Math.floor(Math.random() * FACES.length)];
-      el.className = 'confetti-tile';
-      el.textContent = face;
-      if (!isGlyph(face)) {
-        el.style.color = LETTER_COLORS[Math.floor(Math.random() * LETTER_COLORS.length)];
-      }
+    for (let i = 0; i < count; i++) {
+      const el = makeTile();
       el.style.left = `${x}px`;
       el.style.top = `${y}px`;
       layer.appendChild(el);
 
-      // Burst outward, then fall under "gravity".
       const angle = Math.random() * Math.PI * 2;
-      const dist = 60 + Math.random() * 170;
+      const dist = spread * (0.35 + Math.random() * 0.65);
       const dx = Math.cos(angle) * dist;
-      const dyUp = Math.sin(angle) * dist - (130 + Math.random() * 140);
-      const rot = Math.random() * 720 - 360;
-      const dur = 950 + Math.random() * 750;
+      const dyUp = Math.sin(angle) * dist - (120 + Math.random() * 150);
+      const rot = Math.random() * 760 - 380;
+      const dur = 1700 + Math.random() * 1100; // slower, floatier
 
       const anim = el.animate(
         [
-          { transform: 'translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.3)', opacity: 1 },
+          { transform: 'translate(-50%, -50%) translate(0,0) rotate(0deg) scale(0.3)', opacity: 1 },
           {
-            offset: 0.25,
-            transform: `translate(-50%, -50%) translate(${dx * 0.5}px, ${dyUp * 0.6}px) rotate(${rot * 0.4}deg) scale(1)`,
+            offset: 0.28,
+            transform: `translate(-50%, -50%) translate(${dx * 0.55}px, ${dyUp * 0.6}px) rotate(${rot * 0.4}deg) scale(1)`,
             opacity: 1,
           },
           {
-            transform: `translate(-50%, -50%) translate(${dx}px, ${dyUp + 460}px) rotate(${rot}deg) scale(0.85)`,
+            offset: 0.85,
+            opacity: 1,
+          },
+          {
+            transform: `translate(-50%, -50%) translate(${dx}px, ${dyUp + 720}px) rotate(${rot}deg) scale(0.9)`,
             opacity: 0,
           },
         ],
-        { duration: dur, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'forwards' },
+        { duration: dur, easing: 'cubic-bezier(0.12, 0.66, 0.3, 1)', fill: 'forwards' },
       );
       anim.onfinish = () => el.remove();
       anim.oncancel = () => el.remove();
     }
   }, []);
 
+  // A gentle rain of tiles falling across the whole screen.
+  const spawnRain = useCallback((count: number) => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    for (let i = 0; i < count; i++) {
+      const el = makeTile();
+      const x = Math.random() * W;
+      el.style.left = `${x}px`;
+      el.style.top = `-50px`;
+      layer.appendChild(el);
+
+      const drift = (Math.random() - 0.5) * 160;
+      const rot = Math.random() * 720 - 360;
+      const dur = 2400 + Math.random() * 1600; // slow drift down
+      const delay = Math.random() * 500;
+
+      const anim = el.animate(
+        [
+          { transform: 'translate(-50%, -50%) translate(0,0) rotate(0deg)', opacity: 1 },
+          {
+            transform: `translate(-50%, -50%) translate(${drift}px, ${H + 120}px) rotate(${rot}deg)`,
+            opacity: 1,
+          },
+        ],
+        { duration: dur, delay, easing: 'cubic-bezier(0.4, 0.1, 0.6, 1)', fill: 'forwards' },
+      );
+      anim.onfinish = () => el.remove();
+      anim.oncancel = () => el.remove();
+    }
+  }, []);
+
+  const burst = useCallback(
+    (origin?: { x: number; y: number }) => {
+      if (reduced()) return;
+      const x = origin?.x ?? window.innerWidth / 2;
+      const y = origin?.y ?? window.innerHeight * 0.4;
+      spawnBurst(x, y, 22, 220);
+    },
+    [spawnBurst],
+  );
+
+  const celebrate = useCallback(
+    (opts?: CelebrateOpts) => {
+      setCelebration(opts ?? { title: 'I Got Mahj! 🎉' });
+      if (reduced()) return;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight * 0.42;
+      spawnBurst(cx, cy, 40, Math.min(window.innerWidth, 460));
+      spawnRain(26);
+    },
+    [spawnBurst, spawnRain],
+  );
+
   return (
-    <ConfettiContext.Provider value={burst}>
+    <ConfettiContext.Provider value={{ burst, celebrate }}>
       {children}
       <div ref={layerRef} className="confetti-layer" aria-hidden />
+      {celebration && (
+        <CelebrationModal opts={celebration} onClose={() => setCelebration(null)} />
+      )}
     </ConfettiContext.Provider>
+  );
+}
+
+function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () => void }) {
+  return (
+    <div className="celebrate-scrim" onClick={onClose}>
+      <div className="celebrate-card" onClick={(e) => e.stopPropagation()}>
+        <div className="boom">🀄</div>
+        <h2>{opts.title ?? 'I Got Mahj! 🎉'}</h2>
+        {opts.subtitle && <p className="cele-hand">{opts.subtitle}</p>}
+        <div className="row" style={{ marginTop: 16 }}>
+          {opts.onShare && (
+            <button
+              className="btn coral"
+              onClick={() => {
+                onClose();
+                opts.onShare?.();
+              }}
+            >
+              ↗ Share It
+            </button>
+          )}
+          <button className="btn" onClick={onClose}>
+            Keep Going
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

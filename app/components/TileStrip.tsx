@@ -1,13 +1,22 @@
-// Decorative little row of mahjong tiles — framed as chips so they read as
-// tiles on every platform regardless of how the glyph renders.
-const TILES = ['🀇', '🀐', '🀙', '🀄', '🀅', '🀀', '🀛', '🀒', '🀜', '🀗'];
+import Tile from './Tile';
+import type { TileFace } from '../lib/tileArt';
+
+// A little parade of one of each tile family — custom SVG artwork.
+const STRIP: { face: TileFace; char?: string; color?: string }[] = [
+  { face: 'crack' },
+  { face: 'bam' },
+  { face: 'dot' },
+  { face: 'dragon', char: '中', color: '#E8455F' },
+  { face: 'flower' },
+  { face: 'wind', char: '東' },
+  { face: 'joker' },
+];
 
 export default function TileStrip({ count = 7 }: { count?: number }) {
-  const tiles = Array.from({ length: count }, (_, i) => TILES[i % TILES.length]);
   return (
     <div className="tile-strip" aria-hidden>
-      {tiles.map((t, i) => (
-        <span key={i}>{t}</span>
+      {STRIP.slice(0, count).map((t, i) => (
+        <Tile key={i} face={t.face} char={t.char} color={t.color} size={32} />
       ))}
     </div>
   );

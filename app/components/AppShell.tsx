@@ -10,7 +10,9 @@ import CardTab from './CardTab';
 import WinsTab from './WinsTab';
 import GroupTab from './GroupTab';
 import LearnTab from './LearnTab';
+import SettingsSheet from './SettingsSheet';
 import { ConfettiProvider } from './Confetti';
+import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('card');
@@ -19,10 +21,15 @@ export default function AppShell() {
   const [handNotes, setHandNotes] = useState<Record<string, string>>({});
   const [wins, setWins] = useState<Win[]>([]);
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [theme, setThemeState] = useState<ThemeId>('jade');
 
   // Load all local state once on mount.
   useEffect(() => {
     let alive = true;
+    const t = getStoredTheme();
+    setThemeState(t);
+    applyTheme(t);
     (async () => {
       const [counts, notes, w, s] = await Promise.all([
         db.loadHandCounts(),
@@ -78,29 +85,86 @@ export default function AppShell() {
       const post: social.FeedPost = {
         id: crypto.randomUUID(),
         memberId: social.YOU_ID,
-        memberName: prev.youName,
-        avatarColor: prev.members.find((m) => m.isYou)?.avatarColor ?? '#E8455F',
+        memberName: prev.profile.name,
+        avatar: prev.profile.avatar,
         handLabel: win.handLabel,
         note: win.note,
         photo: win.photo,
         createdAt: win.createdAt,
+        likes: 0,
+        likedByMe: false,
+        comments: [],
       };
       void social.addFeedPost(post);
       return { ...prev, feed: [post, ...prev.feed] };
     });
   }, []);
 
-  const hidePost = useCallback((id: string) => {
+  const toggleLike = useCallback((id: string, liked: boolean) => {
     setSocialState((prev) => {
       if (!prev) return prev;
-      void social.setFeedHidden(id, true);
-      return { ...prev, feed: prev.feed.map((p) => (p.id === id ? { ...p, hidden: true } : p)) };
+      void social.toggleLike(id, liked);
+      return {
+        ...prev,
+        feed: prev.feed.map((p) =>
+          p.id === id ? { ...p, likedByMe: liked, likes: Math.max(0, p.likes + (liked ? 1 : -1)) } : p,
+        ),
+      };
     });
+  }, []);
+
+  const addCommentToPost = useCallback((id: string, text: string) => {
+    setSocialState((prev) => {
+      if (!prev) return prev;
+      const comment: social.Comment = {
+        id: crypto.randomUUID(),
+        author: prev.profile.name,
+        avatar: prev.profile.avatar,
+        text,
+        createdAt: Date.now(),
+      };
+      void social.addComment(id, comment);
+      return {
+        ...prev,
+        feed: prev.feed.map((p) =>
+          p.id === id ? { ...p, comments: [...p.comments, comment] } : p,
+        ),
+      };
+    });
+  }, []);
+
+  const saveProfile = useCallback((profile: social.Profile) => {
+    setSocialState((prev) => {
+      if (!prev) return prev;
+      void social.saveProfile(profile);
+      // Reflect new identity on your existing posts + comments + member row.
+      return {
+        ...prev,
+        profile,
+        members: prev.members.map((m) =>
+          m.isYou ? { ...m, name: profile.name, avatar: profile.avatar } : m,
+        ),
+        feed: prev.feed.map((p) =>
+          p.memberId === social.YOU_ID
+            ? { ...p, memberName: profile.name, avatar: profile.avatar }
+            : p,
+        ),
+      };
+    });
+  }, []);
+
+  const changeTheme = useCallback((id: ThemeId) => {
+    persistTheme(id);
+    setThemeState(id);
   }, []);
 
   return (
     <ConfettiProvider>
       <div className="app">
+        <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
+          ⚙️
+        </button>
+
         {!loaded ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
             <div className="empty">
@@ -114,32 +178,43 @@ export default function AppShell() {
               <CardTab card={SAMPLE_CARD} handCounts={handCounts} onBump={bumpHand} />
             )}
             {tab === 'wins' && (
-            <WinsTab
-              card={SAMPLE_CARD}
-              handNotes={handNotes}
-              wins={wins}
-              groupName={socialState?.group.name ?? 'your group'}
-              onAddWin={addWin}
-              onRemoveWin={removeWin}
-              onBump={bumpHand}
-              onPostToGroup={postToGroup}
-            />
-          )}
-          {tab === 'group' && socialState && (
-            <GroupTab
-              group={socialState.group}
-              members={socialState.members}
-              feed={socialState.feed}
-              youName={socialState.youName}
-              youStats={youStats}
-              onHidePost={hidePost}
-            />
-          )}
-          {tab === 'learn' && <LearnTab />}
-        </>
+              <WinsTab
+                card={SAMPLE_CARD}
+                handNotes={handNotes}
+                wins={wins}
+                groupName={socialState?.group.name ?? 'your table'}
+                onAddWin={addWin}
+                onRemoveWin={removeWin}
+                onBump={bumpHand}
+                onPostToGroup={postToGroup}
+              />
+            )}
+            {tab === 'group' && socialState && (
+              <GroupTab
+                group={socialState.group}
+                members={socialState.members}
+                feed={socialState.feed}
+                profile={socialState.profile}
+                youStats={youStats}
+                onToggleLike={toggleLike}
+                onAddComment={addCommentToPost}
+              />
+            )}
+            {tab === 'learn' && <LearnTab />}
+          </>
         )}
         <BottomNav tab={tab} onChange={setTab} />
       </div>
+
+      {settingsOpen && socialState && (
+        <SettingsSheet
+          profile={socialState.profile}
+          theme={theme}
+          onSaveProfile={saveProfile}
+          onTheme={changeTheme}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </ConfettiProvider>
   );
 }
