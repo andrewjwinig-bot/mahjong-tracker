@@ -47,31 +47,52 @@ function circle(c, cx, cy, r, col) {
   }
 }
 
-const BLUE = [47, 107, 255, 255];
-const WHITE = [255, 255, 255, 255];
-const CORAL = [255, 107, 92, 255];
-const GREEN = [22, 192, 152, 255];
+const JADE_TOP = [18, 184, 158]; // brand jade, lighter
+const JADE_BOT = [11, 124, 107]; // deeper jade
+const IVORY = [253, 251, 245, 255]; // bone tile
+const CORAL = [232, 69, 95, 255]; // dot motif
+const SHEEN = [255, 255, 255, 46]; // soft top highlight
+
+// Vertical gradient background fill.
+function gradientV(c, top, bot) {
+  for (let y = 0; y < c.size; y++) {
+    const t = y / (c.size - 1);
+    const col = [
+      Math.round(top[0] + (bot[0] - top[0]) * t),
+      Math.round(top[1] + (bot[1] - top[1]) * t),
+      Math.round(top[2] + (bot[2] - top[2]) * t),
+      255,
+    ];
+    for (let x = 0; x < c.size; x++) px(c, x, y, col);
+  }
+}
+
+// A ring = filled disk minus an inner disk of the tile color.
+function ring(c, cx, cy, rOuter, rInner, col, fill) {
+  circle(c, cx, cy, rOuter, col);
+  circle(c, cx, cy, rInner, fill);
+}
 
 function draw(size, { maskable }) {
   const c = canvas(size);
-  fillRect(c, 0, 0, size, size, BLUE); // full-bleed background
-  const inset = maskable ? size * 0.2 : size * 0.17; // tile padding
-  const tx = inset;
-  const ty = inset;
-  const tw = size - inset * 2;
-  roundRect(c, Math.round(tx), Math.round(ty), Math.round(tw), Math.round(tw), tw * 0.22, WHITE);
-  // coral "dot"
-  circle(c, Math.round(size / 2), Math.round(ty + tw * 0.34), Math.round(tw * 0.16), CORAL);
-  // green "bar"
-  roundRect(
-    c,
-    Math.round(tx + tw * 0.2),
-    Math.round(ty + tw * 0.6),
-    Math.round(tw * 0.6),
-    Math.round(tw * 0.16),
-    tw * 0.08,
-    GREEN,
-  );
+  gradientV(c, JADE_TOP, JADE_BOT); // full-bleed jade gradient
+
+  const inset = maskable ? size * 0.22 : size * 0.18; // tile padding
+  const tx = Math.round(inset);
+  const ty = Math.round(inset);
+  const tw = Math.round(size - inset * 2);
+  const r = tw * 0.24;
+
+  roundRect(c, tx, ty, tw, tw, r, IVORY); // ivory mahjong tile
+  // soft top sheen on the tile
+  roundRect(c, tx, ty, tw, Math.round(tw * 0.42), r, SHEEN);
+
+  // centered "dot" suit motif: coral ring + center pip
+  const mx = Math.round(size / 2);
+  const my = Math.round(ty + tw * 0.5);
+  ring(c, mx, my, Math.round(tw * 0.3), Math.round(tw * 0.19), CORAL, IVORY);
+  circle(c, mx, my, Math.round(tw * 0.1), CORAL);
+
   return c;
 }
 
