@@ -7,6 +7,7 @@ import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import TileStrip from './TileStrip';
+import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 
 type Filter = 'all' | 'remaining' | 'won';
@@ -50,20 +51,54 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
 
   function gotIt(h: Hand) {
     const was = countOf(h);
-    if (was === 0) {
-      // First clear → post to feed + full-screen celebration with a share prompt.
-      const win = onMahj(h);
+    if (was !== 0) {
+      onBump(h.id, +1);
+      return;
+    }
+    // First clear → post to feed + full-screen celebration with a share prompt.
+    const win = onMahj(h);
+    const total = card.hands.length;
+    const newCleared = stats.cleared + 1;
+
+    // Did this clear finish the whole category, or the entire card?
+    const catHands = card.hands.filter((x) => x.category === h.category);
+    const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
+    const cardDone = newCleared >= total;
+
+    if (cardDone) {
+      celebrate({
+        title: 'You Cleared The Card!!',
+        emoji: '👑',
+        hype: 'ALL 70 HANDS — LEGENDARY 👑',
+        cleared: newCleared,
+        total,
+        posted: true,
+        big: true,
+        onShare: () => setShareWin(win),
+      });
+    } else if (catDone) {
+      celebrate({
+        title: 'Category Cleared! 🎉',
+        emoji: '🏆',
+        hype: `Every ${h.category} hand — done!`,
+        handLabel: h.notation,
+        points: h.points,
+        cleared: newCleared,
+        total,
+        posted: true,
+        big: true,
+        onShare: () => setShareWin(win),
+      });
+    } else {
       celebrate({
         title: 'I Got Mahj! 🎉',
         handLabel: h.notation,
         points: h.points,
-        cleared: stats.cleared + 1,
-        total: card.hands.length,
+        cleared: newCleared,
+        total,
         posted: true,
         onShare: () => setShareWin(win),
       });
-    } else {
-      onBump(h.id, +1);
     }
   }
 
@@ -101,6 +136,10 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
 
       <div className="progress" aria-label={`${pct}% of card cleared`}>
         <span style={{ width: `${pct}%` }} />
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <TipCard />
       </div>
 
       <div className="segmented" style={{ marginTop: 16 }}>
