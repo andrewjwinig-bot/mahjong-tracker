@@ -2,23 +2,22 @@
 
 import { useMemo, useState } from 'react';
 import type { MahjongCard, Hand } from '../lib/types';
-import { colorNotation, themeForCategory } from '../lib/theme';
+import { colorNotation } from '../lib/theme';
+import { useConfetti } from './Confetti';
+import TileStrip from './TileStrip';
 
 type Filter = 'all' | 'remaining' | 'won';
 
 interface Props {
   card: MahjongCard;
   handCounts: Record<string, number>;
-  handNotes: Record<string, string>;
   onBump: (handId: string, delta: number) => void;
-  onSaveNotation: (handId: string, notation: string) => void;
 }
 
-export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNotation }: Props) {
+export default function CardTab({ card, handCounts, onBump }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
-  const [editing, setEditing] = useState<string | null>(null);
+  const fireConfetti = useConfetti();
 
-  const notationOf = (h: Hand) => handNotes[h.id] ?? h.notation;
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
 
   const stats = useMemo(() => {
@@ -26,13 +25,12 @@ export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNot
     let totalWins = 0;
     let totalPoints = 0;
     for (const h of card.hands) {
-      const c = countOf(h);
+      const c = handCounts[h.id] ?? 0;
       if (c > 0) cleared += 1;
       totalWins += c;
       totalPoints += c * h.points;
     }
     return { cleared, totalWins, totalPoints };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [card, handCounts]);
 
   const visible = (h: Hand) => {
@@ -44,24 +42,39 @@ export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNot
 
   const pct = Math.round((stats.cleared / card.hands.length) * 100);
 
+  function gotIt(h: Hand, e: React.MouseEvent<HTMLButtonElement>) {
+    const was = countOf(h);
+    const r = e.currentTarget.getBoundingClientRect();
+    onBump(h.id, +1);
+    // First clear of this hand → celebrate with a MAHJ tile burst.
+    if (was === 0) fireConfetti({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  }
+
   return (
     <div className="screen">
-      <header className="app-header" style={{ padding: '12px 2px 4px' }}>
-        <h1>Your {card.year} Card</h1>
-        <p className="sub">Tap a hand each time you win it. Clear all {card.hands.length}.</p>
+      <header className="app-header">
+        <h1>
+          Your {card.year}
+          <br />
+          Card
+        </h1>
+        <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
+        <TileStrip count={7} />
       </header>
 
-      <div className="stats" style={{ marginTop: 14 }}>
+      <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
           <div className="num">
             {stats.cleared}
-            <span style={{ fontSize: 15, color: 'var(--muted)', fontWeight: 800 }}>/{card.hands.length}</span>
+            <span style={{ fontSize: 15, color: 'var(--muted)', fontWeight: 800 }}>
+              /{card.hands.length}
+            </span>
           </div>
           <div className="lab">Cleared</div>
         </div>
         <div className="stat">
           <div className="num">{stats.totalWins}</div>
-          <div className="lab">Total wins</div>
+          <div className="lab">Mahjs</div>
         </div>
         <div className="stat">
           <div className="num">{stats.totalPoints}</div>
@@ -76,7 +89,7 @@ export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNot
       <div className="segmented" style={{ marginTop: 16 }}>
         {(['all', 'remaining', 'won'] as Filter[]).map((f) => (
           <button key={f} data-active={filter === f} onClick={() => setFilter(f)}>
-            {f === 'all' ? 'All' : f === 'remaining' ? 'Remaining' : 'Won'}
+            {f === 'all' ? 'All' : f === 'remaining' ? 'To Go' : 'Got It'}
           </button>
         ))}
       </div>
@@ -84,86 +97,52 @@ export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNot
       {card.categories.map((category) => {
         const hands = card.hands.filter((h) => h.category === category && visible(h));
         if (hands.length === 0) return null;
-        const theme = themeForCategory(card.categories, category);
         const wonInCat = card.hands.filter((h) => h.category === category && countOf(h) > 0).length;
         const totalInCat = card.hands.filter((h) => h.category === category).length;
         return (
           <section key={category}>
             <div className="cat-head">
-              <span className="pill" style={{ background: theme.bg, color: theme.accent }}>
-                {category}
-              </span>
+              <span className="pill">{category}</span>
               <span className="count">
-                {wonInCat}/{totalInCat} won
+                {wonInCat}/{totalInCat} got
               </span>
             </div>
             {hands.map((h) => {
               const count = countOf(h);
-              const isEditing = editing === h.id;
               return (
                 <div key={h.id} className={`hand${count > 0 ? ' won' : ''}`}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {isEditing ? (
-                      <input
-                        className="field"
-                        defaultValue={notationOf(h)}
-                        autoFocus
-                        onBlur={(e) => {
-                          onSaveNotation(h.id, e.target.value.trim() || h.notation);
-                          setEditing(null);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                          if (e.key === 'Escape') setEditing(null);
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <div className="notation">
-                          {colorNotation(notationOf(h)).map((g, i) => (
-                            <span key={i} style={{ color: g.color }}>
-                              {g.text}
-                              {i < colorNotation(notationOf(h)).length - 1 ? ' ' : ''}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="meta">
-                          <span className="pts">{h.points} pts</span>
-                          {h.concealed && <span className="badge-c" title="Concealed">C</span>}
-                          <button
-                            className="icon-btn"
-                            style={{ width: 26, height: 26, fontSize: 12 }}
-                            onClick={() => setEditing(h.id)}
-                            aria-label="Edit notation"
-                          >
-                            ✎
-                          </button>
-                        </div>
-                      </>
-                    )}
+                  <button
+                    className="check"
+                    data-checked={count > 0}
+                    onClick={(e) => gotIt(h, e)}
+                    aria-label={`Mark "${h.notation}" as won`}
+                  >
+                    {count > 0 ? '✓' : ''}
+                    {count > 1 && <span className="count-badge">{count}</span>}
+                  </button>
+
+                  <div className="notation">
+                    {colorNotation(h.notation).map((g, i) => (
+                      <span key={i} style={{ color: g.color }}>
+                        {g.text}
+                        {i < colorNotation(h.notation).length - 1 ? ' ' : ''}
+                      </span>
+                    ))}
                   </div>
 
-                  {!isEditing && (
-                    <div className="counter">
-                      <button
-                        className="round-btn ghost"
-                        onClick={() => onBump(h.id, -1)}
-                        disabled={count === 0}
-                        aria-label="Remove a win"
-                      >
-                        −
-                      </button>
-                      <span className="val">{count}</span>
-                      <button
-                        className="round-btn"
-                        style={{ background: theme.accent }}
-                        onClick={() => onBump(h.id, +1)}
-                        aria-label="Log a win"
-                      >
-                        +
-                      </button>
-                    </div>
+                  {count > 0 && (
+                    <button
+                      className="minus"
+                      onClick={() => onBump(h.id, -1)}
+                      aria-label="Remove a win"
+                    >
+                      −
+                    </button>
                   )}
+
+                  <span className="pts">
+                    {h.concealed ? `C${h.points}` : `×${h.points}`}
+                  </span>
                 </div>
               );
             })}
@@ -171,8 +150,16 @@ export default function CardTab({ card, handCounts, handNotes, onBump, onSaveNot
         );
       })}
 
-      <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 28 }}>
-        Sample card — notations are editable & illustrative, not the official NMJL card.
+      <p
+        style={{
+          textAlign: 'center',
+          color: 'var(--muted)',
+          fontSize: 12,
+          fontWeight: 700,
+          marginTop: 28,
+        }}
+      >
+        Sample card — illustrative notations, not the official NMJL card.
       </p>
     </div>
   );

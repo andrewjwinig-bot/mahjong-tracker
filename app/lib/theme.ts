@@ -1,18 +1,25 @@
-// Design system — bright, modern, friendly (think colorful planner / Apple Fitness).
+// Design system — bright, playful, sticker-planner energy (think the printed
+// "2026 Mahjong Hand Tracker": soft pink, coral-red, with blue + green pops).
 // Single source of truth for colors so pages don't reinvent chip/accent styling.
 
 export const COLORS = {
-  primary: '#2F6BFF', // blue
-  secondary: '#16C098', // green
-  accent: '#FF6B5C', // coral pop — Log / Share
-  ink: '#1E2430',
-  page: '#EFF5FF',
+  primary: '#E8455F', // brand coral-red (logo)
+  secondary: '#23B196', // green
+  accent: '#E8455F', // coral-red pop — I GOT MAHJ / Share
+  ink: '#2C3A57', // deep navy
+  page: '#FCE7EC', // soft pink
   card: '#FFFFFF',
-  muted: '#7C8398',
-  hairline: '#E4EAF6',
+  muted: '#A98E98',
+  hairline: '#F3D7DF',
 } as const;
 
-/** Rotating per-category accent themes. Categories map to these by index. */
+/**
+ * Decorative per-group notation colors — the navy / green / coral / blue mix
+ * from the card. Positional & decorative only (no suit meaning).
+ */
+export const NOTATION_COLORS = ['#2C3A57', '#23B196', '#E8455F', '#3B7DD8'];
+
+/** Rotating per-category accent themes (used for avatars + the social feed). */
 export interface CategoryTheme {
   /** Soft pill / tint background. */
   bg: string;
@@ -21,12 +28,12 @@ export interface CategoryTheme {
 }
 
 export const CATEGORY_THEMES: CategoryTheme[] = [
-  { bg: '#E4ECFF', accent: '#2F6BFF' }, // blue
-  { bg: '#DFF6EF', accent: '#16C098' }, // green
-  { bg: '#FFE7E4', accent: '#FF6B5C' }, // coral
+  { bg: '#FBD9E0', accent: '#E8455F' }, // coral-red
+  { bg: '#D5F1E9', accent: '#23B196' }, // green
+  { bg: '#D9E6FB', accent: '#3B7DD8' }, // blue
   { bg: '#EAE6FC', accent: '#7C6BE6' }, // violet
   { bg: '#FFF1D9', accent: '#E59A2B' }, // amber
-  { bg: '#E0F2FE', accent: '#2BA8E0' }, // sky
+  { bg: '#FFE0DB', accent: '#F0654F' }, // coral
 ];
 
 /** Stable theme for a category — same category always gets the same color. */
@@ -44,6 +51,6 @@ export function colorNotation(notation: string): { text: string; color: string }
   const groups = notation.trim().split(/\s+/);
   return groups.map((text, i) => ({
     text,
-    color: CATEGORY_THEMES[i % CATEGORY_THEMES.length].accent,
+    color: NOTATION_COLORS[i % NOTATION_COLORS.length],
   }));
 }

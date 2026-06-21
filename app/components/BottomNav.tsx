@@ -2,11 +2,13 @@
 
 export type Tab = 'card' | 'wins' | 'group' | 'learn';
 
+// Tile-flavored icons + mahjong lingo. A mahjong group is a "table"; the
+// learn tab is the "rules"; wins are "mahjs".
 const TABS: { id: Tab; label: string; glyph: string }[] = [
   { id: 'card', label: 'Card', glyph: '🀄' },
-  { id: 'wins', label: 'Wins', glyph: '🏆' },
-  { id: 'group', label: 'Group', glyph: '👥' },
-  { id: 'learn', label: 'Learn', glyph: '💡' },
+  { id: 'wins', label: 'Mahjs', glyph: '🀅' },
+  { id: 'group', label: 'Table', glyph: '🀟' },
+  { id: 'learn', label: 'Rules', glyph: '🀫' },
 ];
 
 export default function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {

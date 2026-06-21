@@ -5,6 +5,8 @@ import type { FeedPost, GroupMember, Group } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { TOTAL_HANDS } from '../lib/cardData';
 import { track } from '../lib/analytics';
+import ShareModal from './ShareModal';
+import TileStrip from './TileStrip';
 
 interface Props {
   group: Group;
@@ -56,6 +58,7 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
   }, []);
 
   const [copied, setCopied] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   // Merge live "you" stats into the leaderboard, then rank.
   const ranked = useMemo(() => {
@@ -84,25 +87,44 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
 
   return (
     <div className="screen">
-      <header className="app-header" style={{ padding: '12px 2px 4px' }}>
+      <header className="app-header">
         <h1>{group.name}</h1>
-        <p className="sub">Your group’s race to clear all {TOTAL_HANDS} hands.</p>
+        <p className="sub">Your table’s race to clear all {TOTAL_HANDS} hands.</p>
+        <TileStrip count={7} />
       </header>
 
       {/* Invite */}
-      <div className="card" style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="card" style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ flex: 1 }}>
           <div className="tag">Invite code</div>
           <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: '0.04em' }}>{group.inviteCode}</div>
         </div>
-        <button className="btn green" style={{ width: 'auto', padding: '10px 16px' }} onClick={copyCode}>
+        <button className="btn ghost" style={{ width: 'auto', padding: '10px 14px' }} onClick={copyCode}>
           {copied ? 'Copied!' : 'Copy'}
+        </button>
+        <button
+          className="btn green"
+          style={{ width: 'auto', padding: '10px 16px' }}
+          onClick={() => setInviteOpen(true)}
+        >
+          ↗ Invite
         </button>
       </div>
 
+      {inviteOpen && (
+        <ShareModal
+          payload={{
+            title: 'Invite Your Crew 👯',
+            text: `Join my mahjong group “${group.name}” and let's race to clear all 70 hands! Invite code: ${group.inviteCode}`,
+            url: typeof window !== 'undefined' ? window.location.origin : '',
+          }}
+          onClose={() => setInviteOpen(false)}
+        />
+      )}
+
       {/* Leaderboard */}
       <div className="cat-head">
-        <span className="pill" style={{ background: '#E4ECFF', color: '#2F6BFF' }}>
+        <span className="pill" style={{ background: '#FFF1D9', color: '#E59A2B' }}>
           🏅 Leaderboard
         </span>
         <span className="count">{ranked.length} players</span>
@@ -150,16 +172,16 @@ export default function GroupTab({ group, members, feed, youName, youStats, onHi
 
       {/* Feed */}
       <div className="cat-head">
-        <span className="pill" style={{ background: '#DFF6EF', color: '#16C098' }}>
-          📣 Feed
+        <span className="pill" style={{ background: '#D5F1E9', color: '#23B196' }}>
+          📣 The Feed
         </span>
-        <span className="count">{visibleFeed.length} wins</span>
+        <span className="count">{visibleFeed.length} mahjs</span>
       </div>
 
       {visibleFeed.length === 0 ? (
         <div className="empty">
-          <div className="big">📣</div>
-          No wins shared yet. Log a win and share it to the group!
+          <div className="big">🀄🀅🀆</div>
+          No mahjs called yet. Be the first to call “Mahjong!”
         </div>
       ) : (
         visibleFeed.map((p) => <FeedCard key={p.id} post={p} onHide={() => onHidePost(p.id)} />)

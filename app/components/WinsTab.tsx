@@ -3,8 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MahjongCard, Win } from '../lib/types';
 import { downscaleImage } from '../lib/image';
-import { buildShareCard, downloadBlob } from '../lib/shareCard';
+import { buildShareCard } from '../lib/shareCard';
 import { recordShare, track } from '../lib/analytics';
+import ShareModal from './ShareModal';
+import { useConfetti } from './Confetti';
+import TileStrip from './TileStrip';
 
 interface Props {
   card: MahjongCard;
@@ -15,6 +18,14 @@ interface Props {
   onRemoveWin: (id: string) => void;
   onBump: (handId: string, delta: number) => void;
   onPostToGroup: (win: Win) => void;
+}
+
+const appUrl = () => (typeof window !== 'undefined' ? window.location.origin : '');
+
+function captionFor(win: Win): string {
+  return win.handLabel
+    ? `I just got MAHJ with ${win.handLabel}! 🀄🎉 Chasing all 70 hands on my 2026 card.`
+    : `I just got MAHJ! 🀄🎉 Chasing all 70 hands on my 2026 card.`;
 }
 
 export default function WinsTab({
@@ -28,27 +39,35 @@ export default function WinsTab({
   onPostToGroup,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const fireConfetti = useConfetti();
 
   return (
     <div className="screen">
-      <header className="app-header" style={{ padding: '12px 2px 4px' }}>
-        <h1>Your Wins</h1>
-        <p className="sub">Log a win with a photo & note. Make a share card to brag.</p>
+      <header className="app-header">
+        <h1>Your Mahjs</h1>
+        <p className="sub">Log every MAHJ with a photo &amp; note — then brag a little.</p>
+        <TileStrip count={7} />
       </header>
 
-      <button className="btn coral" style={{ marginTop: 14 }} onClick={() => setOpen(true)}>
-        ＋ Log a win
+      <button className="btn coral" style={{ marginTop: 16 }} onClick={() => setOpen(true)}>
+        🀄 I Got Mahj!
       </button>
 
       {wins.length === 0 ? (
         <div className="empty">
-          <div className="big">🏆</div>
-          No wins yet. Win a hand at your next game and log it here!
+          <div className="big">🀅🀄🀅</div>
+          No mahjs yet. Call “Mahjong!” at your next game and log it here!
         </div>
       ) : (
         <div style={{ marginTop: 16 }}>
           {wins.map((w) => (
-            <WinCard key={w.id} win={w} onRemove={() => onRemoveWin(w.id)} />
+            <WinCard
+              key={w.id}
+              win={w}
+              groupName={groupName}
+              onRemove={() => onRemoveWin(w.id)}
+              onPostToGroup={onPostToGroup}
+            />
           ))}
         </div>
       )}
@@ -61,10 +80,11 @@ export default function WinsTab({
           onClose={() => setOpen(false)}
           onSave={(win, opts) => {
             onAddWin(win);
-            // Posting a win advances your tracker (and the leaderboard)…
+            // Logging a MAHJ advances your card (and the leaderboard)…
             if (win.handId) onBump(win.handId, +1);
             // …and optionally lands in the group feed.
             if (opts.shareToGroup) onPostToGroup(win);
+            fireConfetti();
             setOpen(false);
           }}
         />
@@ -73,9 +93,19 @@ export default function WinsTab({
   );
 }
 
-function WinCard({ win, onRemove }: { win: Win; onRemove: () => void }) {
+function WinCard({
+  win,
+  groupName,
+  onRemove,
+  onPostToGroup,
+}: {
+  win: Win;
+  groupName: string;
+  onRemove: () => void;
+  onPostToGroup: (win: Win) => void;
+}) {
   const [url, setUrl] = useState<string | null>(null);
-  const [sharing, setSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     if (!win.photo) return;
@@ -90,24 +120,9 @@ function WinCard({ win, onRemove }: { win: Win; onRemove: () => void }) {
     day: 'numeric',
   });
 
-  async function share() {
-    setSharing(true);
-    try {
-      const blob = await buildShareCard(win, win.handLabel);
-      const file = new File([blob], 'mahjong-win.png', { type: 'image/png' });
-      // Prefer native share sheet on mobile; fall back to download.
-      const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-      if (nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'My Mahjong win!' });
-      } else {
-        downloadBlob(blob, 'mahjong-win.png');
-      }
-      await recordShare(win.handLabel);
-    } catch {
-      /* user cancelled or share failed — no-op */
-    } finally {
-      setSharing(false);
-    }
+  function openShare() {
+    void recordShare(win.handLabel);
+    setShareOpen(true);
   }
 
   return (
@@ -122,14 +137,28 @@ function WinCard({ win, onRemove }: { win: Win; onRemove: () => void }) {
         )}
         {win.note && <p className="note">{win.note}</p>}
         <div className="actions">
-          <button className="btn coral" onClick={share} disabled={sharing}>
-            {sharing ? 'Making…' : '↗ Share card'}
+          <button className="btn coral" onClick={openShare}>
+            ↗ Share
           </button>
-          <button className="btn ghost" onClick={onRemove} aria-label="Delete win">
+          <button className="btn ghost" onClick={onRemove} aria-label="Delete mahj">
             🗑
           </button>
         </div>
       </div>
+
+      {shareOpen && (
+        <ShareModal
+          payload={{
+            title: 'Share Your Mahj! 🀄',
+            text: captionFor(win),
+            url: appUrl(),
+            image: () => buildShareCard(win, win.handLabel),
+          }}
+          groupName={groupName}
+          onShareToGroup={() => onPostToGroup(win)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -161,7 +190,12 @@ function LogWinSheet({
   };
 
   const previewUrl = useMemo(() => preview, [preview]);
-  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   async function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -194,7 +228,8 @@ function LogWinSheet({
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
-        <h2>Log a win 🎉</h2>
+        <h2>I Got Mahj! 🎉</h2>
+        <p className="sheet-sub">Log it before the tiles get scooped up.</p>
 
         <label className="lbl">Which hand?</label>
         <select className="field" value={handId} onChange={(e) => setHandId(e.target.value)}>
@@ -232,7 +267,12 @@ function LogWinSheet({
             <img className="photo" src={previewUrl} alt="Preview" />
           </div>
         ) : null}
-        <button className="btn ghost" style={{ marginTop: 8 }} onClick={() => fileRef.current?.click()} disabled={busy}>
+        <button
+          className="btn ghost"
+          style={{ marginTop: 8 }}
+          onClick={() => fileRef.current?.click()}
+          disabled={busy}
+        >
           {busy ? 'Processing…' : previewUrl ? 'Change photo' : '📷 Add photo'}
         </button>
 
@@ -247,11 +287,11 @@ function LogWinSheet({
             marginTop: 14,
             padding: '12px 14px',
             borderRadius: 14,
-            background: shareToGroup ? '#DFF6EF' : '#fff',
-            border: `1.5px solid ${shareToGroup ? '#16C098' : 'var(--hairline)'}`,
+            background: shareToGroup ? '#D5F1E9' : '#fff',
+            border: `2px solid ${shareToGroup ? '#23B196' : 'var(--hairline)'}`,
           }}
         >
-          <span style={{ fontSize: 20 }}>👥</span>
+          <span style={{ fontSize: 20 }}>👯</span>
           <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
             Share to {groupName}
           </span>
@@ -261,7 +301,7 @@ function LogWinSheet({
               width: 44,
               height: 26,
               borderRadius: 999,
-              background: shareToGroup ? '#16C098' : '#d6deea',
+              background: shareToGroup ? '#23B196' : '#d6deea',
               position: 'relative',
               transition: 'background 0.15s',
               flex: '0 0 auto',
@@ -287,7 +327,7 @@ function LogWinSheet({
             Cancel
           </button>
           <button className="btn" onClick={save} disabled={busy}>
-            Save win
+            Save My Mahj
           </button>
         </div>
       </div>

@@ -23,7 +23,7 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
   // Header
   ctx.fillStyle = 'rgba(255,255,255,0.92)';
   ctx.font = '800 40px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('🀄  MAHJONG TRACKER', 64, 110);
+  ctx.fillText('🀄  2026 MAHJONG TRACKER', 64, 110);
 
   // White content card
   const cardX = 56;
@@ -52,10 +52,10 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
     cursorY += 8;
   }
 
-  // "I WON" eyebrow
+  // "I GOT MAHJ" eyebrow
   ctx.fillStyle = COLORS.accent;
-  ctx.font = '800 30px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('I WON THIS HAND', cardX + pad, cursorY);
+  ctx.font = '800 32px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.fillText('I GOT MAHJ! 🀄', cardX + pad, cursorY);
   cursorY += 70;
 
   // Hand label (wrapped)
