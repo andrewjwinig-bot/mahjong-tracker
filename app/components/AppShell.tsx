@@ -15,6 +15,7 @@ import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
 import TrophyShelf from './TrophyShelf';
 import Tutorial from './Tutorial';
+import BadgeWatcher from './BadgeWatcher';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
@@ -263,6 +264,8 @@ export default function AppShell() {
         <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
           ⚙️
         </button>
+
+        <BadgeWatcher card={SAMPLE_CARD} handCounts={handCounts} bestStreak={bestStreak} />
 
         {!loaded ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
