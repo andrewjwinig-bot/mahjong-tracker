@@ -95,8 +95,10 @@ export default function SettingsSheet({
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
-        <h2>Your Profile ✨</h2>
-        <p className="sheet-sub">Make it yours — pick a tile, set your name.</p>
+        <h2>Settings ⚙️</h2>
+        <p className="sheet-sub">Profile, gameplay, appearance &amp; account.</p>
+
+        <div className="set-section">Profile</div>
 
         {/* Avatar preview */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
@@ -187,18 +189,10 @@ export default function SettingsSheet({
           onChange={(e) => setBio(e.target.value)}
         />
 
-        <button className="btn ghost" style={{ marginTop: 16 }} onClick={onTrophies}>
-          🏆 Trophies &amp; Stats
-        </button>
-
-        <button className="btn ghost" style={{ marginTop: 10 }} onClick={onEditCard}>
-          🃏 My Card (bring your own)
-        </button>
+        <div className="set-section">Gameplay</div>
 
         {/* Experience level */}
-        <label className="lbl" style={{ marginTop: 18 }}>
-          Experience level
-        </label>
+        <label className="lbl">Experience level</label>
         <div className="segmented">
           {LEVELS.map((l) => (
             <button key={l} data-active={experience === l} onClick={() => onExperience(l)}>
@@ -209,6 +203,12 @@ export default function SettingsSheet({
         <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
           Tailors your rules &amp; tips.
         </p>
+
+        <button className="btn ghost" style={{ marginTop: 14 }} onClick={onEditCard}>
+          🃏 My Card (bring your own)
+        </button>
+
+        <div className="set-section">Appearance</div>
 
         {/* Sound + haptics */}
         <button
@@ -270,7 +270,13 @@ export default function SettingsSheet({
           </button>
         )}
 
-        <button className="btn ghost" style={{ marginTop: pro ? 16 : 10 }} onClick={() => setAboutOpen(true)}>
+        <div className="set-section">Account</div>
+
+        <button className="btn ghost" onClick={onTrophies}>
+          🏆 Trophies &amp; Stats
+        </button>
+
+        <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setAboutOpen(true)}>
           ℹ️ About &amp; Legal
         </button>
 
