@@ -1742,6 +1742,75 @@ label.lbl {
   left: 21px;
 }
 
+/* ---- Tutorial ------------------------------------------------------------ */
+
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--page);
+  background-image: var(--bg-art);
+  background-size: cover;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
+}
+.tutorial-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  padding: 30px 22px 22px;
+  text-align: center;
+}
+.tut-skip {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.tut-art {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.tutorial-card h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.tut-body {
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.tut-dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin: 18px 0 4px;
+}
+.tut-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--tint-deep);
+}
+.tut-dots span[data-on="true"] {
+  background: var(--brand);
+  width: 22px;
+}
+
 /* ---- Onboarding ---------------------------------------------------------- */
 
 .onboard {
