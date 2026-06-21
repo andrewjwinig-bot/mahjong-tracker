@@ -213,3 +213,153 @@ export const IconCheck = ({ size }: P) =>
 
 export const IconArrowRight = ({ size }: P) =>
   S(<path d="M5 12h14M13 6l6 6-6 6" />, size);
+
+export const IconBulb = ({ size }: P) =>
+  S(
+    <>
+      <path d="M9 17h6M10 20h4" />
+      <path d="M12 3a6 6 0 0 0-3.5 10.9c.5.4.5.7.5 1.1v.5h6v-.5c0-.4 0-.7.5-1.1A6 6 0 0 0 12 3z" />
+    </>,
+    size,
+  );
+
+export const IconShuffle = ({ size }: P) =>
+  S(
+    <>
+      <path d="M4 7h3.5c1.5 0 2.5 1 3.5 2.5M20 7h-3.5c-2.5 0-3.5 3-5.5 5.5S8 17 5 17H4" />
+      <path d="M4 17h1c.7 0 1.3-.2 1.9-.6" />
+      <path d="M17 4l3 3-3 3M17 14l3 3-3 3" />
+    </>,
+    size,
+  );
+
+export const IconFlame = ({ size }: P) =>
+  S(
+    <path d="M12 3c1.5 3-1.5 4.5-1.5 7A1.5 1.5 0 0 1 8 8.5C6 10 5 12 5 14a7 7 0 0 0 14 0c0-3-2-5.5-4-7.5-1.2-1.2-2.3-2.5-3-3.5z" />,
+    size,
+  );
+
+export const IconTap = ({ size }: P) =>
+  S(
+    <>
+      <path d="M9 11V6a1.6 1.6 0 0 1 3.2 0v5" />
+      <path d="M12.2 11V9.2a1.5 1.5 0 0 1 3 0V11" />
+      <path d="M15.2 11v-.5a1.5 1.5 0 0 1 3 0V15a5 5 0 0 1-5 5h-1.3c-1.5 0-2.6-.6-3.5-1.8L6 14.5c-.7-1 .1-2.3 1.3-2.1.6.1 1.1.4 1.7 1l.9 1" />
+    </>,
+    size,
+  );
+
+export const IconSparkle = ({ size }: P) =>
+  S(
+    <path
+      d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
+      fill="currentColor"
+      stroke="none"
+    />,
+    size,
+  );
+
+export const IconGrid = ({ size }: P) =>
+  S(
+    <>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </>,
+    size,
+  );
+
+export const IconTarget = ({ size }: P) =>
+  S(
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="12" cy="12" r="0.6" fill="currentColor" />
+    </>,
+    size,
+  );
+
+export const IconUsers = ({ size }: P) =>
+  S(
+    <>
+      <circle cx="9" cy="8.5" r="3" />
+      <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+      <path d="M16 6a3 3 0 0 1 0 6M17 14.2a5.5 5.5 0 0 1 3.5 4.8" />
+    </>,
+    size,
+  );
+
+export const IconUser = ({ size }: P) =>
+  S(
+    <>
+      <circle cx="12" cy="8" r="3.4" />
+      <path d="M5.5 19.5a6.5 6.5 0 0 1 13 0" />
+    </>,
+    size,
+  );
+
+export const IconBook = ({ size }: P) =>
+  S(
+    <>
+      <path d="M5 4.5h9a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2V4.5z" />
+      <path d="M16 6.5h3V20h-3" />
+      <path d="M8 8.5h5M8 11.5h5" />
+    </>,
+    size,
+  );
+
+export const IconShield = ({ size }: P) =>
+  S(
+    <>
+      <path d="M12 3l7 3v5c0 4.2-2.8 7.5-7 9-4.2-1.5-7-4.8-7-9V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </>,
+    size,
+  );
+
+export const IconHelp = ({ size }: P) =>
+  S(
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.3 9.2a2.7 2.7 0 0 1 5.2 1c0 1.8-2.5 2.3-2.5 4" />
+      <circle cx="12" cy="16.6" r="0.6" fill="currentColor" />
+    </>,
+    size,
+  );
+
+export const IconPalette = ({ size }: P) =>
+  S(
+    <>
+      <path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.4 0 2-.9 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.6 1.7-1.6H16a4.5 4.5 0 0 0 4.5-4.5C20.5 6.6 16.7 3.5 12 3.5z" />
+      <circle cx="8" cy="11" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="8.2" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="10.5" r="1.1" fill="currentColor" stroke="none" />
+    </>,
+    size,
+  );
+
+export const IconCloud = ({ size }: P) =>
+  S(
+    <path d="M7 18a4 4 0 0 1-.5-7.97 5 5 0 0 1 9.6-1.2A3.8 3.8 0 0 1 17.5 18H7z" />,
+    size,
+  );
+
+export const IconLeaf = ({ size }: P) =>
+  S(
+    <>
+      <path d="M5 19c0-7 5-12 14-12 0 9-5 13-11 13-1.5 0-3-.4-3-1z" />
+      <path d="M9 15c2-2.5 4.5-4 7-5" />
+    </>,
+    size,
+  );
+
+export const IconStar = ({ size }: P) =>
+  S(
+    <path
+      d="M12 3.5l2.6 5.3 5.9.9-4.25 4.15 1 5.85L12 17l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9L12 3.5z"
+      fill="currentColor"
+      stroke="none"
+    />,
+    size,
+  );

@@ -8,6 +8,7 @@ import {
   seasonWindow,
   type Challenge,
 } from '../lib/challenges';
+import { IconGrid, IconSparkle } from './uiIcons';
 
 /** The active-season challenge banner shown on the Card tab. */
 export function ChallengeCard({
@@ -37,7 +38,7 @@ export function ChallengeCard({
           <div className="ch-name">{challenge.name}</div>
         </div>
         <button className="ch-seasons" onClick={onSeasons} aria-label="All seasons">
-          ❖
+          <IconGrid size={17} />
         </button>
       </div>
       <p className="ch-blurb">{challenge.blurb}</p>
@@ -45,8 +46,8 @@ export function ChallengeCard({
         <div className="progress" style={{ flex: 1, marginTop: 0 }}>
           <span style={{ width: `${pct}%` }} />
         </div>
-        <span className="ch-count">
-          {complete ? 'Done! 🎉' : `${done}/${total}`}
+        <span className="ch-count" style={complete ? { display: 'inline-flex', alignItems: 'center', gap: 4 } : undefined}>
+          {complete ? <><IconSparkle size={14} /> Done!</> : `${done}/${total}`}
         </span>
       </div>
       {!complete && (

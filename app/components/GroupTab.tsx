@@ -10,7 +10,7 @@ import ShareModal from './ShareModal';
 import TileStrip from './TileStrip';
 import Avatar from './Avatar';
 import Tile from './Tile';
-import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts } from './uiIcons';
+import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers } from './uiIcons';
 
 interface Props {
   members: GroupMember[];
@@ -479,7 +479,9 @@ function AddFriendSheet({
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
-        <h2>Find Friends 👀</h2>
+        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <IconUsers size={20} /> Find Friends
+        </h2>
         <p className="sheet-sub">Invite your contacts, or add someone to your board.</p>
 
         <button

@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { saveAccount, type Account, type Experience } from '../lib/account';
 import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../lib/cloudAuth';
 import TileStrip from './TileStrip';
+import type { ReactNode } from 'react';
+import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
 
-const LEVELS: { id: Experience; label: string; blurb: string; emoji: string }[] = [
-  { id: 'beginner', label: 'Beginner', blurb: 'New to the tiles — show me the ropes.', emoji: '🌱' },
-  { id: 'intermediate', label: 'Intermediate', blurb: 'I know the basics and want to improve.', emoji: '🀄' },
-  { id: 'expert', label: 'Expert', blurb: 'Seasoned — give me the deep cuts.', emoji: '🐉' },
+const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode }[] = [
+  { id: 'beginner', label: 'Beginner', blurb: 'New to the tiles — show me the ropes.', icon: <IconLeaf size={22} /> },
+  { id: 'intermediate', label: 'Intermediate', blurb: 'I know the basics and want to improve.', icon: <IconTarget size={22} /> },
+  { id: 'expert', label: 'Expert', blurb: 'Seasoned — give me the deep cuts.', icon: <IconCrown size={22} /> },
 ];
 
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
@@ -128,7 +130,7 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
                   data-active={experience === l.id}
                   onClick={() => setExperience(l.id)}
                 >
-                  <span className="level-emoji">{l.emoji}</span>
+                  <span className="level-emoji">{l.icon}</span>
                   <span style={{ flex: 1, textAlign: 'left' }}>
                     <span className="level-name">{l.label}</span>
                     <span className="level-blurb">{l.blurb}</span>
