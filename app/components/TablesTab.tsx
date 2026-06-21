@@ -11,6 +11,7 @@ import Avatar from './Avatar';
 import Tile from './Tile';
 import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
+import { IconChat, IconCalendar, IconCamera } from './uiIcons';
 import type { TileAvatar } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 
@@ -237,8 +238,14 @@ function TableDetail({
 
       <div className="segmented" style={{ marginTop: 14 }}>
         {(['chat', 'dates', 'photos'] as View[]).map((v) => (
-          <button key={v} data-active={view === v} onClick={() => setView(v)}>
-            {v === 'chat' ? '💬 Chat' : v === 'dates' ? '📅 Dates' : '📷 Photos'}
+          <button
+            key={v}
+            data-active={view === v}
+            onClick={() => setView(v)}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
+            {v === 'chat' ? <IconChat size={17} /> : v === 'dates' ? <IconCalendar size={17} /> : <IconCamera size={17} />}
+            {v === 'chat' ? 'Chat' : v === 'dates' ? 'Dates' : 'Photos'}
           </button>
         ))}
       </div>

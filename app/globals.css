@@ -436,6 +436,7 @@ a:focus-visible,
   display: grid;
   place-items: center;
   font-size: 19px;
+  color: var(--ink);
 }
 .gear:active {
   transform: scale(0.92);

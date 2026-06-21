@@ -18,6 +18,7 @@ import TrophyShelf from './TrophyShelf';
 import Tutorial from './Tutorial';
 import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
+import { IconSettings } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
@@ -269,7 +270,7 @@ export default function AppShell() {
     <ConfettiProvider>
       <div className="app">
         <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
-          ⚙️
+          <IconSettings size={22} />
         </button>
 
         <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />

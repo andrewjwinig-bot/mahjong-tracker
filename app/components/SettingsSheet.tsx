@@ -10,6 +10,7 @@ import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
+import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown } from './uiIcons';
 import { isPro, setPro } from '../lib/pro';
 
 interface Props {
@@ -95,7 +96,9 @@ export default function SettingsSheet({
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="grab" />
-        <h2>Settings ⚙️</h2>
+        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          Settings <IconSettings size={20} />
+        </h2>
         <p className="sheet-sub">Profile, gameplay, appearance &amp; account.</p>
 
         <div className="set-section">Profile</div>
@@ -204,8 +207,12 @@ export default function SettingsSheet({
           Tailors your rules &amp; tips.
         </p>
 
-        <button className="btn ghost" style={{ marginTop: 14 }} onClick={onEditCard}>
-          🃏 My Card (bring your own)
+        <button
+          className="btn ghost"
+          style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={onEditCard}
+        >
+          <IconCard size={18} /> My Card (bring your own)
         </button>
 
         <div className="set-section">Appearance</div>
@@ -268,19 +275,31 @@ export default function SettingsSheet({
         </div>
 
         {!pro && (
-          <button className="btn" style={{ marginTop: 16 }} onClick={() => setPaywall(true)}>
-            👑 Go Pro
+          <button
+            className="btn"
+            style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            onClick={() => setPaywall(true)}
+          >
+            <IconCrown size={18} /> Go Pro
           </button>
         )}
 
         <div className="set-section">Account</div>
 
-        <button className="btn ghost" onClick={onTrophies}>
-          🏆 Trophies &amp; Stats
+        <button
+          className="btn ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={onTrophies}
+        >
+          <IconTrophy size={18} /> Trophies &amp; Stats
         </button>
 
-        <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setAboutOpen(true)}>
-          ℹ️ About &amp; Legal
+        <button
+          className="btn ghost"
+          style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={() => setAboutOpen(true)}
+        >
+          <IconInfo size={18} /> About &amp; Legal
         </button>
 
         <div className="row" style={{ marginTop: 14 }}>
