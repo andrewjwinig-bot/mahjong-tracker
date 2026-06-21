@@ -1004,6 +1004,111 @@ label.lbl {
   color: var(--brand);
 }
 
+/* ---- Seasonal challenges ------------------------------------------------- */
+
+.challenge {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px var(--tint-deep), var(--shadow-sm);
+  padding: 16px;
+}
+.challenge.done {
+  box-shadow: 0 0 0 2.5px var(--green), var(--shadow-sm);
+}
+.challenge .ch-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ch-emoji {
+  font-size: 30px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.ch-season {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.ch-name {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.ch-seasons {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--tint);
+  color: var(--brand);
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+}
+.ch-blurb {
+  margin: 8px 0 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+.ch-prog {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ch-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brand);
+  white-space: nowrap;
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.ch-focus {
+  margin-top: 12px;
+}
+.ch-row-tag {
+  flex: 0 0 auto;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.season-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.season-row + .season-row {
+  margin-top: 10px;
+}
+.season-row.active {
+  box-shadow: 0 0 0 2px var(--brand), var(--shadow-sm);
+}
+.season-now {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--on-brand);
+  background: var(--brand);
+  padding: 2px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.season-when {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
 /* ---- Bottom nav ---------------------------------------------------------- */
 
 .bottom-nav {

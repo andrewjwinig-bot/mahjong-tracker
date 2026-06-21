@@ -9,8 +9,10 @@ import { useConfetti } from './Confetti';
 import TileStrip from './TileStrip';
 import TipCard from './TipCard';
 import ShareModal from './ShareModal';
+import { ChallengeCard, SeasonsSheet } from './Challenges';
+import { activeChallenge, challengeProgress } from '../lib/challenges';
 
-type Filter = 'all' | 'remaining' | 'won';
+type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
 interface Props {
   card: MahjongCard;
@@ -23,7 +25,14 @@ interface Props {
 export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
+  const [seasonsOpen, setSeasonsOpen] = useState(false);
   const { celebrate } = useConfetti();
+
+  const challenge = useMemo(() => activeChallenge(), []);
+  const chProg = useMemo(
+    () => challengeProgress(challenge, card, handCounts),
+    [challenge, card, handCounts],
+  );
 
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
 
@@ -44,6 +53,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
     const c = countOf(h);
     if (filter === 'won') return c > 0;
     if (filter === 'remaining') return c === 0;
+    if (filter === 'challenge') return challenge.match(h);
     return true;
   };
 
@@ -139,6 +149,17 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
       </div>
 
       <div style={{ marginTop: 16 }}>
+        <ChallengeCard
+          challenge={challenge}
+          done={chProg.done}
+          total={chProg.total}
+          focused={filter === 'challenge'}
+          onToggleFocus={() => setFilter((f) => (f === 'challenge' ? 'all' : 'challenge'))}
+          onSeasons={() => setSeasonsOpen(true)}
+        />
+      </div>
+
+      <div style={{ marginTop: 14 }}>
         <TipCard />
       </div>
 
@@ -196,6 +217,12 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
                     </button>
                   )}
 
+                  {challenge.match(h) && (
+                    <span className="ch-row-tag" title={`${challenge.season} Challenge`}>
+                      {challenge.emoji}
+                    </span>
+                  )}
+
                   <span className="pts">
                     {h.concealed ? `C${h.points}` : `×${h.points}`}
                   </span>
@@ -228,6 +255,10 @@ export default function CardTab({ card, handCounts, onBump, onMahj }: Props) {
           }}
           onClose={() => setShareWin(null)}
         />
+      )}
+
+      {seasonsOpen && (
+        <SeasonsSheet card={card} handCounts={handCounts} onClose={() => setSeasonsOpen(false)} />
       )}
     </div>
   );
