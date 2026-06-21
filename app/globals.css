@@ -26,7 +26,11 @@
   --n2: #ff6b5c;
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/jade.svg");
-  --bg-glow: rgba(255, 255, 255, 0.55); /* soft top-light for depth */
+  /* Painterly base: top sheen + corner glows + soft vertical silk. */
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
+    radial-gradient(80% 55% at 100% 2%, rgba(14, 173, 150, 0.1), transparent 60%),
+    radial-gradient(85% 65% at 0% 100%, rgba(43, 182, 115, 0.08), transparent 55%),
+    linear-gradient(180deg, #faf8f1, #f1ede1);
   --tile-face: #fdfbf5; /* warm ivory tile body */
   --shadow: 0 10px 30px rgba(36, 50, 64, 0.1);
   --shadow-sm: 0 4px 16px rgba(36, 50, 64, 0.08);
@@ -51,8 +55,13 @@
   --n2: #f2784b;
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/bam.svg");
-  --shadow: 0 8px 24px rgba(33, 49, 31, 0.1);
-  --shadow-sm: 0 3px 12px rgba(33, 49, 31, 0.08);
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.65), transparent 56%),
+    radial-gradient(80% 55% at 0% 4%, rgba(46, 158, 80, 0.14), transparent 60%),
+    radial-gradient(85% 65% at 100% 100%, rgba(36, 126, 64, 0.12), transparent 55%),
+    linear-gradient(180deg, #f2f6ea, #e6efda);
+  --tile-face: #fcfbf3;
+  --shadow: 0 10px 30px rgba(33, 49, 31, 0.1);
+  --shadow-sm: 0 4px 16px rgba(33, 49, 31, 0.08);
 }
 
 [data-theme="dot"] {
@@ -73,8 +82,13 @@
   --n2: #ff7a4d;
   --n3: #1e73c4;
   --bg-pattern: url("/patterns/dot.svg");
-  --shadow: 0 8px 24px rgba(27, 42, 58, 0.12);
-  --shadow-sm: 0 3px 12px rgba(27, 42, 58, 0.09);
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
+    radial-gradient(80% 55% at 100% 2%, rgba(30, 115, 196, 0.12), transparent 60%),
+    radial-gradient(85% 65% at 0% 100%, rgba(31, 183, 166, 0.1), transparent 55%),
+    linear-gradient(180deg, #f1f6fc, #e4edf8);
+  --tile-face: #fbfcfe;
+  --shadow: 0 10px 30px rgba(27, 42, 58, 0.12);
+  --shadow-sm: 0 4px 16px rgba(27, 42, 58, 0.09);
 }
 
 [data-theme="crak"] {
@@ -95,8 +109,13 @@
   --n2: #d23b4e;
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/crak.svg");
-  --shadow: 0 8px 24px rgba(210, 59, 78, 0.12);
-  --shadow-sm: 0 3px 12px rgba(210, 59, 78, 0.09);
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.7), transparent 56%),
+    radial-gradient(80% 55% at 0% 2%, rgba(210, 59, 78, 0.12), transparent 60%),
+    radial-gradient(85% 65% at 100% 100%, rgba(224, 160, 43, 0.12), transparent 55%),
+    linear-gradient(180deg, #fdeeed, #f7e0de);
+  --tile-face: #fefbf6;
+  --shadow: 0 10px 30px rgba(210, 59, 78, 0.12);
+  --shadow-sm: 0 4px 16px rgba(210, 59, 78, 0.09);
 }
 
 [data-theme="dragon"] {
@@ -118,8 +137,13 @@
   --n2: #d23b4e;
   --n3: #c9952b;
   --bg-pattern: url("/patterns/dragon.svg");
-  --shadow: 0 8px 24px rgba(26, 42, 38, 0.12);
-  --shadow-sm: 0 3px 12px rgba(26, 42, 38, 0.09);
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 250, 235, 0.72), transparent 56%),
+    radial-gradient(85% 58% at 0% 0%, rgba(15, 143, 110, 0.14), transparent 60%),
+    radial-gradient(85% 65% at 100% 100%, rgba(201, 149, 43, 0.16), transparent 55%),
+    linear-gradient(180deg, #f6f1e3, #ede4d0);
+  --tile-face: #fdf9ee;
+  --shadow: 0 12px 32px rgba(26, 42, 38, 0.13);
+  --shadow-sm: 0 4px 16px rgba(26, 42, 38, 0.09);
 }
 
 [data-theme="flower"] {
@@ -140,8 +164,13 @@
   --n2: #e84c8a;
   --n3: #a06ce0;
   --bg-pattern: url("/patterns/flower.svg");
-  --shadow: 0 8px 24px rgba(232, 76, 138, 0.12);
-  --shadow-sm: 0 3px 12px rgba(232, 76, 138, 0.09);
+  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.78), transparent 56%),
+    radial-gradient(80% 55% at 100% 2%, rgba(232, 76, 138, 0.1), transparent 60%),
+    radial-gradient(85% 65% at 0% 100%, rgba(160, 108, 224, 0.09), transparent 55%),
+    linear-gradient(180deg, #fff1f7, #fbe2ee);
+  --tile-face: #fffafc;
+  --shadow: 0 10px 30px rgba(232, 76, 138, 0.12);
+  --shadow-sm: 0 4px 16px rgba(232, 76, 138, 0.09);
 }
 
 [data-theme="joker"] {
@@ -162,8 +191,14 @@
   --n2: #f5478b;
   --n3: #3e8bff;
   --bg-pattern: url("/patterns/joker.svg");
-  --shadow: 0 8px 24px rgba(124, 77, 224, 0.14);
-  --shadow-sm: 0 3px 12px rgba(124, 77, 224, 0.1);
+  --bg-art: radial-gradient(110% 60% at 50% -10%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(70% 55% at 0% 0%, rgba(124, 77, 224, 0.13), transparent 60%),
+    radial-gradient(70% 55% at 100% 18%, rgba(245, 71, 139, 0.1), transparent 60%),
+    radial-gradient(85% 65% at 100% 100%, rgba(24, 195, 154, 0.08), transparent 55%),
+    linear-gradient(180deg, #f6f3fd, #ebe4fb);
+  --tile-face: #fdfbff;
+  --shadow: 0 10px 30px rgba(124, 77, 224, 0.14);
+  --shadow-sm: 0 4px 16px rgba(124, 77, 224, 0.1);
 }
 
 [data-theme="midnight"] {
@@ -186,7 +221,10 @@
   --n2: #ff6b81;
   --n3: #5aa2ff;
   --bg-pattern: url("/patterns/midnight.svg");
-  --bg-glow: rgba(120, 150, 220, 0.06);
+  --bg-art: radial-gradient(120% 80% at 50% -12%, rgba(90, 162, 255, 0.12), transparent 55%),
+    radial-gradient(80% 60% at 0% 0%, rgba(45, 212, 191, 0.1), transparent 60%),
+    radial-gradient(85% 70% at 100% 100%, rgba(124, 77, 224, 0.14), transparent 55%),
+    linear-gradient(180deg, #171c2e, #10131f);
   --tile-face: #232a3e;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -208,10 +246,10 @@ body {
 
 body {
   background-color: var(--page);
-  background-image: radial-gradient(125% 80% at 50% -8%, var(--bg-glow), transparent 60%),
-    var(--bg-pattern);
-  background-size: 100% 100%, 160px 160px;
-  background-repeat: no-repeat, repeat;
+  background-image: var(--bg-pattern), var(--bg-art);
+  background-size: 160px 160px, cover;
+  background-repeat: repeat, no-repeat;
+  background-position: center, center;
   background-attachment: fixed, fixed;
   color: var(--ink);
   font-family: var(--font-app), "Helvetica Neue", system-ui, -apple-system, sans-serif;
