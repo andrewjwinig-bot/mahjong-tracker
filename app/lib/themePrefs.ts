@@ -17,6 +17,8 @@ export interface ThemeDef {
   name: string;
   tagline: string;
   dark?: boolean;
+  /** Premium theme — gated behind Pro. */
+  pro?: boolean;
   /** Preview swatch + the browser status-bar (theme-color) page tone. */
   swatch: { brand: string; green: string; accent: string; page: string };
 }
@@ -52,6 +54,7 @@ export const THEMES: ThemeDef[] = [
     id: 'dragon',
     name: 'Dragon',
     tagline: 'Emerald & gold',
+    pro: true,
     swatch: { brand: '#0F8F6E', green: '#2BB673', accent: '#D23B4E', page: '#F4EFE1' },
   },
   {
@@ -64,6 +67,7 @@ export const THEMES: ThemeDef[] = [
     id: 'joker',
     name: 'Joker',
     tagline: 'Wild violet',
+    pro: true,
     swatch: { brand: '#7C4DE0', green: '#18C39A', accent: '#F5478B', page: '#F5F2FD' },
   },
   {
@@ -71,6 +75,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Midnight',
     tagline: 'Dark & neon',
     dark: true,
+    pro: true,
     swatch: { brand: '#2DD4BF', green: '#34D399', accent: '#FF6B81', page: '#141826' },
   },
 ];
