@@ -28,8 +28,16 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
             track wins, learn the tiles, and play with friends.
           </p>
           <p className="legal-fine">
-            A full Privacy Policy and Terms of Service will be published before the App Store launch.
+            Read our policies: these open in your browser.
           </p>
+          <div className="row">
+            <a className="btn ghost" href="/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </a>
+            <a className="btn ghost" href="/terms" target="_blank" rel="noopener noreferrer">
+              Terms of Service
+            </a>
+          </div>
         </div>
 
         <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
