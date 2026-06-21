@@ -3,14 +3,15 @@
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
 
-export type Tab = 'card' | 'wins' | 'group' | 'learn';
+export type Tab = 'card' | 'wins' | 'group' | 'tables' | 'learn';
 
-// Tile-icon nav + mahjong lingo. A mahjong group is a "table"; the learn tab
-// is the "rules"; wins are "mahjs".
+// Tile-icon nav + mahjong lingo. The "feed" is public across friends; "tables"
+// are your private groups; the learn tab is the "rules"; wins are "mahjs".
 const TABS: { id: Tab; label: string; face: TileFace; char?: string; color?: string }[] = [
   { id: 'card', label: 'Card', face: 'crack' },
   { id: 'wins', label: 'Mahjs', face: 'dragon', char: '中', color: '#E8455F' },
   { id: 'group', label: 'Feed', face: 'flower' },
+  { id: 'tables', label: 'Tables', face: 'bam' },
   { id: 'learn', label: 'Rules', face: 'dot' },
 ];
 

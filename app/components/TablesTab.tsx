@@ -1,0 +1,533 @@
+'use client';
+
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { Profile } from '../lib/social';
+import type { ChatMsg, PollOption, Table, TablePhoto } from '../lib/tables';
+import { loadTables, saveTables } from '../lib/tables';
+import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
+import { downscaleImage } from '../lib/image';
+import { track } from '../lib/analytics';
+import Avatar from './Avatar';
+import TileStrip from './TileStrip';
+import ShareModal from './ShareModal';
+
+type View = 'chat' | 'dates' | 'photos';
+
+export default function TablesTab({ profile }: { profile: Profile }) {
+  const [tables, setTables] = useState<Table[] | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void loadTables().then((t) => alive && setTables(t));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  function update(id: string, fn: (t: Table) => Table) {
+    setTables((prev) => {
+      if (!prev) return prev;
+      const next = prev.map((t) => (t.id === id ? fn(t) : t));
+      void saveTables(next);
+      return next;
+    });
+  }
+
+  if (!tables) {
+    return (
+      <div className="screen">
+        <div className="empty">
+          <div className="big">🀄</div>
+          Loading your tables…
+        </div>
+      </div>
+    );
+  }
+
+  const selected = tables.find((t) => t.id === selectedId) ?? null;
+
+  if (selected) {
+    return (
+      <TableDetail
+        table={selected}
+        profile={profile}
+        onBack={() => setSelectedId(null)}
+        onUpdate={(fn) => update(selected.id, fn)}
+      />
+    );
+  }
+
+  return <TablesList tables={tables} profile={profile} onOpen={setSelectedId} onCreate={(t) => {
+    setTables((prev) => {
+      const next = [...(prev ?? []), t];
+      void saveTables(next);
+      return next;
+    });
+    setSelectedId(t.id);
+  }} />;
+}
+
+/* ---------------------------------------------------------------- list ---- */
+
+function TablesList({
+  tables,
+  profile,
+  onOpen,
+  onCreate,
+}: {
+  tables: Table[];
+  profile: Profile;
+  onOpen: (id: string) => void;
+  onCreate: (t: Table) => void;
+}) {
+  const [creating, setCreating] = useState(false);
+  const [name, setName] = useState('');
+
+  function create() {
+    const n = name.trim();
+    if (!n) return;
+    const code = `${n.slice(0, 4).toUpperCase().replace(/[^A-Z]/g, 'X')}-${Math.floor(1000 + Math.random() * 9000)}`;
+    onCreate({
+      id: `t_${Date.now()}`,
+      name: n,
+      emoji: '🀄',
+      inviteCode: code,
+      members: [{ name: profile.name, avatar: profile.avatar }],
+      messages: [],
+      poll: { question: 'When should we play next?', options: [] },
+      photos: [],
+    });
+    void track('table_created');
+    setCreating(false);
+    setName('');
+  }
+
+  return (
+    <div className="screen">
+      <header className="app-header">
+        <h1>Your Tables</h1>
+        <p className="sub">Your private groups — chat, schedule &amp; share photos.</p>
+        <TileStrip count={7} />
+      </header>
+
+      <button className="btn coral" style={{ marginTop: 16 }} onClick={() => setCreating(true)}>
+        ＋ New Table
+      </button>
+
+      <div style={{ marginTop: 16 }}>
+        {tables.map((t) => {
+          const last = t.messages[t.messages.length - 1];
+          return (
+            <button key={t.id} className="table-row" onClick={() => onOpen(t.id)}>
+              <span className="table-emoji">{t.emoji}</span>
+              <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                <span className="table-name">{t.name}</span>
+                <span className="table-meta">
+                  {t.members.length + 1} players
+                  {last ? ` · ${last.author}: ${last.text}` : ' · Tap to open'}
+                </span>
+              </span>
+              <span style={{ fontSize: 20, color: 'var(--muted)' }}>›</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
+        Demo tables live on this device. Real shared tables arrive with accounts (v2).
+      </p>
+
+      {creating && (
+        <div className="modal-scrim" onClick={() => setCreating(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="grab" />
+            <h2>New Table 🀄</h2>
+            <p className="sheet-sub">Start a private group with your crew.</p>
+            <label className="lbl">Table name</label>
+            <input
+              className="field"
+              value={name}
+              autoFocus
+              maxLength={28}
+              placeholder="Thursday Night Mahj"
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && create()}
+            />
+            <div className="row">
+              <button className="btn ghost" onClick={() => setCreating(false)}>
+                Cancel
+              </button>
+              <button className="btn" onClick={create} disabled={!name.trim()}>
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------- detail ---- */
+
+function TableDetail({
+  table,
+  profile,
+  onBack,
+  onUpdate,
+}: {
+  table: Table;
+  profile: Profile;
+  onBack: () => void;
+  onUpdate: (fn: (t: Table) => Table) => void;
+}) {
+  const [view, setView] = useState<View>('chat');
+  const [inviteOpen, setInviteOpen] = useState(false);
+
+  return (
+    <div className="screen">
+      <div className="detail-top">
+        <button className="icon-btn" onClick={onBack} aria-label="Back to tables">
+          ‹
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="detail-title">
+            {table.emoji} {table.name}
+          </div>
+          <div className="detail-sub">{table.members.length + 1} players</div>
+        </div>
+        <button className="btn green" style={{ width: 'auto', padding: '9px 14px' }} onClick={() => setInviteOpen(true)}>
+          ↗ Invite
+        </button>
+      </div>
+
+      <div className="segmented" style={{ marginTop: 14 }}>
+        {(['chat', 'dates', 'photos'] as View[]).map((v) => (
+          <button key={v} data-active={view === v} onClick={() => setView(v)}>
+            {v === 'chat' ? '💬 Chat' : v === 'dates' ? '📅 Dates' : '📷 Photos'}
+          </button>
+        ))}
+      </div>
+
+      {view === 'chat' && <ChatView table={table} profile={profile} onUpdate={onUpdate} />}
+      {view === 'dates' && <DatesView table={table} profile={profile} onUpdate={onUpdate} />}
+      {view === 'photos' && <PhotosView table={table} profile={profile} onUpdate={onUpdate} />}
+
+      {inviteOpen && (
+        <ShareModal
+          payload={{
+            title: 'Invite To This Table 👯',
+            text: `Join my mahjong table “${table.name}”! Invite code: ${table.inviteCode}`,
+            url: typeof window !== 'undefined' ? window.location.origin : '',
+          }}
+          onClose={() => setInviteOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function timeAgo(ts: number): string {
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return 'now';
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
+/* ---- Chat ---------------------------------------------------------------- */
+
+function ChatView({
+  table,
+  profile,
+  onUpdate,
+}: {
+  table: Table;
+  profile: Profile;
+  onUpdate: (fn: (t: Table) => Table) => void;
+}) {
+  const [draft, setDraft] = useState('');
+
+  function send() {
+    const text = draft.trim();
+    if (!text) return;
+    const msg: ChatMsg = {
+      id: crypto.randomUUID(),
+      author: profile.name,
+      avatar: profile.avatar,
+      text,
+      createdAt: Date.now(),
+    };
+    onUpdate((t) => ({ ...t, messages: [...t.messages, msg] }));
+    void track('table_message_sent');
+    setDraft('');
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      {table.messages.length === 0 ? (
+        <div className="empty">
+          <div className="big">💬</div>
+          No messages yet. Say hi to your table!
+        </div>
+      ) : (
+        <div className="chat-list">
+          {table.messages.map((m) => {
+            const mine = m.author === profile.name;
+            return (
+              <div key={m.id} className={`chat-msg${mine ? ' mine' : ''}`}>
+                {!mine && <Avatar avatar={m.avatar} size={30} />}
+                <div className="chat-bubble">
+                  {!mine && <span className="chat-author">{m.author}</span>}
+                  {m.text}
+                  <span className="chat-time">{timeAgo(m.createdAt)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="chat-compose">
+        <input
+          className="field"
+          style={{ borderRadius: 999 }}
+          placeholder="Message your table…"
+          value={draft}
+          maxLength={300}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && send()}
+        />
+        <button className="btn" style={{ width: 'auto', padding: '12px 16px' }} onClick={send} disabled={!draft.trim()}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Dates / scheduling -------------------------------------------------- */
+
+function prettyDate(iso: string, time?: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  const day = date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  if (!time) return day;
+  const [hh, mm] = time.split(':').map(Number);
+  const dt = new Date(y, m - 1, d, hh, mm);
+  return `${day} · ${dt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+}
+
+function eventFor(table: Table, opt: PollOption): CalEvent {
+  const [y, m, d] = opt.date.split('-').map(Number);
+  const [hh, mm] = (opt.time || '19:00').split(':').map(Number);
+  return {
+    title: `🀄 Mahjong — ${table.name}`,
+    start: new Date(y, m - 1, d, hh, mm),
+    durationMins: 180,
+    description: `Game night with ${table.name}. Scheduled via Mahjong Tracker.`,
+  };
+}
+
+function DatesView({
+  table,
+  profile,
+  onUpdate,
+}: {
+  table: Table;
+  profile: Profile;
+  onUpdate: (fn: (t: Table) => Table) => void;
+}) {
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('19:00');
+  const [calFor, setCalFor] = useState<PollOption | null>(null);
+
+  const leader = useMemo(() => {
+    return table.poll.options.reduce<PollOption | null>(
+      (best, o) => (!best || o.votes.length > best.votes.length ? o : best),
+      null,
+    );
+  }, [table.poll.options]);
+
+  function toggleVote(optId: string) {
+    onUpdate((t) => ({
+      ...t,
+      poll: {
+        ...t.poll,
+        options: t.poll.options.map((o) => {
+          if (o.id !== optId) return o;
+          const voted = o.votes.includes(profile.name);
+          return { ...o, votes: voted ? o.votes.filter((v) => v !== profile.name) : [...o.votes, profile.name] };
+        }),
+      },
+    }));
+    void track('table_poll_voted');
+  }
+
+  function addOption() {
+    if (!date) return;
+    const opt: PollOption = { id: crypto.randomUUID(), date, time: time || undefined, votes: [profile.name] };
+    onUpdate((t) => ({ ...t, poll: { ...t.poll, options: [...t.poll.options, opt] } }));
+    setDate('');
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      <div className="cat-head" style={{ margin: '4px 2px 12px' }}>
+        <span className="pill" style={{ background: 'var(--tint)', color: 'var(--brand)' }}>
+          📅 {table.poll.question}
+        </span>
+      </div>
+
+      {table.poll.options.length === 0 && (
+        <div className="empty" style={{ padding: '24px 20px' }}>
+          No dates yet — propose one below!
+        </div>
+      )}
+
+      {table.poll.options.map((o) => {
+        const voted = o.votes.includes(profile.name);
+        const isLeader = leader?.id === o.id && o.votes.length > 0;
+        return (
+          <div key={o.id} className={`poll-opt${isLeader ? ' lead' : ''}`}>
+            <button className="vote-btn" data-on={voted} onClick={() => toggleVote(o.id)}>
+              {voted ? '✓' : ''}
+            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: 14 }}>
+                {prettyDate(o.date, o.time)}
+                {isLeader && <span className="lead-tag">Leading</span>}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
+                {o.votes.length ? `${o.votes.length} in · ${o.votes.join(', ')}` : 'No votes yet'}
+              </div>
+            </div>
+            <button className="icon-btn" aria-label="Add to calendar" onClick={() => setCalFor(o)}>
+              📅
+            </button>
+          </div>
+        );
+      })}
+
+      <div className="card" style={{ marginTop: 14 }}>
+        <label className="lbl">Propose a date</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input className="field" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <input className="field" type="time" value={time} style={{ maxWidth: 130 }} onChange={(e) => setTime(e.target.value)} />
+        </div>
+        <button className="btn green" style={{ marginTop: 10 }} onClick={addOption} disabled={!date}>
+          ＋ Add date
+        </button>
+      </div>
+
+      {calFor && (
+        <div className="modal-scrim" onClick={() => setCalFor(null)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="grab" />
+            <h2>Add To Calendar 📅</h2>
+            <p className="sheet-sub">{prettyDate(calFor.date, calFor.time)} · {table.name}</p>
+            <button
+              className="btn"
+              onClick={() => {
+                downloadICS(eventFor(table, calFor));
+                void track('calendar_added', { kind: 'apple' });
+                setCalFor(null);
+              }}
+            >
+               Apple Calendar
+            </button>
+            <button
+              className="btn green"
+              style={{ marginTop: 10 }}
+              onClick={() => {
+                window.open(googleCalUrl(eventFor(table, calFor)), '_blank', 'noopener,noreferrer');
+                void track('calendar_added', { kind: 'google' });
+                setCalFor(null);
+              }}
+            >
+              📆 Google Calendar
+            </button>
+            <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setCalFor(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---- Photos -------------------------------------------------------------- */
+
+function PhotosView({
+  table,
+  profile,
+  onUpdate,
+}: {
+  table: Table;
+  profile: Profile;
+  onUpdate: (fn: (t: Table) => Table) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    try {
+      const blob = await downscaleImage(file);
+      const photo: TablePhoto = {
+        id: crypto.randomUUID(),
+        photo: blob,
+        caption: '',
+        author: profile.name,
+        createdAt: Date.now(),
+      };
+      onUpdate((t) => ({ ...t, photos: [photo, ...t.photos] }));
+      void track('table_photo_added');
+    } finally {
+      setBusy(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
+      <button className="btn coral" onClick={() => fileRef.current?.click()} disabled={busy}>
+        {busy ? 'Adding…' : '📷 Add Photo'}
+      </button>
+
+      {table.photos.length === 0 ? (
+        <div className="empty">
+          <div className="big">📷</div>
+          No photos yet. Snap your prettiest hands &amp; wins!
+        </div>
+      ) : (
+        <div className="photo-grid">
+          {table.photos.map((p) => (
+            <PhotoThumb key={p.id} photo={p} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhotoThumb({ photo }: { photo: TablePhoto }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    const u = URL.createObjectURL(photo.photo);
+    setUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [photo.photo]);
+  return (
+    <div className="photo-cell">
+      {url && <img src={url} alt={photo.caption || 'Table photo'} />}
+      <span className="photo-by">{photo.author}</span>
+    </div>
+  );
+}

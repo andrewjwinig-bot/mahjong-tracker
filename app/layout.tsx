@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Baloo_2 } from 'next/font/google';
+import { Archivo } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
 
-// Chunky, rounded, playful — the planner/sticker vibe.
-const baloo = Baloo_2({
+// Solid, sharp, clean — bold without the rounded/bubbly feel.
+const archivo = Archivo({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-baloo',
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-app',
   display: 'swap',
 });
 
@@ -36,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={baloo.variable}>
+    <html lang="en" className={archivo.variable}>
       <body>
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script

@@ -1,14 +1,32 @@
 'use client';
 
-import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { tileSVG, CONFETTI_FACES } from '../lib/tileArt';
 
 export interface CelebrateOpts {
   title?: string;
-  subtitle?: string | null;
-  /** Optional share action surfaced in the celebration modal. */
+  handLabel?: string | null;
+  points?: number;
+  /** Progress toward clearing the card. */
+  cleared?: number;
+  total?: number;
+  /** Whether this mahj was already posted to the feed. */
+  posted?: boolean;
+  /** Surface a Share action. */
   onShare?: () => void;
+  /** Surface a "Post to feed" action (when not already posted). */
+  onPost?: () => void;
 }
+
+const HYPE = [
+  'You’re on fire! 🔥',
+  'Mahjong royalty 👑',
+  'Tile master! 🀄',
+  'Absolutely unstoppable 💪',
+  'Big flex 😎',
+  'Sparrows are singing 🐦',
+  'Clean hand, clean win ✨',
+];
 
 interface ConfettiApi {
   /** Quick tile burst from a point (e.g. a checkbox). */
@@ -147,13 +165,43 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
 }
 
 function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () => void }) {
+  const [posted, setPosted] = useState(!!opts.posted);
+  // Pick a hype line once per celebration; upgrade to a milestone when earned.
+  const hype = useMemo(() => {
+    if (opts.cleared != null && opts.total != null) {
+      if (opts.cleared >= opts.total) return 'YOU CLEARED THE CARD!! 🎉🀄';
+      if (opts.cleared > 0 && opts.cleared % 10 === 0) return `${opts.cleared} hands down! 🙌`;
+    }
+    return HYPE[Math.floor(Math.random() * HYPE.length)];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="celebrate-scrim" onClick={onClose}>
       <div className="celebrate-card" onClick={(e) => e.stopPropagation()}>
         <div className="boom">🀄</div>
+        <p className="cele-hype">{hype}</p>
         <h2>{opts.title ?? 'I Got Mahj! 🎉'}</h2>
-        {opts.subtitle && <p className="cele-hand">{opts.subtitle}</p>}
-        <div className="row" style={{ marginTop: 16 }}>
+        {opts.handLabel && <p className="cele-hand">{opts.handLabel}</p>}
+
+        {(opts.points != null || opts.cleared != null) && (
+          <div className="cele-stats">
+            {opts.points != null && (
+              <span className="cele-chip">
+                +{opts.points} <small>pts</small>
+              </span>
+            )}
+            {opts.cleared != null && opts.total != null && (
+              <span className="cele-chip">
+                {opts.cleared}/{opts.total} <small>cleared</small>
+              </span>
+            )}
+          </div>
+        )}
+
+        {posted && <p className="cele-posted">✓ Posted to your feed</p>}
+
+        <div className="cele-actions">
           {opts.onShare && (
             <button
               className="btn coral"
@@ -165,7 +213,18 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
               ↗ Share It
             </button>
           )}
-          <button className="btn" onClick={onClose}>
+          {opts.onPost && !posted && (
+            <button
+              className="btn green"
+              onClick={() => {
+                opts.onPost?.();
+                setPosted(true);
+              }}
+            >
+              📣 Post to Feed
+            </button>
+          )}
+          <button className="btn ghost" onClick={onClose}>
             Keep Going
           </button>
         </div>

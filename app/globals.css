@@ -151,8 +151,7 @@ body {
   background-size: 26px 26px;
   background-attachment: fixed;
   color: var(--ink);
-  font-family: var(--font-baloo), ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system,
-    sans-serif;
+  font-family: var(--font-app), "Helvetica Neue", system-ui, -apple-system, sans-serif;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -1033,6 +1032,201 @@ label.lbl {
   color: var(--brand);
 }
 
+/* ---- Tables: list -------------------------------------------------------- */
+
+.table-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.table-row + .table-row {
+  margin-top: 10px;
+}
+.table-row:active {
+  transform: scale(0.99);
+}
+.table-emoji {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: var(--tint);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+}
+.table-name {
+  display: block;
+  font-weight: 800;
+  font-size: 16px;
+}
+.table-meta {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Tables: detail ------------------------------------------------------ */
+
+.detail-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 2px;
+}
+.detail-title {
+  font-size: 21px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* chat */
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.chat-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+}
+.chat-msg.mine {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.chat-bubble {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  padding: 9px 13px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.chat-msg.mine .chat-bubble {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+.chat-author {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--brand);
+  margin-bottom: 1px;
+}
+.chat-time {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  opacity: 0.6;
+}
+.chat-compose {
+  display: flex;
+  gap: 8px;
+  position: sticky;
+  bottom: 0;
+}
+
+/* poll */
+.poll-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.poll-opt + .poll-opt {
+  margin-top: 8px;
+}
+.poll-opt.lead {
+  box-shadow: 0 0 0 2.5px var(--green), var(--shadow-sm);
+}
+.vote-btn {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 2.5px var(--tint-deep);
+  display: grid;
+  place-items: center;
+  color: transparent;
+  font-size: 18px;
+  font-weight: 800;
+}
+.vote-btn[data-on="true"] {
+  background: var(--green);
+  box-shadow: inset 0 0 0 2.5px var(--green);
+  color: #fff;
+}
+.lead-tag {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--green);
+  background: var(--tint);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+/* photos */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.photo-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--tint);
+  box-shadow: var(--shadow-sm);
+}
+.photo-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-by {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(20, 24, 38, 0.55);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
 /* ---- Confetti + celebration --------------------------------------------- */
 
 .confetti-layer {
@@ -1105,6 +1299,14 @@ label.lbl {
   text-transform: uppercase;
   color: var(--brand);
 }
+.celebrate-card .cele-hype {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--green);
+}
 .celebrate-card .cele-hand {
   margin: 4px 0 0;
   font-size: 16px;
@@ -1112,6 +1314,37 @@ label.lbl {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--ink);
+}
+.cele-stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.cele-chip {
+  background: var(--tint);
+  color: var(--brand);
+  font-weight: 800;
+  font-size: 17px;
+  padding: 8px 14px;
+  border-radius: 14px;
+}
+.cele-chip small {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.cele-posted {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--green);
+}
+.cele-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MahjongCard, Win } from '../lib/types';
 import { downscaleImage } from '../lib/image';
 import { buildShareCard } from '../lib/shareCard';
+import { captionFor, appUrl } from '../lib/share';
 import { recordShare, track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
@@ -18,14 +19,6 @@ interface Props {
   onRemoveWin: (id: string) => void;
   onBump: (handId: string, delta: number) => void;
   onPostToGroup: (win: Win) => void;
-}
-
-const appUrl = () => (typeof window !== 'undefined' ? window.location.origin : '');
-
-function captionFor(win: Win): string {
-  return win.handLabel
-    ? `I just got MAHJ with ${win.handLabel}! 🀄🎉 Chasing all 70 hands on my 2026 card.`
-    : `I just got MAHJ! 🀄🎉 Chasing all 70 hands on my 2026 card.`;
 }
 
 export default function WinsTab({
@@ -83,13 +76,19 @@ export default function WinsTab({
             onAddWin(win);
             // Logging a MAHJ advances your card (and the leaderboard)…
             if (win.handId) onBump(win.handId, +1);
-            // …and optionally lands in the group feed.
+            // …and optionally lands in the feed.
             if (opts.shareToGroup) onPostToGroup(win);
             setOpen(false);
+            const pts = win.handId
+              ? card.hands.find((h) => h.id === win.handId)?.points
+              : undefined;
             celebrate({
               title: 'I Got Mahj! 🎉',
-              subtitle: win.handLabel,
+              handLabel: win.handLabel,
+              points: pts,
+              posted: opts.shareToGroup,
               onShare: () => setShareWin(win),
+              onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win),
             });
           }}
         />
