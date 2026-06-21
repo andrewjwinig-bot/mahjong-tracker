@@ -18,6 +18,7 @@ interface Props {
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
   onTrophies: () => void;
+  onEditCard: () => void;
   onClose: () => void;
 }
 
@@ -46,6 +47,7 @@ export default function SettingsSheet({
   onTheme,
   onExperience,
   onTrophies,
+  onEditCard,
   onClose,
 }: Props) {
   const [name, setName] = useState(profile.name);
@@ -183,6 +185,10 @@ export default function SettingsSheet({
 
         <button className="btn ghost" style={{ marginTop: 16 }} onClick={onTrophies}>
           🏆 Trophies &amp; Stats
+        </button>
+
+        <button className="btn ghost" style={{ marginTop: 10 }} onClick={onEditCard}>
+          🃏 My Card (bring your own)
         </button>
 
         {/* Experience level */}
