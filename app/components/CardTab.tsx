@@ -22,9 +22,10 @@ interface Props {
   /** First-time clear of a hand: posts to the feed, returns the Win to share. */
   onMahj: (hand: Hand) => Win;
   experience: Experience;
+  streak: number;
 }
 
-export default function CardTab({ card, handCounts, onBump, onMahj, experience }: Props) {
+export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
@@ -124,6 +125,9 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience }
         </h1>
         <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
         <TileStrip count={7} />
+        {streak > 1 && (
+          <div className="streak-chip">🔥 {streak}-day streak</div>
+        )}
       </header>
 
       <div className="stats" style={{ marginTop: 16 }}>

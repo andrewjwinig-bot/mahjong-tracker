@@ -7,6 +7,7 @@ import { initialOf } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
+import { fxOn, setFx } from '../lib/sound';
 
 interface Props {
   profile: Profile;
@@ -48,6 +49,7 @@ export default function SettingsSheet({
   const [handle, setHandle] = useState(profile.handle);
   const [bio, setBio] = useState(profile.bio);
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
+  const [fx, setFxState] = useState(fxOn());
 
   const letter = initialOf(name);
   // For the letter tile, the displayed character always tracks the name.
@@ -189,6 +191,25 @@ export default function SettingsSheet({
         <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
           Tailors your rules &amp; tips.
         </p>
+
+        {/* Sound + haptics */}
+        <button
+          type="button"
+          className="fx-row"
+          onClick={() => {
+            const next = !fx;
+            setFxState(next);
+            setFx(next);
+          }}
+        >
+          <span style={{ fontSize: 20 }}>🔊</span>
+          <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
+            Sound &amp; haptics
+          </span>
+          <span className="switch" data-on={fx} aria-hidden>
+            <span className="knob" />
+          </span>
+        </button>
 
         {/* Theme picker */}
         <label className="lbl" style={{ marginTop: 18 }}>

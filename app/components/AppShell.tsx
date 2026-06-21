@@ -22,6 +22,7 @@ import {
   type Account,
   type Experience,
 } from '../lib/account';
+import { recordPlay } from '../lib/streak';
 
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('card');
@@ -35,6 +36,7 @@ export default function AppShell() {
   const [account, setAccount] = useState<Account | null>(null);
   const [experience, setExperienceState] = useState<Experience>('beginner');
   const [accountChecked, setAccountChecked] = useState(false);
+  const [streak, setStreak] = useState(0);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function AppShell() {
     setAccount(getAccount());
     setExperienceState(getExperience());
     setAccountChecked(true);
+    setStreak(recordPlay().current);
     (async () => {
       const [counts, notes, w, s] = await Promise.all([
         db.loadHandCounts(),
@@ -265,6 +268,7 @@ export default function AppShell() {
                 onBump={bumpHand}
                 onMahj={cardMahj}
                 experience={experience}
+                streak={streak}
               />
             )}
             {tab === 'wins' && (
