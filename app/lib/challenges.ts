@@ -15,42 +15,46 @@ export interface Challenge {
   match: (h: Hand) => boolean;
 }
 
+// The four seasons partition the card into non-overlapping category sets, so
+// completing all four challenges completes the whole card.
+const inCats = (cats: string[]) => (h: Hand) => cats.includes(h.category);
+
 export const CHALLENGES: Challenge[] = [
   {
     id: 'newyear',
     name: 'New Year, New Card',
     emoji: '🎆',
     season: 'Winter',
-    blurb: 'Ring in the year — clear every hand in the 2026 section.',
+    blurb: 'New-year showstoppers — clear 2026, Singles + Pairs, and Quints.',
     months: [11, 0, 1],
-    match: (h) => h.category === '2026',
+    match: inCats(['2026', 'Singles + Pairs', 'Quints']),
   },
   {
     id: 'flowers',
     name: 'Flower Festival',
     emoji: '🌸',
     season: 'Spring',
-    blurb: 'Bloom season! Win any flower-forward hand (look for the F’s).',
+    blurb: 'Watch your runs bloom — clear Consecutive Run + Any Like Numbers.',
     months: [2, 3, 4],
-    match: (h) => /F/.test(h.notation),
+    match: inCats(['Consecutive Run', 'Any Like Numbers']),
   },
   {
     id: 'summer',
-    name: 'Summer Evens',
+    name: 'Summer Numbers',
     emoji: '☀️',
     season: 'Summer',
-    blurb: 'Hot streak — clear the 2468 even-number hands.',
+    blurb: 'Sunny multiples — clear the 2468 and 369 hands.',
     months: [5, 6, 7],
-    match: (h) => h.category === '2468',
+    match: inCats(['2468', '369']),
   },
   {
     id: 'dragons',
     name: 'Dragon Days',
     emoji: '🐉',
     season: 'Autumn',
-    blurb: 'Chase the Winds + Dragons hands as the leaves turn.',
+    blurb: 'Honors & odds — clear Winds + Dragons and 13579.',
     months: [8, 9, 10],
-    match: (h) => h.category === 'Winds + Dragons',
+    match: inCats(['Winds + Dragons', '13579']),
   },
 ];
 

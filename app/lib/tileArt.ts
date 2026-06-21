@@ -98,6 +98,8 @@ export function tileSVG(face: TileFace, opts: { char?: string; color?: string } 
   return `<svg viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg" class="mj-svg">
     <rect class="mj-edge" x="2" y="4.5" width="44" height="57.5" rx="11"/>
     <rect class="mj-body" x="2" y="2" width="44" height="58" rx="11"/>
+    <ellipse cx="24" cy="11" rx="19" ry="8.5" fill="#ffffff" fill-opacity="0.22"/>
+    <ellipse cx="24" cy="57" rx="18" ry="5" fill="#000000" fill-opacity="0.05"/>
     ${motifFor(face, opts.char, opts.color)}
   </svg>`;
 }
