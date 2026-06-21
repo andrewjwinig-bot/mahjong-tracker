@@ -1,7 +1,26 @@
 // Tiny, dependency-free celebration feedback: a short WebAudio arpeggio + a
-// haptic buzz. Both fail silently where unsupported or blocked.
+// haptic buzz. Both fail silently where unsupported or blocked, and respect a
+// single on/off preference.
 
 type AC = typeof AudioContext;
+
+const K_FX = 'mahj.fx';
+
+export function fxOn(): boolean {
+  try {
+    return localStorage.getItem(K_FX) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export function setFx(on: boolean): void {
+  try {
+    localStorage.setItem(K_FX, on ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+}
 
 export function playMahjChime(): void {
   try {
