@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Comment, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID, initialOf } from '../lib/social';
-import { TOTAL_HANDS } from '../lib/cardData';
+import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
+import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import TileStrip from './TileStrip';
@@ -16,9 +17,31 @@ interface Props {
   profile: Profile;
   /** Live stats for the local user, computed from their tracker. */
   youStats: { handsCleared: number; points: number };
+  /** The local user's real per-hand win counts (for your own detail view). */
+  handCounts: Record<string, number>;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+}
+
+/** Which hand ids a member has cleared. Real for you; deterministic for demo
+ *  friends so their detail view is stable + spread across categories. */
+function completedHandIds(
+  member: GroupMember,
+  handCounts: Record<string, number>,
+): Set<string> {
+  if (member.isYou) {
+    return new Set(SAMPLE_CARD.hands.filter((h) => (handCounts[h.id] ?? 0) > 0).map((h) => h.id));
+  }
+  let seed = 2166136261;
+  for (const c of member.id) seed = (Math.imul(seed ^ c.charCodeAt(0), 16777619) >>> 0);
+  const ids = SAMPLE_CARD.hands.map((h) => h.id);
+  for (let i = ids.length - 1; i > 0; i--) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const j = seed % (i + 1);
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  return new Set(ids.slice(0, Math.min(member.handsCleared, ids.length)));
 }
 
 function timeAgo(ts: number): string {
@@ -37,10 +60,12 @@ export default function GroupTab({
   feed,
   profile,
   youStats,
+  handCounts,
   onToggleLike,
   onAddComment,
   onAddFriend,
 }: Props) {
+  const [detail, setDetail] = useState<GroupMember | null>(null);
   // Track a feed view once per mount (core-loop metric).
   useEffect(() => {
     void track('feed_viewed', { posts: feed.length });
@@ -118,22 +143,20 @@ export default function GroupTab({
         {ranked.map((m, i) => {
           const pct = Math.round((m.handsCleared / TOTAL_HANDS) * 100);
           return (
-            <div
+            <button
               key={m.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 8px',
-                borderRadius: 14,
-                background: m.id === YOU_ID ? 'var(--tint)' : 'transparent',
+              className="lb-row"
+              onClick={() => {
+                setDetail(m);
+                void track('leaderboard_member_opened');
               }}
+              style={{ background: m.id === YOU_ID ? 'var(--tint)' : 'transparent' }}
             >
               <div style={{ width: 26, textAlign: 'center', fontWeight: 900, fontSize: 16 }}>
                 {medals[i] ?? i + 1}
               </div>
               <Avatar avatar={m.avatar} size={36} />
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <div style={{ fontWeight: 800, fontSize: 15 }}>
                   {m.name}
                   {m.id === YOU_ID && <span style={{ color: 'var(--muted)', fontWeight: 700 }}> · you</span>}
@@ -147,12 +170,20 @@ export default function GroupTab({
                   {m.handsCleared}
                   <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}>/{TOTAL_HANDS}</span>
                 </div>
-                <div style={{ color: 'var(--muted)', fontSize: 11, fontWeight: 800 }}>{m.points} pts</div>
+                <div style={{ color: 'var(--muted)', fontSize: 11, fontWeight: 800 }}>tap to view</div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {detail && (
+        <MemberDetail
+          member={detail}
+          completed={completedHandIds(detail, handCounts)}
+          onClose={() => setDetail(null)}
+        />
+      )}
 
       {/* Feed */}
       <div className="cat-head">
@@ -283,6 +314,75 @@ function FeedCard({
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Member detail (which hands they've cleared) ------------------------- */
+
+function MemberDetail({
+  member,
+  completed,
+  onClose,
+}: {
+  member: GroupMember;
+  completed: Set<string>;
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-scrim" onClick={onClose}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="grab" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+          <Avatar avatar={member.avatar} size={46} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: 20, textTransform: 'uppercase', color: 'var(--brand)' }}>
+              {member.name}
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
+              {completed.size}/{TOTAL_HANDS} cleared · {member.points} pts
+            </div>
+          </div>
+        </div>
+
+        {SAMPLE_CARD.categories.map((cat) => {
+          const hands = SAMPLE_CARD.hands.filter((h) => h.category === cat);
+          const done = hands.filter((h) => completed.has(h.id)).length;
+          return (
+            <section key={cat}>
+              <div className="cat-head" style={{ margin: '16px 2px 8px' }}>
+                <span className="pill">{cat}</span>
+                <span className="count">
+                  {done}/{hands.length}
+                </span>
+              </div>
+              {hands.map((h) => {
+                const got = completed.has(h.id);
+                return (
+                  <div key={h.id} className={`mini-hand${got ? ' got' : ''}`}>
+                    <span className="mini-check" data-on={got}>
+                      {got ? '✓' : ''}
+                    </span>
+                    <span className="mini-note">
+                      {colorNotation(h.notation).map((g, i, arr) => (
+                        <span key={i} className={g.cls}>
+                          {g.text}
+                          {i < arr.length - 1 ? ' ' : ''}
+                        </span>
+                      ))}
+                    </span>
+                    <span className="pts">{h.concealed ? `C${h.points}` : `×${h.points}`}</span>
+                  </div>
+                );
+              })}
+            </section>
+          );
+        })}
+
+        <button className="btn ghost" style={{ marginTop: 18 }} onClick={onClose}>
+          Done
+        </button>
       </div>
     </div>
   );
