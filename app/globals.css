@@ -689,6 +689,10 @@ select {
 .btn.green {
   background: linear-gradient(180deg, var(--green), color-mix(in srgb, var(--green) 82%, #000));
 }
+.btn.danger {
+  background: linear-gradient(180deg, #e8473e, #c9362e);
+  color: #fff;
+}
 .btn.ghost {
   background: var(--tint);
   color: var(--brand);
