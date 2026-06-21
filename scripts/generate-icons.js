@@ -115,6 +115,27 @@ function fillPoly(c, pts, colFn) {
   }
 }
 
+// Scale a polygon about a center point (used for outlines).
+function scalePoly(pts, f, cx, cy) {
+  return pts.map((p) => [cx + (p[0] - cx) * f, cy + (p[1] - cy) * f]);
+}
+
+// A jester-hat lobe (the joker emblem): an outlined point with a bell.
+function lobe(c, baseX, baseY, tipX, tipY, halfBase, col) {
+  const pts = [
+    [baseX - halfBase, baseY],
+    [tipX, tipY],
+    [baseX + halfBase, baseY],
+  ];
+  const cx = (pts[0][0] + pts[1][0] + pts[2][0]) / 3;
+  const cy = (pts[0][1] + pts[1][1] + pts[2][1]) / 3;
+  fillPoly(c, pts, () => NAVY); // outline base
+  fillPoly(c, scalePoly(pts, 0.84, cx, cy), () => col); // colored fill
+  // bell at the tip
+  circle(c, Math.round(tipX), Math.round(tipY), Math.round(halfBase * 0.62), [...NAVY, 255]);
+  circle(c, Math.round(tipX), Math.round(tipY), Math.round(halfBase * 0.42), [...GOLD, 255]);
+}
+
 // Vertical gradient background fill.
 function gradientV(c, top, bot) {
   for (let y = 0; y < c.size; y++) {
@@ -149,20 +170,21 @@ function draw(size, { maskable }) {
   // soft top sheen on the tile
   roundRect(c, tx, ty, tw, Math.round(tw * 0.42), r, SHEEN);
 
-  // centered joker star: navy outline + coral→gold→violet gradient
+  // centered joker emblem: a jester's hat with three belled points
   const mx = size / 2;
-  const my = ty + tw * 0.5;
-  const R = tw * 0.37;
-  fillPoly(c, starPoints(mx, my, R, R * 0.42), () => NAVY);
+  const by = ty + tw * 0.64; // hat band baseline
+  const bw = tw * 0.5;
+  const bh = tw * 0.13;
+  const half = tw * 0.12;
 
-  const sR = R * 0.9;
-  const top = my - sR;
-  const grad = (x, y) => {
-    let t = (y - top) / (sR * 2);
-    t = Math.max(0, Math.min(1, t));
-    return t < 0.5 ? lerp(CORAL, GOLD, t * 2) : lerp(GOLD, VIOLET, (t - 0.5) * 2);
-  };
-  fillPoly(c, starPoints(mx, my, sR, sR * 0.42), grad);
+  // three floppy points rising from the band
+  lobe(c, mx - bw * 0.34, by, mx - tw * 0.31, by - tw * 0.34, half, CORAL);
+  lobe(c, mx + bw * 0.34, by, mx + tw * 0.31, by - tw * 0.34, half, VIOLET);
+  lobe(c, mx, by, mx, by - tw * 0.46, half, GOLD);
+
+  // hat band (navy outline + ivory face so points read on top)
+  roundRect(c, mx - bw / 2 - 3, by - 3, bw + 6, bh + 6, (bh + 6) * 0.5, [...NAVY, 255]);
+  roundRect(c, mx - bw / 2, by, bw, bh, bh * 0.5, [...CORAL, 255]);
 
   return c;
 }
