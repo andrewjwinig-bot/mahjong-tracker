@@ -103,7 +103,8 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
         </button>
         <p className="onboard-fine">
           On-device demo account — your data stays on this phone. Cloud accounts &amp; sync arrive
-          with the App Store release.
+          with the App Store release. Not affiliated with the National Mah Jongg League; sample hands
+          are original and illustrative.
         </p>
       </div>
     </div>
