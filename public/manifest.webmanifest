@@ -1,7 +1,7 @@
 {
-  "name": "Mahjong Tracker",
-  "short_name": "Mahjong",
-  "description": "Track your American Mahjong wins and clear all 70 hands this year.",
+  "name": "Let's Mahj — The Original Mahj Social Network",
+  "short_name": "Let's Mahj",
+  "description": "The original mahj social network. Track your American Mahjong wins, score live games, and play along with your table.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -408,13 +408,37 @@ a:focus-visible,
   color: var(--brand);
 }
 .app-header .sub {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 13.5px;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 10px auto 0;
+  background: var(--card);
+  color: var(--ink-soft);
+  padding: 7px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
   font-weight: 700;
 }
 
-/* Tiled "LETS / MAHJ" wordmark header with corner accent tiles. */
+/* Brand tagline badge. */
+.brand-tag {
+  display: block;
+  width: fit-content;
+  margin: 10px auto 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: var(--on-brand, #fff);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tiled "LETS / MAHJ" wordmark header with accent tiles tucked behind. */
 .card-title {
   position: relative;
   display: flex;
@@ -423,9 +447,11 @@ a:focus-visible,
   gap: 6px;
   margin: 6px auto 2px;
   width: fit-content;
-  padding: 4px 16px;
+  padding: 18px 30px;
 }
 .card-title-row {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
   gap: 5px;
@@ -435,21 +461,23 @@ a:focus-visible,
   filter: drop-shadow(0 4px 8px rgba(36, 50, 64, 0.16));
   transition: transform 0.15s ease;
 }
+/* Decorative suit tiles sitting BEHIND the wordmark, peeking out at the corners. */
 .ct-accent {
   position: absolute;
+  z-index: 0;
   line-height: 0;
-  filter: drop-shadow(0 5px 10px rgba(36, 50, 64, 0.2));
-  z-index: 1;
+  opacity: 0.92;
+  filter: drop-shadow(0 5px 12px rgba(36, 50, 64, 0.22));
 }
 .ct-accent-tr {
-  top: -12px;
-  right: -8px;
-  transform: rotate(12deg);
+  top: -6px;
+  right: 2px;
+  transform: rotate(13deg);
 }
 .ct-accent-bl {
-  bottom: -12px;
-  left: -8px;
-  transform: rotate(-12deg);
+  bottom: -6px;
+  left: 2px;
+  transform: rotate(-13deg);
 }
 
 /* ---- Custom tile artwork ------------------------------------------------- */
