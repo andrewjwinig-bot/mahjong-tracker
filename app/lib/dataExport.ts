@@ -46,6 +46,91 @@ export async function exportData(): Promise<void> {
   downloadBlob(blob, `mahjong-tracker-data-${Date.now()}.json`);
 }
 
+export interface ImportSummary {
+  hands: number;
+  notes: number;
+  wins: number;
+  profileRestored: boolean;
+}
+
+/**
+ * Restore data from a previously exported JSON file (device-to-device backup,
+ * no cloud). Merges onto whatever's already here: card progress + notes are
+ * overwritten per-hand, wins are added (deduped by id), settings + profile are
+ * restored. Photos aren't part of the export, so they aren't restored.
+ */
+export async function importData(file: File): Promise<ImportSummary> {
+  const text = await file.text();
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error('That file isn’t valid JSON.');
+  }
+  if (!data || data.app !== 'Mahjong Tracker') {
+    throw new Error('That doesn’t look like a Mahjong Tracker backup.');
+  }
+
+  const summary: ImportSummary = { hands: 0, notes: 0, wins: 0, profileRestored: false };
+
+  // Settings (localStorage) — only our own namespaced keys.
+  if (data.settings && typeof data.settings === 'object') {
+    try {
+      for (const [k, v] of Object.entries(data.settings)) {
+        if (k.startsWith(LS_PREFIX) && typeof v === 'string') localStorage.setItem(k, v);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // Profile lives in IndexedDB meta.
+  if (data.profile) {
+    await db.setMeta('social.profile', data.profile);
+    summary.profileRestored = true;
+  }
+
+  // Per-hand win counts.
+  if (data.cardProgress && typeof data.cardProgress === 'object') {
+    for (const [handId, count] of Object.entries(data.cardProgress)) {
+      const n = Number(count);
+      if (handId && Number.isFinite(n) && n > 0) {
+        await db.setHandCount(handId, n);
+        summary.hands += 1;
+      }
+    }
+  }
+
+  // Per-hand notation overrides.
+  if (data.handNotes && typeof data.handNotes === 'object') {
+    for (const [handId, note] of Object.entries(data.handNotes)) {
+      if (handId && typeof note === 'string') {
+        await db.setHandNote(handId, note);
+        summary.notes += 1;
+      }
+    }
+  }
+
+  // Wins journal (photos not included). Dedupe against existing ids.
+  if (Array.isArray(data.wins)) {
+    const existing = new Set((await db.loadWins()).map((w) => w.id));
+    for (const w of data.wins) {
+      if (!w || typeof w.id !== 'string' || existing.has(w.id)) continue;
+      await db.saveWin({
+        id: w.id,
+        handId: typeof w.handId === 'string' ? w.handId : null,
+        handLabel: typeof w.handLabel === 'string' ? w.handLabel : null,
+        note: typeof w.note === 'string' ? w.note : '',
+        photo: null,
+        createdAt: Number(w.createdAt) || Date.now(),
+      });
+      summary.wins += 1;
+    }
+  }
+
+  return summary;
+}
+
 /** Erase all locally-stored data (localStorage keys + the IndexedDB database). */
 export async function deleteAllData(): Promise<void> {
   try {

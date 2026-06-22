@@ -361,6 +361,7 @@ export default function AppShell() {
         <TrophyShelf
           card={card}
           handCounts={handCounts}
+          wins={wins}
           bestStreak={bestStreak}
           memberSince={account?.createdAt}
           profile={socialState.profile}

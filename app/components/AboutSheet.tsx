@@ -1,14 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import { exportData, deleteAllData } from '../lib/dataExport';
+import { useRef, useState } from 'react';
+import { exportData, importData, deleteAllData } from '../lib/dataExport';
 import { isCloudEnabled, cloudSignOut, cloudDeleteAccount } from '../lib/cloudAuth';
-import { IconDownload, IconSignOut, IconTrash } from './uiIcons';
+import { IconDownload, IconSignOut, IconTrash, IconCard } from './uiIcons';
 
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const cloud = isCloudEnabled();
+
+  async function onRestore(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (fileRef.current) fileRef.current.value = '';
+    if (!file) return;
+    setRestoreMsg(null);
+    setBusy(true);
+    try {
+      const s = await importData(file);
+      const parts = [
+        s.hands ? `${s.hands} hand${s.hands === 1 ? '' : 's'}` : '',
+        s.wins ? `${s.wins} mahj${s.wins === 1 ? '' : 's'}` : '',
+        s.profileRestored ? 'profile' : '',
+      ].filter(Boolean);
+      setRestoreMsg(
+        `Restored ${parts.length ? parts.join(', ') : 'your settings'}. Reloading…`,
+      );
+      setTimeout(() => window.location.reload(), 900);
+    } catch (err) {
+      setBusy(false);
+      setRestoreMsg(err instanceof Error ? err.message : 'Couldn’t read that file.');
+    }
+  }
 
   async function doDelete() {
     setBusy(true);
@@ -72,13 +97,32 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
         <label className="lbl" style={{ marginTop: 20 }}>
           Your data
         </label>
+        <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
+          Back up your progress to a file, or restore it on another device — no account needed.
+        </p>
         <button
           className="btn ghost"
           style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           onClick={() => void exportData()}
+          disabled={busy}
         >
-          <IconDownload size={18} /> Export my data
+          <IconDownload size={18} /> Back up my data
         </button>
+
+        <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onRestore} />
+        <button
+          className="btn ghost"
+          style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={() => fileRef.current?.click()}
+          disabled={busy}
+        >
+          <IconCard size={18} /> Restore from backup
+        </button>
+        {restoreMsg && (
+          <p style={{ margin: '8px 2px 0', fontSize: 12.5, fontWeight: 700, color: 'var(--brand)' }}>
+            {restoreMsg}
+          </p>
+        )}
 
         {cloud && (
           <button
