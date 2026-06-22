@@ -11,7 +11,7 @@ import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconFlame, IconTap } from './uiIcons';
+import { IconFlame, IconTap, IconTrophy } from './uiIcons';
 import type { Experience } from '../lib/account';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -24,9 +24,10 @@ interface Props {
   onMahj: (hand: Hand) => Win;
   experience: Experience;
   streak: number;
+  onScore: () => void;
 }
 
-export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak }: Props) {
+export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak, onScore }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
@@ -164,6 +165,14 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
       <div className="progress" aria-label={`${pct}% of card cleared`}>
         <span style={{ width: `${pct}%` }} />
       </div>
+
+      <button
+        className="btn ghost"
+        style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+        onClick={onScore}
+      >
+        <IconTrophy size={18} /> Score a live game
+      </button>
 
       <div style={{ marginTop: 16 }}>
         <ChallengeCard
