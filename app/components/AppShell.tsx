@@ -366,6 +366,9 @@ export default function AppShell() {
             socialState?.profile.name ?? 'You',
             ...(socialState?.members.filter((m) => !m.isYou).map((m) => m.name) ?? []),
           ].slice(0, 4)}
+          friends={(socialState?.members ?? [])
+            .filter((m) => !m.isYou)
+            .map((m) => ({ name: m.name, avatar: m.avatar }))}
           onClose={() => setScorerOpen(false)}
         />
       )}

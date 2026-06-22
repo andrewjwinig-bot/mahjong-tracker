@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import {
   type Game,
   type GameResult,
+  type PlayerSeed,
   type RoundInput,
   applyRound,
   clearGame,
@@ -14,11 +15,18 @@ import {
   recordResult,
   undoLastRound,
 } from '../lib/gameScorer';
-import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock } from './uiIcons';
+import type { TileAvatar } from '../lib/social';
+import Avatar from './Avatar';
+import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock, IconPlus } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 import { usePro } from '../lib/usePro';
 import { setPro } from '../lib/pro';
 import Paywall from './Paywall';
+
+export interface Friend {
+  name: string;
+  avatar: TileAvatar;
+}
 
 const PRESET_VALUES = [25, 30, 35, 40, 50];
 
@@ -27,9 +35,11 @@ const FREE_HISTORY = 1;
 
 export default function GameScorer({
   suggestedNames,
+  friends,
   onClose,
 }: {
   suggestedNames: string[];
+  friends: Friend[];
   onClose: () => void;
 }) {
   useEscape(onClose);
@@ -60,10 +70,26 @@ export default function GameScorer({
     return base.slice(0, 4);
   }, [suggestedNames]);
   const [names, setNames] = useState<string[]>(initialNames);
+  const [avatars, setAvatars] = useState<(TileAvatar | undefined)[]>([undefined, undefined, undefined, undefined]);
+
+  function setName(i: number, name: string, avatar?: TileAvatar) {
+    setNames((prev) => prev.map((x, j) => (j === i ? name : x)));
+    setAvatars((prev) => prev.map((x, j) => (j === i ? avatar : x)));
+  }
+
+  // Drop a friend into the first empty slot (or the last slot if full).
+  function addFriend(f: Friend) {
+    let slot = names.findIndex((n) => !n.trim());
+    if (slot === -1) slot = 3;
+    setName(slot, f.name, f.avatar);
+  }
+
+  // Friends not already on the roster.
+  const availableFriends = friends.filter((f) => !names.some((n) => n.trim().toLowerCase() === f.name.toLowerCase()));
 
   function start() {
-    const g = newGame(names.map((n, i) => n.trim() || `Player ${i + 1}`));
-    setGame(g);
+    const seeds: PlayerSeed[] = names.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avatars[i] }));
+    setGame(newGame(seeds));
   }
 
   // ---- Record-a-hand form -------------------------------------------------
@@ -109,10 +135,14 @@ export default function GameScorer({
     resetForm();
     setEndConfirm(false);
     setNames(initialNames);
+    setAvatars([undefined, undefined, undefined, undefined]);
   }
 
   function rematch(r: GameResult) {
-    setNames(r.players.map((p) => p.name).slice(0, 4));
+    const ns = r.players.map((p) => p.name).slice(0, 4);
+    while (ns.length < 4) ns.push('');
+    setNames(ns);
+    setAvatars(ns.map((n) => friends.find((f) => f.name.toLowerCase() === n.toLowerCase())?.avatar));
   }
 
   const lead = game ? leaderId(game.players) : null;
@@ -132,18 +162,41 @@ export default function GameScorer({
 
             <label className="lbl">Players</label>
             {names.map((n, i) => (
-              <input
-                key={i}
-                className="field"
-                style={{ marginBottom: 8 }}
-                value={n}
-                maxLength={20}
-                placeholder={`Player ${i + 1}`}
-                onChange={(e) => setNames((prev) => prev.map((x, j) => (j === i ? e.target.value : x)))}
-              />
+              <div key={i} className="player-slot">
+                {avatars[i] ? (
+                  <Avatar avatar={avatars[i]!} size={34} />
+                ) : (
+                  <span className="player-num">{i + 1}</span>
+                )}
+                <input
+                  className="field"
+                  style={{ flex: 1 }}
+                  value={n}
+                  maxLength={20}
+                  placeholder={`Player ${i + 1}`}
+                  onChange={(e) => setName(i, e.target.value, undefined)}
+                />
+              </div>
             ))}
 
-            <button className="btn" style={{ marginTop: 8 }} onClick={start}>
+            {availableFriends.length > 0 && (
+              <>
+                <label className="lbl" style={{ marginTop: 12 }}>
+                  Add from friends
+                </label>
+                <div className="picker-row">
+                  {availableFriends.map((f) => (
+                    <button key={f.name} className="friend-chip" onClick={() => addFriend(f)}>
+                      <Avatar avatar={f.avatar} size={22} />
+                      {f.name}
+                      <IconPlus size={13} />
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <button className="btn" style={{ marginTop: 14 }} onClick={start}>
               Start Game
             </button>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
@@ -226,6 +279,11 @@ export default function GameScorer({
                     <span className="score-crown" aria-label="Leading">
                       <IconTrophy size={14} />
                     </span>
+                  )}
+                  {p.avatar && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
+                      <Avatar avatar={p.avatar} size={28} />
+                    </div>
                   )}
                   <div className="score-name">{p.name}</div>
                   <div className="score-num" data-neg={p.score < 0}>
