@@ -19,6 +19,7 @@ import Tutorial from './Tutorial';
 import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
 import GameScorer from './GameScorer';
+import PracticeSheet from './PracticeSheet';
 import { IconSettings } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
@@ -53,6 +54,7 @@ export default function AppShell() {
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
   const [editorOpen, setEditorOpen] = useState(false);
   const [scorerOpen, setScorerOpen] = useState(false);
+  const [practiceOpen, setPracticeOpen] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -295,6 +297,7 @@ export default function AppShell() {
                 experience={experience}
                 streak={streak}
                 onScore={() => setScorerOpen(true)}
+                onPractice={() => setPracticeOpen(true)}
               />
             )}
             {tab === 'wins' && (
@@ -322,7 +325,7 @@ export default function AppShell() {
               />
             )}
             {tab === 'tables' && socialState && <TablesTab profile={socialState.profile} />}
-            {tab === 'learn' && <LearnTab experience={experience} />}
+            {tab === 'learn' && <LearnTab experience={experience} onPractice={() => setPracticeOpen(true)} />}
           </>
         )}
         <BottomNav tab={tab} onChange={setTab} />
@@ -372,6 +375,8 @@ export default function AppShell() {
           onClose={() => setScorerOpen(false)}
         />
       )}
+
+      {practiceOpen && <PracticeSheet card={card} onClose={() => setPracticeOpen(false)} />}
 
       {trophyOpen && socialState && (
         <TrophyShelf

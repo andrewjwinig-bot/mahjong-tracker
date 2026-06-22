@@ -348,7 +348,13 @@ const SUBTITLE: Record<Experience, string> = {
   expert: 'Deep cuts — strategy & defense for sharks. 🐉',
 };
 
-export default function LearnTab({ experience }: { experience: Experience }) {
+export default function LearnTab({
+  experience,
+  onPractice,
+}: {
+  experience: Experience;
+  onPractice: () => void;
+}) {
   const [open, setOpen] = useState<number | null>(0);
   const sections = SECTIONS.filter((s) => !s.levels || s.levels.includes(experience));
   return (
@@ -358,6 +364,14 @@ export default function LearnTab({ experience }: { experience: Experience }) {
         <p className="sub">{SUBTITLE[experience]}</p>
         <TileStrip count={7} />
       </header>
+
+      <button
+        className="btn"
+        style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+        onClick={onPractice}
+      >
+        <IconTarget size={18} /> Practice: what can I make?
+      </button>
 
       <div style={{ marginTop: 18 }}>
         {sections.map((s, i) => (
