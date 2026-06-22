@@ -129,7 +129,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
   return (
     <div className="screen">
       <header className="app-header">
-        <CardTitle year={card.year} />
+        <CardTitle />
         <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
         {streak > 1 && (
           <div className="streak-chip">
