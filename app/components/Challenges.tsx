@@ -9,6 +9,7 @@ import {
   type Challenge,
 } from '../lib/challenges';
 import { IconGrid, IconSparkle } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 /** The active-season challenge banner shown on the Card tab. */
 export function ChallengeCard({
@@ -69,6 +70,7 @@ export function SeasonsSheet({
   handCounts: Record<string, number>;
   onClose: () => void;
 }) {
+  useEscape(onClose);
   const active = activeChallenge();
   return (
     <div className="modal-scrim" onClick={onClose}>

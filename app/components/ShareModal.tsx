@@ -15,6 +15,7 @@ import {
   IconFriends,
 } from './brandIcons';
 import { IconArrowRight } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 export interface SharePayload {
   /** Sheet title, e.g. "SHARE YOUR MAHJ! 🀄" */
@@ -57,6 +58,7 @@ function Opt({
 }
 
 export default function ShareModal({ payload, groupName, onShareToGroup, onClose }: Props) {
+  useEscape(onClose);
   const [status, setStatus] = useState<string | null>(null);
   const { title, text, url } = payload;
   const caption = `${text} ${url}`.trim();

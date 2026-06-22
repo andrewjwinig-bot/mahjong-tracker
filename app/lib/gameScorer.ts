@@ -135,3 +135,52 @@ export function leaderId(players: Player[]): string | null {
   const leaders = players.filter((p) => p.score === max);
   return leaders.length === 1 ? leaders[0].id : null;
 }
+
+// ---- Finished-game history ------------------------------------------------
+
+export interface GameResult {
+  id: string;
+  endedAt: number;
+  hands: number;
+  winnerName: string | null;
+  players: { name: string; score: number }[];
+}
+
+const HISTORY_KEY = 'mahj.gameHistory';
+const HISTORY_CAP = 50;
+
+export function loadResults(): GameResult[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? (JSON.parse(raw) as GameResult[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Snapshot a finished game into the history log (most recent first). */
+export function recordResult(game: Game): GameResult {
+  const ranked = [...game.players].sort((a, b) => b.score - a.score);
+  const top = ranked[0];
+  const lid = leaderId(game.players); // null on a tie
+  const result: GameResult = {
+    id: `g_${Date.now()}`,
+    endedAt: Date.now(),
+    hands: game.rounds.length,
+    winnerName: lid && top ? top.name : null,
+    players: ranked.map((p) => ({ name: p.name, score: p.score })),
+  };
+  try {
+    const all = [result, ...loadResults()].slice(0, HISTORY_CAP);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+  return result;
+}
+
+/** How many recorded games this name finished on top of. */
+export function gameWins(name: string): number {
+  const n = name.trim().toLowerCase();
+  return loadResults().filter((r) => (r.winnerName ?? '').trim().toLowerCase() === n).length;
+}

@@ -12,6 +12,7 @@ import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
 import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown, IconSound, IconLock } from './uiIcons';
 import { isPro, setPro } from '../lib/pro';
+import { useEscape } from '../lib/useEscape';
 
 interface Props {
   profile: Profile;
@@ -53,6 +54,7 @@ export default function SettingsSheet({
   onEditCard,
   onClose,
 }: Props) {
+  useEscape(onClose);
   const [name, setName] = useState(profile.name);
   const [handle, setHandle] = useState(profile.handle);
   const [bio, setBio] = useState(profile.bio);

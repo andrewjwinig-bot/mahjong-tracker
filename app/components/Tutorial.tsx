@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
+import { useEscape } from '../lib/useEscape';
 
 interface Slide {
   face: TileFace;
@@ -41,6 +42,7 @@ const SLIDES: Slide[] = [
 ];
 
 export default function Tutorial({ onDone }: { onDone: () => void }) {
+  useEscape(onDone);
   const [i, setI] = useState(0);
   const last = i === SLIDES.length - 1;
   const s = SLIDES[i];

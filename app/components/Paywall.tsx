@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useEscape } from '../lib/useEscape';
 import {
   IconPalette,
   IconCard,
@@ -27,6 +28,7 @@ export default function Paywall({
   onUnlock: () => void;
   onClose: () => void;
 }) {
+  useEscape(onClose);
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
