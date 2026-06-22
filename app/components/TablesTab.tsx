@@ -12,6 +12,10 @@ import Tile from './Tile';
 import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus } from './uiIcons';
+import Paywall from './Paywall';
+import ProUpsell from './ProUpsell';
+import { usePro } from '../lib/usePro';
+import { setPro, FREE_TABLE_LIMIT } from '../lib/pro';
 import type { TileAvatar } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 
@@ -100,6 +104,14 @@ function TablesList({
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
   const [iconIdx, setIconIdx] = useState(0);
+  const [paywall, setPaywall] = useState(false);
+  const pro = usePro();
+  const atLimit = !pro && tables.length >= FREE_TABLE_LIMIT;
+
+  function startCreate() {
+    if (atLimit) setPaywall(true);
+    else setCreating(true);
+  }
 
   function create() {
     const n = name.trim();
@@ -129,9 +141,18 @@ function TablesList({
         <TileStrip count={7} />
       </header>
 
-      <button className="btn coral" style={{ marginTop: 16 }} onClick={() => setCreating(true)}>
-        ＋ New Table
+      <button
+        className="btn coral"
+        style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+        onClick={startCreate}
+      >
+        <IconPlus size={17} /> New Table
       </button>
+      {atLimit && (
+        <p style={{ margin: '8px 2px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
+          Free includes {FREE_TABLE_LIMIT} tables — go Pro for unlimited.
+        </p>
+      )}
 
       <div style={{ marginTop: 16 }}>
         {tables.map((t) => {
@@ -152,9 +173,23 @@ function TablesList({
         })}
       </div>
 
+      <div style={{ marginTop: 18 }}>
+        <ProUpsell copy="Unlimited tables, premium themes & cloud sync." />
+      </div>
+
       <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
         Demo tables live on this device. Real shared tables arrive with accounts (v2).
       </p>
+
+      {paywall && (
+        <Paywall
+          onUnlock={() => {
+            setPro(true);
+            setPaywall(false);
+          }}
+          onClose={() => setPaywall(false)}
+        />
+      )}
 
       {creating && (
         <div className="modal-scrim" onClick={() => setCreating(false)}>

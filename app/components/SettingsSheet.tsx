@@ -11,7 +11,8 @@ import { fxOn, setFx } from '../lib/sound';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
 import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown, IconSound, IconLock } from './uiIcons';
-import { isPro, setPro } from '../lib/pro';
+import { setPro } from '../lib/pro';
+import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
 
 interface Props {
@@ -61,7 +62,7 @@ export default function SettingsSheet({
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
   const [fx, setFxState] = useState(fxOn());
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [pro, setProState] = useState(isPro());
+  const pro = usePro();
   const [paywall, setPaywall] = useState(false);
 
   const letter = initialOf(name);
@@ -319,7 +320,6 @@ export default function SettingsSheet({
         <Paywall
           onUnlock={() => {
             setPro(true);
-            setProState(true);
             setPaywall(false);
           }}
           onClose={() => setPaywall(false)}

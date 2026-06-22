@@ -11,6 +11,7 @@ import TileStrip from './TileStrip';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers } from './uiIcons';
+import ProUpsell from './ProUpsell';
 
 interface Props {
   members: GroupMember[];
@@ -231,7 +232,11 @@ export default function GroupTab({
         ))
       )}
 
-      <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 24 }}>
+      <div style={{ marginTop: 22 }}>
+        <ProUpsell />
+      </div>
+
+      <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
         Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).
       </p>
     </div>
