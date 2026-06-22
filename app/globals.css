@@ -26,8 +26,7 @@
   --n2: #ff6b5c;
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/jade.svg");
-  /* Optional full-bleed wallpaper photo layer (none for most themes). */
-  --bg-photo: none;
+  --bg-photo: url("/patterns/bg-jade.svg");
   /* Painterly base: top sheen + corner glows + soft vertical silk. */
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(14, 173, 150, 0.1), transparent 60%),
@@ -58,7 +57,7 @@
   --n3: #2f80ed;
   /* Bamboo wallpaper photo with a soft veil over it for text legibility. */
   --bg-pattern: none;
-  --bg-photo: url("/patterns/bam-bg.jpg");
+  --bg-photo: url("/patterns/bg-bam.svg");
   --bg-art: radial-gradient(120% 60% at 50% -8%, rgba(247, 250, 240, 0.55), transparent 60%),
     linear-gradient(180deg, rgba(243, 247, 236, 0.34), rgba(225, 237, 213, 0.52));
   --tile-face: #fcfbf3;
@@ -83,7 +82,7 @@
   --n1: #1fb7a6;
   --n2: #ff7a4d;
   --n3: #1e73c4;
-  --bg-pattern: url("/patterns/dot.svg");
+  --bg-photo: url("/patterns/bg-dot.svg");
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(30, 115, 196, 0.12), transparent 60%),
     radial-gradient(85% 65% at 0% 100%, rgba(31, 183, 166, 0.1), transparent 55%),
@@ -110,7 +109,7 @@
   --n1: #23b196;
   --n2: #d23b4e;
   --n3: #2f80ed;
-  --bg-pattern: url("/patterns/crak.svg");
+  --bg-photo: url("/patterns/bg-crak.svg");
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.7), transparent 56%),
     radial-gradient(80% 55% at 0% 2%, rgba(210, 59, 78, 0.12), transparent 60%),
     radial-gradient(85% 65% at 100% 100%, rgba(224, 160, 43, 0.12), transparent 55%),
@@ -138,7 +137,7 @@
   --n1: #0f8f6e;
   --n2: #d23b4e;
   --n3: #c9952b;
-  --bg-pattern: url("/patterns/dragon.svg");
+  --bg-photo: url("/patterns/bg-dragon.svg");
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 250, 235, 0.72), transparent 56%),
     radial-gradient(85% 58% at 0% 0%, rgba(15, 143, 110, 0.14), transparent 60%),
     radial-gradient(85% 65% at 100% 100%, rgba(201, 149, 43, 0.16), transparent 55%),
@@ -165,7 +164,7 @@
   --n1: #2bbe9e;
   --n2: #e84c8a;
   --n3: #a06ce0;
-  --bg-pattern: url("/patterns/flower.svg");
+  --bg-photo: url("/patterns/bg-flower.svg");
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.78), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(232, 76, 138, 0.1), transparent 60%),
     radial-gradient(85% 65% at 0% 100%, rgba(160, 108, 224, 0.09), transparent 55%),
@@ -192,7 +191,7 @@
   --n1: #18c39a;
   --n2: #f5478b;
   --n3: #3e8bff;
-  --bg-pattern: url("/patterns/joker.svg");
+  --bg-photo: url("/patterns/bg-joker.svg");
   --bg-art: radial-gradient(110% 60% at 50% -10%, rgba(255, 255, 255, 0.7), transparent 55%),
     radial-gradient(70% 55% at 0% 0%, rgba(124, 77, 224, 0.13), transparent 60%),
     radial-gradient(70% 55% at 100% 18%, rgba(245, 71, 139, 0.1), transparent 60%),
@@ -222,7 +221,7 @@
   --n1: #34d399;
   --n2: #ff6b81;
   --n3: #5aa2ff;
-  --bg-pattern: url("/patterns/midnight.svg");
+  --bg-photo: url("/patterns/bg-midnight.svg");
   --bg-art: radial-gradient(120% 80% at 50% -12%, rgba(90, 162, 255, 0.12), transparent 55%),
     radial-gradient(80% 60% at 0% 0%, rgba(45, 212, 191, 0.1), transparent 60%),
     radial-gradient(85% 70% at 100% 100%, rgba(124, 77, 224, 0.14), transparent 55%),
@@ -258,10 +257,9 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* The themed background lives on a real fixed, viewport-sized layer rather than
-   `background-attachment: fixed` (which iOS Safari mis-sizes / repeats). The
-   wallpaper photo fills the screen once via `cover`; pattern themes keep their
-   subtle 160px repeat. */
+/* The themed background is a full-bleed wallpaper on a real fixed, viewport-
+   sized layer (not `background-attachment: fixed`, which iOS Safari mis-sizes /
+   repeats). Each theme sets its own `--bg-photo`; it fills the screen once. */
 body::before {
   content: "";
   position: fixed;
@@ -273,21 +271,11 @@ body::before {
   height: 100%;
   z-index: -1;
   background-color: var(--page);
-  background-image: var(--bg-pattern), var(--bg-art), var(--bg-photo);
-  background-size: 160px 160px, cover, cover;
-  background-repeat: repeat, no-repeat, no-repeat;
-  background-position: center, center, center;
+  background-image: var(--bg-photo);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
   pointer-events: none;
-}
-
-/* Photo wallpaper themes: a single, unambiguous full-screen image (veil over
-   photo) — no repeating tile layer, so it can never patternize. */
-[data-theme="bam"] body::before {
-  background-image: linear-gradient(180deg, rgba(243, 247, 236, 0.32), rgba(225, 237, 213, 0.5)),
-    url("/patterns/bam-bg.jpg");
-  background-size: cover, cover;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, center;
 }
 
 /* Chunky display face for headers, branding, buttons + loud labels. */
