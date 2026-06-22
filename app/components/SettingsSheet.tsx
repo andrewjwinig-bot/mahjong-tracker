@@ -251,13 +251,22 @@ export default function SettingsSheet({
         <div className="theme-grid">
           {THEMES.map((t) => {
             const locked = !!t.pro && !pro;
+            // Preview the theme's real background: its wallpaper photo if it has
+            // one, else a gradient built from its palette. A bottom veil keeps
+            // the name/tagline legible over either.
+            const base = t.wallpaper
+              ? `url("${t.wallpaper}") center/cover`
+              : `radial-gradient(120% 85% at 28% 0%, ${t.swatch.brand}2e, transparent 62%), linear-gradient(165deg, ${t.swatch.page}, ${t.swatch.brand}1f)`;
+            const veil = t.dark
+              ? 'linear-gradient(180deg, rgba(15,18,30,0) 30%, rgba(15,18,30,0.68) 100%)'
+              : 'linear-gradient(180deg, rgba(255,255,255,0) 32%, rgba(255,255,255,0.7) 100%)';
             return (
             <button
               key={t.id}
               className="theme-card"
               data-active={theme === t.id}
               data-locked={locked}
-              style={{ background: `linear-gradient(160deg, ${t.swatch.page}, ${t.swatch.brand}30)` }}
+              style={{ background: `${veil}, ${base}` }}
               onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
             >
               {theme === t.id && <span className="tick">✓</span>}

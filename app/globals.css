@@ -1500,13 +1500,15 @@ label.lbl {
 .theme-card {
   position: relative;
   border-radius: 18px;
-  padding: 16px 12px 12px;
+  padding: 14px 12px 13px;
   box-shadow: var(--shadow-sm);
   border: 2.5px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
+  min-height: 140px;
   overflow: hidden;
 }
 .theme-card[data-active="true"] {
