@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { saveAccount, type Account, type Experience } from '../lib/account';
 import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../lib/cloudAuth';
 import TileStrip from './TileStrip';
+import OfficialCardCallout from './OfficialCardCallout';
 import type { ReactNode } from 'react';
 import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
 
@@ -17,6 +18,8 @@ const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const cloud = isCloudEnabled();
 
 export default function Onboarding({ onDone }: { onDone: (a: Account) => void }) {
+  const [step, setStep] = useState<'form' | 'card'>('form');
+  const [account, setAccount] = useState<Account | null>(null);
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -62,14 +65,37 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
   }
 
   function finish(p: { username: string; email: string; experience: Experience }) {
-    const account: Account = {
+    const acc: Account = {
       username: p.username || 'You',
       email: p.email.trim().toLowerCase(),
       experience: p.experience,
       createdAt: Date.now(),
     };
-    saveAccount(account); // password is never stored on-device
-    onDone(account);
+    saveAccount(acc); // password is never stored on-device
+    setAccount(acc);
+    setStep('card'); // one-time "get the official card" prompt before entering
+  }
+
+  // Step 2: encourage buying the official card on first launch.
+  if (step === 'card' && account) {
+    return (
+      <div className="onboard">
+        <div className="onboard-card">
+          <div className="onboard-head">
+            <h1>You’re in, {account.username}!</h1>
+            <p className="sub">One thing before you play…</p>
+            <TileStrip count={7} />
+          </div>
+          <OfficialCardCallout />
+          <button className="btn" style={{ marginTop: 16 }} onClick={() => onDone(account)}>
+            Start playing
+          </button>
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => onDone(account)}>
+            I already have my card
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
