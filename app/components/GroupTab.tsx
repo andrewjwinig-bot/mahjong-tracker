@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Comment, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID, initialOf } from '../lib/social';
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
+import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
@@ -68,6 +69,7 @@ export default function GroupTab({
   onAddFriend,
 }: Props) {
   const [detail, setDetail] = useState<GroupMember | null>(null);
+  const [lbMetric, setLbMetric] = useState<'rows' | 'points'>('rows');
   // Track a feed view once per mount (core-loop metric).
   useEffect(() => {
     void track('feed_viewed', { posts: feed.length });
@@ -90,8 +92,14 @@ export default function GroupTab({
           }
         : m,
     );
-    return withYou.sort((a, b) => b.handsCleared - a.handsCleared || b.points - a.points);
-  }, [members, profile, youStats]);
+    return withYou.sort((a, b) =>
+      lbMetric === 'points'
+        ? b.points - a.points || b.handsCleared - a.handsCleared
+        : b.handsCleared - a.handsCleared || b.points - a.points,
+    );
+  }, [members, profile, youStats, lbMetric]);
+
+  const maxPoints = Math.max(1, ...ranked.map((m) => m.points));
 
   // Podium tint for the dot-tile ranks: gold / silver / bronze, then standard
   // dot-blue for everyone below the medals.
@@ -154,9 +162,21 @@ export default function GroupTab({
         <span className="count">{ranked.length} players</span>
       </div>
 
+      <div className="segmented" style={{ marginBottom: 12 }}>
+        <button data-active={lbMetric === 'rows'} onClick={() => setLbMetric('rows')}>
+          Rows cleared
+        </button>
+        <button data-active={lbMetric === 'points'} onClick={() => setLbMetric('points')}>
+          Total points
+        </button>
+      </div>
+
       <div className="card" style={{ padding: 8 }}>
         {ranked.map((m, i) => {
-          const pct = Math.round((m.handsCleared / TOTAL_HANDS) * 100);
+          const pct =
+            lbMetric === 'points'
+              ? Math.round((m.points / maxPoints) * 100)
+              : Math.round((m.handsCleared / TOTAL_HANDS) * 100);
           return (
             <button
               key={m.id}
@@ -186,8 +206,17 @@ export default function GroupTab({
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontWeight: 900, fontSize: 16 }}>
-                  {m.handsCleared}
-                  <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}>/{TOTAL_HANDS}</span>
+                  {lbMetric === 'points' ? (
+                    <>
+                      {m.points}
+                      <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}> pts</span>
+                    </>
+                  ) : (
+                    <>
+                      {m.handsCleared}
+                      <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}>/{TOTAL_HANDS}</span>
+                    </>
+                  )}
                 </div>
                 <div style={{ color: 'var(--muted)', fontSize: 11, fontWeight: 800 }}>tap to view</div>
               </div>
@@ -356,6 +385,11 @@ function MemberDetail({
   completed: Set<string>;
   onClose: () => void;
 }) {
+  const ch = activeChallenge();
+  const counts = Object.fromEntries([...completed].map((id) => [id, 1]));
+  const cp = challengeProgress(ch, SAMPLE_CARD, counts);
+  const chPct = cp.total ? Math.round((cp.done / cp.total) * 100) : 0;
+
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -370,6 +404,24 @@ function MemberDetail({
               {completed.size}/{TOTAL_HANDS} cleared · {member.points} pts
             </div>
           </div>
+        </div>
+
+        {/* Their progress on the active seasonal challenge */}
+        <div className="member-challenge">
+          <span className="mc-emoji" aria-hidden>
+            {ch.emoji}
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="mc-name">
+              {ch.season} Challenge · {ch.name}
+            </div>
+            <div className="progress" style={{ marginTop: 6, height: 7 }}>
+              <span style={{ width: `${chPct}%` }} />
+            </div>
+          </div>
+          <span className="mc-count">
+            {cp.done}/{cp.total}
+          </span>
         </div>
 
         {SAMPLE_CARD.categories.map((cat) => {

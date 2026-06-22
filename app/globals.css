@@ -2815,6 +2815,68 @@ label.lbl {
   color: var(--accent);
 }
 
+.member-challenge {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 8px 0 4px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: var(--tint);
+}
+.member-challenge .mc-emoji {
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+.member-challenge .mc-name {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.member-challenge .mc-count {
+  flex: 0 0 auto;
+  font-weight: 900;
+  font-size: 14px;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.player-slot {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+.player-num {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: var(--tint);
+  color: var(--brand);
+  font-weight: 900;
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.friend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px 6px 7px;
+  border-radius: 999px;
+  background: var(--tint);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.friend-chip:active {
+  transform: scale(0.96);
+}
+
 .picker-row {
   display: flex;
   flex-wrap: wrap;

@@ -5,10 +5,14 @@
 //   • Off a discard: the discarder pays 2×, the other two pay 1× each.
 //   • Wall game: no exchange (recorded for history).
 
+import type { TileAvatar } from './social';
+
 export interface Player {
   id: string;
   name: string;
   score: number;
+  /** Optional tile avatar when the player was picked from your friends. */
+  avatar?: TileAvatar;
 }
 
 export interface Round {
@@ -60,11 +64,17 @@ export function clearGame(): void {
   }
 }
 
-export function newGame(names: string[]): Game {
-  const players = names.slice(0, 4).map((name, i) => ({
+export interface PlayerSeed {
+  name: string;
+  avatar?: TileAvatar;
+}
+
+export function newGame(seeds: PlayerSeed[]): Game {
+  const players = seeds.slice(0, 4).map((s, i) => ({
     id: `p${i}_${Math.random().toString(36).slice(2, 7)}`,
-    name: name.trim() || `Player ${i + 1}`,
+    name: s.name.trim() || `Player ${i + 1}`,
     score: 0,
+    avatar: s.avatar,
   }));
   return { players, rounds: [], createdAt: Date.now() };
 }
