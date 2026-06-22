@@ -1,7 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useEscape } from '../lib/useEscape';
+import { useState, type ReactNode } from 'react';
 import {
   IconPalette,
   IconCard,
@@ -10,7 +9,10 @@ import {
   IconBell,
   IconHeart,
   IconCrown,
+  IconCheck,
 } from './uiIcons';
+import { PLANS, restorePurchases } from '../lib/pro';
+import { useEscape } from '../lib/useEscape';
 
 const PERKS: { icon: ReactNode; text: string }[] = [
   { icon: <IconPalette size={20} />, text: 'All premium themes — Dragon, Joker & Midnight' },
@@ -29,6 +31,16 @@ export default function Paywall({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const [plan, setPlan] = useState(PLANS.find((p) => p.highlight)?.id ?? PLANS[0].id);
+  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+
+  async function restore() {
+    setRestoreMsg('Checking…');
+    const ok = await restorePurchases();
+    if (ok) onUnlock();
+    else setRestoreMsg('No previous purchase found on this device.');
+  }
+
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -47,12 +59,49 @@ export default function Paywall({
           ))}
         </div>
 
-        <button className="btn" style={{ marginTop: 16 }} onClick={onUnlock}>
+        {/* Plan picker */}
+        <div className="plan-list">
+          {PLANS.map((p) => (
+            <button
+              key={p.id}
+              className="plan"
+              data-active={plan === p.id}
+              onClick={() => setPlan(p.id)}
+            >
+              <span className="plan-check" aria-hidden>
+                {plan === p.id && <IconCheck size={15} />}
+              </span>
+              <span style={{ flex: 1, textAlign: 'left' }}>
+                <span className="plan-name">
+                  {p.name}
+                  {p.highlight && <span className="plan-badge">Popular</span>}
+                </span>
+                {p.note && <span className="plan-note">{p.note}</span>}
+              </span>
+              <span className="plan-price">
+                {p.price}
+                <span className="plan-cadence">{p.cadence}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <button className="btn" style={{ marginTop: 14 }} onClick={onUnlock}>
           Unlock Pro
         </button>
+        <button className="btn ghost" style={{ marginTop: 10 }} onClick={restore}>
+          Restore purchases
+        </button>
+        {restoreMsg && (
+          <p style={{ margin: '8px 2px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
+            {restoreMsg}
+          </p>
+        )}
+
         <p className="paywall-fine">
-          Preview unlock — real subscriptions &amp; one-time purchases arrive via the App Store at
-          launch. Pricing TBD.
+          Preview unlock — real subscriptions &amp; one-time purchases are billed through the App Store
+          at launch. Prices shown are placeholders and may change. Subscriptions auto-renew until
+          cancelled; manage them in your App Store settings.
         </p>
         <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
           Maybe later
