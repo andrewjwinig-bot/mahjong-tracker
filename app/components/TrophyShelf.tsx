@@ -6,6 +6,7 @@ import type { Profile } from '../lib/social';
 import { computeStats, computeBadges } from '../lib/badges';
 import { computeInsights } from '../lib/insights';
 import { loadResults, gameWins } from '../lib/gameScorer';
+import { usePro } from '../lib/usePro';
 import { buildTrophyCard } from '../lib/shareCard';
 import { appUrl } from '../lib/share';
 import Avatar from './Avatar';
@@ -31,6 +32,7 @@ export default function TrophyShelf({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const pro = usePro();
   const [shareOpen, setShareOpen] = useState(false);
   const s = computeStats(card, handCounts);
   const badges = computeBadges(card, handCounts, bestStreak);
@@ -94,7 +96,7 @@ export default function TrophyShelf({
                   <span className="insight-ic"><IconTrophy size={17} /></span>
                   <span className="insight-lab">Games scored</span>
                   <span className="insight-val">
-                    {gamesPlayed} played · {myGameWins} won
+                    {gamesPlayed} played{pro ? ` · ${myGameWins} won` : ''}
                   </span>
                 </div>
               )}

@@ -14,10 +14,16 @@ import {
   recordResult,
   undoLastRound,
 } from '../lib/gameScorer';
-import { IconTrophy, IconCheck, IconTrash } from './uiIcons';
+import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { usePro } from '../lib/usePro';
+import { setPro } from '../lib/pro';
+import Paywall from './Paywall';
 
 const PRESET_VALUES = [25, 30, 35, 40, 50];
+
+// Free keeps the most recent game; Pro keeps the full history + rematch-any.
+const FREE_HISTORY = 1;
 
 export default function GameScorer({
   suggestedNames,
@@ -27,8 +33,25 @@ export default function GameScorer({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const pro = usePro();
   const [game, setGame] = useState<Game | null>(() => loadGame());
   const [results, setResults] = useState<GameResult[]>(() => loadResults());
+  const [paywall, setPaywall] = useState(false);
+
+  const visibleResults = pro ? results.slice(0, 12) : results.slice(0, FREE_HISTORY);
+  const lockedCount = pro ? 0 : Math.max(0, results.length - FREE_HISTORY);
+
+  async function shareResult(r: GameResult) {
+    const line = r.players.map((p) => `${p.name} ${p.score > 0 ? '+' : ''}${p.score}`).join(' · ');
+    const text = `Mahjong scorepad — ${r.winnerName ? `${r.winnerName} won` : 'tie'} over ${r.hands} hand${r.hands === 1 ? '' : 's'}: ${line}`;
+    try {
+      const nav = navigator as Navigator;
+      if (typeof nav.share === 'function') await nav.share({ text });
+      else if (nav.clipboard) await nav.clipboard.writeText(text);
+    } catch {
+      /* user cancelled */
+    }
+  }
 
   // ---- Setup (no game yet) ------------------------------------------------
   const initialNames = useMemo(() => {
@@ -131,7 +154,7 @@ export default function GameScorer({
               <>
                 <div className="set-section">Recent games</div>
                 <div className="round-list">
-                  {results.slice(0, 8).map((r) => (
+                  {visibleResults.map((r) => (
                     <div className="round-row" key={r.id}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="round-title">
@@ -146,6 +169,16 @@ export default function GameScorer({
                           · {r.players.map((p) => `${p.name} ${p.score > 0 ? '+' : ''}${p.score}`).join(', ')}
                         </div>
                       </div>
+                      {pro && (
+                        <button
+                          className="icon-btn"
+                          aria-label="Share result"
+                          style={{ flex: '0 0 auto' }}
+                          onClick={() => shareResult(r)}
+                        >
+                          <IconShare size={16} />
+                        </button>
+                      )}
                       <button
                         className="pick-chip"
                         style={{ flex: '0 0 auto' }}
@@ -156,6 +189,23 @@ export default function GameScorer({
                     </div>
                   ))}
                 </div>
+
+                {lockedCount > 0 && (
+                  <button className="locked-history" onClick={() => setPaywall(true)}>
+                    <span className="lh-ic" aria-hidden>
+                      <IconLock size={18} />
+                    </span>
+                    <span style={{ flex: 1, textAlign: 'left' }}>
+                      <span className="lh-title">
+                        {lockedCount} more game{lockedCount === 1 ? '' : 's'} saved
+                      </span>
+                      <span className="lh-sub">
+                        Go Pro to keep your full history, rematch any game &amp; share scorecards.
+                      </span>
+                    </span>
+                    <span className="lh-cta">Unlock</span>
+                  </button>
+                )}
               </>
             )}
           </>
@@ -371,6 +421,16 @@ export default function GameScorer({
           </>
         )}
       </div>
+
+      {paywall && (
+        <Paywall
+          onUnlock={() => {
+            setPro(true);
+            setPaywall(false);
+          }}
+          onClose={() => setPaywall(false)}
+        />
+      )}
     </div>
   );
 }
