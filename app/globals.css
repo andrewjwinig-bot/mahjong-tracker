@@ -26,6 +26,8 @@
   --n2: #ff6b5c;
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/jade.svg");
+  /* Optional full-bleed wallpaper photo layer (none for most themes). */
+  --bg-photo: none;
   /* Painterly base: top sheen + corner glows + soft vertical silk. */
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(14, 173, 150, 0.1), transparent 60%),
@@ -54,11 +56,11 @@
   --n1: #2e9e50;
   --n2: #f2784b;
   --n3: #2f80ed;
-  --bg-pattern: url("/patterns/bam.svg");
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.65), transparent 56%),
-    radial-gradient(80% 55% at 0% 4%, rgba(46, 158, 80, 0.14), transparent 60%),
-    radial-gradient(85% 65% at 100% 100%, rgba(36, 126, 64, 0.12), transparent 55%),
-    linear-gradient(180deg, #f2f6ea, #e6efda);
+  /* Bamboo wallpaper photo with a soft veil over it for text legibility. */
+  --bg-pattern: none;
+  --bg-photo: url("/patterns/bam-bg.jpg");
+  --bg-art: radial-gradient(120% 60% at 50% -8%, rgba(247, 250, 240, 0.55), transparent 60%),
+    linear-gradient(180deg, rgba(243, 247, 236, 0.34), rgba(225, 237, 213, 0.52));
   --tile-face: #fcfbf3;
   --shadow: 0 10px 30px rgba(33, 49, 31, 0.1);
   --shadow-sm: 0 4px 16px rgba(33, 49, 31, 0.08);
@@ -246,11 +248,11 @@ body {
 
 body {
   background-color: var(--page);
-  background-image: var(--bg-pattern), var(--bg-art);
-  background-size: 160px 160px, cover;
-  background-repeat: repeat, no-repeat;
-  background-position: center, center;
-  background-attachment: fixed, fixed;
+  background-image: var(--bg-pattern), var(--bg-art), var(--bg-photo);
+  background-size: 160px 160px, cover, cover;
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-position: center, center, center top;
+  background-attachment: fixed, fixed, fixed;
   color: var(--ink);
   font-family: var(--font-app), "Helvetica Neue", system-ui, -apple-system, sans-serif;
   font-weight: 600;
