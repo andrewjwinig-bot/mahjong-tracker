@@ -246,8 +246,10 @@ body {
   padding: 0;
 }
 
-body {
+html {
   background-color: var(--page);
+}
+body {
   color: var(--ink);
   font-family: var(--font-app), "Helvetica Neue", system-ui, -apple-system, sans-serif;
   font-weight: 600;
@@ -395,6 +397,28 @@ a:focus-visible,
   color: var(--muted);
   font-size: 13.5px;
   font-weight: 700;
+}
+
+/* Tiled "YOUR {year} CARD" wordmark header. */
+.card-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 2px;
+}
+.card-title-row {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.ct-tile {
+  line-height: 0;
+  filter: drop-shadow(0 4px 8px rgba(36, 50, 64, 0.16));
+  transition: transform 0.15s ease;
+}
+.card-title-row:nth-child(2) .ct-tile {
+  margin-top: -2px;
 }
 
 /* ---- Custom tile artwork ------------------------------------------------- */

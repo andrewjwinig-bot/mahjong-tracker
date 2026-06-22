@@ -6,7 +6,7 @@ import { colorNotation } from '../lib/theme';
 import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
-import TileStrip from './TileStrip';
+import CardTitle from './CardTitle';
 import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
@@ -129,13 +129,8 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>
-          Your {card.year}
-          <br />
-          Card
-        </h1>
+        <CardTitle year={card.year} />
         <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
-        <TileStrip count={7} />
         {streak > 1 && (
           <div className="streak-chip">
             <IconFlame size={15} /> {streak}-day streak
