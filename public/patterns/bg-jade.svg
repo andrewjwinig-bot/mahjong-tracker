@@ -21,4 +21,4 @@
       <path d="M -30 640 C 140 590, 300 630, 470 600 L 470 822 L -30 822 Z" fill="#1F6B4E"/>
       <path d="M -30 720 C 120 690, 320 720, 470 700 L 470 822 L -30 822 Z" fill="#16513B"/></g>
     <g filter="url(#rough_jade)" fill="none" stroke="#1F6B4E" stroke-width="6" stroke-linecap="round" opacity="0.5">
-      <path d="M 40 170 q 80 -26 150 0"/><path d="M 70 210 q 70 -22 130 0"/></g><rect width="440" height="792" filter="url(#paper_jade)" opacity="0.08" style="mix-blend-mode:multiply"/></svg>
+      <path d="M 40 170 q 80 -26 150 0"/><path d="M 70 210 q 70 -22 130 0"/></g><rect width="440" height="792" fill="#ECE6D2" opacity="0.45"/><rect width="440" height="792" filter="url(#paper_jade)" opacity="0.08" style="mix-blend-mode:multiply"/></svg>
