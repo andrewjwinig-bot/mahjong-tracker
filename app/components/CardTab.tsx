@@ -130,7 +130,6 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
     <div className="screen">
       <header className="app-header">
         <CardTitle />
-        <div className="brand-tag">The Original Mahj Social Network</div>
         {streak > 1 && (
           <div className="streak-chip">
             <IconFlame size={15} /> {streak}-day streak
