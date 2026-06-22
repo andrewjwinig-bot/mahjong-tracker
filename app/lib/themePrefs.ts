@@ -23,6 +23,8 @@ export interface ThemeDef {
   pro?: boolean;
   /** The mahjong tile that represents this theme in the picker. */
   tile: { face: TileFace; char?: string; color?: string };
+  /** Optional full-bleed wallpaper image (also previewed on the theme card). */
+  wallpaper?: string;
   /** Preview swatch + the browser status-bar (theme-color) page tone. */
   swatch: { brand: string; green: string; accent: string; page: string };
 }
@@ -42,6 +44,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Bam',
     tagline: 'Bamboo green',
     tile: { face: 'bam' },
+    wallpaper: '/patterns/bam-bg.jpg',
     swatch: { brand: '#2E9E50', green: '#2BB673', accent: '#F2784B', page: '#F0F5E9' },
   },
   {
