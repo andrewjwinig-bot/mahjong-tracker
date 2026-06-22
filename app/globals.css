@@ -421,23 +421,6 @@ a:focus-visible,
   font-weight: 700;
 }
 
-/* Brand tagline badge. */
-.brand-tag {
-  display: block;
-  width: fit-content;
-  margin: 10px auto 0;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  color: var(--on-brand, #fff);
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  box-shadow: var(--shadow-sm);
-}
-
 /* Tiled "LETS / MAHJ" wordmark header with accent tiles tucked behind. */
 .card-title {
   position: relative;

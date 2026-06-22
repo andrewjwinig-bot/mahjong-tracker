@@ -1,19 +1,22 @@
-# Store Listing Copy — Mahjong Tracker
+# Store Listing Copy — Let's Mahj
 
 Draft marketing copy for the App Store and Google Play. All original. Replace
 [bracketed] values and have a final pass before submission. Avoid using the
 "National Mah Jongg League"/"NMJL" trademark in the name, subtitle, or
 keywords; keep the non-affiliation disclaimer in the description.
 
+**Brand tagline:** _The Original Mahj Social Network_ — use it in the subtitle,
+promo text, and the top of the long description (it's the positioning hook).
+
 ---
 
 ## App name (≤ 30 chars)
-- **Mahjong Tracker**
-- Alt: `Mahjong Tracker: Cards & Wins`
+- **Let's Mahj**
+- Alt: `Let's Mahj: Cards & Wins`
 
 ## Subtitle (Apple, ≤ 30 chars)
-- **Track wins, clear your card**
-- Alts: `Your American mahjong card`, `Tiles, wins & your table`
+- **The original mahj social network**  _(30 chars exactly)_
+- Alts: `Track wins, play your table`, `Your American mahjong card`
 
 ## Promotional text (Apple, ≤ 170 chars — editable anytime)
 > Tap a tile every time you call Mahjong, chase a new seasonal challenge, and
@@ -25,17 +28,17 @@ american mahjong,mahjongg,mahjong card,tile tracker,scorecard,hands,wins,tiles,b
 ```
 
 ## Promo / What's New (first release)
-> Welcome to Mahjong Tracker! Track your wins, learn the tiles, chase seasonal
-> challenges, earn trophies, and play along with friends. Tap a hand each time
-> you win it and watch your card fill in.
+> Welcome to Let's Mahj — the original mahj social network! Track your wins,
+> learn the tiles, chase seasonal challenges, earn trophies, and play along with
+> your table. Tap a hand each time you win it and watch your card fill in.
 
 ---
 
 ## Description (App Store / Google Play)
 
-**Your American mahjong year — tracked, gamified, and shared.**
+**Let's Mahj — the original mahj social network.**
 
-Mahjong Tracker is the playful way to track every hand you win, learn the tiles,
+The playful way to track every hand you win, learn the tiles, score your games,
 and keep your table connected. Tap a hand each time you call “Mahjong!” and watch
 your card fill in with a celebration of tumbling tiles.
 
