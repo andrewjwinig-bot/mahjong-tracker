@@ -49,8 +49,48 @@ nothing changes — the app stays 100% on-device.**
    cloud with local-first writes and background sync.
 4. **Social** — back the feed, likes, comments, friends, and tables (chat,
    polls, photos) with Supabase + realtime subscriptions.
-5. **Migration on first login** — offer to upload existing on-device data.
-6. **Capacitor** — add the native shell, app icons/splash, and push.
+5. **Live multiplayer scorer** — turn the on-device scorepad into a shared,
+   cross-account session (see below).
+6. **Migration on first login** — offer to upload existing on-device data.
+7. **Capacitor** — add the native shell, app icons/splash, and push.
+
+## Live multiplayer scorer (cross-account, real-time)
+
+Today the scorer is fully on-device: you add players (typed, or picked from your
+friends with `GameScorer`'s friend chips) and the scorepad lives in
+`localStorage` via `app/lib/gameScorer.ts`. The next step is letting everyone at
+the table track the **same** game from their own phone in real time.
+
+**New migration (`0002_live_scorer.sql`):**
+
+- `game_sessions` — `id`, `host_id`, `code` (short join code), `status`
+  (`active`/`ended`), `created_at`, `ended_at`.
+- `session_players` — `session_id`, `user_id` (nullable for guests),
+  `display_name`, `avatar` (jsonb), `seat`, `score`. One row per seat.
+- `game_rounds` — `session_id`, `winner_player_id` (nullable = wall),
+  `hand_label`, `value`, `self_pick`, `discarder_player_id`, `deltas` (jsonb),
+  `created_at`.
+- **RLS:** a member of a session (row in `session_players`) can read it and
+  append rounds; only the host can end it. Reuse the `is_table_member()` pattern
+  with an `is_session_player()` SECURITY DEFINER helper.
+
+**Client wiring:**
+
+- Keep `gameScorer.ts`'s pure scoring (`computeDeltas`, payouts) — it's the
+  single source of truth for both local and cloud games.
+- Add a cloud-backed mode behind `isCloudEnabled()`: host creates a session +
+  seats, others **join by code**; recording a hand inserts a `game_rounds` row
+  and updates `session_players.score` in a transaction (an RPC keeps it atomic).
+- Subscribe to the session's `game_rounds` + `session_players` via Supabase
+  **realtime** so every phone updates instantly; the local scorepad stays the
+  offline fallback / single-device mode.
+- Finished sessions still snapshot into the existing per-user history
+  (`recordResult`) so the profile "games scored / won" stats keep working, and
+  cloud history becomes a Pro perk (mirrors the local gating in
+  `monetization.md`).
+
+**Entry points already in place:** the friend-pick UI and avatars on the
+scoreboard; only the transport (local vs. session) changes.
 
 ## Privacy & store requirements (gating launch)
 
