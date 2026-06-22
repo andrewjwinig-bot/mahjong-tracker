@@ -4,8 +4,10 @@ import { useRef, useState } from 'react';
 import { exportData, importData, deleteAllData } from '../lib/dataExport';
 import { isCloudEnabled, cloudSignOut, cloudDeleteAccount } from '../lib/cloudAuth';
 import { IconDownload, IconSignOut, IconTrash, IconCard } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
+  useEscape(onClose);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [restoreMsg, setRestoreMsg] = useState<string | null>(null);

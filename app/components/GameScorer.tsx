@@ -3,15 +3,19 @@
 import { useMemo, useState } from 'react';
 import {
   type Game,
+  type GameResult,
   type RoundInput,
   applyRound,
   clearGame,
   leaderId,
   loadGame,
+  loadResults,
   newGame,
+  recordResult,
   undoLastRound,
 } from '../lib/gameScorer';
 import { IconTrophy, IconCheck, IconTrash } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 const PRESET_VALUES = [25, 30, 35, 40, 50];
 
@@ -22,7 +26,9 @@ export default function GameScorer({
   suggestedNames: string[];
   onClose: () => void;
 }) {
+  useEscape(onClose);
   const [game, setGame] = useState<Game | null>(() => loadGame());
+  const [results, setResults] = useState<GameResult[]>(() => loadResults());
 
   // ---- Setup (no game yet) ------------------------------------------------
   const initialNames = useMemo(() => {
@@ -71,11 +77,19 @@ export default function GameScorer({
   }
 
   function endGame() {
+    if (game && game.rounds.length > 0) {
+      recordResult(game);
+      setResults(loadResults());
+    }
     clearGame();
     setGame(null);
     resetForm();
     setEndConfirm(false);
     setNames(initialNames);
+  }
+
+  function rematch(r: GameResult) {
+    setNames(r.players.map((p) => p.name).slice(0, 4));
   }
 
   const lead = game ? leaderId(game.players) : null;
@@ -112,6 +126,38 @@ export default function GameScorer({
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
               Cancel
             </button>
+
+            {results.length > 0 && (
+              <>
+                <div className="set-section">Recent games</div>
+                <div className="round-list">
+                  {results.slice(0, 8).map((r) => (
+                    <div className="round-row" key={r.id}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="round-title">
+                          {r.winnerName ? `${r.winnerName} won` : 'Tie game'}
+                          {` · ${r.hands} hand${r.hands === 1 ? '' : 's'}`}
+                        </div>
+                        <div className="round-sub">
+                          {new Date(r.endedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                          })}{' '}
+                          · {r.players.map((p) => `${p.name} ${p.score > 0 ? '+' : ''}${p.score}`).join(', ')}
+                        </div>
+                      </div>
+                      <button
+                        className="pick-chip"
+                        style={{ flex: '0 0 auto' }}
+                        onClick={() => rematch(r)}
+                      >
+                        Rematch
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         ) : (
           <>

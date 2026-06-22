@@ -13,6 +13,7 @@ import {
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
 import { IconCamera } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 export default function CardEditor({
   current,
@@ -25,6 +26,7 @@ export default function CardEditor({
   onUseSample: () => void;
   onClose: () => void;
 }) {
+  useEscape(onClose);
   const [year, setYear] = useState(current.year);
   const [rows, setRows] = useState<HandRow[]>(() =>
     current.source === 'custom'

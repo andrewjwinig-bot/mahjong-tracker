@@ -5,11 +5,13 @@ import type { MahjongCard, Win } from '../lib/types';
 import type { Profile } from '../lib/social';
 import { computeStats, computeBadges } from '../lib/badges';
 import { computeInsights } from '../lib/insights';
+import { loadResults, gameWins } from '../lib/gameScorer';
 import { buildTrophyCard } from '../lib/shareCard';
 import { appUrl } from '../lib/share';
 import Avatar from './Avatar';
 import ShareModal from './ShareModal';
-import { IconShare, IconLock, IconStar, IconFlame, IconTarget } from './uiIcons';
+import { IconShare, IconLock, IconStar, IconFlame, IconTarget, IconTrophy } from './uiIcons';
+import { useEscape } from '../lib/useEscape';
 
 export default function TrophyShelf({
   card,
@@ -28,12 +30,15 @@ export default function TrophyShelf({
   profile: Profile;
   onClose: () => void;
 }) {
+  useEscape(onClose);
   const [shareOpen, setShareOpen] = useState(false);
   const s = computeStats(card, handCounts);
   const badges = computeBadges(card, handCounts, bestStreak);
   const earned = badges.filter((b) => b.earned);
   const ins = computeInsights(card, handCounts, wins);
   const topCats = ins.categories.filter((c) => c.total > 0).slice(0, 5);
+  const gamesPlayed = loadResults().length;
+  const myGameWins = gameWins(profile.name);
 
   const since = memberSince
     ? new Date(memberSince).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
@@ -80,10 +85,19 @@ export default function TrophyShelf({
           ))}
         </div>
 
-        {s.mahjs > 0 && (
+        {(s.mahjs > 0 || gamesPlayed > 0) && (
           <>
             <div className="set-section">Your game</div>
             <div className="insight-list">
+              {gamesPlayed > 0 && (
+                <div className="insight-row">
+                  <span className="insight-ic"><IconTrophy size={17} /></span>
+                  <span className="insight-lab">Games scored</span>
+                  <span className="insight-val">
+                    {gamesPlayed} played · {myGameWins} won
+                  </span>
+                </div>
+              )}
               {ins.favorite && (
                 <div className="insight-row">
                   <span className="insight-ic"><IconStar size={17} /></span>
