@@ -33,6 +33,10 @@ live in the sibling docs:
 - [ ] Set `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel; redeploy.
 - [ ] Wire the gated cloud modules (auth → profile → gameplay sync → social),
       then the **first-login migration** that uploads existing on-device data.
+- [ ] **Live multiplayer scorer** (cross-account real-time scorepad): add the
+      `0002_live_scorer.sql` migration + realtime wiring (see `backend.md`).
+      The friend-pick UI and scoreboard avatars already ship; only the transport
+      changes.
 - [ ] Add **report/block** before enabling public user-generated content.
 
 ## 2. Native wrapper — see `capacitor.md`
