@@ -11,7 +11,10 @@ export default function CardTitle({ size = 46 }: { size?: number }) {
   return (
     <div className="card-title" role="heading" aria-level={1} aria-label="Let’s Mahj">
       <span className="ct-accent ct-accent-tr" aria-hidden>
-        <Tile face="flower" size={size - 2} />
+        <Tile face="flower" size={size + 14} />
+      </span>
+      <span className="ct-accent ct-accent-bl" aria-hidden>
+        <Tile face="bam" size={size + 14} />
       </span>
 
       {rows.map((word, r) => (
@@ -30,10 +33,6 @@ export default function CardTitle({ size = 46 }: { size?: number }) {
           })}
         </div>
       ))}
-
-      <span className="ct-accent ct-accent-bl" aria-hidden>
-        <Tile face="bam" size={size - 2} />
-      </span>
     </div>
   );
 }
