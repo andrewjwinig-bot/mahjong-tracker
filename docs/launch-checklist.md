@@ -1,0 +1,90 @@
+# Launch-day checklist — Mahjong Tracker
+
+The end-to-end runbook to take the app from on-device prototype to a shipped
+App Store / Play Store release. Ordered roughly the way you'll do it. Deep-dives
+live in the sibling docs:
+
+- `backend.md` — Supabase (auth, DB, storage) activation
+- `capacitor.md` — native wrapper + push notifications
+- `monetization.md` — tiers, gating & in-app purchase wiring
+- `store-listing.md` — marketing copy / metadata
+- `qa-checklist.md` — pre-ship QA pass
+
+> **Nothing here is required to keep using the app as-is.** Until you create a
+> Supabase project and wrap natively, the app stays 100% on-device.
+
+---
+
+## 0. Accounts & legal (do first; some have lead time)
+
+- [ ] **Apple Developer Program** ($99/yr). Individual is fine; an **LLC** gives
+      liability separation + keeps your legal name off the listing (needs a free
+      D-U-N-S number — allow a few days). See the chat notes / your own counsel.
+- [ ] **Google Play Developer** ($25 once) if shipping Android.
+- [ ] Confirm the **non-affiliation disclaimer** (not NMJL) stays in the app
+      (`AboutSheet`) and the store description. Don't use "National Mah Jongg
+      League"/"NMJL" in the app name, subtitle, or keywords.
+- [ ] Decide the bundle id, e.g. `com.yourco.mahjongtracker`.
+
+## 1. Backend activation (Supabase) — see `backend.md`
+
+- [ ] Create the Supabase project; copy Project URL + anon key.
+- [ ] Run `supabase/migrations/0001_init.sql`; create the public `photos` bucket.
+- [ ] Set `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel; redeploy.
+- [ ] Wire the gated cloud modules (auth → profile → gameplay sync → social),
+      then the **first-login migration** that uploads existing on-device data.
+- [ ] Add **report/block** before enabling public user-generated content.
+
+## 2. Native wrapper — see `capacitor.md`
+
+- [ ] `npm install` Capacitor; `npx cap init`; add iOS/Android.
+- [ ] Choose hosted-URL (fast content updates) vs. static-export (offline-first).
+- [ ] Generate app icons + splash from a 1024×1024 source (current PWA icons are
+      in `public/icons/`, regenerated via `npm run icons`).
+- [ ] Push notifications: APNs key (iOS) / Firebase FCM (Android); store device
+      tokens server-side; send via a Supabase Edge Function/cron.
+
+## 3. Monetization / IAP — see `monetization.md`
+
+- [ ] Create products (monthly/annual subscriptions + lifetime non-consumable)
+      matching `PLANS` ids in `app/lib/pro.ts`; finalize prices.
+- [ ] Swap the mock unlock + `restorePurchases()` in `pro.ts` for real billing
+      (RevenueCat or StoreKit 2 / Play Billing). Keep the local flag as the
+      cached entitlement.
+- [ ] Verify **Restore purchases** on a fresh install (Apple requires it).
+- [ ] Confirm zero third-party ad/tracking SDKs.
+
+## 4. Privacy & compliance (gates review)
+
+- [ ] Update the **Privacy Policy** (`/privacy`) practices to match accounts +
+      cloud storage + any processors (Supabase, push, RevenueCat). Host URL ready.
+- [ ] Keep in-app **account deletion** (wired to the `delete-account` edge
+      function) + **data export/backup** (already built).
+- [ ] Complete Apple **privacy "nutrition label"** / Play **Data Safety** honestly
+      (with no ad SDKs this stays minimal: account data + user content only).
+- [ ] GDPR/CCPA "manage your data" affordances present (export + delete).
+
+## 5. Store listing & assets — see `store-listing.md`
+
+- [ ] App name (≤30), subtitle, promo text, keywords, description (with disclaimer).
+- [ ] Screenshots for required device sizes (capture Card, Feed, a theme, the
+      live scorer, trophies/insights). Optional app preview video.
+- [ ] Support URL + marketing URL; age rating questionnaire; category (e.g.
+      Games / Board or Utilities).
+- [ ] "What's New" text for the first release.
+
+## 6. QA & release — see `qa-checklist.md`
+
+- [ ] Run the QA checklist on a real device (PWA install, offline, themes,
+      confetti/sound, reduced-motion, share sheet, scorer, backup/restore).
+- [ ] Test IAP purchase + restore with sandbox/license testers.
+- [ ] Verify deep links / legal pages open; Escape/back dismiss modals.
+- [ ] Bump version + build number; archive in Xcode / build AAB.
+- [ ] Submit for review. Have a TestFlight/internal-testing pass first.
+
+## Post-launch
+
+- [ ] Watch crash logs + the local analytics signal (share rate) once forwarded
+      to a real sink.
+- [ ] Seed the public feed / onboarding so day-one users see life.
+- [ ] Plan the first content update (new card year, seasonal challenge refresh).
