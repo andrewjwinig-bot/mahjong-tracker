@@ -265,7 +265,12 @@ body {
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   background-color: var(--page);
   background-image: var(--bg-pattern), var(--bg-art), var(--bg-photo);
@@ -273,6 +278,16 @@ body::before {
   background-repeat: repeat, no-repeat, no-repeat;
   background-position: center, center, center;
   pointer-events: none;
+}
+
+/* Photo wallpaper themes: a single, unambiguous full-screen image (veil over
+   photo) — no repeating tile layer, so it can never patternize. */
+[data-theme="bam"] body::before {
+  background-image: linear-gradient(180deg, rgba(243, 247, 236, 0.32), rgba(225, 237, 213, 0.5)),
+    url("/patterns/bam-bg.jpg");
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
 }
 
 /* Chunky display face for headers, branding, buttons + loud labels. */
@@ -399,13 +414,16 @@ a:focus-visible,
   font-weight: 700;
 }
 
-/* Tiled "YOUR {year} CARD" wordmark header. */
+/* Tiled "LETS / MAHJ" wordmark header with corner accent tiles. */
 .card-title {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  margin: 2px 0 2px;
+  margin: 6px auto 2px;
+  width: fit-content;
+  padding: 4px 16px;
 }
 .card-title-row {
   display: flex;
@@ -417,8 +435,21 @@ a:focus-visible,
   filter: drop-shadow(0 4px 8px rgba(36, 50, 64, 0.16));
   transition: transform 0.15s ease;
 }
-.card-title-row:nth-child(2) .ct-tile {
-  margin-top: -2px;
+.ct-accent {
+  position: absolute;
+  line-height: 0;
+  filter: drop-shadow(0 5px 10px rgba(36, 50, 64, 0.2));
+  z-index: 1;
+}
+.ct-accent-tr {
+  top: -12px;
+  right: -8px;
+  transform: rotate(12deg);
+}
+.ct-accent-bl {
+  bottom: -12px;
+  left: -8px;
+  transform: rotate(-12deg);
 }
 
 /* ---- Custom tile artwork ------------------------------------------------- */

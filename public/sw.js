@@ -2,7 +2,7 @@
 // App shell is cached; navigations fall back to the cached shell when offline.
 // All user data lives in IndexedDB (handled by the app), not here.
 
-const CACHE = 'mahjong-v3';
+const CACHE = 'mahjong-v4';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -18,6 +18,11 @@ self.addEventListener('activate', (event) => {
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
+});
+
+// Let the page tell a waiting worker to take over immediately.
+self.addEventListener('message', (event) => {
+  if (event.data === 'skip-waiting') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {

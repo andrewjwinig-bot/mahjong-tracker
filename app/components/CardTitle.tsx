@@ -1,16 +1,19 @@
 import Tile from './Tile';
 
-// "YOUR · {year} · CARD" spelled in mahjong letter-tiles — a custom, hand-set
-// wordmark in place of a plain heading. Tiles take theme colors and a gentle
-// scatter so it reads playful rather than rigid.
+// "LETS / MAHJ" spelled in mahjong letter-tiles — a custom, hand-set wordmark
+// in place of a plain heading, with colorful accent tiles in two corners.
 const PALETTE = ['var(--brand)', 'var(--accent)', 'var(--green)', 'var(--n3)'];
 const TILT = [-3, 2, -2, 3, -2, 3, -3, 2]; // small per-tile rotation, cycled
 
-export default function CardTitle({ year, size = 42 }: { year: number; size?: number }) {
-  const rows = ['YOUR', String(year), 'CARD'];
-  let k = 0; // running index for color + tilt variety across all tiles
+export default function CardTitle({ size = 46 }: { size?: number }) {
+  const rows = ['LETS', 'MAHJ'];
+  let k = 0;
   return (
-    <div className="card-title" role="heading" aria-level={1} aria-label={`Your ${year} Card`}>
+    <div className="card-title" role="heading" aria-level={1} aria-label="Let’s Mahj">
+      <span className="ct-accent ct-accent-tr" aria-hidden>
+        <Tile face="flower" size={size - 2} />
+      </span>
+
       {rows.map((word, r) => (
         <div className="card-title-row" key={r}>
           {word.split('').map((ch, i) => {
@@ -27,6 +30,10 @@ export default function CardTitle({ year, size = 42 }: { year: number; size?: nu
           })}
         </div>
       ))}
+
+      <span className="ct-accent ct-accent-bl" aria-hidden>
+        <Tile face="bam" size={size - 2} />
+      </span>
     </div>
   );
 }
