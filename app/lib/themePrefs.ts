@@ -37,6 +37,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Jade',
     tagline: 'Clean & neutral',
     tile: { face: 'wind', char: '東', color: '#0EAD96' },
+    wallpaper: '/patterns/bg-jade.svg',
     swatch: { brand: '#0EAD96', green: '#2BB673', accent: '#FF6B5C', page: '#F7F5EF' },
   },
   {
@@ -44,7 +45,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Bam',
     tagline: 'Bamboo green',
     tile: { face: 'bam' },
-    wallpaper: '/patterns/bam-bg.jpg',
+    wallpaper: '/patterns/bg-bam.svg',
     swatch: { brand: '#2E9E50', green: '#2BB673', accent: '#F2784B', page: '#F0F5E9' },
   },
   {
@@ -52,6 +53,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Dot',
     tagline: 'Circle blue',
     tile: { face: 'dot' },
+    wallpaper: '/patterns/bg-dot.svg',
     swatch: { brand: '#1E73C4', green: '#1FB7A6', accent: '#FF7A4D', page: '#EEF4FB' },
   },
   {
@@ -59,6 +61,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Crak',
     tagline: 'Character red',
     tile: { face: 'crack' },
+    wallpaper: '/patterns/bg-crak.svg',
     swatch: { brand: '#D23B4E', green: '#23B196', accent: '#E0A02B', page: '#FCEDEC' },
   },
   {
@@ -67,6 +70,7 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Emerald & gold',
     pro: true,
     tile: { face: 'dragon', char: '中', color: '#D23B4E' },
+    wallpaper: '/patterns/bg-dragon.svg',
     swatch: { brand: '#0F8F6E', green: '#2BB673', accent: '#D23B4E', page: '#F4EFE1' },
   },
   {
@@ -74,6 +78,7 @@ export const THEMES: ThemeDef[] = [
     name: 'Flower',
     tagline: 'Petal pink',
     tile: { face: 'flower' },
+    wallpaper: '/patterns/bg-flower.svg',
     swatch: { brand: '#E84C8A', green: '#2BBE9E', accent: '#F2A93C', page: '#FFF0F6' },
   },
   {
@@ -82,6 +87,7 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Wild violet',
     pro: true,
     tile: { face: 'joker' },
+    wallpaper: '/patterns/bg-joker.svg',
     swatch: { brand: '#7C4DE0', green: '#18C39A', accent: '#F5478B', page: '#F5F2FD' },
   },
   {
@@ -91,6 +97,7 @@ export const THEMES: ThemeDef[] = [
     dark: true,
     pro: true,
     tile: { face: 'dragon', char: '白', color: '#5AA2FF' },
+    wallpaper: '/patterns/bg-midnight.svg',
     swatch: { brand: '#2DD4BF', green: '#34D399', accent: '#FF6B81', page: '#141826' },
   },
 ];
