@@ -1,18 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import type { MahjongCard } from '../lib/types';
+import type { MahjongCard, Win } from '../lib/types';
 import type { Profile } from '../lib/social';
 import { computeStats, computeBadges } from '../lib/badges';
+import { computeInsights } from '../lib/insights';
 import { buildTrophyCard } from '../lib/shareCard';
 import { appUrl } from '../lib/share';
 import Avatar from './Avatar';
 import ShareModal from './ShareModal';
-import { IconShare, IconLock } from './uiIcons';
+import { IconShare, IconLock, IconStar, IconFlame, IconTarget } from './uiIcons';
 
 export default function TrophyShelf({
   card,
   handCounts,
+  wins,
   bestStreak,
   memberSince,
   profile,
@@ -20,6 +22,7 @@ export default function TrophyShelf({
 }: {
   card: MahjongCard;
   handCounts: Record<string, number>;
+  wins: Win[];
   bestStreak: number;
   memberSince?: number;
   profile: Profile;
@@ -29,6 +32,8 @@ export default function TrophyShelf({
   const s = computeStats(card, handCounts);
   const badges = computeBadges(card, handCounts, bestStreak);
   const earned = badges.filter((b) => b.earned);
+  const ins = computeInsights(card, handCounts, wins);
+  const topCats = ins.categories.filter((c) => c.total > 0).slice(0, 5);
 
   const since = memberSince
     ? new Date(memberSince).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
@@ -75,6 +80,75 @@ export default function TrophyShelf({
           ))}
         </div>
 
+        {s.mahjs > 0 && (
+          <>
+            <div className="set-section">Your game</div>
+            <div className="insight-list">
+              {ins.favorite && (
+                <div className="insight-row">
+                  <span className="insight-ic"><IconStar size={17} /></span>
+                  <span className="insight-lab">Favorite hand</span>
+                  <span className="insight-val" title={ins.favorite.label}>
+                    {ins.favorite.label} · {ins.favorite.count}×
+                  </span>
+                </div>
+              )}
+              {ins.bestCategory && (
+                <div className="insight-row">
+                  <span className="insight-ic"><IconTarget size={17} /></span>
+                  <span className="insight-lab">Best category</span>
+                  <span className="insight-val">
+                    {ins.bestCategory.category} · {ins.bestCategory.pct}%
+                  </span>
+                </div>
+              )}
+              {ins.busiestDay && (
+                <div className="insight-row">
+                  <span className="insight-ic"><IconFlame size={17} /></span>
+                  <span className="insight-lab">Busiest day</span>
+                  <span className="insight-val">{ins.busiestDay}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="stat-row" style={{ marginTop: 10 }}>
+              <div className="stat-mini">
+                <div className="sm-num">{ins.mahjsLast7}</div>
+                <div className="sm-lab">Last 7 days</div>
+              </div>
+              <div className="stat-mini">
+                <div className="sm-num">{ins.mahjsLast30}</div>
+                <div className="sm-lab">Last 30 days</div>
+              </div>
+              <div className="stat-mini">
+                <div className="sm-num">{ins.avgPoints}</div>
+                <div className="sm-lab">Avg points</div>
+              </div>
+              <div className="stat-mini">
+                <div className="sm-num">{ins.longestDailyRun}d</div>
+                <div className="sm-lab">Best run</div>
+              </div>
+            </div>
+
+            {topCats.length > 0 && (
+              <div className="cat-bars">
+                {topCats.map((c) => (
+                  <div className="cat-bar-row" key={c.category}>
+                    <span className="cb-name">{c.category}</span>
+                    <span className="progress" style={{ flex: 1, height: 8, marginTop: 0 }}>
+                      <span style={{ width: `${c.pct}%` }} />
+                    </span>
+                    <span className="cb-val">
+                      {c.cleared}/{c.total}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="set-section">Trophies</div>
         <div className="trophy-grid">
           {badges.map((b) => (
             <div className="trophy" data-earned={b.earned} key={b.id} title={b.desc}>

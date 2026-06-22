@@ -25,7 +25,9 @@ export async function track(name: string, props?: Record<string, unknown>): Prom
   } catch {
     /* analytics must never break the app */
   }
-  if (typeof console !== 'undefined') console.debug('[analytics]', name, props ?? '');
+  if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
+    console.debug('[analytics]', name, props ?? '');
+  }
 }
 
 /** The headline Phase-1 metric. Call when a win's "Share card" is used. */

@@ -18,6 +18,7 @@ import TrophyShelf from './TrophyShelf';
 import Tutorial from './Tutorial';
 import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
+import GameScorer from './GameScorer';
 import { IconSettings } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
@@ -51,6 +52,7 @@ export default function AppShell() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [scorerOpen, setScorerOpen] = useState(false);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -292,6 +294,7 @@ export default function AppShell() {
                 onMahj={cardMahj}
                 experience={experience}
                 streak={streak}
+                onScore={() => setScorerOpen(true)}
               />
             )}
             {tab === 'wins' && (
@@ -357,10 +360,21 @@ export default function AppShell() {
         />
       )}
 
+      {scorerOpen && (
+        <GameScorer
+          suggestedNames={[
+            socialState?.profile.name ?? 'You',
+            ...(socialState?.members.filter((m) => !m.isYou).map((m) => m.name) ?? []),
+          ].slice(0, 4)}
+          onClose={() => setScorerOpen(false)}
+        />
+      )}
+
       {trophyOpen && socialState && (
         <TrophyShelf
           card={card}
           handCounts={handCounts}
+          wins={wins}
           bestStreak={bestStreak}
           memberSince={account?.createdAt}
           profile={socialState.profile}
