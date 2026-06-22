@@ -36,16 +36,12 @@ function ringDot(cx: number, cy: number, r: number, color: string): string {
     <circle cx="${cx}" cy="${cy}" r="${(r * 0.34).toFixed(1)}" fill="${color}"/>`;
 }
 
-// An n-dot ("bing") tile: 1–9 circles laid out in canonical arrangements. Used
-// for festive leaderboard ranks (1st = one dot, 2nd = two dots, …).
-function dotsMotif(count: number, color = DOT): string {
-  const n = Math.max(1, Math.min(9, Math.round(count)));
-  if (n === 1) return ringDot(24, 31, 13, color);
-
-  // Three-column / three-row grid the smaller dots snap to.
+// Canonical 1–9 pip arrangements (shared by dot circles and bamboo sticks).
+function pipPositions(n: number): [number, number][] {
   const C = { L: 14, M: 24, R: 34 };
   const R = { T: 20, M: 31, B: 42 };
   const layouts: Record<number, [number, number][]> = {
+    1: [[C.M, R.M]],
     2: [[C.M, R.T], [C.M, R.B]],
     3: [[C.L, R.T], [C.M, R.M], [C.R, R.B]],
     4: [[C.L, R.T], [C.R, R.T], [C.L, R.B], [C.R, R.B]],
@@ -55,15 +51,42 @@ function dotsMotif(count: number, color = DOT): string {
     8: [[C.L, R.T], [C.R, R.T], [C.L, R.M], [C.R, R.M], [C.L, R.B], [C.R, R.B], [C.M, 25.5], [C.M, 36.5]],
     9: [[C.L, R.T], [C.M, R.T], [C.R, R.T], [C.L, R.M], [C.M, R.M], [C.R, R.M], [C.L, R.B], [C.M, R.B], [C.R, R.B]],
   };
-  const r = n <= 4 ? 5 : 4.2;
-  return layouts[n].map(([x, y]) => ringDot(x, y, r, color)).join('');
+  return layouts[Math.max(1, Math.min(9, Math.round(n)))];
 }
 
+// An n-dot ("bing") tile: 1–9 circles. Also used for festive leaderboard ranks.
+function dotsMotif(count: number, color = DOT): string {
+  const n = Math.max(1, Math.min(9, Math.round(count)));
+  if (n === 1) return ringDot(24, 31, 13, color);
+  const r = n <= 4 ? 5 : 4.2;
+  return pipPositions(n).map(([x, y]) => ringDot(x, y, r, color)).join('');
+}
+
+// Default bamboo tile (canonical 3-stick look) when no value is given.
 function bamMotif(): string {
   const stick = (x: number) =>
     `<rect x="${x - 3}" y="17" width="6" height="28" rx="3" fill="${BAM}"/>
      <rect x="${x - 3}" y="29" width="6" height="2.6" fill="${BAM_DK}"/>`;
   return `${stick(15)}${stick(24)}${stick(33)}`;
+}
+
+// An n-bam tile: 1–9 bamboo sticks in the canonical pip arrangement.
+function bamsMotif(count: number): string {
+  const n = Math.max(1, Math.min(9, Math.round(count)));
+  const h = n <= 4 ? 13 : 9;
+  const w = n <= 4 ? 4.6 : 3.8;
+  const stick = (x: number, y: number) =>
+    `<rect x="${(x - w / 2).toFixed(1)}" y="${(y - h / 2).toFixed(1)}" width="${w}" height="${h}" rx="${(w / 2).toFixed(1)}" fill="${BAM}"/>
+     <rect x="${(x - w / 2).toFixed(1)}" y="${(y - 1).toFixed(1)}" width="${w}" height="2" fill="${BAM_DK}"/>`;
+  return pipPositions(n).map(([x, y]) => stick(x, y)).join('');
+}
+
+// A numbered character ("crak") tile: the digit over 萬.
+function crakValueMotif(value: number): string {
+  return `<text x="24" y="21" text-anchor="middle" dominant-baseline="central"
+      font-size="18" font-weight="800" fill="${NAVY}" font-family="var(--font-display), ${CJK}">${value}</text>
+    <text x="24" y="41" text-anchor="middle" dominant-baseline="central"
+      font-size="17" font-weight="800" fill="${CRACK}" font-family="${CJK}">萬</text>`;
 }
 
 function flowerMotif(): string {
@@ -107,13 +130,13 @@ function motifFor(face: TileFace, char?: string, color?: string, count?: number)
     case 'dot':
       return count != null ? dotsMotif(count, color) : dotMotif();
     case 'bam':
-      return bamMotif();
+      return count != null ? bamsMotif(count) : bamMotif();
     case 'flower':
       return flowerMotif();
     case 'joker':
       return jokerMotif();
     case 'crack':
-      return charMotif('萬', CRACK);
+      return count != null ? crakValueMotif(count) : charMotif('萬', CRACK);
     case 'wind':
       return charMotif(char ?? '東', NAVY);
     case 'dragon':

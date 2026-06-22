@@ -11,7 +11,7 @@ import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconFlame, IconTap, IconTrophy } from './uiIcons';
+import { IconFlame, IconTap, IconTrophy, IconTarget } from './uiIcons';
 import type { Experience } from '../lib/account';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -25,9 +25,10 @@ interface Props {
   experience: Experience;
   streak: number;
   onScore: () => void;
+  onPractice: () => void;
 }
 
-export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak, onScore }: Props) {
+export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak, onScore, onPractice }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
@@ -166,13 +167,22 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         <span style={{ width: `${pct}%` }} />
       </div>
 
-      <button
-        className="btn ghost"
-        style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-        onClick={onScore}
-      >
-        <IconTrophy size={18} /> Score a live game
-      </button>
+      <div className="row" style={{ marginTop: 14 }}>
+        <button
+          className="btn ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={onScore}
+        >
+          <IconTrophy size={17} /> Score game
+        </button>
+        <button
+          className="btn ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+          onClick={onPractice}
+        >
+          <IconTarget size={17} /> Practice
+        </button>
+      </div>
 
       <div style={{ marginTop: 16 }}>
         <ChallengeCard

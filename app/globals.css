@@ -2815,6 +2815,106 @@ label.lbl {
   color: var(--accent);
 }
 
+/* ---- Practice / hand coach ---------------------------------------------- */
+
+.rack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 52px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--tint);
+  align-items: center;
+}
+.rack-empty {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 4px;
+}
+.rack-tile {
+  line-height: 0;
+}
+.rack-tile:active {
+  transform: scale(0.9);
+}
+.palette {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 5px;
+}
+.palette-tile {
+  line-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 2px 0;
+  border-radius: 8px;
+}
+.palette-tile:active {
+  transform: scale(0.9);
+}
+.palette-tile:disabled {
+  opacity: 0.4;
+}
+
+.match-row {
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.match-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.match-notation {
+  flex: 1;
+  min-width: 0;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.match-pct {
+  flex: 0 0 auto;
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--brand);
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+.match-meta {
+  margin-top: 7px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.match-need {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.match-need .need-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+.need-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.need-tile .need-x {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
 .member-challenge {
   display: flex;
   align-items: center;
