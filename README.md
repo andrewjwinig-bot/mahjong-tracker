@@ -44,7 +44,8 @@ app/
 public/
   icons/ , patterns/ , manifest.webmanifest, sw.js
 scripts/generate-icons.js            # dependency-free PNG icon generator
-docs/                                 # store listing, QA checklist
+docs/                                 # launch checklist, monetization, backend,
+                                      #     capacitor, store listing, QA checklist
 ```
 
 The `lib/*` modules are written as a clean “swap point”: today they read/write
