@@ -131,7 +131,6 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
       <header className="app-header">
         <CardTitle />
         <div className="brand-tag">The Original Mahj Social Network</div>
-        <p className="sub">Tap a tile each time you call MAHJ — clear all {card.hands.length}!</p>
         {streak > 1 && (
           <div className="streak-chip">
             <IconFlame size={15} /> {streak}-day streak
