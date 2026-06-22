@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import TileStrip from './TileStrip';
+import OfficialCardCallout from './OfficialCardCallout';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
@@ -386,6 +387,10 @@ export default function LearnTab({
             {open === i && <div className="acc-body">{s.body}</div>}
           </div>
         ))}
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <OfficialCardCallout blurb="These lessons use an original sample card. To play real games, use your official National Mah Jongg League card — they release a new one each year." />
       </div>
     </div>
   );
