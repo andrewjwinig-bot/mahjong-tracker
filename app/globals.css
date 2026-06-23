@@ -27,6 +27,8 @@
   --n3: #2f80ed;
   --bg-pattern: url("/patterns/jade.svg");
   --bg-photo: url("/patterns/bg-jade.svg");
+  --title-color: #06291B;
+  --title-shadow: none;
   /* Painterly base: top sheen + corner glows + soft vertical silk. */
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(14, 173, 150, 0.1), transparent 60%),
@@ -58,6 +60,8 @@
   /* Bamboo wallpaper photo with a soft veil over it for text legibility. */
   --bg-pattern: none;
   --bg-photo: url("/patterns/bg-bam.svg");
+  --title-color: #FFFFFF;
+  --title-shadow: 3px 3px 0 #053219;
   --bg-art: radial-gradient(120% 60% at 50% -8%, rgba(247, 250, 240, 0.55), transparent 60%),
     linear-gradient(180deg, rgba(243, 247, 236, 0.34), rgba(225, 237, 213, 0.52));
   --tile-face: #fcfbf3;
@@ -83,6 +87,8 @@
   --n2: #ff7a4d;
   --n3: #1e73c4;
   --bg-photo: url("/patterns/bg-dot.svg");
+  --title-color: #0A2A4E;
+  --title-shadow: none;
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(30, 115, 196, 0.12), transparent 60%),
     radial-gradient(85% 65% at 0% 100%, rgba(31, 183, 166, 0.1), transparent 55%),
@@ -110,6 +116,8 @@
   --n2: #d23b4e;
   --n3: #2f80ed;
   --bg-photo: url("/patterns/bg-crak.svg");
+  --title-color: #1A1410;
+  --title-shadow: none;
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.7), transparent 56%),
     radial-gradient(80% 55% at 0% 2%, rgba(210, 59, 78, 0.12), transparent 60%),
     radial-gradient(85% 65% at 100% 100%, rgba(224, 160, 43, 0.12), transparent 55%),
@@ -138,6 +146,8 @@
   --n2: #d23b4e;
   --n3: #c9952b;
   --bg-photo: url("/patterns/bg-dragon.svg");
+  --title-color: #F3E6C6;
+  --title-shadow: 3px 3px 0 #4C0D0B;
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 250, 235, 0.72), transparent 56%),
     radial-gradient(85% 58% at 0% 0%, rgba(15, 143, 110, 0.14), transparent 60%),
     radial-gradient(85% 65% at 100% 100%, rgba(201, 149, 43, 0.16), transparent 55%),
@@ -165,6 +175,8 @@
   --n2: #e84c8a;
   --n3: #a06ce0;
   --bg-photo: url("/patterns/bg-flower.svg");
+  --title-color: #5C0A30;
+  --title-shadow: none;
   --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.78), transparent 56%),
     radial-gradient(80% 55% at 100% 2%, rgba(232, 76, 138, 0.1), transparent 60%),
     radial-gradient(85% 65% at 0% 100%, rgba(160, 108, 224, 0.09), transparent 55%),
@@ -192,6 +204,8 @@
   --n2: #f5478b;
   --n3: #3e8bff;
   --bg-photo: url("/patterns/bg-joker.svg");
+  --title-color: #FFFFFF;
+  --title-shadow: 3px 3px 0 #281451;
   --bg-art: radial-gradient(110% 60% at 50% -10%, rgba(255, 255, 255, 0.7), transparent 55%),
     radial-gradient(70% 55% at 0% 0%, rgba(124, 77, 224, 0.13), transparent 60%),
     radial-gradient(70% 55% at 100% 18%, rgba(245, 71, 139, 0.1), transparent 60%),
@@ -222,6 +236,8 @@
   --n2: #ff6b81;
   --n3: #5aa2ff;
   --bg-photo: url("/patterns/bg-midnight.svg");
+  --title-color: #ECE7D6;
+  --title-shadow: 3px 3px 0 #14105C;
   --bg-art: radial-gradient(120% 80% at 50% -12%, rgba(90, 162, 255, 0.12), transparent 55%),
     radial-gradient(80% 60% at 0% 0%, rgba(45, 212, 191, 0.1), transparent 60%),
     radial-gradient(85% 70% at 100% 100%, rgba(124, 77, 224, 0.14), transparent 55%),
@@ -257,24 +273,25 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* The themed background is a full-bleed wallpaper on a real fixed, viewport-
-   sized layer (not `background-attachment: fixed`, which iOS Safari mis-sizes /
-   repeats). Each theme sets its own `--bg-photo`; it fills the screen once. */
+/* Per the design: the themed art is a banner behind each screen header that
+   fades out toward the bottom (not a full-screen wallpaper). The page itself is
+   the solid --page color (set on <html>); this fixed layer paints only the top
+   band of art, masked to transparent. */
 body::before {
   content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
+  height: 300px;
   z-index: -1;
-  background-color: var(--page);
   background-image: var(--bg-photo);
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center top;
+  opacity: 0.62;
+  -webkit-mask-image: linear-gradient(180deg, #000 52%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 52%, transparent 100%);
   pointer-events: none;
 }
 
@@ -386,14 +403,27 @@ a:focus-visible,
   padding: 20px 6px 6px;
   text-align: center;
 }
+/* Two-tone poster title: heavy Bricolage in the theme's title color over a hard
+   offset, with a short accent underline. The signature headline treatment. */
 .app-header h1 {
   margin: 0;
-  font-size: 34px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 36px;
   font-weight: 800;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  letter-spacing: -1px;
+  text-transform: none;
   line-height: 0.95;
-  color: var(--brand);
+  color: var(--title-color, var(--ink));
+  text-shadow: var(--title-shadow, none);
+}
+.app-header h1::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--brand);
+  margin: 12px auto 0;
 }
 .app-header .sub {
   display: block;
@@ -409,46 +439,34 @@ a:focus-visible,
   font-weight: 700;
 }
 
-/* Tiled "LETS / MAHJ" wordmark header with accent tiles tucked behind. */
-.card-title {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin: 6px auto 2px;
-  width: fit-content;
-  padding: 18px 30px;
+/* Card screen header is left-aligned around the two-tone logo. */
+.app-header.card-header {
+  text-align: left;
+  padding: 18px 4px 6px;
 }
-.card-title-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  gap: 5px;
+.logo {
+  line-height: 0.82;
 }
-.ct-tile {
-  line-height: 0;
-  filter: drop-shadow(0 4px 8px rgba(36, 50, 64, 0.16));
-  transition: transform 0.15s ease;
+.logo-kicker {
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--title-color, var(--ink));
+  margin-bottom: 2px;
 }
-/* Decorative suit tiles sitting BEHIND the wordmark, peeking out at the corners. */
-.ct-accent {
-  position: absolute;
-  z-index: 0;
-  line-height: 0;
-  opacity: 0.92;
-  filter: drop-shadow(0 5px 12px rgba(36, 50, 64, 0.22));
+.logo-word {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 46px;
+  letter-spacing: -1.5px;
+  color: var(--title-color, var(--ink));
+  text-shadow: var(--title-shadow, none);
 }
-.ct-accent-tr {
-  top: -6px;
-  right: 2px;
-  transform: rotate(13deg);
-}
-.ct-accent-bl {
-  bottom: -6px;
-  left: 2px;
-  transform: rotate(-13deg);
+.logo-dots {
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 700;
 }
 
 /* ---- Custom tile artwork ------------------------------------------------- */
