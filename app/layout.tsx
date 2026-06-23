@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Space_Grotesk, Hanken_Grotesk } from 'next/font/google';
+import { Bricolage_Grotesque, Hanken_Grotesk, Space_Mono } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
 
-// Two-font pairing: a sharp, modern grotesque for headers/branding + a clean
-// grotesque for body text.
-const display = Space_Grotesk({
+// Type system per the design: Bricolage Grotesque for display/headlines, Hanken
+// Grotesk for body/labels, Space Mono for meta (timestamps, counts, eyebrows).
+const display = Bricolage_Grotesque({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
+  weight: ['500', '600', '700', '800'],
   variable: '--font-display',
   display: 'swap',
 });
@@ -16,6 +16,13 @@ const body = Hanken_Grotesk({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-app',
+  display: 'swap',
+});
+
+const mono = Space_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-mono',
   display: 'swap',
 });
 
@@ -45,7 +52,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script

@@ -128,7 +128,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
 
   return (
     <div className="screen">
-      <header className="app-header">
+      <header className="app-header card-header">
         <CardTitle />
         {streak > 1 && (
           <div className="streak-chip">
