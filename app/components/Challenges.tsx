@@ -31,29 +31,30 @@ export function ChallengeCard({
   const complete = total > 0 && done >= total;
 
   return (
-    <div className={`challenge${complete ? ' done' : ''}`}>
-      <div className="ch-top">
-        <span className="ch-emoji">{challenge.emoji}</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="ch-season">{challenge.season} Challenge</div>
-          <div className="ch-name">{challenge.name}</div>
-        </div>
-        <button className="ch-seasons" onClick={onSeasons} aria-label="All seasons">
-          <IconGrid size={17} />
-        </button>
-      </div>
+    <div className="challenge">
+      <button className="ch-seasons" onClick={onSeasons} aria-label="All seasons">
+        <IconGrid size={16} />
+      </button>
+      <div className="ch-eyebrow">★ {challenge.season} Challenge</div>
+      <div className="ch-name">{challenge.name}</div>
       <p className="ch-blurb">{challenge.blurb}</p>
       <div className="ch-prog">
-        <div className="progress" style={{ flex: 1, marginTop: 0 }}>
+        <div className="rack-bar">
           <span style={{ width: `${pct}%` }} />
         </div>
-        <span className="ch-count" style={complete ? { display: 'inline-flex', alignItems: 'center', gap: 4 } : undefined}>
-          {complete ? <><IconSparkle size={14} /> Done!</> : `${done}/${total}`}
+        <span className="ch-count">
+          {complete ? (
+            <>
+              <IconSparkle size={13} /> Done!
+            </>
+          ) : (
+            `${done}/${total}`
+          )}
         </span>
       </div>
       {!complete && (
-        <button className="btn ghost ch-focus" onClick={onToggleFocus}>
-          {focused ? 'Show all rows' : `${challenge.emoji} Focus these rows`}
+        <button className="ch-focus" onClick={onToggleFocus}>
+          {focused ? 'Show all rows' : 'Focus these rows'}
         </button>
       )}
     </div>

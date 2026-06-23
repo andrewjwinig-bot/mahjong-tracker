@@ -461,6 +461,27 @@ a:focus-visible,
   align-items: center;
   justify-content: center;
 }
+/* stat tiles "deal in" on entry */
+.stat {
+  animation: deal-in 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+.stat:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.stat:nth-child(3) {
+  animation-delay: 0.16s;
+}
+@keyframes deal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotate(-3deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat {
+    animation: none;
+  }
+}
 .stat .num {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
@@ -806,6 +827,18 @@ a:focus-visible,
   background: var(--green);
   border-color: var(--green);
   color: #fff;
+  animation: stamp 0.4s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+@keyframes stamp {
+  0% {
+    transform: scale(0.2);
+  }
+  60% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 .check .count-badge {
   position: absolute;
@@ -1280,69 +1313,95 @@ label.lbl {
 
 /* ---- Seasonal challenges ------------------------------------------------- */
 
+/* Challenge card: pine fill, gold eyebrow, tile-rack progress (design). */
 .challenge {
-  background: var(--card);
-  border-radius: 20px;
-  box-shadow: 0 0 0 2px var(--tint-deep), var(--shadow-sm);
+  position: relative;
+  background: #10b39a;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.13);
   padding: 16px;
+  overflow: hidden;
+  margin-top: 16px;
 }
-.challenge.done {
-  box-shadow: 0 0 0 2.5px var(--green), var(--shadow-sm);
-}
-.challenge .ch-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.ch-emoji {
-  font-size: 30px;
-  line-height: 1;
-  flex: 0 0 auto;
-}
-.ch-season {
-  font-size: 11px;
+.ch-eyebrow {
+  font-family: var(--font-app), system-ui, sans-serif;
   font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
+  color: #f5a524;
+  margin-bottom: 5px;
 }
 .ch-name {
-  font-size: 18px;
-  font-weight: 800;
   font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.05;
+  color: #f4f6fa;
 }
 .ch-seasons {
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  background: var(--tint);
-  color: var(--brand);
-  font-size: 15px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
   display: grid;
   place-items: center;
 }
 .ch-blurb {
-  margin: 8px 0 12px;
-  font-size: 13.5px;
+  margin: 5px 0 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  line-height: 1.35;
-  color: var(--ink-soft);
+  line-height: 1.4;
+  color: rgba(242, 232, 214, 0.82);
 }
 .ch-prog {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+}
+/* tile-rack progress bar — gold segments on a dark track */
+.rack-bar {
+  flex: 1;
+  height: 12px;
+  border: 2px solid rgba(20, 22, 42, 0.09);
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.rack-bar > span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #f5a524 0 8px, rgba(0, 0, 0, 0.3) 8px 10px);
+  transition: width 0.9s cubic-bezier(0.3, 0.85, 0.3, 1);
 }
 .ch-count {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--brand);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f4f6fa;
   white-space: nowrap;
-  font-family: var(--font-display), system-ui, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .ch-focus {
   margin-top: 12px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 7px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 .ch-row-tag {
   flex: 0 0 auto;
@@ -2977,11 +3036,35 @@ label.lbl {
 .tip-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
+  gap: 11px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  background: #fff;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  margin-top: 14px;
+}
+.tip-tile {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 42px;
+  border-radius: 4px;
+  background: #fff;
+  border: 2px solid rgba(20, 22, 42, 0.09);
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #f5a524;
+}
+.tip-shuffle {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
 }
 
 /* "Get the official card" callout (onboarding + Rules). */
@@ -3018,18 +3101,19 @@ label.lbl {
   color: var(--muted);
 }
 .tip-label {
-  font-size: 11px;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 1.5px;
   color: var(--brand);
+  margin-bottom: 2px;
 }
 .tip-text {
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
-  line-height: 1.34;
-  color: var(--ink-soft);
-  margin-top: 2px;
+  line-height: 1.35;
+  color: #2a2a30;
 }
 @keyframes boom {
   0% {
