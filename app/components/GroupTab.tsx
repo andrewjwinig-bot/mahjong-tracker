@@ -8,7 +8,6 @@ import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
-import TileStrip from './TileStrip';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers } from './uiIcons';
@@ -109,8 +108,7 @@ export default function GroupTab({
     <div className="screen">
       <header className="app-header">
         <h1>The Feed</h1>
-        <p className="sub">See what your whole crew is calling. 🀄</p>
-        <TileStrip count={7} />
+        <p className="sub">See what your whole crew is calling.</p>
       </header>
 
       <div className="row" style={{ marginTop: 14 }}>
