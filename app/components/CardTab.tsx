@@ -9,7 +9,9 @@ import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
 import CountUp from './CountUp';
 import TipCard from './TipCard';
+import Tile from './Tile';
 import ShareModal from './ShareModal';
+import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { IconFlame, IconTap } from './uiIcons';
@@ -20,19 +22,41 @@ type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 interface Props {
   card: MahjongCard;
   handCounts: Record<string, number>;
+  handNotes: Record<string, string>;
+  wins: Win[];
+  groupName: string;
   onBump: (handId: string, delta: number) => void;
   /** First-time clear of a hand: posts to the feed, returns the Win to share. */
   onMahj: (hand: Hand) => Win;
+  onAddWin: (win: Win) => void;
+  onRemoveWin: (id: string) => void;
+  onPostToGroup: (win: Win) => void;
   experience: Experience;
   streak: number;
   onScore: () => void;
   onPractice: () => void;
 }
 
-export default function CardTab({ card, handCounts, onBump, onMahj, experience, streak, onScore, onPractice }: Props) {
+export default function CardTab({
+  card,
+  handCounts,
+  handNotes,
+  wins,
+  groupName,
+  onBump,
+  onMahj,
+  onAddWin,
+  onRemoveWin,
+  onPostToGroup,
+  experience,
+  streak,
+  onScore,
+  onPractice,
+}: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
   const { celebrate } = useConfetti();
 
   const challenge = useMemo(() => activeChallenge(), []);
@@ -164,6 +188,12 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         </div>
       </div>
 
+      <button className="mahj-hero" onClick={() => setLogOpen(true)}>
+        <span className="mahj-hero-shine" aria-hidden />
+        <Tile face="crack" size={34} className="mahj-hero-tile" />
+        <span className="mahj-hero-label">I GOT MAHJ!</span>
+      </button>
+
       <div className="action-row">
         <button className="act-btn primary" onClick={onScore}>
           ⊕ Score Game
@@ -268,6 +298,26 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         );
       })}
 
+      {wins.length > 0 && (
+        <section style={{ marginTop: 26 }}>
+          <div className="cat-bar">
+            <span className="cat-name">Your Mahjs</span>
+            <span className="cat-count">
+              {wins.length} logged
+            </span>
+          </div>
+          {wins.map((w) => (
+            <WinCard
+              key={w.id}
+              win={w}
+              groupName={groupName}
+              onRemove={() => onRemoveWin(w.id)}
+              onPostToGroup={onPostToGroup}
+            />
+          ))}
+        </section>
+      )}
+
       <p
         style={{
           textAlign: 'center',
@@ -294,6 +344,32 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
 
       {seasonsOpen && (
         <SeasonsSheet card={card} handCounts={handCounts} onClose={() => setSeasonsOpen(false)} />
+      )}
+
+      {logOpen && (
+        <LogWinSheet
+          card={card}
+          handNotes={handNotes}
+          groupName={groupName}
+          onClose={() => setLogOpen(false)}
+          onSave={(win, opts) => {
+            onAddWin(win);
+            if (win.handId) onBump(win.handId, +1);
+            if (opts.shareToGroup) onPostToGroup(win);
+            setLogOpen(false);
+            const pts = win.handId
+              ? card.hands.find((h) => h.id === win.handId)?.points
+              : undefined;
+            celebrate({
+              title: 'I Got Mahj! 🎉',
+              handLabel: win.handLabel,
+              points: pts,
+              posted: opts.shareToGroup,
+              onShare: () => setShareWin(win),
+              onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win),
+            });
+          }}
+        />
       )}
     </div>
   );

@@ -8,7 +8,6 @@ import * as db from '../lib/storage';
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
-import WinsTab from './WinsTab';
 import GroupTab from './GroupTab';
 import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
@@ -301,24 +300,18 @@ export default function AppShell() {
               <CardTab
                 card={card}
                 handCounts={handCounts}
+                handNotes={handNotes}
+                wins={wins}
+                groupName={socialState?.group.name ?? 'your table'}
                 onBump={bumpHand}
                 onMahj={cardMahj}
+                onAddWin={addWin}
+                onRemoveWin={removeWin}
+                onPostToGroup={postToGroup}
                 experience={experience}
                 streak={streak}
                 onScore={() => openScorer()}
                 onPractice={() => setPracticeOpen(true)}
-              />
-            )}
-            {tab === 'wins' && (
-              <WinsTab
-                card={card}
-                handNotes={handNotes}
-                wins={wins}
-                groupName={socialState?.group.name ?? 'your table'}
-                onAddWin={addWin}
-                onRemoveWin={removeWin}
-                onBump={bumpHand}
-                onPostToGroup={postToGroup}
               />
             )}
             {tab === 'group' && socialState && (
