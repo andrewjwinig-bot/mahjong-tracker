@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Comment, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID, initialOf } from '../lib/social';
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
-import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
@@ -227,6 +226,7 @@ export default function GroupTab({
         <MemberDetail
           member={detail}
           completed={completedHandIds(detail, handCounts)}
+          rank={Math.max(1, ranked.findIndex((m) => m.id === detail.id) + 1)}
           onClose={() => setDetail(null)}
         />
       )}
@@ -377,88 +377,140 @@ function FeedCard({
 function MemberDetail({
   member,
   completed,
+  rank,
   onClose,
 }: {
   member: GroupMember;
   completed: Set<string>;
+  rank: number;
   onClose: () => void;
 }) {
-  const ch = activeChallenge();
-  const counts = Object.fromEntries([...completed].map((id) => [id, 1]));
-  const cp = challengeProgress(ch, SAMPLE_CARD, counts);
-  const chPct = cp.total ? Math.round((cp.done / cp.total) * 100) : 0;
+  const [showAll, setShowAll] = useState(false);
+  const cleared = completed.size;
+  const pct = Math.round((cleared / TOTAL_HANDS) * 100);
+  const handle = member.name.toLowerCase().replace(/\s+/g, '');
+  // A couple of "recent mahjs" drawn from their cleared hands.
+  const recent = SAMPLE_CARD.hands.filter((h) => completed.has(h.id)).slice(0, 2);
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="grab" />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-          <Avatar avatar={member.avatar} size={46} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 20, textTransform: 'uppercase', color: 'var(--brand)' }}>
-              {member.name}
-            </div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
-              {completed.size}/{TOTAL_HANDS} cleared · {member.points} pts
-            </div>
-          </div>
-        </div>
-
-        {/* Their progress on the active seasonal challenge */}
-        <div className="member-challenge">
-          <span className="mc-emoji" aria-hidden>
-            {ch.emoji}
-          </span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="mc-name">
-              {ch.season} Challenge · {ch.name}
-            </div>
-            <div className="progress" style={{ marginTop: 6, height: 7 }}>
-              <span style={{ width: `${chPct}%` }} />
-            </div>
-          </div>
-          <span className="mc-count">
-            {cp.done}/{cp.total}
-          </span>
-        </div>
-
-        {SAMPLE_CARD.categories.map((cat) => {
-          const hands = SAMPLE_CARD.hands.filter((h) => h.category === cat);
-          const done = hands.filter((h) => completed.has(h.id)).length;
-          return (
-            <section key={cat}>
-              <div className="cat-head" style={{ margin: '16px 2px 8px' }}>
-                <span className="pill">{cat}</span>
-                <span className="count">
-                  {done}/{hands.length}
-                </span>
+      <div className="sheet member-sheet" onClick={(e) => e.stopPropagation()}>
+        {/* Cinnabar header band */}
+        <div className="md-band">
+          <span className="md-stripe" aria-hidden />
+          <div className="grab light" />
+          <div className="md-band-row">
+            <span className="md-avatar">
+              <Avatar avatar={member.avatar} size={46} />
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="md-name">{member.name}</div>
+              <div className="md-handle">
+                @{handle}
+                {!member.isYou ? ' · FRIEND' : ' · YOU'}
               </div>
-              {hands.map((h) => {
-                const got = completed.has(h.id);
-                return (
-                  <div key={h.id} className={`mini-hand${got ? ' got' : ''}`}>
-                    <span className="mini-check" data-on={got}>
-                      {got ? '✓' : ''}
-                    </span>
-                    <span className="mini-note">
-                      {colorNotation(h.notation).map((g, i, arr) => (
-                        <span key={i} className={g.cls}>
-                          {g.text}
-                          {i < arr.length - 1 ? ' ' : ''}
-                        </span>
-                      ))}
-                    </span>
-                    <span className="pts">{h.concealed ? `C${h.points}` : `×${h.points}`}</span>
-                  </div>
-                );
-              })}
-            </section>
-          );
-        })}
+            </div>
+            <div className="md-rank">
+              <div className="md-rank-n">#{rank}</div>
+              <div className="md-rank-l">RANK</div>
+            </div>
+          </div>
+        </div>
 
-        <button className="btn ghost" style={{ marginTop: 18 }} onClick={onClose}>
-          Done
-        </button>
+        <div className="md-body">
+          {/* Stat tiles */}
+          <div className="md-stats">
+            <div className="md-stat">
+              <div className="md-num">
+                {cleared}
+                <span style={{ fontSize: 13, color: 'var(--green)' }}>/{TOTAL_HANDS}</span>
+              </div>
+              <div className="md-lab" style={{ color: 'var(--green)' }}>CLEARED</div>
+            </div>
+            <div className="md-stat">
+              <div className="md-num">{cleared}</div>
+              <div className="md-lab" style={{ color: 'var(--brand)' }}>MAHJS</div>
+            </div>
+            <div className="md-stat">
+              <div className="md-num">{member.points}</div>
+              <div className="md-lab" style={{ color: '#C9871A' }}>POINTS</div>
+            </div>
+          </div>
+
+          {/* Collection progress */}
+          <div className="md-prog-head">
+            <span>COLLECTION PROGRESS</span>
+            <span style={{ color: 'var(--brand)' }}>{pct}%</span>
+          </div>
+          <div className="progress" style={{ marginTop: 0, marginBottom: 22 }}>
+            <span style={{ width: `${pct}%` }} />
+          </div>
+
+          {/* Recent mahjs */}
+          {recent.length > 0 && (
+            <>
+              <div className="set-label">RECENT MAHJS</div>
+              {recent.map((h) => (
+                <div key={h.id} className="md-recent">
+                  <div className="md-recent-note">
+                    {colorNotation(h.notation).map((g, i, arr) => (
+                      <span key={i} className={g.cls}>
+                        {g.text}
+                        {i < arr.length - 1 ? ' ' : ''}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="md-badge">+{h.points}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Expandable full breakdown */}
+          {showAll &&
+            SAMPLE_CARD.categories.map((cat) => {
+              const hands = SAMPLE_CARD.hands.filter((h) => h.category === cat);
+              const done = hands.filter((h) => completed.has(h.id)).length;
+              return (
+                <section key={cat}>
+                  <div className="cat-head" style={{ margin: '16px 2px 8px' }}>
+                    <span className="pill">{cat}</span>
+                    <span className="count">
+                      {done}/{hands.length}
+                    </span>
+                  </div>
+                  {hands.map((h) => {
+                    const got = completed.has(h.id);
+                    return (
+                      <div key={h.id} className={`mini-hand${got ? ' got' : ''}`}>
+                        <span className="mini-check" data-on={got}>
+                          {got ? '✓' : ''}
+                        </span>
+                        <span className="mini-note">
+                          {colorNotation(h.notation).map((g, i, arr) => (
+                            <span key={i} className={g.cls}>
+                              {g.text}
+                              {i < arr.length - 1 ? ' ' : ''}
+                            </span>
+                          ))}
+                        </span>
+                        <span className="pts">{h.concealed ? `C${h.points}` : `×${h.points}`}</span>
+                      </div>
+                    );
+                  })}
+                </section>
+              );
+            })}
+
+          <div className="md-foot">
+            <button className="md-done" onClick={onClose}>
+              DONE
+            </button>
+            <button className="md-viewall" onClick={() => setShowAll((v) => !v)}>
+              {showAll ? 'Hide hands' : '⚇ View all hands'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
