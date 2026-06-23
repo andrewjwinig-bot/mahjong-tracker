@@ -1,251 +1,115 @@
 /* ===========================================================================
    THEME TOKENS
-   Default = "Jade" (bold but gender-neutral). Other themes override these
-   tokens via [data-theme="…"] blocks below. Components only ever read tokens,
-   so flipping data-theme reskins the entire app at once.
+   All themes are LIGHT (light screen + dark body ink); the banner art may be
+   dark with a light title. Per-theme [data-theme] blocks override only the
+   primaries; the rest derives from --brand / --page / --ink. Components only
+   read tokens, so flipping data-theme reskins the whole app. Default = Crak.
    ========================================================================== */
-
 :root {
-  /* Jade — neutral default */
-  --brand: #0ead96;
-  --brand-deep: #0b8c7b;
-  --green: #2bb673;
-  --accent: #ff6b5c;
-  --ink: #243240;
-  --ink-soft: #56616e;
-  --muted: #7e8a93;
-  --page: #f7f5ef;
+  /* shared / fixed tokens */
+  --green: #10b39a; /* pine */
+  --accent: #f5a524; /* gold secondary */
+  --on-brand: #ffffff;
   --card: #ffffff;
-  --tint: #dcf2ec;
-  --tint-deep: #bbe6dc;
-  --hairline: #e7e0d4;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --on-brand: #ffffff;
-  --n0: #243240;
-  --n1: #2bb673;
-  --n2: #ff6b5c;
-  --n3: #2f80ed;
-  --bg-pattern: url("/patterns/jade.svg");
-  --bg-photo: url("/patterns/bg-jade.svg");
-  --title-color: #06291B;
-  --title-shadow: none;
-  /* Painterly base: top sheen + corner glows + soft vertical silk. */
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
-    radial-gradient(80% 55% at 100% 2%, rgba(14, 173, 150, 0.1), transparent 60%),
-    radial-gradient(85% 65% at 0% 100%, rgba(43, 182, 115, 0.08), transparent 55%),
-    linear-gradient(180deg, #faf8f1, #f1ede1);
-  --tile-face: #fdfbf5; /* warm ivory tile body */
-  --shadow: 0 10px 30px rgba(36, 50, 64, 0.1);
-  --shadow-sm: 0 4px 16px rgba(36, 50, 64, 0.08);
+  --tile-face: #fbf7ee; /* cream tile body, all themes */
+  --tint: color-mix(in srgb, var(--brand) 13%, var(--page));
+  --tint-deep: color-mix(in srgb, var(--brand) 24%, var(--page));
+  --ink-soft: color-mix(in srgb, var(--ink) 72%, var(--page));
+  --muted: color-mix(in srgb, var(--ink) 46%, var(--page));
+  --hairline: color-mix(in srgb, var(--ink) 13%, transparent);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --shadow: 0 10px 26px rgba(20, 22, 42, 0.13);
+  --shadow-sm: 0 4px 16px rgba(20, 22, 42, 0.09);
   --nav-h: 66px;
-}
-
-[data-theme="bam"] {
-  --brand: #2e9e50;
-  --brand-deep: #247e40;
-  --green: #2bb673;
-  --accent: #f2784b;
-  --ink: #21311f;
-  --ink-soft: #47553f;
-  --muted: #7d9078;
-  --page: #f0f5e9;
-  --tint: #dbedcf;
-  --tint-deep: #bfe0a8;
-  --hairline: #e0e8d2;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --n0: #21311f;
-  --n1: #2e9e50;
-  --n2: #f2784b;
-  --n3: #2f80ed;
-  /* Bamboo wallpaper photo with a soft veil over it for text legibility. */
-  --bg-pattern: none;
-  --bg-photo: url("/patterns/bg-bam.svg");
-  --title-color: #FFFFFF;
-  --title-shadow: 3px 3px 0 #053219;
-  --bg-art: radial-gradient(120% 60% at 50% -8%, rgba(247, 250, 240, 0.55), transparent 60%),
-    linear-gradient(180deg, rgba(243, 247, 236, 0.34), rgba(225, 237, 213, 0.52));
-  --tile-face: #fcfbf3;
-  --shadow: 0 10px 30px rgba(33, 49, 31, 0.1);
-  --shadow-sm: 0 4px 16px rgba(33, 49, 31, 0.08);
-}
-
-[data-theme="dot"] {
-  --brand: #1e73c4;
-  --brand-deep: #185fa3;
-  --green: #1fb7a6;
-  --accent: #ff7a4d;
-  --ink: #1b2a3a;
-  --ink-soft: #46566a;
-  --muted: #7e8ea0;
-  --page: #eef4fb;
-  --tint: #d6e6f7;
-  --tint-deep: #b3d2f0;
-  --hairline: #dce6f2;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --n0: #1b2a3a;
-  --n1: #1fb7a6;
-  --n2: #ff7a4d;
-  --n3: #1e73c4;
-  --bg-photo: url("/patterns/bg-dot.svg");
-  --title-color: #0A2A4E;
+  /* fixed hand-notation palette */
+  --n0: #1a1410;
+  --n1: #c0392b;
+  --n2: #c9871a;
+  --n3: #2e86d4;
+  /* Crak — default */
+  --brand: #c0392b;
+  --brand-deep: #4d0f09;
+  --page: #f6eedd;
+  --ink: #1a1410;
+  --title-color: #1a1410;
   --title-shadow: none;
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.75), transparent 56%),
-    radial-gradient(80% 55% at 100% 2%, rgba(30, 115, 196, 0.12), transparent 60%),
-    radial-gradient(85% 65% at 0% 100%, rgba(31, 183, 166, 0.1), transparent 55%),
-    linear-gradient(180deg, #f1f6fc, #e4edf8);
-  --tile-face: #fbfcfe;
-  --shadow: 0 10px 30px rgba(27, 42, 58, 0.12);
-  --shadow-sm: 0 4px 16px rgba(27, 42, 58, 0.09);
-}
-
-[data-theme="crak"] {
-  --brand: #d23b4e;
-  --brand-deep: #b92d40;
-  --green: #23b196;
-  --accent: #e0a02b;
-  --ink: #3a222a;
-  --ink-soft: #5e424a;
-  --muted: #a98e95;
-  --page: #fceded;
-  --tint: #fad9dc;
-  --tint-deep: #f4bcc1;
-  --hairline: #f1d8da;
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --n0: #3a222a;
-  --n1: #23b196;
-  --n2: #d23b4e;
-  --n3: #2f80ed;
   --bg-photo: url("/patterns/bg-crak.svg");
-  --title-color: #1A1410;
-  --title-shadow: none;
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.7), transparent 56%),
-    radial-gradient(80% 55% at 0% 2%, rgba(210, 59, 78, 0.12), transparent 60%),
-    radial-gradient(85% 65% at 100% 100%, rgba(224, 160, 43, 0.12), transparent 55%),
-    linear-gradient(180deg, #fdeeed, #f7e0de);
-  --tile-face: #fefbf6;
-  --shadow: 0 10px 30px rgba(210, 59, 78, 0.12);
-  --shadow-sm: 0 4px 16px rgba(210, 59, 78, 0.09);
 }
 
+[data-theme="jade"] {
+  --brand: #1f6b4e;
+  --brand-deep: #06291b;
+  --page: #f1eee0;
+  --ink: #23201a;
+  --title-color: #06291b;
+  --title-shadow: none;
+  --bg-photo: url("/patterns/bg-jade.svg");
+}
+[data-theme="bam"] {
+  --brand: #15803d;
+  --brand-deep: #053219;
+  --page: #e9f4ec;
+  --ink: #0a3d24;
+  --title-color: #ffffff;
+  --title-shadow: 3px 3px 0 #053219;
+  --bg-photo: url("/patterns/bg-bam.svg");
+}
+[data-theme="dot"] {
+  --brand: #1e6fcb;
+  --brand-deep: #0a2c58;
+  --page: #ebf1f4;
+  --ink: #15386e;
+  --title-color: #0a2a4e;
+  --title-shadow: none;
+  --bg-photo: url("/patterns/bg-dot.svg");
+}
 [data-theme="dragon"] {
-  --brand: #0f8f6e;
-  --brand-deep: #0b7459;
-  --green: #2bb673;
-  --accent: #d23b4e;
-  --ink: #1a2a26;
-  --ink-soft: #44544e;
-  --muted: #7e918a;
-  --page: #f4efe1;
-  --tint: #dcede5;
-  --tint-deep: #bbe0d0;
-  --hairline: #e8e0cc;
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --on-brand: #ffffff;
-  --n0: #1a2a26;
-  --n1: #0f8f6e;
-  --n2: #d23b4e;
-  --n3: #c9952b;
+  --brand: #c8302c;
+  --brand-deep: #4c0d0b;
+  --page: #e7f0ea;
+  --ink: #143a2e;
+  --title-color: #f3e6c6;
+  --title-shadow: 3px 3px 0 #4c0d0b;
   --bg-photo: url("/patterns/bg-dragon.svg");
-  --title-color: #F3E6C6;
-  --title-shadow: 3px 3px 0 #4C0D0B;
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 250, 235, 0.72), transparent 56%),
-    radial-gradient(85% 58% at 0% 0%, rgba(15, 143, 110, 0.14), transparent 60%),
-    radial-gradient(85% 65% at 100% 100%, rgba(201, 149, 43, 0.16), transparent 55%),
-    linear-gradient(180deg, #f6f1e3, #ede4d0);
-  --tile-face: #fdf9ee;
-  --shadow: 0 12px 32px rgba(26, 42, 38, 0.13);
-  --shadow-sm: 0 4px 16px rgba(26, 42, 38, 0.09);
 }
-
 [data-theme="flower"] {
-  --brand: #e84c8a;
-  --brand-deep: #d13a77;
-  --green: #2bbe9e;
-  --accent: #f2a93c;
-  --ink: #3a2740;
-  --ink-soft: #614a66;
-  --muted: #b08aa0;
-  --page: #fff0f6;
-  --tint: #fcddec;
-  --tint-deep: #f8c2dd;
-  --hairline: #f3d7e5;
-  --nav-bg: rgba(255, 255, 255, 0.94);
-  --n0: #6d2c57;
-  --n1: #2bbe9e;
-  --n2: #e84c8a;
-  --n3: #a06ce0;
-  --bg-photo: url("/patterns/bg-flower.svg");
-  --title-color: #5C0A30;
+  --brand: #db2777;
+  --brand-deep: #5c0a30;
+  --page: #faecf3;
+  --ink: #7a1e48;
+  --title-color: #5c0a30;
   --title-shadow: none;
-  --bg-art: radial-gradient(120% 72% at 50% -12%, rgba(255, 255, 255, 0.78), transparent 56%),
-    radial-gradient(80% 55% at 100% 2%, rgba(232, 76, 138, 0.1), transparent 60%),
-    radial-gradient(85% 65% at 0% 100%, rgba(160, 108, 224, 0.09), transparent 55%),
-    linear-gradient(180deg, #fff1f7, #fbe2ee);
-  --tile-face: #fffafc;
-  --shadow: 0 10px 30px rgba(232, 76, 138, 0.12);
-  --shadow-sm: 0 4px 16px rgba(232, 76, 138, 0.09);
+  --bg-photo: url("/patterns/bg-flower.svg");
 }
-
 [data-theme="joker"] {
-  --brand: #7c4de0;
-  --brand-deep: #6438c8;
-  --green: #18c39a;
-  --accent: #f5478b;
-  --ink: #261b3c;
-  --ink-soft: #4f4566;
-  --muted: #8a82a6;
-  --page: #f5f2fd;
-  --tint: #e7defb;
-  --tint-deep: #d3c4f8;
-  --hairline: #e7e0f5;
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --n0: #261b3c;
-  --n1: #18c39a;
-  --n2: #f5478b;
-  --n3: #3e8bff;
-  --bg-photo: url("/patterns/bg-joker.svg");
-  --title-color: #FFFFFF;
+  --brand: #6a3fc0;
+  --brand-deep: #281451;
+  --page: #f0ebfa;
+  --ink: #2e1a57;
+  --title-color: #ffffff;
   --title-shadow: 3px 3px 0 #281451;
-  --bg-art: radial-gradient(110% 60% at 50% -10%, rgba(255, 255, 255, 0.7), transparent 55%),
-    radial-gradient(70% 55% at 0% 0%, rgba(124, 77, 224, 0.13), transparent 60%),
-    radial-gradient(70% 55% at 100% 18%, rgba(245, 71, 139, 0.1), transparent 60%),
-    radial-gradient(85% 65% at 100% 100%, rgba(24, 195, 154, 0.08), transparent 55%),
-    linear-gradient(180deg, #f6f3fd, #ebe4fb);
-  --tile-face: #fdfbff;
-  --shadow: 0 10px 30px rgba(124, 77, 224, 0.14);
-  --shadow-sm: 0 4px 16px rgba(124, 77, 224, 0.1);
+  --bg-photo: url("/patterns/bg-joker.svg");
+}
+[data-theme="midnight"] {
+  --brand: #4f46e5;
+  --brand-deep: #14105c;
+  --page: #edeff6;
+  --ink: #1b1e3a;
+  --title-color: #ece7d6;
+  --title-shadow: 3px 3px 0 #14105c;
+  --bg-photo: url("/patterns/bg-midnight.svg");
+}
+[data-theme="felt"] {
+  --brand: #c0392b;
+  --brand-deep: #0c3325;
+  --page: #e8f1ea;
+  --ink: #0e3d28;
+  --title-color: #f4e6c0;
+  --title-shadow: 3px 3px 0 #0c3325;
+  --bg-photo: url("/patterns/bg-felt.svg");
 }
 
-[data-theme="midnight"] {
-  --brand: #2dd4bf;
-  --brand-deep: #16b6a3;
-  --green: #34d399;
-  --accent: #ff6b81;
-  --ink: #eaedf7;
-  --ink-soft: #c2c9e0;
-  --muted: #8a93b2;
-  --page: #141826;
-  --card: #1e2336;
-  --tint: #262c44;
-  --tint-deep: #333a57;
-  --hairline: #2c3350;
-  --nav-bg: rgba(20, 24, 38, 0.92);
-  --on-brand: #10202a;
-  --n0: #c9d2f0;
-  --n1: #34d399;
-  --n2: #ff6b81;
-  --n3: #5aa2ff;
-  --bg-photo: url("/patterns/bg-midnight.svg");
-  --title-color: #ECE7D6;
-  --title-shadow: 3px 3px 0 #14105C;
-  --bg-art: radial-gradient(120% 80% at 50% -12%, rgba(90, 162, 255, 0.12), transparent 55%),
-    radial-gradient(80% 60% at 0% 0%, rgba(45, 212, 191, 0.1), transparent 60%),
-    radial-gradient(85% 70% at 100% 100%, rgba(124, 77, 224, 0.14), transparent 55%),
-    linear-gradient(180deg, #171c2e, #10131f);
-  --tile-face: #232a3e;
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
+
 
 /* ===========================================================================
    BASE
