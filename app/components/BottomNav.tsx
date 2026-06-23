@@ -53,10 +53,12 @@ const ICONS: Record<Tab, JSX.Element> = {
   ),
 };
 
+// Feed-first (Goodreads model): the social Feed is home, your Card (progress)
+// is the immediate second tab.
 const TABS: { id: Tab; label: string }[] = [
+  { id: 'group', label: 'Feed' },
   { id: 'card', label: 'Card' },
   { id: 'wins', label: 'Mahjs' },
-  { id: 'group', label: 'Feed' },
   { id: 'tables', label: 'Tables' },
   { id: 'learn', label: 'Rules' },
 ];

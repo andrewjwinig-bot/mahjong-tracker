@@ -37,7 +37,7 @@ import {
 import { recordPlay } from '../lib/streak';
 
 export default function AppShell() {
-  const [tab, setTab] = useState<Tab>('card');
+  const [tab, setTab] = useState<Tab>('group');
   const [loaded, setLoaded] = useState(false);
   const [handCounts, setHandCounts] = useState<Record<string, number>>({});
   const [handNotes, setHandNotes] = useState<Record<string, string>>({});
