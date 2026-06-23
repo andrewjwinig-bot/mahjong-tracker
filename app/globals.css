@@ -1048,10 +1048,31 @@ label.lbl {
 /* ======================================================================
    FEED — match the Card page's design language (design frame 3)
    ====================================================================== */
+/* Primary "Score a Game" CTA (Feed home + Tables detail). */
+.score-cta {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 9px;
+  background: var(--brand);
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--brand) 40%, transparent);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  transition: transform 0.12s ease;
+}
+.score-cta:active {
+  transform: translateY(2px);
+}
 .feed-actions {
   display: flex;
   gap: 10px;
-  margin: 14px 0 22px;
+  margin: 12px 0 22px;
 }
 .feed-btn {
   flex: 1;

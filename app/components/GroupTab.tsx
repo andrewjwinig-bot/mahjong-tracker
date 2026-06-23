@@ -23,6 +23,7 @@ interface Props {
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+  onScore: () => void;
 }
 
 /** Which hand ids a member has cleared. Real for you; deterministic for demo
@@ -65,6 +66,7 @@ export default function GroupTab({
   onToggleLike,
   onAddComment,
   onAddFriend,
+  onScore,
 }: Props) {
   const [detail, setDetail] = useState<GroupMember | null>(null);
   const [lbMetric, setLbMetric] = useState<'rows' | 'points'>('rows');
@@ -111,6 +113,11 @@ export default function GroupTab({
           {profile.name ? `Hi ${profile.name.split(' ')[0]} — ` : ''}see what your whole crew is calling.
         </p>
       </header>
+
+      <button className="score-cta" onClick={onScore}>
+        <span className="mahj-hero-shine" aria-hidden />
+        ⊕ Score a Game
+      </button>
 
       <div className="feed-actions">
         <button className="feed-btn primary" onClick={() => setAddOpen(true)}>
