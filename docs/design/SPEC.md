@@ -2,7 +2,7 @@
 
 Machine-checkable spec for the **5 existing screens + Log-a-Mahj sheet + confetti**. Every value below is lifted verbatim from `Lets Mahj.dc.html`. Diff your CSS against this.
 
-> Surfaces NOT yet designed (onboarding, game scorer, practice sheet, paywall, settings, distinct win/cleared result modals, empty states, member-detail) are tracked separately and are **out of scope for this doc** until designed.
+> **Settings** and **Edit Profile** screens (and a member-detail sheet) are now designed and live in `Lets Mahj.dc.html` — see README §Screens 6–7 for their layouts. Still NOT designed (out of scope here): onboarding, game scorer, practice sheet, paywall internals, distinct win/cleared result modals, empty states.
 
 Canvas: **402 × 874** (iOS frame). Screen horizontal gutter: **20px**. Body top padding **54px**, bottom padding **92px** (clears the nav). Fonts (Google): **Bricolage Grotesque**, **Hanken Grotesk**, **Space Mono**. CJK glyphs (萬發中東南西北花) render from the system CJK serif (`'Hiragino Mincho ProN','Yu Mincho','Songti SC',serif`).
 
@@ -11,22 +11,21 @@ Canvas: **402 × 874** (iOS frame). Screen horizontal gutter: **20px**. Body top
 ## A) DESIGN TOKENS
 
 ### Per-theme CSS variables
-Set these 6 vars on the app root per active theme. `--art` is the banner `url(...)` from `generators.js → bannerURI(theme)`. There are 9 themes; default is **Crak**.
+Set these 6 vars on the app root per active theme. `--art` is the banner `url(...)` from `generators.js → bannerURI(theme)`. There are **8 themes**; default is **Felt**.
 
 | Theme | `--c1` (accent) | `--screen` (page bg) | `--onbg` (body text on bg) | `--titleColor` (big titles) | `--c1dark` (offset shadow) | banner ground |
 |---|---|---|---|---|---|---|
-| jade | `#1F6B4E` | `#F1EEE0` | `#23201A` | `#06291B` | `#06291B` | `#ECE6D2` |
 | bam | `#15803D` | `#E9F4EC` | `#0A3D24` | `#FFFFFF` | `#053219` | `#1AA45C` |
 | dot | `#1E6FCB` | `#EBF1F4` | `#15386E` | `#0A2A4E` | `#0A2C58` | `#EAEFEA` |
-| **crak** (default) | `#C0392B` | `#F6EEDD` | `#1A1410` | `#4D0F09` | `#4D0F09` | `#F2E8D6` |
+| crak | `#C0392B` | `#F6EEDD` | `#1A1410` | `#4D0F09` | `#4D0F09` | `#F2E8D6` |
 | dragon | `#C8302C` | `#E7F0EA` | `#F3E6C6` | `#F3E6C6` | `#4C0D0B` | `#0E4031` |
 | flower | `#DB2777` | `#FAECF3` | `#7A1E48` | `#5C0A30` | `#5C0A30` | `#F7DCE9` |
 | joker | `#6A3FC0` | `#F0EBFA` | `#F0EBFA` | `#FFFFFF` | `#281451` | `#6A3FC0` |
-| midnight | `#4F46E5` | `#EDEFF6` | `#ECE7D6` | `#ECE7D6` | `#14105C` | `#0A0E1C` |
-| felt | `#C0392B` | `#E8F1EA` | `#0E3D28` | `#F4E6C0` | `#0C3325` | `#1C5A3E` |
+| wind | `#2E7D8C` | `#EAF2F3` | `#143B42` | `#0E353C` | `#0A2E34` | `#E3EEEF` |
+| **felt** (default) | `#C0392B` | `#E8F1EA` | `#0E3D28` | `#FFFFFF` | `#0C3325` | `#1C5A3E` |
 
 - `--titleSh` (title text-shadow) is `none` in the current build for every theme. The two-tone *poster* offset uses `--c1dark` only where explicitly applied (logo, Log-sheet title).
-- Banner seeds (stable scatter): jade 3, bam 11, dot 7, crak 5, dragon 13, flower 8, joker 21, midnight 17, felt 23.
+- Banner seeds (stable scatter): bam 11, dot 7, crak 5, dragon 13, flower 8, joker 21, wind 17, felt 23.
 
 ### Fixed palette (theme-independent — hand notation, badges, illustrations)
 | Token | Hex | Use |
@@ -115,7 +114,7 @@ Same box; bg `#FFFFFF`, label color `#1A1410`.
 Container `display:flex; border:2.5px solid rgba(20,22,42,0.09); radius:7px; overflow:hidden`. Segment `flex:1; text-align:center; padding:9px;` Hanken 800 11px `1px`. Dividers `border-left:2.5px solid rgba(20,22,42,0.09)`. **active segment:** bg `var(--c1)`, color `#FFFFFF`. inactive color `#1A1410`. (Leaderboard variant: 2px border, radius 6, padding 7, 10px label.)
 
 ### Challenge card (Card screen) — Pine fill
-bg `#10B39A`; border `2.5px solid rgba(20,22,42,0.09)`; radius 8; shadow Card; padding 16; `position:relative; overflow:hidden`. Corner **sunburst SVG** (see §C) top `-26px` right `-22px`, 138×138, opacity .18, white. Eyebrow "★ SUMMER CHALLENGE" Hanken 800 10px `2px` **Gold `#F5A524`**. Title Bricolage 23px `#F4F6FA`. Desc 12.5px `rgba(242,232,214,.82)`. Progress: track `height:12px; border:2px rgba(20,22,42,0.09); radius:5; bg:rgba(0,0,0,.18)`; fill `repeating-linear-gradient(90deg,#F5A524 0 8px,rgba(0,0,0,.30) 8px 10px)` width 14%, animation `mahjGrow 1.1s cubic-bezier(.3,.85,.3,1) .35s both`; count `1/42` Space Mono 11px `#F4F6FA`.
+bg `#10B39A`; border `2.5px solid rgba(20,22,42,0.09)`; radius 8; shadow Card; padding 16; `position:relative; overflow:hidden`. Corner **sunburst SVG** (see §C) top `-26px` right `-22px`, 138×138, opacity .18, white. Eyebrow "★ SUMMER CHALLENGE" Hanken 800 10px `2px` **Gold `#F5A524`**. Title Bricolage 23px `#F4F6FA`. Desc 12.5px `rgba(242,232,214,.82)`. Progress: track `height:11px; border:2px rgba(20,22,42,0.09); radius:6; bg:rgba(0,0,0,.18)`; fill **solid** `#F5A524`, `border-radius:6`, width 14%, animation `mahjGrow 1.1s cubic-bezier(.3,.85,.3,1) .35s both`; count `1/42` Space Mono 11px `#F4F6FA`.
 
 ### Tip card (Card screen)
 flex row, gap 11, centered; bg `#FFFFFF`; border `2.5px solid rgba(20,22,42,0.09)`; radius 8; padding `11px 13px`. Star tile 34×42, white, border `2px`, shadow small, font 18px Gold `#F5A524`. Eyebrow "TIP OF THE DAY" Hanken 800 9px `1.5px` `var(--c1)`. Body 12.5px `#2A2A30`.
@@ -132,7 +131,7 @@ flex row gap 11, centered; bg `#FFFFFF`; radius 7; padding 12; margin-bottom 9; 
 - **Points chip** dot 16×16 `border-radius:50%` (Gold `#F5A524` if earned, else `#F4F6FA`) + Space Mono 12px count.
 
 ### Leaderboard row + hatched progress bar (Feed)
-flex row gap 9, centered, margin-bottom 11. Avatar 24×30 tile (glyph in player color). Right col `flex:1`: name (Hanken 700 13px) + `x/70` (Space Mono 11px, `/70` in `#8C8C96`); below, bar `height:12px; border:2px rgba(20,22,42,0.09); radius:5; overflow:hidden; bg:#F4F6FA` with fill `repeating-linear-gradient(90deg,<color> 0 7px,rgba(0,0,0,.26) 7px 9px)` at the player's %; animation `mahjGrow 1.1s cubic-bezier(.3,.85,.3,1)` staggered `.4/.5/.6/.7s both`.
+flex row gap 9, centered, margin-bottom 11. Avatar 24×30 tile (glyph in player color). Right col `flex:1`: name (Hanken 700 13px) + `x/70` (Space Mono 11px, `/70` in `#8C8C96`); below, bar `height:12px; border:2px rgba(20,22,42,0.09); radius:5; overflow:hidden; bg:#F4F6FA` with fill **solid** `<player color>` (`border-radius:5`) at the player's %; animation `mahjGrow 1.1s cubic-bezier(.3,.85,.3,1)` staggered `.4/.5/.6/.7s both`. (All progress bars in the app are slim solid fills — no hatching/segments.)
 - **"you" row:** wrapped in tinted panel bg `#F4F6FA`, border `2px rgba(20,22,42,0.09)`, radius 6, padding 8, margin `0 -3px`; avatar bg white; name suffix "· YOU" Space Mono 9px Violet `#6A3FC0`.
 
 ### Feed post card
@@ -195,7 +194,7 @@ Non-SVG glyph marks used as icons: `★` (challenge/tip eyebrows), `♛` (leader
 ### CSS @keyframes
 | Name | Frames | Default timing | Applied to |
 |---|---|---|---|
-| `mahjGrow` | `from { width:0 }` | `1.1s cubic-bezier(.3,.85,.3,1)`, delay `.35–.7s`, `both` | challenge progress fill; all leaderboard bars (staggered) |
+| `mahjGrow` | `from { width:0 }` | `1.1s cubic-bezier(.3,.85,.3,1)`, delay `.35–.7s`, `both` | challenge progress fill; all leaderboard bars (staggered) — all now **solid** fills |
 | `mahjShine` | `0%{translateX(-130%)} 55%,100%{translateX(360%)}` | `3.4s ease-in-out infinite` | shine sweep on I GOT MAHJ + SAVE MY MAHJ |
 | `mahjFade` | `from { opacity:0 }` | `.22s ease both` | sheet backdrop |
 | `mahjSheet` | `from { transform:translateY(100%) }` | `.36s cubic-bezier(.2,.85,.3,1) both` | sheet panel slide-up |
@@ -214,4 +213,4 @@ Non-SVG glyph marks used as icons: `★` (challenge/tip eyebrows), `♛` (leader
 ---
 
 ## State (current build)
-`theme` (string, default `crak`) · `mahjOpen` (bool) · `mahjCat` (string, default `free`) · `mahjLine` (int|null, toggleable) · per-hand-row cleared (local) · share toggle (default on). Category line data: see `CATS` table in source (9 categories, 0–3 lines each).
+`theme` (string, default `felt`) · `mahjOpen` (bool) · `mahjCat` (string, default `free`) · `mahjLine` (int|null, toggleable) · per-hand-row cleared (local) · share toggle (default on) · **Edit-Profile**: `profFace` (int, 0–13), `profColor` (hex), `profLevel` (int 0–2), `profSound` (bool). Category line data: see `CATS` table in source (9 categories, 0–3 lines each). Tile-face set (Edit Profile “YOUR TILE”), in order: monogram `D`, dot1, dot3, circle, bam2, bam3, bird, flower, blossom, star, joker, dragon, `中`, `發` — built by `faceSVG(type)`; tile-color swatches `#10B39A #C0392B #2E86D4 #6A3FC0 #F5A524 #1F8A5B #14162A`.

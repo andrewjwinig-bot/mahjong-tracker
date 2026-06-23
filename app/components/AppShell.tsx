@@ -43,7 +43,7 @@ export default function AppShell() {
   const [wins, setWins] = useState<Win[]>([]);
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [theme, setThemeState] = useState<ThemeId>('jade');
+  const [theme, setThemeState] = useState<ThemeId>('felt');
   const [account, setAccount] = useState<Account | null>(null);
   const [experience, setExperienceState] = useState<Experience>('beginner');
   const [accountChecked, setAccountChecked] = useState(false);

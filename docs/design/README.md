@@ -1,7 +1,7 @@
 # Handoff: Let's Mahj — Themeable mobile app
 
 ## Overview
-"Let's Mahj" is a mobile app for American Mahjong players to track wins, work through the 70 hands on the annual card, follow friends, coordinate game tables, and learn the rules. This package documents a **high-fidelity design** of five core screens plus a celebratory "Log a Mahj" flow, built as a live, fully themeable system (8+ color themes that re-skin the entire app instantly).
+"Let's Mahj" is a mobile app for American Mahjong players to track wins, work through the 70 hands on the annual card, follow friends, coordinate game tables, and learn the rules. This package documents a **high-fidelity design** of five core screens, a celebratory "Log a Mahj" flow, plus a **Settings** screen and an **Edit Profile** screen, built as a live, fully themeable system (**8 color themes**, default **Felt**, that re-skin the entire app instantly).
 
 The design's signature ideas:
 - A **two-tone poster headline** treatment (heavy display title in the theme accent, dropped behind a hard offset in a darker tone of the same hue) used selectively on the logo and each screen's big title.
@@ -32,7 +32,7 @@ Layout (top→bottom):
 - **Logo** ("LET'S" kicker + "Mahj…" display, two-tone) + settings tile, in a row.
 - **3 stat tiles** (CLEARED `1/70`, MAHJS `1`, POINTS `25`): equal flex, 120px tall, white→cream gradient, radius 9, 2px border, layered shadow + inset. Big Bricolage numbers (42px, -2px tracking). On mount these "deal in" (stagger fade + translateY + slight rotate) and numbers count up.
 - **Action row**: `SCORE GAME` (primary, accent fill) + `PRACTICE` (white). Both radius 7, 2.5px border, bold 13px label, 1px letter-spacing.
-- **Challenge card** (`#10B39A` pine fill): "★ SUMMER CHALLENGE" eyebrow (gold), "Summer Kongs" title, description, and a **tile-rack progress bar** + `1/42` count.
+- **Challenge card** (`#10B39A` pine fill): "★ SUMMER CHALLENGE" eyebrow (gold), "Summer Kongs" title, description, and a **slim solid progress bar** (rounded, animated grow) + `1/42` count.
 - **Tip of the day** card (white, star tile + text).
 - **Filter segmented control**: ALL / TO GO / GOT IT (active segment = accent fill, white text).
 - **The 70 Hands collection board** (signature feature): header "★ THE 70 HANDS — YOUR COLLECTION" + `1 / 70`. A **7-column grid of 70 tile cells** (`aspect-ratio:24/31`, radius 5, 2px border, cream gradient). Cleared cells flip face-up: white bg, colored hand label (e.g. "369"), and a green check badge top-right. Locked cells show a faint jade ring motif.
@@ -59,7 +59,7 @@ A celebratory **bottom sheet** (slides up, dim backdrop, radius-24 top corners).
 Purpose: social feed + friends leaderboard.
 - Title "The Feed" (two-tone) + underline + subtitle.
 - **Action row**: `+ ADD FRIEND` (accent) / `⤴ INVITE` (`#10B39A`).
-- **Friends leaderboard** card: "♛ FRIENDS LEADERBOARD" + player count; a ROWS CLEARED / TOTAL POINTS segmented toggle; **player rows** each with a tile avatar (CJK glyph in a theme color), name, `x/70`, and a **tile-rack progress bar** (animated grow). The "you" row is highlighted on a tinted panel.
+- **Friends leaderboard** card: "♛ FRIENDS LEADERBOARD" + player count; a ROWS CLEARED / TOTAL POINTS segmented toggle; **player rows** each with a tile avatar (CJK glyph in a theme color), name, `x/70`, and a **slim solid progress bar** (rounded, animated grow). The "you" row is highlighted on a tinted panel.
 - "⚇ THE FEED" header + **post cards**: avatar tile + name + time + a "MAHJ" badge; the hand in colored notation on a divider; optional caption; like/comment row.
 - A faint oversized **hand-notation watermark** (`369 2025 FFFF`, ~46px, .12 opacity) fills the empty lower area as decorative brand texture.
 
@@ -77,6 +77,22 @@ Purpose: learn/reference.
 - A practice CTA button (accent): "◎ PRACTICE: WHAT CAN I MAKE?".
 - **Accordion**: an open "Understanding the tiles" section (accent header bar, 萬 tile) listing tile types (Bams, Cracks, Dots, Winds, Dragons, Flowers & Seasons, Jokers) — each a row with a small tile illustration + name + description. Then collapsed rows: "How to play — the 60-second version", "The Charleston — step-by-step", "Playing with 3 players" (each with a tile glyph + ▸).
 
+### 6. Settings — profile, theme & preferences
+Purpose: account hub. Layout (top→bottom): back tile + "Settings" title; a **profile card** (tile avatar + name/handle/email + an INTERMEDIATE level pill + chevron — tapping it opens **Edit Profile**); a **“Let's Mahj Pro” upsell** (ink card, gold stripe overlay, gold tile, GO PRO button); an **APP THEME** 2-col grid of theme chips (banner thumbnail + accent dot + name, selected one ringed in the accent with a check); **PREFERENCES** list (iOS toggles: share mahjs / push / leaderboards / sound & haptics); **GAME** list (Card year, Default table, Experience level — rows with value + chevron); **ACCOUNT** list (change password / help / privacy); a **SIGN OUT** button (cinnabar outline) + `v1.0` footer.
+
+### 7. Edit Profile — customize your tile & identity (opens from the Settings profile card)
+Purpose: personalize avatar, name and play level. Layout:
+- Back tile + **“Edit profile”** title + subtitle.
+- **Avatar**: a large mahjong tile (96×120, radius 11, cream gradient) showing the selected tile face in the selected tile color, with a round cinnabar **camera badge** bottom-right.
+- **YOUR TILE** picker: a 5-col grid of **14 tile faces** the user picks from — a letter **monogram (D)**, a single **dot**, a **three-dot**, a **concentric “target”**, **two-stalk** and **three-stalk bamboo**, a **bird** (1-bamboo sparrow), a **flower**, a **plum blossom**, a **star**, a **joker** (ringed-bird emblem), a **dragon** (coiled, horned), and the characters **中** and **發**. Each is a single-color SVG/glyph on a cream tile; the selected one gets an accent border + a small ✓ badge. Faces are built by `faceSVG(type)` / `faceNode(face,px,color)` in the source (all use `currentColor` so they recolor).
+- **TILE COLOR**: a row of 7 swatch circles — `#10B39A #C0392B #2E86D4 #6A3FC0 #F5A524 #1F8A5B #14162A` — selected swatch gets a same-color ring. Changing it recolors the avatar (and the monogram).
+- **NAME** input (defaultValue “drew”), **HANDLE** input (`@` prefix, Space Mono), **BIO** textarea (“Mahjong addict. Chasing all 70.”). All white, 2px border, radius 11, focus border = accent.
+- **GAMEPLAY** section divider; **EXPERIENCE LEVEL** segmented control (Beginner / Intermediate / Expert, selected = accent fill) + caption “Tailors your rules & tips.”; a **MY CARD — BRING YOUR OWN** outline button (document glyph).
+- **APPEARANCE** divider; a **Sound & haptics** toggle row (speaker glyph + iOS toggle); a **COLOR THEME** 2-col theme-chip grid (same as Settings); a **SAVE CHANGES** primary button.
+
+### Member detail (sheet from a leaderboard/feed row)
+A bottom-sheet profile: cinnabar header band (stripe overlay, big avatar tile, name, `@handle · FRIEND SINCE`, a `#1 RANK` gold chip), three stat tiles (CLEARED `31/70`, MAHJS, POINTS), a **COLLECTION PROGRESS** solid bar, a “you both play …” mutual-table chip, a RECENT MAHJS list, and REMOVE FRIEND / VIEW ALL MAHJS footer buttons. The feed behind is dimmed.
+
 ## Interactions & Behavior
 - **Theme switching**: tapping a theme chip (top of the design page) sets CSS vars (`--c1`, `--screen`, `--onbg`, `--c1dark`, `--titleColor`) and swaps the generated banner art. In production this is a theme context/provider; the chip row itself is a design-harness control, not an app screen.
 - **Stat tiles**: on first mount, stagger-animate in (opacity + translateY(16px) + rotate(-3deg) → settle) and numbers count up over ~950ms with an ease-out cubic.
@@ -92,7 +108,8 @@ Purpose: learn/reference.
 On open and on save, ~46 **mini mahjong-tile** elements spawn across the full width at the top of the screen (`top:-46px`, random x), each a cream tile (16–27px wide, h = w×1.32, radius 4, border, shadow) containing a random face: a CJK glyph (萬/發/中/東/花/北 in a theme color), a **dot** (concentric circles), or **bamboo** (two rounded bars). They animate down past the bottom with horizontal sway, rotation (±~760°), staggered start (≤~430ms), 1.5–2.5s duration, fading out at the end; elements remove themselves on finish. Implement with whatever particle/animation approach suits the platform (e.g. Reanimated, a confetti lib themed with custom tile shapes, or a Lottie).
 
 ## State Management
-- `theme` (string) — active theme key; drives all color tokens + banner art.
+- `theme` (string) — active theme key; drives all color tokens + banner art. **Default `felt`.**
+- **Edit Profile state**: `profFace` (int, index into the 14 tile faces), `profColor` (hex tile color), `profLevel` (int 0–2 — Beginner/Intermediate/Expert), `profSound` (bool). These drive the live avatar + selection states; in production back them with the user's profile record.
 - `mahjOpen` (bool) — Log-a-Mahj sheet visibility.
 - `mahjCat` (string) — selected hand category key (default `free`).
 - `mahjLine` (int | null) — selected line index within the category (toggleable).
@@ -105,15 +122,14 @@ On open and on save, ~46 **mini mahjong-tile** elements spawn across the full wi
 ### Themes (each defines accent `c1`, screen bg, on-bg text, banner ground, dark offset, title color)
 | Theme | c1 (accent) | screen | onbg | banner ground | c1dark (offset) | title |
 |---|---|---|---|---|---|---|
-| Jade | `#1F6B4E` | `#F1EEE0` | `#23201A` | `#ECE6D2` | `#06291B` | `#06291B` |
 | Bam | `#15803D` | `#E9F4EC` | `#0A3D24` | `#1AA45C` | `#053219` | `#FFFFFF` |
 | Dot | `#1E6FCB` | `#EBF1F4` | `#15386E` | `#EAEFEA` | `#0A2C58` | `#0A2A4E` |
-| Crak (default) | `#C0392B` | `#F6EEDD` | `#1A1410` | `#F2E8D6` | `#4D0F09` | `#4D0F09` |
+| Crak | `#C0392B` | `#F6EEDD` | `#1A1410` | `#F2E8D6` | `#4D0F09` | `#4D0F09` |
 | Dragon | `#C8302C` | `#E7F0EA` | `#F3E6C6` | `#0E4031` | `#4C0D0B` | `#F3E6C6` |
 | Flower | `#DB2777` | `#FAECF3` | `#7A1E48` | `#F7DCE9` | `#5C0A30` | `#5C0A30` |
 | Joker | `#6A3FC0` | `#F0EBFA` | `#F0EBFA` | `#6A3FC0` | `#281451` | `#FFFFFF` |
-| Midnight | `#4F46E5` | `#EDEFF6` | `#ECE7D6` | `#0A0E1C` | `#14105C` | `#ECE7D6` |
-| Felt | `#C0392B` | `#E8F1EA` | `#0E3D28` | `#1C5A3E` | `#0C3325` | `#F4E6C0` |
+| Wind | `#2E7D8C` | `#EAF2F3` | `#143B42` | `#E3EEEF` | `#0A2E34` | `#0E353C` |
+| Felt (default) | `#C0392B` | `#E8F1EA` | `#0E3D28` | `#1C5A3E` | `#0C3325` | `#FFFFFF` |
 
 `--titleColor` is the high-contrast color used for the big screen titles (chosen to pop off that theme's banner art). `--c1dark` is the hard-offset shadow color for the two-tone headline (and the Log sheet title shadow).
 
@@ -143,13 +159,13 @@ On open and on save, ~46 **mini mahjong-tile** elements spawn across the full wi
 Active state recolors to the theme accent + raises the tile + shows the underline pill.
 
 ### Theme art (banner behind each header)
-Each theme generates an SVG banner (motif of jade pendant / bamboo / dot rings / crak character / dragon burst / flowers / jokers / starfield / felt table with tiles), rendered with a hand-drawn "rough" displacement filter + paper texture, on the theme's banner-ground color, masked to fade out toward the bottom. This is a flourish — reproduce with static themed illustrations/images per theme if generating SVG at runtime isn't worth it.
+Each theme generates an SVG banner (motif of bamboo / dot rings / crak character / dragon burst / flowers / jokers / wind gusts + 風 medallion / felt table with tiles), rendered with a hand-drawn "rough" displacement filter + paper texture, on the theme's banner-ground color, masked to fade out toward the bottom. This is a flourish — reproduce with static themed illustrations/images per theme if generating SVG at runtime isn't worth it.
 
 ## Assets
 No external image assets — everything is CSS/SVG. Photo areas (table photos, post images) are placeholders the user fills. Fonts are Google Fonts: **Bricolage Grotesque, Hanken Grotesk, Space Mono**. CJK tile glyphs (萬 發 中 東 南 西 北 花) render from the system CJK font.
 
 ## Files
-- `Lets Mahj.dc.html` — the full hi-fi design (all 5 screens + Log-a-Mahj sheet + theming + animations). **Primary reference.**
+- `Lets Mahj.dc.html` — the full hi-fi design (5 core screens + Log-a-Mahj sheet + **Settings** + **Edit Profile** + member-detail sheet + theming + animations). **Primary reference, and the source of truth for all icons / banner generators.**
 - `Lets Mahj (backup before custom).dc.html` — earlier version before the collection board / confetti / felt theme / tile-rack progress were added (kept for reference only).
 - `support.js` — the in-house runtime that renders `.dc.html`. **Do not port**; it's only here so the HTML opens in a browser.
 - `ios-frame.jsx` — the device-bezel wrapper used to present each screen as a phone. Not part of the app.

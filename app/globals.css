@@ -26,24 +26,34 @@
   --n1: #c0392b;
   --n2: #c9871a;
   --n3: #2e86d4;
-  /* Crak — default */
+  /* Felt — default */
+  --brand: #c0392b;
+  --brand-deep: #0c3325;
+  --page: #e8f1ea;
+  --ink: #0e3d28;
+  --title-color: #ffffff;
+  --title-shadow: none;
+  --bg-photo: url("/patterns/bg-felt.svg");
+}
+
+[data-theme="crak"] {
   --brand: #c0392b;
   --brand-deep: #4d0f09;
   --page: #f6eedd;
   --ink: #1a1410;
-  --title-color: #1a1410;
+  --title-color: #4d0f09;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-crak.svg");
 }
 
-[data-theme="jade"] {
-  --brand: #1f6b4e;
-  --brand-deep: #06291b;
-  --page: #f1eee0;
-  --ink: #23201a;
-  --title-color: #06291b;
+[data-theme="wind"] {
+  --brand: #2e7d8c;
+  --brand-deep: #0a2e34;
+  --page: #eaf2f3;
+  --ink: #143b42;
+  --title-color: #0e353c;
   --title-shadow: none;
-  --bg-photo: url("/patterns/bg-jade.svg");
+  --bg-photo: url("/patterns/bg-wind.svg");
 }
 [data-theme="bam"] {
   --brand: #15803d;
@@ -90,21 +100,12 @@
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-joker.svg");
 }
-[data-theme="midnight"] {
-  --brand: #4f46e5;
-  --brand-deep: #14105c;
-  --page: #edeff6;
-  --ink: #1b1e3a;
-  --title-color: #ece7d6;
-  --title-shadow: none;
-  --bg-photo: url("/patterns/bg-midnight.svg");
-}
 [data-theme="felt"] {
   --brand: #c0392b;
   --brand-deep: #0c3325;
   --page: #e8f1ea;
   --ink: #0e3d28;
-  --title-color: #f4e6c0;
+  --title-color: #ffffff;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
@@ -667,12 +668,9 @@ a:focus-visible,
 .progress > span {
   display: block;
   height: 100%;
-  /* Hand-screened hatch — the design's woven-tile progress fill. */
-  background: repeating-linear-gradient(
-    90deg,
-    var(--brand) 0 7px,
-    rgba(0, 0, 0, 0.26) 7px 9px
-  );
+  border-radius: 5px;
+  /* Slim solid fill (design build) — no hatch/segments. */
+  background: var(--brand);
   transition: width 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
   animation: mahjGrow 1.1s cubic-bezier(0.3, 0.85, 0.3, 1) both;
 }
@@ -1394,19 +1392,20 @@ label.lbl {
   align-items: center;
   gap: 9px;
 }
-/* tile-rack progress bar — gold segments on a dark track */
+/* Challenge progress — slim solid gold fill on a dark track (design build). */
 .rack-bar {
   flex: 1;
-  height: 12px;
+  height: 11px;
   border: 2px solid rgba(20, 22, 42, 0.09);
-  border-radius: 5px;
+  border-radius: 6px;
   background: rgba(0, 0, 0, 0.18);
   overflow: hidden;
 }
 .rack-bar > span {
   display: block;
   height: 100%;
-  background: repeating-linear-gradient(90deg, #f5a524 0 8px, rgba(0, 0, 0, 0.3) 8px 10px);
+  border-radius: 6px;
+  background: #f5a524;
   transition: width 0.9s cubic-bezier(0.3, 0.85, 0.3, 1);
 }
 .ch-count {
