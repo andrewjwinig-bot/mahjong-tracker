@@ -112,20 +112,12 @@ export default function GroupTab({
         </p>
       </header>
 
-      <div className="row" style={{ marginTop: 14 }}>
-        <button
-          className="btn"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={() => setAddOpen(true)}
-        >
-          <IconPlus size={17} /> Add Friend
+      <div className="feed-actions">
+        <button className="feed-btn primary" onClick={() => setAddOpen(true)}>
+          <IconPlus size={16} /> ADD FRIEND
         </button>
-        <button
-          className="btn green"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={() => setInviteOpen(true)}
-        >
-          <IconShare size={17} /> Invite
+        <button className="feed-btn pine" onClick={() => setInviteOpen(true)}>
+          <IconShare size={16} /> INVITE
         </button>
       </div>
 
@@ -151,26 +143,23 @@ export default function GroupTab({
       )}
 
       {/* Leaderboard */}
-      <div className="cat-head" style={{ marginTop: 22 }}>
-        <span
-          className="pill"
-          style={{ background: '#FFF1D9', color: '#E59A2B', display: 'inline-flex', alignItems: 'center', gap: 5 }}
-        >
-          <IconMedal size={15} /> Friends Leaderboard
-        </span>
-        <span className="count">{ranked.length} players</span>
-      </div>
+      <div className="lb-card">
+        <div className="lb-head">
+          <span className="lb-title">
+            <IconMedal size={14} /> FRIENDS LEADERBOARD
+          </span>
+          <span className="lb-count">{ranked.length} PLAYERS</span>
+        </div>
 
-      <div className="segmented" style={{ marginBottom: 12 }}>
-        <button data-active={lbMetric === 'rows'} onClick={() => setLbMetric('rows')}>
-          Rows cleared
-        </button>
-        <button data-active={lbMetric === 'points'} onClick={() => setLbMetric('points')}>
-          Total points
-        </button>
-      </div>
+        <div className="segmented lb-seg">
+          <button data-active={lbMetric === 'rows'} onClick={() => setLbMetric('rows')}>
+            Rows cleared
+          </button>
+          <button data-active={lbMetric === 'points'} onClick={() => setLbMetric('points')}>
+            Total points
+          </button>
+        </div>
 
-      <div className="card" style={{ padding: 8 }}>
         {ranked.map((m, i) => {
           const pct =
             lbMetric === 'points'
@@ -234,14 +223,8 @@ export default function GroupTab({
       )}
 
       {/* Feed */}
-      <div className="cat-head">
-        <span
-          className="pill"
-          style={{ background: '#D5F1E9', color: '#23B196', display: 'inline-flex', alignItems: 'center', gap: 5 }}
-        >
-          <IconFeed size={15} /> The Feed
-        </span>
-        <span className="count">{feed.length} mahjs</span>
+      <div className="feed-label">
+        <IconFeed size={13} /> THE FEED
       </div>
 
       {feed.length === 0 ? (
@@ -303,43 +286,47 @@ function FeedCard({
   }
 
   return (
-    <div className="win">
-      {url && <img className="photo" src={url} alt="Mahj photo" />}
-      <div className="body">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar avatar={post.avatar} size={38} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 15 }}>{post.memberName}</div>
-            <div className="when">{timeAgo(post.createdAt)}</div>
-          </div>
-          <span className="mahj-tag">🀄 MAHJ</span>
+    <div className="post">
+      {url && <img className="photo" src={url} alt="Mahj photo" style={{ marginBottom: 11 }} />}
+      <div className="post-head">
+        <Avatar avatar={post.avatar} size={36} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="post-name">{post.memberName}</div>
+          <div className="post-time">{timeAgo(post.createdAt).toUpperCase()}</div>
         </div>
+        <span className="post-badge">MAHJ</span>
+      </div>
 
-        {post.handLabel && (
-          <p className="note" style={{ fontWeight: 800, marginTop: 10, letterSpacing: '0.02em' }}>
-            {post.handLabel}
-          </p>
-        )}
-        {post.note && <p className="note">{post.note}</p>}
-
-        {/* Like + comment bar */}
-        <div className="social-bar">
-          <button
-            className="social-btn"
-            data-on={post.likedByMe}
-            onClick={() => onToggleLike(post.id, !post.likedByMe)}
-          >
-            <span className="ic"><IconHeart size={18} fill={post.likedByMe} /></span>
-            {post.likes > 0 ? post.likes : ''} {post.likes === 1 ? 'Like' : 'Likes'}
-          </button>
-          <button className="social-btn" onClick={() => setShowComments((v) => !v)}>
-            <span className="ic"><IconComment size={18} /></span>
-            {post.comments.length > 0 ? post.comments.length : ''}{' '}
-            {post.comments.length === 1 ? 'Comment' : 'Comments'}
-          </button>
+      {post.handLabel && (
+        <div className="post-note">
+          {colorNotation(post.handLabel).map((g, i, arr) => (
+            <span key={i} className={g.cls}>
+              {g.text}
+              {i < arr.length - 1 ? ' ' : ''}
+            </span>
+          ))}
         </div>
+      )}
+      {post.note && <p className="post-cap">{post.note}</p>}
 
-        {showComments && (
+      {/* Like + comment bar */}
+      <div className="post-actions">
+        <button
+          className="post-act"
+          data-on={post.likedByMe}
+          onClick={() => onToggleLike(post.id, !post.likedByMe)}
+        >
+          <IconHeart size={16} fill={post.likedByMe} />
+          {post.likes > 0 ? ` ${post.likes}` : ''} {post.likes === 1 ? 'Like' : 'Likes'}
+        </button>
+        <button className="post-act" onClick={() => setShowComments((v) => !v)}>
+          <IconComment size={16} />
+          {post.comments.length > 0 ? ` ${post.comments.length}` : ''}{' '}
+          {post.comments.length === 1 ? 'Comment' : 'Comments'}
+        </button>
+      </div>
+
+      {showComments && (
           <div className="comments">
             {post.comments.map((c: Comment) => (
               <div className="comment" key={c.id}>
@@ -369,7 +356,6 @@ function FeedCard({
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }
