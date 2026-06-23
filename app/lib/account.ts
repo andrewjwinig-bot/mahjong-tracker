@@ -34,6 +34,17 @@ export function saveAccount(a: Account): void {
   }
 }
 
+// Sign out: drop the local session (the account gate). A real backend (v2)
+// also clears auth tokens here. The player's game data lives in IndexedDB and
+// is intentionally preserved so it re-associates when they sign back in.
+export function clearAccount(): void {
+  try {
+    localStorage.removeItem(K_ACCOUNT);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function getExperience(): Experience {
   try {
     const e = localStorage.getItem(K_EXP) as Experience | null;

@@ -20,12 +20,14 @@ interface Props {
   profile: Profile;
   theme: ThemeId;
   experience: Experience;
+  email?: string;
   groupName?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
   onTrophies: () => void;
   onEditCard: () => void;
+  onSignOut?: () => void;
   onClose: () => void;
 }
 
@@ -66,12 +68,14 @@ export default function SettingsSheet({
   profile,
   theme,
   experience,
+  email,
   groupName = 'Tuesday Game',
   onSaveProfile,
   onTheme,
   onExperience,
   onTrophies,
   onEditCard,
+  onSignOut,
   onClose,
 }: Props) {
   useEscape(onClose);
@@ -167,7 +171,10 @@ export default function SettingsSheet({
         <Tile face={avatar.face} char={previewChar} color={avatar.color} size={48} />
         <span className="pc-body">
           <span className="pc-name">{name || 'You'}</span>
-          <span className="pc-meta">@{handle || 'you'}</span>
+          <span className="pc-meta">
+            @{handle || 'you'}
+            {email ? ` · ${email}` : ''}
+          </span>
           <span className="pc-level">★ {EXPERIENCE_LABEL[experience].toUpperCase()}</span>
         </span>
         <span className="pc-chev">›</span>
@@ -205,17 +212,28 @@ export default function SettingsSheet({
       <div className="set-list">
         <ValueRow label="Card year" value="2025" />
         <ValueRow label="Default table" value={groupName} />
-        <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} last />
+        <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
+        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
+        <ValueRow label="Trophies & stats" onClick={onTrophies} last />
       </div>
 
       <div className="set-label">ACCOUNT</div>
       <div className="set-list">
-        <ValueRow label="Trophies & stats" onClick={onTrophies} />
-        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
+        <ValueRow label="Change password" value="Soon" />
+        <ValueRow label="Help & rules" onClick={() => setAboutOpen(true)} />
         <ValueRow label="Privacy & terms" onClick={() => setAboutOpen(true)} last />
       </div>
 
-      <button className="signout" onClick={onClose}>DONE</button>
+      {onSignOut && (
+        <button
+          className="signout"
+          onClick={() => {
+            if (confirm('Sign out of Let’s Mahj? Your saved games stay on this device.')) onSignOut();
+          }}
+        >
+          SIGN OUT
+        </button>
+      )}
       <div className="set-version">Let’s Mahj · v1.0</div>
     </>
   );
@@ -349,10 +367,10 @@ function PrefRow({ label, on, onToggle, last }: { label: string; on: boolean; on
 
 function ValueRow({ label, value, onClick, last }: { label: string; value?: string; onClick?: () => void; last?: boolean }) {
   return (
-    <button className="set-row" data-last={!!last} onClick={onClick} disabled={!onClick && !value}>
+    <button className="set-row" data-last={!!last} onClick={onClick} disabled={!onClick}>
       <span className="sr-label">{label}</span>
       {value && <span className="sr-value">{value}</span>}
-      <span className="sr-chev">›</span>
+      {onClick && <span className="sr-chev">›</span>}
     </button>
   );
 }
