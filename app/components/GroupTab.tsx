@@ -107,7 +107,9 @@ export default function GroupTab({
     <div className="screen">
       <header className="app-header">
         <h1>The Feed</h1>
-        <p className="sub">See what your whole crew is calling.</p>
+        <p className="sub">
+          {profile.name ? `Hi ${profile.name.split(' ')[0]} — ` : ''}see what your whole crew is calling.
+        </p>
       </header>
 
       <div className="row" style={{ marginTop: 14 }}>
@@ -198,7 +200,7 @@ export default function GroupTab({
                   {m.id === YOU_ID && <span style={{ color: 'var(--muted)', fontWeight: 700 }}> · you</span>}
                 </div>
                 <div className="progress" style={{ marginTop: 6, height: 7 }}>
-                  <span style={{ width: `${pct}%` }} />
+                  <span style={{ width: `${pct}%`, background: m.avatar.color }} />
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
