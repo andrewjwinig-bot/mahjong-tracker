@@ -8,7 +8,6 @@ import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
 import CountUp from './CountUp';
-import CollectionBoard from './CollectionBoard';
 import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
@@ -188,8 +187,6 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
       <div style={{ marginTop: 14 }}>
         <TipCard experience={experience} />
       </div>
-
-      <CollectionBoard card={card} handCounts={handCounts} />
 
       <div className="segmented" style={{ marginTop: 18 }}>
         {(['all', 'remaining', 'won'] as Filter[]).map((f) => (

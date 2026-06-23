@@ -336,6 +336,7 @@ export default function AppShell() {
           profile={socialState.profile}
           theme={theme}
           experience={experience}
+          groupName={socialState.group.name}
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
           onExperience={changeExperience}
