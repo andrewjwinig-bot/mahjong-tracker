@@ -20,7 +20,7 @@
   --nav-bg: rgba(255, 255, 255, 0.92);
   --shadow: 0 10px 26px rgba(20, 22, 42, 0.13);
   --shadow-sm: 0 4px 16px rgba(20, 22, 42, 0.09);
-  --nav-h: 66px;
+  --nav-h: 74px;
   /* fixed hand-notation palette */
   --n0: #1a1410;
   --n1: #c0392b;
@@ -444,48 +444,72 @@ a:focus-visible,
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 11px;
   margin-bottom: 8px;
 }
-/* Each stat is styled like a mahjong tile: ivory body, a themed bottom edge
-   lip, and a soft top sheen. */
+/* Stat tile: white→cream face, 2px border, layered + inset shadow. Big ink
+   number; the label takes that stat's color. */
 .stat {
-  position: relative;
-  background: var(--tile-face);
-  border-radius: 18px;
-  padding: 16px 12px 15px;
-  text-align: center;
-  box-shadow: 0 5px 0 var(--tint-deep), 0 12px 20px rgba(36, 50, 64, 0.12);
-  overflow: hidden;
-}
-.stat::before {
-  content: "";
-  position: absolute;
-  top: -16px;
-  left: 50%;
-  width: 150%;
-  height: 38px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.7), transparent 72%);
-  pointer-events: none;
+  min-height: 108px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2e8 100%);
+  border: 2px solid rgba(20, 22, 42, 0.09);
+  border-radius: 9px;
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.12), 0 12px 22px rgba(20, 22, 42, 0.07),
+    inset 0 -5px 9px rgba(20, 22, 42, 0.045);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .stat .num {
-  position: relative;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: var(--brand);
   font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 38px;
+  letter-spacing: -2px;
+  line-height: 0.8;
+  color: var(--ink);
+}
+.stat .num-suf {
+  font-size: 15px;
+  letter-spacing: -1px;
 }
 .stat .lab {
-  position: relative;
-  margin-top: 6px;
-  font-size: 11px;
+  margin-top: 12px;
+  font-size: 9.5px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 1.6px;
   color: var(--muted);
+}
+
+/* Card action row: SCORE GAME (accent) + PRACTICE (white). */
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.act-btn {
+  flex: 1;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  border-radius: 7px;
+  box-shadow: 0 7px 20px rgba(20, 22, 42, 0.11);
+  padding: 13px;
+  text-align: center;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: #fff;
+  color: var(--ink);
+}
+.act-btn.primary {
+  background: var(--brand);
+  color: #f4f6fa;
+}
+.act-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 10px rgba(20, 22, 42, 0.16);
 }
 
 .progress {
@@ -623,53 +647,53 @@ a:focus-visible,
 
 .segmented {
   display: flex;
-  background: var(--tint);
-  border-radius: 16px;
-  padding: 5px;
-  gap: 5px;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  border-radius: 7px;
+  overflow: hidden;
+  background: #fff;
 }
 .segmented button {
   flex: 1;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
-  padding: 9px 0;
-  border-radius: 12px;
-  color: var(--brand-deep);
+  letter-spacing: 1px;
+  padding: 9px 4px;
+  color: var(--ink);
+}
+.segmented button + button {
+  border-left: 2.5px solid rgba(20, 22, 42, 0.09);
 }
 .segmented button[data-active="true"] {
-  background: var(--card);
-  color: var(--brand);
-  box-shadow: var(--shadow-sm);
+  background: var(--brand);
+  color: #fff;
 }
 
 /* ---- Category headers + hand rows ---------------------------------------- */
 
-/* Full-width category header bar (Card tab) */
+/* Section header: the section name in big display color + a mono count. */
 .cat-bar {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 10px;
   width: 100%;
-  margin: 26px 0 12px;
-  padding: 11px 16px;
-  border-radius: 13px;
-  background: var(--tint);
-  color: var(--brand);
+  margin: 24px 2px 11px;
 }
 .cat-bar .cat-name {
-  font-size: 18px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--brand);
 }
 .cat-bar .cat-count {
-  font-size: 12.5px;
-  font-weight: 800;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  opacity: 0.75;
+  letter-spacing: 0.5px;
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -1349,9 +1373,8 @@ label.lbl {
   bottom: 0;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: var(--nav-bg);
-  backdrop-filter: saturate(1.5) blur(12px);
-  border-top: 2px solid var(--tint);
+  background: #fff;
+  border-top: 2px solid rgba(20, 22, 42, 0.08);
   display: flex;
   z-index: 50;
 }
@@ -1360,27 +1383,55 @@ label.lbl {
   margin: 0 auto;
   width: 100%;
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 22px 0;
 }
 .bottom-nav button {
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  height: var(--nav-h);
+  gap: 5px;
 }
-.bottom-nav button[data-active="true"] {
+/* cream tile holding the multi-color illustration */
+.bottom-nav .nav-tile {
+  width: 32px;
+  height: 40px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
+  border: 1.5px solid rgba(20, 22, 42, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 3px rgba(20, 22, 42, 0.1), 0 5px 11px rgba(20, 22, 42, 0.06),
+    inset 0 -3px 5px rgba(20, 22, 42, 0.05);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+.bottom-nav button[data-active="true"] .nav-tile {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 6px rgba(20, 22, 42, 0.14), 0 11px 18px rgba(20, 22, 42, 0.12),
+    inset 0 -3px 5px rgba(20, 22, 42, 0.05);
+}
+.bottom-nav .nav-label {
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 8px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #9a9aa4;
+}
+.bottom-nav button[data-active="true"] .nav-label {
   color: var(--brand);
 }
-.bottom-nav .glyph {
-  font-size: 23px;
-  line-height: 1;
+.bottom-nav .nav-underline {
+  width: 15px;
+  height: 3px;
+  border-radius: 3px;
+  background: transparent;
+}
+.bottom-nav button[data-active="true"] .nav-underline {
+  background: var(--brand);
 }
 
 /* ---- Modal / sheet ------------------------------------------------------- */

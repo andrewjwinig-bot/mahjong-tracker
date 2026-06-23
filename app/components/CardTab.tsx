@@ -12,7 +12,7 @@ import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconFlame, IconTap, IconTrophy, IconTarget } from './uiIcons';
+import { IconFlame, IconTap } from './uiIcons';
 import type { Experience } from '../lib/account';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -142,40 +142,34 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         <div className="stat">
           <div className="num">
             {stats.cleared}
-            <span style={{ fontSize: 15, color: 'var(--muted)', fontWeight: 800 }}>
+            <span className="num-suf" style={{ color: 'var(--green)' }}>
               /{card.hands.length}
             </span>
           </div>
-          <div className="lab">Cleared</div>
+          <div className="lab" style={{ color: 'var(--green)' }}>
+            Cleared
+          </div>
         </div>
         <div className="stat">
           <div className="num">{stats.totalWins}</div>
-          <div className="lab">Mahjs</div>
+          <div className="lab" style={{ color: 'var(--brand)' }}>
+            Mahjs
+          </div>
         </div>
         <div className="stat">
           <div className="num">{stats.totalPoints}</div>
-          <div className="lab">Points</div>
+          <div className="lab" style={{ color: '#C9871A' }}>
+            Points
+          </div>
         </div>
       </div>
 
-      <div className="progress" aria-label={`${pct}% of card cleared`}>
-        <span style={{ width: `${pct}%` }} />
-      </div>
-
-      <div className="row" style={{ marginTop: 14 }}>
-        <button
-          className="btn ghost"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={onScore}
-        >
-          <IconTrophy size={17} /> Score game
+      <div className="action-row">
+        <button className="act-btn primary" onClick={onScore}>
+          ⊕ Score Game
         </button>
-        <button
-          className="btn ghost"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={onPractice}
-        >
-          <IconTarget size={17} /> Practice
+        <button className="act-btn" onClick={onPractice}>
+          ◎ Practice
         </button>
       </div>
 
