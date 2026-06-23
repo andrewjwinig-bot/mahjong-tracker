@@ -9,7 +9,7 @@ import { track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import Avatar from './Avatar';
 import Tile from './Tile';
-import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers } from './uiIcons';
+import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
   youStats: { handsCleared: number; points: number };
   /** The local user's real per-hand win counts (for your own detail view). */
   handCounts: Record<string, number>;
+  streak: number;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
@@ -63,6 +64,7 @@ export default function GroupTab({
   profile,
   youStats,
   handCounts,
+  streak,
   onToggleLike,
   onAddComment,
   onAddFriend,
@@ -113,6 +115,15 @@ export default function GroupTab({
           {profile.name ? `Hi ${profile.name.split(' ')[0]} — ` : ''}see what your whole crew is calling.
         </p>
       </header>
+
+      {streak > 1 && (
+        <div className="feed-streak">
+          <span className="fs-flame"><IconFlame size={16} /></span>
+          <span>
+            You’re on a <strong>{streak}-day streak</strong> — keep it going!
+          </span>
+        </div>
+      )}
 
       <button className="score-cta" onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
@@ -235,9 +246,16 @@ export default function GroupTab({
       </div>
 
       {feed.length === 0 ? (
-        <div className="empty">
-          <div className="big">🀄🀅🀆</div>
-          No mahjs called yet. Be the first to call “Mahjong!”
+        <div className="feed-empty">
+          <div className="fe-tiles" aria-hidden>
+            <span className="fe-tile">🀄</span>
+            <span className="fe-tile">🀅</span>
+            <span className="fe-tile">🀆</span>
+          </div>
+          <div className="fe-title">No mahjs called yet</div>
+          <div className="fe-sub">
+            Be the first — call Mahj on your Card and it’ll land right here for your crew to see.
+          </div>
         </div>
       ) : (
         feed.map((p) => (

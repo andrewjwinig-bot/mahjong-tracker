@@ -9,6 +9,7 @@ import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
 import GroupTab from './GroupTab';
+import LoadingWall from './LoadingWall';
 import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
@@ -289,10 +290,7 @@ export default function AppShell() {
 
         {!loaded ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
-            <div className="empty">
-              <div className="big">🀄🀫🀐</div>
-              Stacking the wall…
-            </div>
+            <LoadingWall />
           </div>
         ) : (
           <>
@@ -321,6 +319,7 @@ export default function AppShell() {
                 profile={socialState.profile}
                 youStats={youStats}
                 handCounts={handCounts}
+                streak={streak}
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
