@@ -51,7 +51,7 @@
   --page: #e9f4ec;
   --ink: #0a3d24;
   --title-color: #ffffff;
-  --title-shadow: 3px 3px 0 #053219;
+  --title-shadow: none;
   --bg-photo: url("/patterns/bg-bam.svg");
 }
 [data-theme="dot"] {
@@ -69,7 +69,7 @@
   --page: #e7f0ea;
   --ink: #143a2e;
   --title-color: #f3e6c6;
-  --title-shadow: 3px 3px 0 #4c0d0b;
+  --title-shadow: none;
   --bg-photo: url("/patterns/bg-dragon.svg");
 }
 [data-theme="flower"] {
@@ -87,7 +87,7 @@
   --page: #f0ebfa;
   --ink: #2e1a57;
   --title-color: #ffffff;
-  --title-shadow: 3px 3px 0 #281451;
+  --title-shadow: none;
   --bg-photo: url("/patterns/bg-joker.svg");
 }
 [data-theme="midnight"] {
@@ -96,7 +96,7 @@
   --page: #edeff6;
   --ink: #1b1e3a;
   --title-color: #ece7d6;
-  --title-shadow: 3px 3px 0 #14105c;
+  --title-shadow: none;
   --bg-photo: url("/patterns/bg-midnight.svg");
 }
 [data-theme="felt"] {
@@ -105,7 +105,7 @@
   --page: #e8f1ea;
   --ink: #0e3d28;
   --title-color: #f4e6c0;
-  --title-shadow: 3px 3px 0 #0c3325;
+  --title-shadow: none;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
 
@@ -150,13 +150,26 @@ body::before {
   height: 252px;
   z-index: -1;
   background-image: var(--bg-photo);
-  background-size: cover;
+  background-size: 440px auto;
   background-repeat: no-repeat;
   background-position: center top;
   opacity: 0.6;
   -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
   mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
   pointer-events: none;
+}
+
+/* Faint paper-grain texture over every screen (design §B). A fixed multiply
+   overlay of tiling fractal noise at ~10% — keeps surfaces from feeling flat. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='90'%20height='90'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='2'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='90'%20height='90'%20filter='url(%23n)'%20opacity='0.6'/%3E%3C/svg%3E");
 }
 
 /* Chunky display face for headers, branding, buttons + loud labels. */
@@ -264,15 +277,15 @@ a:focus-visible,
 }
 
 .app-header {
-  padding: 20px 6px 6px;
-  text-align: center;
+  padding: 20px 4px 6px;
+  text-align: left;
 }
-/* Two-tone poster title: heavy Bricolage in the theme's title color over a hard
-   offset, with a short accent underline. The signature headline treatment. */
+/* Poster title: heavy Bricolage in the theme's high-contrast title color, with a
+   short left-aligned accent underline. (Two-tone offset is off in this build.) */
 .app-header h1 {
   margin: 0;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 36px;
+  font-size: 39px;
   font-weight: 800;
   letter-spacing: -1px;
   text-transform: none;
@@ -287,20 +300,15 @@ a:focus-visible,
   height: 6px;
   border-radius: 4px;
   background: var(--brand);
-  margin: 12px auto 0;
+  margin: 11px 0 9px;
 }
 .app-header .sub {
   display: block;
-  width: fit-content;
-  max-width: 100%;
-  margin: 10px auto 0;
-  background: var(--card);
+  margin: 0 0 16px;
   color: var(--ink-soft);
-  padding: 7px 16px;
-  border-radius: 999px;
-  box-shadow: var(--shadow-sm);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 /* Card screen header is left-aligned around the two-tone logo. */
@@ -314,7 +322,7 @@ a:focus-visible,
 .logo-kicker {
   font-family: var(--font-app), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 3px;
   color: var(--title-color, var(--ink));
   margin-bottom: 2px;
@@ -322,7 +330,7 @@ a:focus-visible,
 .logo-word {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 46px;
+  font-size: 42px;
   letter-spacing: -1.5px;
   color: var(--title-color, var(--ink));
   text-shadow: var(--title-shadow, none);

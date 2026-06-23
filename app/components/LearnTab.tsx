@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import TileStrip from './TileStrip';
 import OfficialCardCallout from './OfficialCardCallout';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
@@ -363,7 +362,6 @@ export default function LearnTab({
       <header className="app-header">
         <h1>The Rules</h1>
         <p className="sub">{SUBTITLE[experience]}</p>
-        <TileStrip count={7} />
       </header>
 
       <button

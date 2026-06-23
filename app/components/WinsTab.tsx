@@ -9,7 +9,6 @@ import { recordShare, track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
 import { colorNotation } from '../lib/theme';
-import TileStrip from './TileStrip';
 import Tile from './Tile';
 import { IconShare, IconTrash, IconCamera } from './uiIcons';
 
@@ -43,7 +42,6 @@ export default function WinsTab({
       <header className="app-header">
         <h1>Your Mahjs</h1>
         <p className="sub">Log every MAHJ with a photo &amp; note — then brag a little.</p>
-        <TileStrip count={7} />
       </header>
 
       <button className="mahj-hero" onClick={() => setOpen(true)}>
