@@ -2,7 +2,7 @@
 // App shell is cached; navigations fall back to the cached shell when offline.
 // All user data lives in IndexedDB (handled by the app), not here.
 
-const CACHE = 'mahjong-v32';
+const CACHE = 'mahjong-v33';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
