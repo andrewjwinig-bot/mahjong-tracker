@@ -47,7 +47,7 @@ export default function WinsTab({
       <button className="mahj-hero" onClick={() => setOpen(true)}>
         <span className="mahj-hero-shine" aria-hidden />
         <Tile face="crack" size={34} className="mahj-hero-tile" />
-        <span className="mahj-hero-label">I GOT MAHJ!</span>
+        <span className="mahj-hero-label">CALL MAHJ!</span>
       </button>
 
       {wins.length === 0 ? (
@@ -266,7 +266,7 @@ export function LogWinSheet({
           <Tile face="crack" size={40} className="log-band-tile" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="log-kicker">LOG YOUR WIN</div>
-            <div className="log-title">I GOT MAHJ!</div>
+            <div className="log-title">CALL MAHJ!</div>
             <div className="log-band-sub">Log it before the tiles get scooped up.</div>
           </div>
         </div>

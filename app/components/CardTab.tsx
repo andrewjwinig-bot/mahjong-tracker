@@ -191,7 +191,7 @@ export default function CardTab({
       <button className="mahj-hero" onClick={() => setLogOpen(true)}>
         <span className="mahj-hero-shine" aria-hidden />
         <Tile face="crack" size={34} className="mahj-hero-tile" />
-        <span className="mahj-hero-label">I GOT MAHJ!</span>
+        <span className="mahj-hero-label">CALL MAHJ!</span>
       </button>
 
       <div className="action-row">
