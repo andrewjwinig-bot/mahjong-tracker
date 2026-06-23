@@ -1,6 +1,6 @@
 'use client';
 
-export type Tab = 'card' | 'wins' | 'group' | 'tables' | 'learn';
+export type Tab = 'card' | 'group' | 'tables' | 'learn';
 
 // Per the design: each tab is a little cream tile holding a multi-color mini
 // illustration, over an 8px label + a 3px underline pill. The active tab's tile
@@ -12,18 +12,6 @@ const ICONS: Record<Tab, JSX.Element> = {
       <path d="M5 6.2h7" stroke="#C0392B" strokeWidth="1.7" strokeLinecap="round" />
       <path d="M5 9.5h7" stroke="#10B39A" strokeWidth="1.7" strokeLinecap="round" />
       <path d="M5 12.8h4.6" stroke="#2E86D4" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  ),
-  wins: (
-    <svg width="19" height="19" viewBox="0 0 20 20">
-      <path
-        d="M10 2.3 L12.25 7 L17.4 7.6 L13.6 11.2 L14.6 16.3 L10 13.8 L5.4 16.3 L6.4 11.2 L2.6 7.6 L7.75 7 Z"
-        fill="#F5A524"
-        stroke="#C9871A"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
-      <circle cx="10" cy="9.1" r="1.7" fill="#fff" opacity="0.6" />
     </svg>
   ),
   group: (
@@ -58,7 +46,6 @@ const ICONS: Record<Tab, JSX.Element> = {
 const TABS: { id: Tab; label: string }[] = [
   { id: 'group', label: 'Feed' },
   { id: 'card', label: 'Card' },
-  { id: 'wins', label: 'Mahjs' },
   { id: 'tables', label: 'Tables' },
   { id: 'learn', label: 'Rules' },
 ];

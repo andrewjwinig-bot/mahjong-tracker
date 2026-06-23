@@ -114,7 +114,7 @@ export default function WinsTab({
   );
 }
 
-function WinCard({
+export function WinCard({
   win,
   groupName,
   onRemove,
@@ -188,7 +188,7 @@ function WinCard({
   );
 }
 
-function LogWinSheet({
+export function LogWinSheet({
   card,
   handNotes,
   groupName,
