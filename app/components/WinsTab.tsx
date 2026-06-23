@@ -9,6 +9,7 @@ import { recordShare, track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
 import TileStrip from './TileStrip';
+import Tile from './Tile';
 import { IconShare, IconTrash, IconCamera } from './uiIcons';
 
 interface Props {
@@ -44,8 +45,10 @@ export default function WinsTab({
         <TileStrip count={7} />
       </header>
 
-      <button className="btn coral" style={{ marginTop: 16 }} onClick={() => setOpen(true)}>
-        🀄 I Got Mahj!
+      <button className="mahj-hero" onClick={() => setOpen(true)}>
+        <span className="mahj-hero-shine" aria-hidden />
+        <Tile face="crack" size={34} className="mahj-hero-tile" />
+        <span className="mahj-hero-label">I GOT MAHJ!</span>
       </button>
 
       {wins.length === 0 ? (
