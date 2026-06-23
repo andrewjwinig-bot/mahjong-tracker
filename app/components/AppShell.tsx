@@ -28,6 +28,7 @@ import {
   getAccount,
   getExperience,
   setExperience as persistExperience,
+  clearAccount,
   tutorialSeen,
   setTutorialSeen,
   type Account,
@@ -336,7 +337,13 @@ export default function AppShell() {
           profile={socialState.profile}
           theme={theme}
           experience={experience}
+          email={account?.email}
           groupName={socialState.group.name}
+          onSignOut={() => {
+            clearAccount();
+            setSettingsOpen(false);
+            setAccount(null);
+          }}
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
           onExperience={changeExperience}
