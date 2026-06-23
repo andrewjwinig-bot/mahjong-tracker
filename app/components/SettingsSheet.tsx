@@ -8,9 +8,10 @@ import type { TileFace } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
+import { getPref, setPref } from '../lib/prefs';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
-import { IconSettings, IconTrophy, IconCard, IconInfo, IconCrown, IconSound, IconLock } from './uiIcons';
+import { IconCard } from './uiIcons';
 import { setPro } from '../lib/pro';
 import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
@@ -19,6 +20,7 @@ interface Props {
   profile: Profile;
   theme: ThemeId;
   experience: Experience;
+  groupName?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
@@ -29,25 +31,42 @@ interface Props {
 
 const LEVELS: Experience[] = ['beginner', 'intermediate', 'expert'];
 
-// Avatar choices: your initial + a favorite tile + a couple of jokers/dragons.
+// Small inline marks matching the design.
+const BackChevron = () => (
+  <svg width="11" height="13" viewBox="0 0 11 13" aria-hidden>
+    <path d="M8 1L2 6.5 8 12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const CameraMark = () => (
+  <svg width="14" height="13" viewBox="0 0 20 18" aria-hidden>
+    <rect x="1.3" y="3.5" width="17.4" height="13" rx="2.6" fill="none" stroke="#fff" strokeWidth="2" />
+    <circle cx="10" cy="10.2" r="3.6" fill="none" stroke="#fff" strokeWidth="2" />
+    <path d="M6.5 3.5 L7.7 1.4 H12.3 L13.5 3.5" fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
+  </svg>
+);
+
+// The "YOUR TILE" face set (design: a 5-col grid of single-color tiles).
 const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string }[] = [
   { key: 'letter', face: 'letter' },
-  { key: 'crack', face: 'crack' },
-  { key: 'bam', face: 'bam' },
   { key: 'dot', face: 'dot' },
+  { key: 'bam', face: 'bam' },
+  { key: 'crack', face: 'crack' },
   { key: 'flower', face: 'flower' },
-  { key: 'wind', face: 'wind', char: '東' },
-  { key: 'dragonR', face: 'dragon', char: '中', fixedColor: '#E8455F' },
-  { key: 'dragonG', face: 'dragon', char: '發', fixedColor: '#1FA85B' },
+  { key: 'wind', face: 'wind', char: '風' },
+  { key: 'dragonR', face: 'dragon', char: '中', fixedColor: '#C0392B' },
+  { key: 'dragonG', face: 'dragon', char: '發', fixedColor: '#1F8A5B' },
   { key: 'joker', face: 'joker' },
+  { key: 'crackZ', face: 'crack', char: '萬' },
 ];
 
-const COLOR_SWATCHES = ['#0EAD96', '#E8455F', '#2F80ED', '#7C5CE0', '#E59A2B', '#1FA85B', '#2C3A57'];
+// Design tile-color swatches.
+const COLOR_SWATCHES = ['#10B39A', '#C0392B', '#2E86D4', '#6A3FC0', '#F5A524', '#1F8A5B', '#14162A'];
 
 export default function SettingsSheet({
   profile,
   theme,
   experience,
+  groupName = 'Tuesday Game',
   onSaveProfile,
   onTheme,
   onExperience,
@@ -56,17 +75,20 @@ export default function SettingsSheet({
   onClose,
 }: Props) {
   useEscape(onClose);
+  const [view, setView] = useState<'settings' | 'edit'>('settings');
   const [name, setName] = useState(profile.name);
   const [handle, setHandle] = useState(profile.handle);
   const [bio, setBio] = useState(profile.bio);
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
   const [fx, setFxState] = useState(fxOn());
+  const [shareDefault, setShareDefault] = useState(() => getPref('shareDefault', true));
+  const [push, setPush] = useState(() => getPref('push', true));
+  const [showOnBoards, setShowOnBoards] = useState(() => getPref('leaderboards', true));
   const [aboutOpen, setAboutOpen] = useState(false);
   const pro = usePro();
   const [paywall, setPaywall] = useState(false);
 
   const letter = initialOf(name);
-  // For the letter tile, the displayed character always tracks the name.
   const previewChar = avatar.face === 'letter' ? letter : avatar.char;
 
   function pickFace(opt: (typeof FACE_OPTIONS)[number]) {
@@ -76,252 +98,230 @@ export default function SettingsSheet({
       color: opt.fixedColor ?? avatar.color,
     });
   }
-
-  function pickColor(c: string) {
-    setAvatar((a) => ({ ...a, color: c }));
-  }
-
   function isActiveFace(opt: (typeof FACE_OPTIONS)[number]) {
-    return avatar.face === opt.face && (opt.char ?? undefined) === (opt.face === 'letter' ? undefined : avatar.char);
+    return (
+      avatar.face === opt.face &&
+      (opt.face === 'letter' ? true : (opt.char ?? undefined) === avatar.char)
+    );
   }
 
-  function save() {
+  function saveProfile() {
     onSaveProfile({
       name: name.trim() || 'You',
       handle: (handle.trim().replace(/^@+/, '') || 'you').toLowerCase(),
       bio: bio.trim(),
       avatar: { ...avatar, char: avatar.face === 'letter' ? letter : avatar.char },
     });
-    onClose();
+    setView('settings');
   }
+
+  function toggleSound() {
+    const next = !fx;
+    setFxState(next);
+    setFx(next);
+  }
+
+  // A theme chip — banner thumbnail + accent dot (check when active) + name.
+  // Shared between the Settings grid and the Edit-Profile grid (thumb height
+  // differs slightly per the design).
+  function ThemeChip({ t, thumb }: { t: (typeof THEMES)[number]; thumb: number }) {
+    const active = theme === t.id;
+    const locked = !!t.pro && !pro;
+    return (
+      <button
+        className="theme-chip"
+        data-active={active}
+        onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
+      >
+        <span
+          className="tc-thumb"
+          style={{
+            height: thumb,
+            backgroundColor: t.swatch.page,
+            backgroundImage: `url("${t.wallpaper}")`,
+          }}
+        />
+        <span className="tc-dot" style={{ background: t.swatch.brand }}>
+          {active ? '✓' : locked ? '★' : ''}
+        </span>
+        <span className="tc-foot">
+          <span className="tc-sq" style={{ background: t.swatch.brand }} />
+          <span className="tc-name">{t.name}</span>
+        </span>
+      </button>
+    );
+  }
+
+  /* ---- Settings view ----------------------------------------------------- */
+  const settingsView = (
+    <>
+      <div className="set-head">
+        <button className="set-back" onClick={onClose} aria-label="Close">
+          <BackChevron />
+        </button>
+        <h1 className="set-title">Settings</h1>
+      </div>
+
+      {/* Profile card → Edit Profile */}
+      <button className="prof-card" onClick={() => setView('edit')}>
+        <Tile face={avatar.face} char={previewChar} color={avatar.color} size={48} />
+        <span className="pc-body">
+          <span className="pc-name">{name || 'You'}</span>
+          <span className="pc-meta">@{handle || 'you'}</span>
+          <span className="pc-level">★ {EXPERIENCE_LABEL[experience].toUpperCase()}</span>
+        </span>
+        <span className="pc-chev">›</span>
+      </button>
+
+      {/* Pro upsell */}
+      <button className="pro-upsell" data-pro={pro} onClick={() => (pro ? undefined : setPaywall(true))}>
+        <span className="pu-stripe" aria-hidden />
+        <span className="pu-tile" aria-hidden>★</span>
+        <span className="pu-body">
+          <span className="pu-title">Let’s Mahj Pro</span>
+          <span className="pu-sub">
+            {pro ? 'Thanks for going Pro — everything’s unlocked.' : 'Unlimited tables, full stats & every theme.'}
+          </span>
+        </span>
+        <span className="pu-cta">{pro ? 'PRO ✓' : 'GO PRO'}</span>
+      </button>
+
+      <div className="set-label">APP THEME</div>
+      <div className="theme-grid2">
+        {THEMES.map((t) => (
+          <ThemeChip key={t.id} t={t} thumb={72} />
+        ))}
+      </div>
+
+      <div className="set-label">PREFERENCES</div>
+      <div className="set-list">
+        <PrefRow label="Share mahjs by default" on={shareDefault} onToggle={() => { const n = !shareDefault; setShareDefault(n); setPref('shareDefault', n); }} />
+        <PrefRow label="Push notifications" on={push} onToggle={() => { const n = !push; setPush(n); setPref('push', n); }} />
+        <PrefRow label="Show me on leaderboards" on={showOnBoards} onToggle={() => { const n = !showOnBoards; setShowOnBoards(n); setPref('leaderboards', n); }} />
+        <PrefRow label="Sound & haptics" on={fx} onToggle={toggleSound} last />
+      </div>
+
+      <div className="set-label">GAME</div>
+      <div className="set-list">
+        <ValueRow label="Card year" value="2025" />
+        <ValueRow label="Default table" value={groupName} />
+        <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} last />
+      </div>
+
+      <div className="set-label">ACCOUNT</div>
+      <div className="set-list">
+        <ValueRow label="Trophies & stats" onClick={onTrophies} />
+        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
+        <ValueRow label="Privacy & terms" onClick={() => setAboutOpen(true)} last />
+      </div>
+
+      <button className="signout" onClick={onClose}>DONE</button>
+      <div className="set-version">Let’s Mahj · v1.0</div>
+    </>
+  );
+
+  /* ---- Edit Profile view ------------------------------------------------- */
+  const editView = (
+    <>
+      <div className="set-head" style={{ marginBottom: 4 }}>
+        <button className="set-back" onClick={() => setView('settings')} aria-label="Back">
+          <BackChevron />
+        </button>
+        <h1 className="set-title">Edit profile</h1>
+      </div>
+      <p className="edit-sub">Your tile, name &amp; how you play.</p>
+
+      {/* Avatar + camera badge */}
+      <div className="edit-avatar-wrap">
+        <div className="edit-avatar">
+          <Tile face={avatar.face} char={previewChar} color={avatar.color} size={72} />
+          <span className="edit-cam" aria-hidden>
+            <CameraMark />
+          </span>
+        </div>
+      </div>
+
+      <div className="set-label">YOUR TILE</div>
+      <div className="face-grid">
+        {FACE_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            className="face-cell"
+            data-active={isActiveFace(opt)}
+            onClick={() => pickFace(opt)}
+          >
+            <Tile
+              face={opt.face}
+              char={opt.face === 'letter' ? letter : opt.char}
+              color={opt.fixedColor ?? avatar.color}
+              size={34}
+            />
+            {isActiveFace(opt) && <span className="face-check">✓</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="set-label">TILE COLOR</div>
+      <div className="swatch-row2">
+        {COLOR_SWATCHES.map((c) => (
+          <button
+            key={c}
+            className="swatch2"
+            data-active={avatar.color.toLowerCase() === c.toLowerCase()}
+            style={{ background: c, boxShadow: `0 0 0 ${avatar.color.toLowerCase() === c.toLowerCase() ? 3 : 0}px ${c}, 0 2px 6px rgba(20,22,42,0.18)` }}
+            onClick={() => setAvatar((a) => ({ ...a, color: c }))}
+            aria-label={`Use ${c}`}
+          />
+        ))}
+      </div>
+
+      <div className="set-label">NAME</div>
+      <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
+
+      <div className="set-label">HANDLE</div>
+      <div className="handle-field">
+        <span className="handle-at">@</span>
+        <input value={handle} maxLength={20} placeholder="handle" onChange={(e) => setHandle(e.target.value)} />
+      </div>
+
+      <div className="set-label">BIO</div>
+      <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
+
+      <div className="edit-divider"><span>Gameplay</span><i /></div>
+      <div className="set-label">EXPERIENCE LEVEL</div>
+      <div className="level-seg">
+        {LEVELS.map((l) => (
+          <button key={l} data-active={experience === l} onClick={() => onExperience(l)}>
+            {EXPERIENCE_LABEL[l]}
+          </button>
+        ))}
+      </div>
+      <p className="edit-caption">Tailors your rules &amp; tips.</p>
+      <button className="card-btn" onClick={onEditCard}>
+        <IconCard size={17} /> MY CARD — BRING YOUR OWN
+      </button>
+
+      <div className="edit-divider"><span>Appearance</span><i /></div>
+      <button className="sound-row" onClick={toggleSound}>
+        <span className="sr-label">Sound &amp; haptics</span>
+        <span className="ios-toggle" data-on={fx} aria-hidden><span className="ios-knob" /></span>
+      </button>
+
+      <div className="set-label">COLOR THEME</div>
+      <div className="theme-grid2" style={{ marginBottom: 22 }}>
+        {THEMES.map((t) => (
+          <ThemeChip key={t.id} t={t} thumb={54} />
+        ))}
+      </div>
+
+      <button className="save-changes" onClick={saveProfile}>SAVE CHANGES</button>
+    </>
+  );
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="grab" />
-        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          Settings <IconSettings size={20} />
-        </h2>
-        <p className="sheet-sub">Profile, gameplay, appearance &amp; account.</p>
-
-        <div className="set-section">Profile</div>
-
-        {/* Avatar preview */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-          <Tile face={avatar.face} char={previewChar} color={avatar.color} size={84} />
-        </div>
-
-        {/* Avatar picker */}
-        <label className="lbl">Your tile</label>
-        <div className="avatar-grid">
-          {FACE_OPTIONS.map((opt) => (
-            <button
-              key={opt.key}
-              className="avatar-opt"
-              data-active={isActiveFace(opt)}
-              onClick={() => pickFace(opt)}
-            >
-              <Tile
-                face={opt.face}
-                char={opt.face === 'letter' ? letter : opt.char}
-                color={opt.fixedColor ?? avatar.color}
-                size={42}
-              />
-            </button>
-          ))}
-        </div>
-
-        <label className="lbl" style={{ marginTop: 14 }}>
-          Tile color
-        </label>
-        <div className="swatch-row">
-          {COLOR_SWATCHES.map((c) => (
-            <button
-              key={c}
-              className="swatch-dot"
-              data-active={avatar.color.toLowerCase() === c.toLowerCase()}
-              style={{ background: c }}
-              onClick={() => pickColor(c)}
-              aria-label={`Use ${c}`}
-            />
-          ))}
-        </div>
-
-        <label className="lbl" style={{ marginTop: 14 }}>
-          Name
-        </label>
-        <input
-          className="field"
-          value={name}
-          maxLength={24}
-          placeholder="Your name"
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <label className="lbl" style={{ marginTop: 12 }}>
-          Handle
-        </label>
-        <div style={{ position: 'relative' }}>
-          <span
-            style={{
-              position: 'absolute',
-              left: 14,
-              top: 13,
-              fontWeight: 800,
-              color: 'var(--muted)',
-            }}
-          >
-            @
-          </span>
-          <input
-            className="field"
-            style={{ paddingLeft: 28 }}
-            value={handle}
-            maxLength={20}
-            placeholder="handle"
-            onChange={(e) => setHandle(e.target.value)}
-          />
-        </div>
-
-        <label className="lbl" style={{ marginTop: 12 }}>
-          Bio
-        </label>
-        <textarea
-          className="field"
-          rows={2}
-          maxLength={120}
-          placeholder="Mahjong addict. Chasing all 70. 🀄"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        />
-
-        <div className="set-section">Gameplay</div>
-
-        {/* Experience level */}
-        <label className="lbl">Experience level</label>
-        <div className="segmented">
-          {LEVELS.map((l) => (
-            <button key={l} data-active={experience === l} onClick={() => onExperience(l)}>
-              {EXPERIENCE_LABEL[l]}
-            </button>
-          ))}
-        </div>
-        <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
-          Tailors your rules &amp; tips.
-        </p>
-
-        <button
-          className="btn ghost"
-          style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          onClick={onEditCard}
-        >
-          <IconCard size={18} /> My Card (bring your own)
-        </button>
-
-        <div className="set-section">Appearance</div>
-
-        {/* Sound + haptics */}
-        <button
-          type="button"
-          className="fx-row"
-          role="switch"
-          aria-checked={fx}
-          aria-label="Sound and haptics"
-          onClick={() => {
-            const next = !fx;
-            setFxState(next);
-            setFx(next);
-          }}
-        >
-          <span style={{ display: 'inline-flex' }} aria-hidden>
-            <IconSound size={20} />
-          </span>
-          <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
-            Sound &amp; haptics
-          </span>
-          <span className="switch" data-on={fx} aria-hidden>
-            <span className="knob" />
-          </span>
-        </button>
-
-        {/* Theme picker */}
-        <label className="lbl" style={{ marginTop: 18 }}>
-          Color theme
-        </label>
-        <div className="theme-grid">
-          {THEMES.map((t) => {
-            const locked = !!t.pro && !pro;
-            // Preview the theme's real background: its wallpaper photo if it has
-            // one, else a gradient built from its palette. A bottom veil keeps
-            // the name/tagline legible over either.
-            const base = t.wallpaper
-              ? `url("${t.wallpaper}") center/cover`
-              : `radial-gradient(120% 85% at 28% 0%, ${t.swatch.brand}2e, transparent 62%), linear-gradient(165deg, ${t.swatch.page}, ${t.swatch.brand}1f)`;
-            const veil = t.dark
-              ? 'linear-gradient(180deg, rgba(15,18,30,0) 30%, rgba(15,18,30,0.68) 100%)'
-              : 'linear-gradient(180deg, rgba(255,255,255,0) 32%, rgba(255,255,255,0.7) 100%)';
-            return (
-            <button
-              key={t.id}
-              className="theme-card"
-              data-active={theme === t.id}
-              data-locked={locked}
-              style={{ background: `${veil}, ${base}` }}
-              onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
-            >
-              {theme === t.id && <span className="tick">✓</span>}
-              {locked && <span className="theme-lock"><IconLock size={15} /></span>}
-              <Tile face={t.tile.face} char={t.tile.char} color={t.tile.color} size={52} />
-              <span className="tname" style={{ color: t.dark ? '#fff' : '#243240' }}>
-                {t.name}
-              </span>
-              <span
-                className="ttag"
-                style={{ color: t.dark ? 'rgba(255,255,255,0.72)' : undefined }}
-              >
-                {t.tagline}
-              </span>
-            </button>
-            );
-          })}
-        </div>
-
-        {!pro && (
-          <button
-            className="btn"
-            style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            onClick={() => setPaywall(true)}
-          >
-            <IconCrown size={18} /> Go Pro
-          </button>
-        )}
-
-        <div className="set-section">Account</div>
-
-        <button
-          className="btn ghost"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          onClick={onTrophies}
-        >
-          <IconTrophy size={18} /> Trophies &amp; Stats
-        </button>
-
-        <button
-          className="btn ghost"
-          style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-          onClick={() => setAboutOpen(true)}
-        >
-          <IconInfo size={18} /> About &amp; Legal
-        </button>
-
-        <div className="row" style={{ marginTop: 14 }}>
-          <button className="btn ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn" onClick={save}>
-            Save Profile
-          </button>
-        </div>
+      <div className="sheet set-sheet" onClick={(e) => e.stopPropagation()}>
+        {view === 'settings' ? settingsView : editView}
       </div>
 
       {aboutOpen && <AboutSheet onClose={() => setAboutOpen(false)} />}
@@ -335,5 +335,24 @@ export default function SettingsSheet({
         />
       )}
     </div>
+  );
+}
+
+function PrefRow({ label, on, onToggle, last }: { label: string; on: boolean; onToggle: () => void; last?: boolean }) {
+  return (
+    <button className="set-row" data-last={!!last} onClick={onToggle}>
+      <span className="sr-label">{label}</span>
+      <span className="ios-toggle" data-on={on} aria-hidden><span className="ios-knob" /></span>
+    </button>
+  );
+}
+
+function ValueRow({ label, value, onClick, last }: { label: string; value?: string; onClick?: () => void; last?: boolean }) {
+  return (
+    <button className="set-row" data-last={!!last} onClick={onClick} disabled={!onClick && !value}>
+      <span className="sr-label">{label}</span>
+      {value && <span className="sr-value">{value}</span>}
+      <span className="sr-chev">›</span>
+    </button>
   );
 }
