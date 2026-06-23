@@ -8,7 +8,7 @@ import {
   seasonWindow,
   type Challenge,
 } from '../lib/challenges';
-import { IconGrid, IconSparkle } from './uiIcons';
+import { IconSparkle } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 
 /** The active-season challenge banner shown on the Card tab. */
@@ -32,8 +32,16 @@ export function ChallengeCard({
 
   return (
     <div className="challenge">
-      <button className="ch-seasons" onClick={onSeasons} aria-label="All seasons">
-        <IconGrid size={16} />
+      <button className="ch-sun" onClick={onSeasons} aria-label="All challenge seasons">
+        <svg viewBox="0 0 100 100" aria-hidden>
+          <g stroke="#fff" strokeWidth="4.5" strokeLinecap="round">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <line key={i} x1="50" y1="4" x2="50" y2="15" transform={`rotate(${i * 30} 50 50)`} />
+            ))}
+          </g>
+          <circle cx="50" cy="50" r="22" fill="none" stroke="#fff" strokeWidth="4.5" />
+          <circle cx="50" cy="50" r="9" fill="#fff" />
+        </svg>
       </button>
       <div className="ch-eyebrow">★ {challenge.season} Challenge</div>
       <div className="ch-name">{challenge.name}</div>
