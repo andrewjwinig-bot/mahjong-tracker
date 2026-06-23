@@ -1,16 +1,15 @@
 // Color-theme preferences. Themes are just sets of CSS variables toggled via a
 // `data-theme` attribute on <html>, so switching reskins the whole app at once.
-// Default is the gender-neutral "Jade" scheme.
+// Default is the card-table "Felt" scheme.
 
 export type ThemeId =
-  | 'crak'
-  | 'jade'
   | 'bam'
   | 'dot'
+  | 'crak'
   | 'dragon'
   | 'flower'
   | 'joker'
-  | 'midnight'
+  | 'wind'
   | 'felt';
 
 import type { TileFace } from './tileArt';
@@ -30,25 +29,9 @@ export interface ThemeDef {
   swatch: { brand: string; green: string; accent: string; page: string };
 }
 
-export const DEFAULT_THEME: ThemeId = 'crak';
+export const DEFAULT_THEME: ThemeId = 'felt';
 
 export const THEMES: ThemeDef[] = [
-  {
-    id: 'crak',
-    name: 'Crak',
-    tagline: 'Character red',
-    tile: { face: 'crack' },
-    wallpaper: '/patterns/bg-crak.svg',
-    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F5A524', page: '#F6EEDD' },
-  },
-  {
-    id: 'jade',
-    name: 'Jade',
-    tagline: 'Clean & neutral',
-    tile: { face: 'wind', char: '東', color: '#1F6B4E' },
-    wallpaper: '/patterns/bg-jade.svg',
-    swatch: { brand: '#1F6B4E', green: '#10B39A', accent: '#F5A524', page: '#F1EEE0' },
-  },
   {
     id: 'bam',
     name: 'Bam',
@@ -64,6 +47,14 @@ export const THEMES: ThemeDef[] = [
     tile: { face: 'dot' },
     wallpaper: '/patterns/bg-dot.svg',
     swatch: { brand: '#1E6FCB', green: '#10B39A', accent: '#F5A524', page: '#EBF1F4' },
+  },
+  {
+    id: 'crak',
+    name: 'Crak',
+    tagline: 'Character red',
+    tile: { face: 'crack' },
+    wallpaper: '/patterns/bg-crak.svg',
+    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F5A524', page: '#F6EEDD' },
   },
   {
     id: 'dragon',
@@ -92,23 +83,21 @@ export const THEMES: ThemeDef[] = [
     swatch: { brand: '#6A3FC0', green: '#10B39A', accent: '#F5A524', page: '#F0EBFA' },
   },
   {
-    id: 'midnight',
-    name: 'Midnight',
-    tagline: 'Indigo & neon',
-    dark: true,
+    id: 'wind',
+    name: 'Wind',
+    tagline: 'Breezy teal',
     pro: true,
-    tile: { face: 'dragon', char: '白', color: '#4F46E5' },
-    wallpaper: '/patterns/bg-midnight.svg',
-    swatch: { brand: '#4F46E5', green: '#10B39A', accent: '#F5A524', page: '#EDEFF6' },
+    tile: { face: 'wind', char: '風', color: '#2E7D8C' },
+    wallpaper: '/patterns/bg-wind.svg',
+    swatch: { brand: '#2E7D8C', green: '#10B39A', accent: '#F5A524', page: '#EAF2F3' },
   },
   {
     id: 'felt',
     name: 'Felt',
     tagline: 'Card-table green',
-    pro: true,
     tile: { face: 'flower', color: '#C0392B' },
     wallpaper: '/patterns/bg-felt.svg',
-    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F4E6C0', page: '#E8F1EA' },
+    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F5A524', page: '#E8F1EA' },
   },
 ];
 
