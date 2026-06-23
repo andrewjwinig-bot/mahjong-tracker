@@ -7,6 +7,7 @@ import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
+import CountUp from './CountUp';
 import CollectionBoard from './CollectionBoard';
 import TipCard from './TipCard';
 import ShareModal from './ShareModal';
@@ -141,7 +142,7 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
       <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
           <div className="num">
-            {stats.cleared}
+            <CountUp value={stats.cleared} />
             <span className="num-suf" style={{ color: 'var(--green)' }}>
               /{card.hands.length}
             </span>
@@ -151,13 +152,13 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
           </div>
         </div>
         <div className="stat">
-          <div className="num">{stats.totalWins}</div>
+          <div className="num"><CountUp value={stats.totalWins} /></div>
           <div className="lab" style={{ color: 'var(--brand)' }}>
             Mahjs
           </div>
         </div>
         <div className="stat">
-          <div className="num">{stats.totalPoints}</div>
+          <div className="num"><CountUp value={stats.totalPoints} /></div>
           <div className="lab" style={{ color: '#C9871A' }}>
             Points
           </div>
