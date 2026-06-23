@@ -779,10 +779,14 @@ a:focus-visible,
   flex: 1;
   min-width: 0;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 21px;
+  /* Each hand stays on a single line: clamp the size to the viewport so even
+     the longest notation fits a small phone, while normal phones keep it near
+     the design's 21px. */
+  font-size: clamp(13.5px, 4.4vw, 21px);
   font-weight: 700;
-  letter-spacing: 1px;
-  word-break: break-word;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 /* decorative notation colors (theme-aware) */
