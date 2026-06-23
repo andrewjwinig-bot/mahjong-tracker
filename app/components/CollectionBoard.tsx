@@ -38,7 +38,7 @@ export default function CollectionBoard({
             >
               {got ? (
                 <>
-                  <span className="hc-pts">{h.points}</span>
+                  <span className="hc-pts">{h.category.slice(0, 4)}</span>
                   <span className="hc-check" aria-hidden>
                     ✓
                   </span>
