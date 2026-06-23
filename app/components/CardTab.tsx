@@ -7,6 +7,7 @@ import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
+import CollectionBoard from './CollectionBoard';
 import TipCard from './TipCard';
 import ShareModal from './ShareModal';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
@@ -193,7 +194,9 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
         <TipCard experience={experience} />
       </div>
 
-      <div className="segmented" style={{ marginTop: 16 }}>
+      <CollectionBoard card={card} handCounts={handCounts} />
+
+      <div className="segmented" style={{ marginTop: 18 }}>
         {(['all', 'remaining', 'won'] as Filter[]).map((f) => (
           <button key={f} data-active={filter === f} onClick={() => setFilter(f)}>
             {f === 'all' ? 'All' : f === 'remaining' ? 'To Go' : 'Got It'}
