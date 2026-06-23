@@ -3,14 +3,15 @@
 // Default is the gender-neutral "Jade" scheme.
 
 export type ThemeId =
+  | 'crak'
   | 'jade'
   | 'bam'
   | 'dot'
-  | 'crak'
   | 'dragon'
   | 'flower'
   | 'joker'
-  | 'midnight';
+  | 'midnight'
+  | 'felt';
 
 import type { TileFace } from './tileArt';
 
@@ -29,16 +30,24 @@ export interface ThemeDef {
   swatch: { brand: string; green: string; accent: string; page: string };
 }
 
-export const DEFAULT_THEME: ThemeId = 'jade';
+export const DEFAULT_THEME: ThemeId = 'crak';
 
 export const THEMES: ThemeDef[] = [
+  {
+    id: 'crak',
+    name: 'Crak',
+    tagline: 'Character red',
+    tile: { face: 'crack' },
+    wallpaper: '/patterns/bg-crak.svg',
+    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F5A524', page: '#F6EEDD' },
+  },
   {
     id: 'jade',
     name: 'Jade',
     tagline: 'Clean & neutral',
-    tile: { face: 'wind', char: '東', color: '#0EAD96' },
+    tile: { face: 'wind', char: '東', color: '#1F6B4E' },
     wallpaper: '/patterns/bg-jade.svg',
-    swatch: { brand: '#0EAD96', green: '#2BB673', accent: '#FF6B5C', page: '#F7F5EF' },
+    swatch: { brand: '#1F6B4E', green: '#10B39A', accent: '#F5A524', page: '#F1EEE0' },
   },
   {
     id: 'bam',
@@ -46,7 +55,7 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Bamboo green',
     tile: { face: 'bam' },
     wallpaper: '/patterns/bg-bam.svg',
-    swatch: { brand: '#2E9E50', green: '#2BB673', accent: '#F2784B', page: '#F0F5E9' },
+    swatch: { brand: '#15803D', green: '#10B39A', accent: '#F5A524', page: '#E9F4EC' },
   },
   {
     id: 'dot',
@@ -54,24 +63,16 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Circle blue',
     tile: { face: 'dot' },
     wallpaper: '/patterns/bg-dot.svg',
-    swatch: { brand: '#1E73C4', green: '#1FB7A6', accent: '#FF7A4D', page: '#EEF4FB' },
-  },
-  {
-    id: 'crak',
-    name: 'Crak',
-    tagline: 'Character red',
-    tile: { face: 'crack' },
-    wallpaper: '/patterns/bg-crak.svg',
-    swatch: { brand: '#D23B4E', green: '#23B196', accent: '#E0A02B', page: '#FCEDEC' },
+    swatch: { brand: '#1E6FCB', green: '#10B39A', accent: '#F5A524', page: '#EBF1F4' },
   },
   {
     id: 'dragon',
     name: 'Dragon',
     tagline: 'Emerald & gold',
     pro: true,
-    tile: { face: 'dragon', char: '中', color: '#D23B4E' },
+    tile: { face: 'dragon', char: '中', color: '#C8302C' },
     wallpaper: '/patterns/bg-dragon.svg',
-    swatch: { brand: '#0F8F6E', green: '#2BB673', accent: '#D23B4E', page: '#F4EFE1' },
+    swatch: { brand: '#C8302C', green: '#10B39A', accent: '#F5A524', page: '#E7F0EA' },
   },
   {
     id: 'flower',
@@ -79,7 +80,7 @@ export const THEMES: ThemeDef[] = [
     tagline: 'Petal pink',
     tile: { face: 'flower' },
     wallpaper: '/patterns/bg-flower.svg',
-    swatch: { brand: '#E84C8A', green: '#2BBE9E', accent: '#F2A93C', page: '#FFF0F6' },
+    swatch: { brand: '#DB2777', green: '#10B39A', accent: '#F5A524', page: '#FAECF3' },
   },
   {
     id: 'joker',
@@ -88,17 +89,26 @@ export const THEMES: ThemeDef[] = [
     pro: true,
     tile: { face: 'joker' },
     wallpaper: '/patterns/bg-joker.svg',
-    swatch: { brand: '#7C4DE0', green: '#18C39A', accent: '#F5478B', page: '#F5F2FD' },
+    swatch: { brand: '#6A3FC0', green: '#10B39A', accent: '#F5A524', page: '#F0EBFA' },
   },
   {
     id: 'midnight',
     name: 'Midnight',
-    tagline: 'Dark & neon',
+    tagline: 'Indigo & neon',
     dark: true,
     pro: true,
-    tile: { face: 'dragon', char: '白', color: '#5AA2FF' },
+    tile: { face: 'dragon', char: '白', color: '#4F46E5' },
     wallpaper: '/patterns/bg-midnight.svg',
-    swatch: { brand: '#2DD4BF', green: '#34D399', accent: '#FF6B81', page: '#141826' },
+    swatch: { brand: '#4F46E5', green: '#10B39A', accent: '#F5A524', page: '#EDEFF6' },
+  },
+  {
+    id: 'felt',
+    name: 'Felt',
+    tagline: 'Card-table green',
+    pro: true,
+    tile: { face: 'flower', color: '#C0392B' },
+    wallpaper: '/patterns/bg-felt.svg',
+    swatch: { brand: '#C0392B', green: '#10B39A', accent: '#F4E6C0', page: '#E8F1EA' },
   },
 ];
 
