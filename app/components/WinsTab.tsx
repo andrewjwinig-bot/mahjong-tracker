@@ -8,6 +8,7 @@ import { captionFor, appUrl } from '../lib/share';
 import { recordShare, track } from '../lib/analytics';
 import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
+import { colorNotation } from '../lib/theme';
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import { IconShare, IconTrash, IconCamera } from './uiIcons';
@@ -250,114 +251,125 @@ function LogWinSheet({
     onSave(win, { shareToGroup });
   }
 
+  const { burst } = useConfetti();
+  // A rain of tiles when the sheet opens — "before the tiles get scooped up".
+  useEffect(() => {
+    burst({ x: window.innerWidth / 2, y: 90 });
+  }, [burst]);
+
+  const [cat, setCat] = useState<string>(''); // '' = Freeform
+
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="grab" />
-        <h2>I Got Mahj! 🎉</h2>
-        <p className="sheet-sub">Log it before the tiles get scooped up.</p>
+      <div className="sheet log-sheet" onClick={(e) => e.stopPropagation()}>
+        {/* Celebratory header band */}
+        <div className="log-band">
+          <div className="grab light" />
+          <Tile face="crack" size={40} className="log-band-tile" />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="log-kicker">LOG YOUR WIN</div>
+            <div className="log-title">I GOT MAHJ!</div>
+            <div className="log-band-sub">Log it before the tiles get scooped up.</div>
+          </div>
+        </div>
 
-        <label className="lbl">Which hand?</label>
-        <select className="field" value={handId} onChange={(e) => setHandId(e.target.value)}>
-          <option value="">Freeform (no specific hand)</option>
-          {card.categories.map((cat) => (
-            <optgroup key={cat} label={cat}>
+        <div className="log-body">
+          <label className="lbl">Which hand?</label>
+          <div className="chip-wrap">
+            <button className="cat-chip" data-active={cat === ''} onClick={() => { setCat(''); setHandId(''); }}>
+              Freeform
+            </button>
+            {card.categories.map((c) => (
+              <button
+                key={c}
+                className="cat-chip"
+                data-active={cat === c}
+                onClick={() => { setCat(c); setHandId(''); }}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {cat !== '' && (
+            <div className="line-pick">
+              <div className="line-pick-head">Pick your line — check the one you won</div>
               {card.hands
                 .filter((h) => h.category === cat)
-                .map((h) => (
-                  <option key={h.id} value={h.id}>
-                    {handNotes[h.id] ?? h.notation}
-                  </option>
-                ))}
-            </optgroup>
-          ))}
-        </select>
+                .map((h) => {
+                  const picked = handId === h.id;
+                  return (
+                    <button
+                      key={h.id}
+                      className="line-row"
+                      data-picked={picked}
+                      onClick={() => setHandId(picked ? '' : h.id)}
+                    >
+                      <span className="check" data-checked={picked}>
+                        {picked ? '✓' : ''}
+                      </span>
+                      <span className="notation">
+                        {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
+                          <span key={i} className={g.cls}>
+                            {g.text}
+                            {i < arr.length - 1 ? ' ' : ''}
+                          </span>
+                        ))}
+                      </span>
+                    </button>
+                  );
+                })}
+            </div>
+          )}
 
-        <label className="lbl" style={{ marginTop: 14 }}>
-          Note (optional)
-        </label>
-        <textarea
-          className="field"
-          rows={2}
-          placeholder="Tuesday game with the girls…"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
+          <label className="lbl" style={{ marginTop: 16 }}>
+            Note <span style={{ color: 'var(--muted)' }}>— optional</span>
+          </label>
+          <textarea
+            className="field"
+            rows={2}
+            placeholder="Tuesday game with the girls…"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
 
-        <label className="lbl" style={{ marginTop: 14 }}>
-          Photo (optional)
-        </label>
-        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-        {previewUrl ? (
-          <div className="win" style={{ marginTop: 4 }}>
-            <img className="photo" src={previewUrl} alt="Preview" />
-          </div>
-        ) : null}
-        <button
-          className="btn ghost"
-          style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={() => fileRef.current?.click()}
-          disabled={busy}
-        >
-          {busy ? 'Processing…' : previewUrl ? 'Change photo' : <><IconCamera size={17} /> Add photo</>}
-        </button>
+          <label className="lbl" style={{ marginTop: 16 }}>
+            Photo <span style={{ color: 'var(--muted)' }}>— optional</span>
+          </label>
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+          {previewUrl && <img className="photo" src={previewUrl} alt="Preview" style={{ marginBottom: 8 }} />}
+          <button className="photo-add" onClick={() => fileRef.current?.click()} disabled={busy}>
+            <IconCamera size={18} /> {busy ? 'Processing…' : previewUrl ? 'CHANGE PHOTO' : 'ADD PHOTO'}
+          </button>
 
-        <button
-          type="button"
-          role="switch"
-          aria-checked={shareToGroup}
-          aria-label="Share to your table"
-          onClick={() => setShareToGroup((v) => !v)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            width: '100%',
-            marginTop: 14,
-            padding: '12px 14px',
-            borderRadius: 14,
-            background: shareToGroup ? '#D5F1E9' : '#fff',
-            border: `2px solid ${shareToGroup ? '#23B196' : 'var(--hairline)'}`,
-          }}
-        >
-          <span style={{ fontSize: 20 }}>👯</span>
-          <span style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 14 }}>
-            Share to {groupName}
-          </span>
-          <span
-            aria-hidden
-            style={{
-              width: 44,
-              height: 26,
-              borderRadius: 999,
-              background: shareToGroup ? '#23B196' : '#d6deea',
-              position: 'relative',
-              transition: 'background 0.15s',
-              flex: '0 0 auto',
-            }}
+          <button
+            type="button"
+            className="share-row"
+            role="switch"
+            aria-checked={shareToGroup}
+            data-on={shareToGroup}
+            onClick={() => setShareToGroup((v) => !v)}
           >
-            <span
-              style={{
-                position: 'absolute',
-                top: 3,
-                left: shareToGroup ? 21 : 3,
-                width: 20,
-                height: 20,
-                borderRadius: 999,
-                background: '#fff',
-                transition: 'left 0.15s',
-              }}
-            />
-          </span>
-        </button>
+            <Tile face="flower" size={34} />
+            <span style={{ flex: 1, textAlign: 'left' }}>
+              <span className="share-row-title">Share to {groupName}</span>
+              <span className="share-row-sub">PLAYERS WILL SEE IT</span>
+            </span>
+            <span className="ios-toggle" data-on={shareToGroup} aria-hidden>
+              <span className="ios-knob" />
+            </span>
+          </button>
 
-        <div className="row">
-          <button className="btn ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn" onClick={save} disabled={busy}>
-            Save My Mahj
-          </button>
+          <div className="log-footer">
+            <button className="act-btn" onClick={onClose}>
+              CANCEL
+            </button>
+            <button className="mahj-hero log-save" onClick={save} disabled={busy}>
+              <span className="mahj-hero-shine" aria-hidden />
+              <Tile face="crack" size={26} className="mahj-hero-tile" />
+              <span className="mahj-hero-label">SAVE MY MAHJ</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
