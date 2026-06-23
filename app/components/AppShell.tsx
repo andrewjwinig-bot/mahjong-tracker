@@ -55,7 +55,15 @@ export default function AppShell() {
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
   const [editorOpen, setEditorOpen] = useState(false);
   const [scorerOpen, setScorerOpen] = useState(false);
+  // Optional pre-seeded players for the scorer (e.g. a table's members).
+  type ScorerSeed = { suggestedNames: string[]; friends: { name: string; avatar: social.TileAvatar }[] };
+  const [scorerSeed, setScorerSeed] = useState<ScorerSeed | null>(null);
   const [practiceOpen, setPracticeOpen] = useState(false);
+
+  const openScorer = useCallback((seed?: ScorerSeed) => {
+    setScorerSeed(seed ?? null);
+    setScorerOpen(true);
+  }, []);
 
   // Load all local state once on mount.
   useEffect(() => {
@@ -297,7 +305,7 @@ export default function AppShell() {
                 onMahj={cardMahj}
                 experience={experience}
                 streak={streak}
-                onScore={() => setScorerOpen(true)}
+                onScore={() => openScorer()}
                 onPractice={() => setPracticeOpen(true)}
               />
             )}
@@ -323,9 +331,21 @@ export default function AppShell() {
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
+                onScore={() => openScorer()}
               />
             )}
-            {tab === 'tables' && socialState && <TablesTab profile={socialState.profile} />}
+            {tab === 'tables' && socialState && (
+              <TablesTab
+                profile={socialState.profile}
+                onScoreTable={(members) => {
+                  const others = members.filter((m) => m.name !== socialState.profile.name);
+                  openScorer({
+                    suggestedNames: [socialState.profile.name, ...others.map((m) => m.name)].slice(0, 4),
+                    friends: others,
+                  });
+                }}
+              />
+            )}
             {tab === 'learn' && <LearnTab experience={experience} onPractice={() => setPracticeOpen(true)} />}
           </>
         )}
@@ -373,14 +393,23 @@ export default function AppShell() {
 
       {scorerOpen && (
         <GameScorer
-          suggestedNames={[
-            socialState?.profile.name ?? 'You',
-            ...(socialState?.members.filter((m) => !m.isYou).map((m) => m.name) ?? []),
-          ].slice(0, 4)}
-          friends={(socialState?.members ?? [])
-            .filter((m) => !m.isYou)
-            .map((m) => ({ name: m.name, avatar: m.avatar }))}
-          onClose={() => setScorerOpen(false)}
+          suggestedNames={
+            scorerSeed?.suggestedNames ??
+            [
+              socialState?.profile.name ?? 'You',
+              ...(socialState?.members.filter((m) => !m.isYou).map((m) => m.name) ?? []),
+            ].slice(0, 4)
+          }
+          friends={
+            scorerSeed?.friends ??
+            (socialState?.members ?? [])
+              .filter((m) => !m.isYou)
+              .map((m) => ({ name: m.name, avatar: m.avatar }))
+          }
+          onClose={() => {
+            setScorerOpen(false);
+            setScorerSeed(null);
+          }}
         />
       )}
 

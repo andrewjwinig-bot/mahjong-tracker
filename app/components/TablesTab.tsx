@@ -33,7 +33,13 @@ const TABLE_ICONS: TileAvatar[] = [
   { face: 'joker', color: '#7C5CE0' },
 ];
 
-export default function TablesTab({ profile }: { profile: Profile }) {
+export default function TablesTab({
+  profile,
+  onScoreTable,
+}: {
+  profile: Profile;
+  onScoreTable: (members: { name: string; avatar: TileAvatar }[]) => void;
+}) {
   const [tables, setTables] = useState<Table[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -74,6 +80,7 @@ export default function TablesTab({ profile }: { profile: Profile }) {
         profile={profile}
         onBack={() => setSelectedId(null)}
         onUpdate={(fn) => update(selected.id, fn)}
+        onScore={() => onScoreTable(selected.members)}
       />
     );
   }
@@ -246,11 +253,13 @@ function TableDetail({
   profile,
   onBack,
   onUpdate,
+  onScore,
 }: {
   table: Table;
   profile: Profile;
   onBack: () => void;
   onUpdate: (fn: (t: Table) => Table) => void;
+  onScore: () => void;
 }) {
   const [view, setView] = useState<View>('chat');
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -274,6 +283,11 @@ function TableDetail({
           <IconShare size={16} /> Invite
         </button>
       </div>
+
+      <button className="score-cta" style={{ marginTop: 14 }} onClick={onScore}>
+        <span className="mahj-hero-shine" aria-hidden />
+        ⊕ Score This Table
+      </button>
 
       <div className="segmented" style={{ marginTop: 14 }}>
         {(['chat', 'dates', 'photos'] as View[]).map((v) => (
