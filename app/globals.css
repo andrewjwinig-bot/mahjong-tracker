@@ -775,6 +775,12 @@ a:focus-visible,
 .hand.won {
   border-color: var(--green);
 }
+/* Hands in the active seasonal challenge are tinted with the challenge box's
+   pine + a matching left accent — no per-row icon. */
+.hand[data-challenge="true"] {
+  background: color-mix(in srgb, var(--green) 9%, #fff);
+  box-shadow: inset 4px 0 0 var(--green), 0 7px 20px rgba(20, 22, 42, 0.11);
+}
 .hand .notation {
   flex: 1;
   min-width: 0;

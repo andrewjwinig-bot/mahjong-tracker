@@ -221,8 +221,14 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
             </div>
             {hands.map((h) => {
               const count = countOf(h);
+              const inChallenge = challenge.match(h);
               return (
-                <div key={h.id} className={`hand${count > 0 ? ' won' : ''}`}>
+                <div
+                  key={h.id}
+                  className={`hand${count > 0 ? ' won' : ''}`}
+                  data-challenge={inChallenge || undefined}
+                  title={inChallenge ? `${challenge.season} Challenge hand` : undefined}
+                >
                   <button
                     className="check"
                     data-checked={count > 0}
@@ -250,12 +256,6 @@ export default function CardTab({ card, handCounts, onBump, onMahj, experience, 
                     >
                       −
                     </button>
-                  )}
-
-                  {challenge.match(h) && (
-                    <span className="ch-row-tag" title={`${challenge.season} Challenge`}>
-                      {challenge.emoji}
-                    </span>
                   )}
 
                   <span className="pts">
