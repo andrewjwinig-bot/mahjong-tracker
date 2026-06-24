@@ -54,7 +54,7 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v4';
+const K_TABLES = 'tables.v5';
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -100,9 +100,9 @@ function seed(): Table[] {
       icon: A('flower', '#E84C8A'),
       inviteCode: 'MOMS-7788',
       members: [
-        { name: 'Diane', avatar: A('crack', '#E8455F') },
+        { name: 'Greg', avatar: A('crack', '#E8455F') },
         { name: 'Hailey', avatar: A('joker', '#7C5CE0') },
-        { name: 'Rae', avatar: A('wind', '#2C3A57', '東') },
+        { name: 'Avery', avatar: A('wind', '#2C3A57', '東') },
       ],
       messages: [
         { id: 'm4', author: 'Hailey', avatar: A('joker', '#7C5CE0'), text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
@@ -110,7 +110,7 @@ function seed(): Table[] {
       poll: {
         question: 'Pick a weekend slot',
         options: [
-          { id: 'p4', date: isoInDays(6), time: '11:00', votes: ['Hailey', 'Diane'] },
+          { id: 'p4', date: isoInDays(6), time: '11:00', votes: ['Hailey', 'Greg'] },
           { id: 'p5', date: isoInDays(13), time: '11:00', votes: [] },
         ],
       },
