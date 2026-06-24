@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MahjongCard, Win } from '../lib/types';
+import type { FeedPost } from '../lib/social';
 import { downscaleImage } from '../lib/image';
 import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
@@ -117,11 +118,14 @@ export default function WinsTab({
 export function WinCard({
   win,
   groupName,
+  post,
   onRemove,
   onPostToGroup,
 }: {
   win: Win;
   groupName: string;
+  /** The matching feed post, if this mahj was shared — for likes/comments. */
+  post?: FeedPost | null;
   onRemove: () => void;
   onPostToGroup: (win: Win) => void;
 }) {
@@ -136,7 +140,6 @@ export function WinCard({
   }, [win.photo]);
 
   const when = new Date(win.createdAt).toLocaleDateString(undefined, {
-    weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
@@ -147,29 +150,47 @@ export function WinCard({
   }
 
   return (
-    <div className="win">
-      {url && <img className="photo" src={url} alt="Win photo" />}
-      <div className="body">
-        <div className="when">{when}</div>
-        {win.handLabel && (
-          <p className="note" style={{ fontWeight: 800 }}>
-            🀄 {win.handLabel}
-          </p>
-        )}
-        {win.note && <p className="note">{win.note}</p>}
-        <div className="actions">
-          <button
-            className="btn coral"
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-            onClick={openShare}
-          >
-            <IconShare size={17} /> Share
-          </button>
-          <button className="btn ghost" onClick={onRemove} aria-label="Delete mahj">
-            <IconTrash size={18} />
-          </button>
+    <div className="win-row">
+      {url ? (
+        <img className="win-thumb" src={url} alt="Win photo" />
+      ) : (
+        <span className="win-check" aria-hidden>
+          ✓
+        </span>
+      )}
+
+      <div className="win-main">
+        <div className="notation">
+          {win.handLabel ? (
+            colorNotation(win.handLabel).map((g, i, arr) => (
+              <span key={i} className={g.cls}>
+                {g.text}
+                {i < arr.length - 1 ? ' ' : ''}
+              </span>
+            ))
+          ) : (
+            <span style={{ color: 'var(--muted)' }}>Freeform mahj</span>
+          )}
+        </div>
+        <div className="win-meta">
+          <span>{when}</span>
+          {win.note && <span className="win-note">· {win.note}</span>}
+          {post ? (
+            <span className="win-social">
+              ❤️ {post.likes} · 💬 {post.comments.length}
+            </span>
+          ) : (
+            <span className="win-social muted">· in {groupName}</span>
+          )}
         </div>
       </div>
+
+      <button className="win-act" onClick={openShare} aria-label="Share mahj">
+        <IconShare size={16} />
+      </button>
+      <button className="win-act danger" onClick={onRemove} aria-label="Delete mahj">
+        <IconTrash size={15} />
+      </button>
 
       {shareOpen && (
         <ShareModal

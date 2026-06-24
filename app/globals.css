@@ -1013,48 +1013,93 @@ label.lbl {
 
 /* ---- Wins feed ----------------------------------------------------------- */
 
-.win {
-  background: var(--card);
-  border-radius: 22px;
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
+/* "Your Mahjs" journal rows — same row language as the card's hand rows. */
+.win-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 7px;
+  background: #fff;
+  border: 2.5px solid var(--green);
+  box-shadow: 0 7px 20px rgba(20, 22, 42, 0.11);
 }
-.win + .win {
-  margin-top: 14px;
+.win-row + .win-row {
+  margin-top: 8px;
 }
-.win img.photo {
-  width: 100%;
-  display: block;
-  max-height: 320px;
+.win-check {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  background: var(--green);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: #fff;
+}
+.win-thumb {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 6px;
   object-fit: cover;
   background: var(--tint);
 }
-.win .body {
-  padding: 14px 16px;
-}
-.win .when {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-.win .note {
-  margin: 6px 0 0;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.35;
-}
-.win .actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-.win .actions .btn {
-  width: auto;
+.win-main {
   flex: 1;
-  padding: 11px 14px;
-  font-size: 14px;
+  min-width: 0;
+}
+.win-row .notation {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(13.5px, 4.4vw, 19px);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.win-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.win-note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+.win-social {
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.win-social.muted {
+  font-weight: 700;
+  color: var(--muted);
+}
+.win-act {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--tint);
+  color: var(--brand);
+}
+.win-act.danger {
+  color: var(--muted);
+}
+.win-act:active {
+  transform: scale(0.9);
 }
 
 /* ---- Leaderboard rows + member detail ----------------------------------- */

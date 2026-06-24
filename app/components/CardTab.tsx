@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import type { MahjongCard, Hand, Win } from '../lib/types';
+import type { FeedPost } from '../lib/social';
+import { YOU_ID } from '../lib/social';
 import { colorNotation } from '../lib/theme';
 import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
@@ -22,6 +24,7 @@ interface Props {
   handCounts: Record<string, number>;
   handNotes: Record<string, string>;
   wins: Win[];
+  feed: FeedPost[];
   groupName: string;
   onBump: (handId: string, delta: number) => void;
   onAddWin: (win: Win) => void;
@@ -36,6 +39,7 @@ export default function CardTab({
   handCounts,
   handNotes,
   wins,
+  feed,
   groupName,
   onBump,
   onAddWin,
@@ -268,6 +272,7 @@ export default function CardTab({
               key={w.id}
               win={w}
               groupName={groupName}
+              post={feed.find((p) => p.memberId === YOU_ID && p.createdAt === w.createdAt) ?? null}
               onRemove={() => onRemoveWin(w.id)}
               onPostToGroup={onPostToGroup}
             />
