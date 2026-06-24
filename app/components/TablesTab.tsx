@@ -6,6 +6,7 @@ import type { ChatMsg, PollOption, Table, TablePhoto } from '../lib/tables';
 import { loadTables, saveTables } from '../lib/tables';
 import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
 import { downscaleImage } from '../lib/image';
+import PageTitle from './PageTitle';
 import { track } from '../lib/analytics';
 import Avatar from './Avatar';
 import Tile from './Tile';
@@ -164,7 +165,7 @@ function TablesList({
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>Your Tables</h1>
+        <PageTitle kicker="YOUR" word="Tables" />
         <p className="sub">Your private groups — chat, schedule &amp; share photos.</p>
         <TileStrip count={7} />
       </header>

@@ -20,6 +20,7 @@ import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import TipCard from './TipCard';
+import PageTitle from './PageTitle';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
@@ -148,7 +149,7 @@ export default function GroupTab({
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>The Feed</h1>
+        <PageTitle kicker={`${(profile.name.trim().split(/\s+/)[0] || 'Your').toUpperCase()}’S`} word="Feed" />
       </header>
 
       {nextG && (
