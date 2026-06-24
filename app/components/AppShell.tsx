@@ -59,6 +59,8 @@ export default function AppShell() {
   type ScorerSeed = { suggestedNames: string[]; friends: { name: string; avatar: social.TileAvatar }[] };
   const [scorerSeed, setScorerSeed] = useState<ScorerSeed | null>(null);
   const [practiceOpen, setPracticeOpen] = useState(false);
+  // A table to deep-link into (e.g. from the Feed's "next game" card).
+  const [tablesTarget, setTablesTarget] = useState<string | null>(null);
 
   const openScorer = useCallback((seed?: ScorerSeed) => {
     setScorerSeed(seed ?? null);
@@ -353,12 +355,17 @@ export default function AppShell() {
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
                 onScore={() => openScorer()}
-                onOpenTables={() => setTab('tables')}
+                onOpenTables={(id) => {
+                  setTablesTarget(id);
+                  setTab('tables');
+                }}
               />
             )}
             {tab === 'tables' && socialState && (
               <TablesTab
                 profile={socialState.profile}
+                openTableId={tablesTarget}
+                onConsumedOpen={() => setTablesTarget(null)}
                 onScoreTable={(members) => {
                   const others = members.filter((m) => m.name !== socialState.profile.name);
                   openScorer({

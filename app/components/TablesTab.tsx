@@ -35,9 +35,13 @@ const TABLE_ICONS: TileAvatar[] = [
 
 export default function TablesTab({
   profile,
+  openTableId,
+  onConsumedOpen,
   onScoreTable,
 }: {
   profile: Profile;
+  openTableId?: string | null;
+  onConsumedOpen?: () => void;
   onScoreTable: (members: { name: string; avatar: TileAvatar }[]) => void;
 }) {
   const [tables, setTables] = useState<Table[] | null>(null);
@@ -50,6 +54,16 @@ export default function TablesTab({
       alive = false;
     };
   }, []);
+
+  // Deep-link: open a specific table when asked (e.g. from the Feed's next-game
+  // card), then clear the request so a later tap re-opens it.
+  useEffect(() => {
+    if (openTableId) {
+      setSelectedId(openTableId);
+      onConsumedOpen?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openTableId]);
 
   function update(id: string, fn: (t: Table) => Table) {
     setTables((prev) => {
