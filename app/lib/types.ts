@@ -30,5 +30,7 @@ export interface Win {
   handLabel: string | null;
   note: string;
   photo: Blob | null;
+  /** Vertical focal point (0–100%) for cover-cropped displays. Default 50. */
+  photoPos?: number;
   createdAt: number;
 }
