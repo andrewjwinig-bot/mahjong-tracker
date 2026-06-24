@@ -2165,6 +2165,17 @@ label.lbl {
   font-size: 11px;
   letter-spacing: 0.4px;
 }
+/* Photo preview inside the Call Mahj sheet — constrained so a big iPhone
+   photo (portrait or landscape) never overflows or breaks the frame. */
+.log-photo {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: var(--tint);
+}
 .photo-add {
   display: inline-flex;
   align-items: center;

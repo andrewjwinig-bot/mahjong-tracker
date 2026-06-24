@@ -259,8 +259,14 @@ export function LogWinSheet({
       setPhoto(blob);
       if (preview) URL.revokeObjectURL(preview);
       setPreview(URL.createObjectURL(blob));
+    } catch {
+      // Some formats (e.g. HEIC on unsupported browsers) can't be decoded —
+      // skip rather than crash, and let the user pick a different photo.
+      alert('Sorry, that photo couldn’t be added. Try a different one (JPEG or PNG).');
     } finally {
       setBusy(false);
+      // Allow re-picking the same file after a failure.
+      if (fileRef.current) fileRef.current.value = '';
     }
   }
 
@@ -396,7 +402,7 @@ export function LogWinSheet({
             Photo <span style={{ color: 'var(--muted)' }}>— optional</span>
           </label>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          {previewUrl && <img className="photo" src={previewUrl} alt="Preview" style={{ marginBottom: 8 }} />}
+          {previewUrl && <img className="log-photo" src={previewUrl} alt="Preview" />}
           <button className="photo-add" onClick={() => fileRef.current?.click()} disabled={busy}>
             <IconCamera size={18} /> {busy ? 'Processing…' : previewUrl ? 'CHANGE PHOTO' : 'ADD PHOTO'}
           </button>

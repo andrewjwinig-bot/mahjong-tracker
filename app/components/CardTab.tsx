@@ -262,7 +262,9 @@ export default function CardTab({
       {wins.length > 0 && (
         <section style={{ marginTop: 26 }}>
           <div className="cat-bar">
-            <span className="cat-name">Your Mahjs</span>
+            <span className="cat-name" style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+              <IconTrophy size={15} /> Your Mahjs
+            </span>
             <span className="cat-count">
               {wins.length} logged
             </span>
