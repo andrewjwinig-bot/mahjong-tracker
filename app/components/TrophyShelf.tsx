@@ -46,48 +46,50 @@ export default function TrophyShelf({
     ? new Date(memberSince).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
     : '—';
 
-  const stats: { label: string; value: string }[] = [
-    { label: 'Cleared', value: `${s.cleared}/${s.total}` },
-    { label: 'Mahjs', value: `${s.mahjs}` },
-    { label: 'Points', value: `${s.points}` },
-    { label: 'Best streak', value: `${bestStreak}d` },
+  const stats: { label: string; value: string; color: string }[] = [
+    { label: 'Cleared', value: `${s.cleared}/${s.total}`, color: 'var(--green)' },
+    { label: 'Mahjs', value: `${s.mahjs}`, color: 'var(--brand)' },
+    { label: 'Points', value: `${s.points}`, color: '#C9871A' },
+    { label: 'Best streak', value: `${bestStreak}d`, color: '#2E86D4' },
   ];
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="grab" />
-
-        {/* Profile header */}
-        <div className="profile-head">
-          <Avatar avatar={profile.avatar} size={64} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="profile-name">{profile.name}</div>
-            <div className="profile-handle">@{profile.handle}</div>
-          </div>
-          <button
-            className="btn coral"
-            style={{ width: 'auto', padding: '9px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            onClick={() => setShareOpen(true)}
-          >
-            <IconShare size={16} /> Share
-          </button>
-        </div>
-        {profile.bio && <p className="profile-bio">{profile.bio}</p>}
-        <p className="sheet-sub" style={{ textAlign: 'left', margin: '4px 2px 14px' }}>
-          {earned.length}/{badges.length} trophies · since {since}
-        </p>
-
-        <div className="stat-row">
-          {stats.map((st) => (
-            <div className="stat-mini" key={st.label}>
-              <div className="sm-num">{st.value}</div>
-              <div className="sm-lab">{st.label}</div>
+      <div className="sheet profile-sheet" onClick={(e) => e.stopPropagation()}>
+        {/* Cinnabar header band */}
+        <div className="profile-band">
+          <span className="md-stripe" aria-hidden />
+          <div className="grab light" />
+          <div className="profile-band-row">
+            <span className="profile-band-tile">
+              <Avatar avatar={profile.avatar} size={46} />
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="profile-name">{profile.name}</div>
+              <div className="profile-handle">@{profile.handle}</div>
             </div>
-          ))}
+            <button className="profile-share" onClick={() => setShareOpen(true)}>
+              <IconShare size={15} /> SHARE
+            </button>
+          </div>
         </div>
 
-        {(s.mahjs > 0 || gamesPlayed > 0) && (
+        <div className="profile-body">
+          {profile.bio && <p className="profile-bio">{profile.bio}</p>}
+          <p className="sheet-sub" style={{ textAlign: 'left', margin: '0 2px 14px' }}>
+            {earned.length}/{badges.length} trophies · since {since}
+          </p>
+
+          <div className="stat-row">
+            {stats.map((st) => (
+              <div className="stat-mini" key={st.label}>
+                <div className="sm-num">{st.value}</div>
+                <div className="sm-lab" style={{ color: st.color }}>{st.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {(s.mahjs > 0 || gamesPlayed > 0) && (
           <>
             <div className="set-section">Your game</div>
             <div className="insight-list">
@@ -175,9 +177,10 @@ export default function TrophyShelf({
           ))}
         </div>
 
-        <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
-          Done
-        </button>
+          <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
+            Done
+          </button>
+        </div>
       </div>
 
       {shareOpen && (

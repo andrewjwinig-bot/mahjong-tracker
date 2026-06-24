@@ -1,11 +1,25 @@
 // Generates a downloadable "share card" PNG for a win — the artifact whose
 // usage is the headline Phase-1 metric. Drawn on a 4:5 canvas (social-friendly).
 
-import { COLORS } from './theme';
+import { COLORS, colorNotation } from './theme';
 import type { Win } from './types';
 
 const W = 1080;
 const H = 1350;
+
+// Fixed "felt & paper" v6 palette for the shareable artifact (not theme-reactive).
+const SC_BRAND = '#C0392B';
+const SC_BRAND_DEEP = '#4D0F09';
+const SC_CREAM = '#FBF7EC';
+const SC_INK = '#1A1410';
+// Fixed 4-color hand-notation palette (nc0–nc3).
+const SC_NOTE: Record<string, string> = {
+  nc0: '#1A1410',
+  nc1: '#C0392B',
+  nc2: '#C9871A',
+  nc3: '#2E86D4',
+};
+const RND = 'ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
 
 export async function buildShareCard(win: Win, handLabel: string | null): Promise<Blob> {
   const canvas = document.createElement('canvas');
@@ -13,77 +27,114 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
   canvas.height = H;
   const ctx = canvas.getContext('2d')!;
 
-  // Background gradient (blue → green)
-  const g = ctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, COLORS.primary);
-  g.addColorStop(1, COLORS.secondary);
-  ctx.fillStyle = g;
+  // Cream paper card background.
+  ctx.fillStyle = SC_CREAM;
   ctx.fillRect(0, 0, W, H);
 
-  // Header
-  ctx.fillStyle = 'rgba(255,255,255,0.92)';
-  ctx.font = '800 40px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('🀄  2026 MAHJONG TRACKER', 64, 110);
-
-  // White content card
-  const cardX = 56;
-  const cardY = 160;
-  const cardW = W - cardX * 2;
-  const cardH = H - cardY - 120;
-  roundRect(ctx, cardX, cardY, cardW, cardH, 44);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-
-  let cursorY = cardY + 56;
-  const pad = 56;
-
-  // Photo (optional)
-  if (win.photo) {
-    const img = await blobToImage(win.photo);
-    const photoH = 560;
-    const photoY = cursorY;
-    ctx.save();
-    roundRect(ctx, cardX + pad, photoY, cardW - pad * 2, photoH, 28);
-    ctx.clip();
-    drawCover(ctx, img, cardX + pad, photoY, cardW - pad * 2, photoH);
-    ctx.restore();
-    cursorY = photoY + photoH + 48;
-  } else {
-    cursorY += 8;
+  // Brand header band with diagonal stripes.
+  const bandH = 210;
+  ctx.fillStyle = SC_BRAND;
+  ctx.fillRect(0, 0, W, bandH);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, bandH);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  ctx.lineWidth = 7;
+  for (let i = -H; i < W; i += 46) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + bandH, bandH);
+    ctx.stroke();
   }
+  ctx.restore();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = `800 34px ${RND}`;
+  ctx.fillText('LET’S MAHJ', 64, 92);
+  ctx.font = `800 66px ${RND}`;
+  ctx.fillStyle = SC_BRAND_DEEP;
+  ctx.fillText('2026 Season', 69, 165);
+  ctx.fillStyle = '#fff';
+  ctx.fillText('2026 Season', 64, 160);
 
-  // "I GOT MAHJ" eyebrow
-  ctx.fillStyle = COLORS.accent;
-  ctx.font = '800 32px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('I GOT MAHJ! 🀄', cardX + pad, cursorY);
+  let cursorY = bandH + 120;
+  const pad = 72;
+
+  // Two-tone "I GOT MAHJ!" headline (centered).
+  ctx.textAlign = 'center';
+  ctx.font = `900 96px ${RND}`;
+  ctx.fillStyle = SC_BRAND_DEEP;
+  ctx.fillText('I GOT MAHJ!', W / 2 + 6, cursorY + 6);
+  ctx.fillStyle = SC_BRAND;
+  ctx.fillText('I GOT MAHJ!', W / 2, cursorY);
   cursorY += 70;
 
-  // Hand label (wrapped)
-  ctx.fillStyle = COLORS.ink;
-  ctx.font = '900 64px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  const label = handLabel ?? 'Mahjong!';
-  cursorY = wrapText(ctx, label, cardX + pad, cursorY, cardW - pad * 2, 72) + 24;
-
-  // Note (optional)
-  if (win.note) {
-    ctx.fillStyle = '#4a4f5e';
-    ctx.font = '600 36px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-    cursorY = wrapText(ctx, `“${win.note}”`, cardX + pad, cursorY, cardW - pad * 2, 48) + 16;
+  // Photo (optional) — framed.
+  if (win.photo) {
+    const img = await blobToImage(win.photo);
+    const photoH = 540;
+    ctx.save();
+    roundRect(ctx, pad, cursorY, W - pad * 2, photoH, 28);
+    ctx.clip();
+    drawCover(ctx, img, pad, cursorY, W - pad * 2, photoH);
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(20,22,42,0.12)';
+    ctx.lineWidth = 5;
+    roundRect(ctx, pad, cursorY, W - pad * 2, photoH, 28);
+    ctx.stroke();
+    cursorY += photoH + 70;
+  } else {
+    cursorY += 30;
   }
 
-  // Date footer
+  // Winning hand in fixed 4-color notation (centered).
+  drawNotation(ctx, colorNotation(handLabel ?? 'Mahjong!'), W / 2, cursorY, `900 60px ${RND}`);
+  cursorY += 80;
+
+  // Note (optional, centered).
+  if (win.note) {
+    ctx.fillStyle = '#4a4f5e';
+    ctx.font = `600 34px ${RND}`;
+    ctx.fillText(`“${win.note}”`, W / 2, cursorY);
+    cursorY += 50;
+  }
+
+  // Date footer (centered, near bottom).
   ctx.fillStyle = COLORS.muted;
-  ctx.font = '700 30px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
+  ctx.font = `700 30px ${RND}`;
   const date = new Date(win.createdAt).toLocaleDateString(undefined, {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
-  ctx.fillText(date, cardX + pad, cardY + cardH - 48);
+  ctx.fillText(date, W / 2, H - 70);
 
   return await new Promise<Blob>((resolve) =>
     canvas.toBlob((b) => resolve(b ?? new Blob()), 'image/png'),
   );
+}
+
+// Draw position-cycled 4-color notation, centered on cx.
+function drawNotation(
+  ctx: CanvasRenderingContext2D,
+  groups: { text: string; cls: string }[],
+  cx: number,
+  y: number,
+  font: string,
+): void {
+  ctx.font = font;
+  ctx.textAlign = 'left';
+  const space = ctx.measureText(' ').width;
+  let total = 0;
+  for (const g of groups) total += ctx.measureText(g.text).width + space;
+  total = Math.max(0, total - space);
+  let x = cx - total / 2;
+  for (const g of groups) {
+    ctx.fillStyle = SC_NOTE[g.cls] ?? SC_INK;
+    ctx.fillText(g.text, x, y);
+    x += ctx.measureText(g.text).width + space;
+  }
 }
 
 export interface TrophyCardData {
