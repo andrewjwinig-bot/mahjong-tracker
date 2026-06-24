@@ -168,7 +168,7 @@ export default function CardTab({
 
       <button className="trophy-link" onClick={onTrophies}>
         <IconTrophy size={17} />
-        <span>Trophies &amp; Stats</span>
+        <span>Stats &amp; Trophies</span>
         <span className="tl-chev">›</span>
       </button>
 

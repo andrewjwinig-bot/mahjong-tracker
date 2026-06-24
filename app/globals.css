@@ -508,7 +508,7 @@ a:focus-visible,
   color: var(--muted);
 }
 
-/* Compact "Trophies & Stats" entry on the Card hub (opens the trophy shelf). */
+/* Compact "Stats & Trophies" entry on the Card hub (opens the trophy shelf). */
 .trophy-link {
   display: flex;
   align-items: center;
