@@ -8,14 +8,12 @@ import { captionFor, appUrl } from '../lib/share';
 import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
 import CountUp from './CountUp';
-import TipCard from './TipCard';
 import Tile from './Tile';
 import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconFlame, IconTap } from './uiIcons';
-import type { Experience } from '../lib/account';
+import { IconTap } from './uiIcons';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
@@ -32,8 +30,6 @@ interface Props {
   onRemoveWin: (id: string) => void;
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
-  experience: Experience;
-  streak: number;
   onScore: () => void;
   onPractice: () => void;
 }
@@ -50,8 +46,6 @@ export default function CardTab({
   onRemoveWin,
   onPostToGroup,
   onMilestone,
-  experience,
-  streak,
   onScore,
   onPractice,
 }: Props) {
@@ -167,11 +161,6 @@ export default function CardTab({
     <div className="screen">
       <header className="app-header card-header">
         <CardTitle />
-        {streak > 1 && (
-          <div className="streak-chip">
-            <IconFlame size={15} /> {streak}-day streak
-          </div>
-        )}
       </header>
 
       <div className="stats" style={{ marginTop: 16 }}>
@@ -224,10 +213,6 @@ export default function CardTab({
           onToggleFocus={() => setFilter((f) => (f === 'challenge' ? 'all' : 'challenge'))}
           onSeasons={() => setSeasonsOpen(true)}
         />
-      </div>
-
-      <div style={{ marginTop: 14 }}>
-        <TipCard experience={experience} />
       </div>
 
       <div className="segmented" style={{ marginTop: 18 }}>

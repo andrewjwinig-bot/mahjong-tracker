@@ -19,6 +19,8 @@ import { track } from '../lib/analytics';
 import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
+import TipCard from './TipCard';
+import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
 
@@ -31,6 +33,7 @@ interface Props {
   /** The local user's real per-hand win counts (for your own detail view). */
   handCounts: Record<string, number>;
   streak: number;
+  experience: Experience;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
@@ -91,6 +94,7 @@ export default function GroupTab({
   youStats,
   handCounts,
   streak,
+  experience,
   onToggleLike,
   onAddComment,
   onAddFriend,
@@ -173,10 +177,14 @@ export default function GroupTab({
         </div>
       )}
 
-      <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
+      <button className="score-cta" onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
         ⊕ Score a Game
       </button>
+
+      <div style={{ margin: '14px 0 22px' }}>
+        <TipCard experience={experience} />
+      </div>
 
       {addOpen && (
         <AddFriendSheet
