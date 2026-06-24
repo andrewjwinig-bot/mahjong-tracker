@@ -107,8 +107,23 @@ const SEED: Record<string, Seed[]> = {
   ],
 };
 
+// Explicit section order. (Object key order can't be trusted here: the
+// integer-like keys like '2026' / '369' would otherwise be iterated in numeric
+// order — 369 before 2026 — instead of the intended printed-card order.)
+const CATEGORY_ORDER = [
+  '2026',
+  '2468',
+  'Any Like Numbers',
+  'Quints',
+  'Consecutive Run',
+  '13579',
+  'Winds + Dragons',
+  '369',
+  'Singles + Pairs',
+];
+
 function build(): MahjongCard {
-  const categories = Object.keys(SEED);
+  const categories = CATEGORY_ORDER;
   const hands: Hand[] = [];
   for (const category of categories) {
     SEED[category].forEach(([notation, points, concealed], i) => {
