@@ -2068,6 +2068,22 @@ label.lbl {
 .line-row + .line-row {
   border-top: 1.5px solid rgba(20, 22, 42, 0.06);
 }
+.line-row[data-picked] {
+  background: color-mix(in srgb, var(--green) 8%, #fff);
+}
+.change-hand {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1.5px solid var(--hairline);
+  background: #fff;
+  color: var(--brand);
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
 .photo-add {
   display: inline-flex;
   align-items: center;
@@ -4652,6 +4668,38 @@ label.lbl {
   font-weight: 900;
   font-family: var(--font-display), system-ui, sans-serif;
 }
+.player-locked {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 13px;
+  border-radius: 11px;
+  border: 2px solid color-mix(in srgb, var(--brand) 26%, transparent);
+  background: var(--tint);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-remove {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--tint);
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+}
+.player-remove:active {
+  transform: scale(0.9);
+}
 .friend-chip {
   display: inline-flex;
   align-items: center;
@@ -4665,6 +4713,61 @@ label.lbl {
 }
 .friend-chip:active {
   transform: scale(0.96);
+}
+.friend-chip[data-on="true"] {
+  background: linear-gradient(180deg, var(--brand), var(--brand-deep));
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 38%, transparent);
+}
+
+/* Rich, centered "When should we play next?" hero for the table poll. */
+.poll-hero {
+  position: relative;
+  margin: 6px 0 16px;
+  padding: 22px 18px 20px;
+  border-radius: 16px;
+  text-align: center;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(160deg, var(--brand), var(--brand-deep));
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--brand) 38%, transparent);
+}
+.poll-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 12px);
+  opacity: 0.12;
+  pointer-events: none;
+}
+.poll-hero-ic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 9px;
+  border-radius: 14px;
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.28);
+}
+.poll-hero-q {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.12;
+  letter-spacing: -0.2px;
+}
+.poll-hero-sub {
+  position: relative;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .picker-row {

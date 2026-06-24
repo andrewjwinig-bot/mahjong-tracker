@@ -206,6 +206,9 @@ export function LogWinSheet({
 }) {
   const initialHand = initialHandId ? card.hands.find((h) => h.id === initialHandId) : null;
   const [handId, setHandId] = useState<string>(initialHand?.id ?? '');
+  // When a hand was pre-selected (tapping a Card row), skip the picker and show
+  // it as already chosen — the user shouldn't have to re-select it.
+  const [picking, setPicking] = useState<boolean>(!initialHand);
   const [note, setNote] = useState('');
   const [photo, setPhoto] = useState<Blob | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -277,51 +280,84 @@ export function LogWinSheet({
 
         <div className="log-body">
           <label className="lbl">Which hand?</label>
-          <div className="chip-wrap">
-            <button className="cat-chip" data-active={cat === ''} onClick={() => { setCat(''); setHandId(''); }}>
-              Freeform
-            </button>
-            {card.categories.map((c) => (
-              <button
-                key={c}
-                className="cat-chip"
-                data-active={cat === c}
-                onClick={() => { setCat(c); setHandId(''); }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
 
-          {cat !== '' && (
+          {handId && !picking ? (
+            // A hand is already chosen (tapped from the Card) — show it, don't re-pick.
             <div className="line-pick">
-              <div className="line-pick-head">Pick your line — check the one you won</div>
-              {card.hands
-                .filter((h) => h.category === cat)
-                .map((h) => {
-                  const picked = handId === h.id;
-                  return (
-                    <button
-                      key={h.id}
-                      className="line-row"
-                      data-picked={picked}
-                      onClick={() => setHandId(picked ? '' : h.id)}
-                    >
-                      <span className="check" data-checked={picked}>
-                        {picked ? '✓' : ''}
-                      </span>
-                      <span className="notation">
-                        {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
-                          <span key={i} className={g.cls}>
-                            {g.text}
-                            {i < arr.length - 1 ? ' ' : ''}
-                          </span>
-                        ))}
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="line-row" data-picked>
+                <span className="check" data-checked>
+                  ✓
+                </span>
+                <span className="notation">
+                  {colorNotation(handNotes[handId] ?? labelFor(handId) ?? '').map((g, i, arr) => (
+                    <span key={i} className={g.cls}>
+                      {g.text}
+                      {i < arr.length - 1 ? ' ' : ''}
+                    </span>
+                  ))}
+                </span>
+                <button
+                  className="change-hand"
+                  onClick={() => {
+                    setPicking(true);
+                  }}
+                >
+                  Change
+                </button>
+              </div>
             </div>
+          ) : (
+            <>
+              <div className="chip-wrap">
+                <button className="cat-chip" data-active={cat === ''} onClick={() => { setCat(''); setHandId(''); }}>
+                  Freeform
+                </button>
+                {card.categories.map((c) => (
+                  <button
+                    key={c}
+                    className="cat-chip"
+                    data-active={cat === c}
+                    onClick={() => { setCat(c); setHandId(''); }}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+
+              {cat !== '' && (
+                <div className="line-pick">
+                  <div className="line-pick-head">Pick your line — check the one you won</div>
+                  {card.hands
+                    .filter((h) => h.category === cat)
+                    .map((h) => {
+                      const picked = handId === h.id;
+                      return (
+                        <button
+                          key={h.id}
+                          className="line-row"
+                          data-picked={picked}
+                          onClick={() => {
+                            setHandId(picked ? '' : h.id);
+                            if (!picked) setPicking(false);
+                          }}
+                        >
+                          <span className="check" data-checked={picked}>
+                            {picked ? '✓' : ''}
+                          </span>
+                          <span className="notation">
+                            {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
+                              <span key={i} className={g.cls}>
+                                {g.text}
+                                {i < arr.length - 1 ? ' ' : ''}
+                              </span>
+                            ))}
+                          </span>
+                        </button>
+                      );
+                    })}
+                </div>
+              )}
+            </>
           )}
 
           <label className="lbl" style={{ marginTop: 16 }}>
