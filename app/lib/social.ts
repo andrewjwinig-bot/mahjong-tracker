@@ -82,10 +82,10 @@ export interface SocialState {
   profile: Profile;
 }
 
-const K_SEEDED = 'social.seeded.v3';
+const K_SEEDED = 'social.seeded.v4';
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
-const K_FEED = 'social.feed.v3';
+const K_FEED = 'social.feed.v4';
 const K_PROFILE = 'social.profile';
 
 const HOUR = 3_600_000;
@@ -122,67 +122,67 @@ async function seedIfNeeded(): Promise<void> {
 
   const members: GroupMember[] = [
     { id: YOU_ID, name: profile.name, avatar: profile.avatar, isYou: true, handsCleared: 0, points: 0 },
-    { id: 'm_sandra', name: 'Sandra', avatar: DEMO_AVATARS.m_sandra, isYou: false, handsCleared: 31, points: 845 },
-    { id: 'm_bev', name: 'Bev', avatar: DEMO_AVATARS.m_bev, isYou: false, handsCleared: 27, points: 720 },
-    { id: 'm_marsha', name: 'Marsha', avatar: DEMO_AVATARS.m_marsha, isYou: false, handsCleared: 24, points: 610 },
-    { id: 'm_lois', name: 'Lois', avatar: DEMO_AVATARS.m_lois, isYou: false, handsCleared: 19, points: 505 },
+    { id: 'm_sandra', name: 'Lily', avatar: DEMO_AVATARS.m_sandra, isYou: false, handsCleared: 31, points: 845 },
+    { id: 'm_bev', name: 'Nicole', avatar: DEMO_AVATARS.m_bev, isYou: false, handsCleared: 27, points: 720 },
+    { id: 'm_marsha', name: 'Alison', avatar: DEMO_AVATARS.m_marsha, isYou: false, handsCleared: 24, points: 610 },
+    { id: 'm_lois', name: 'Matthew', avatar: DEMO_AVATARS.m_lois, isYou: false, handsCleared: 19, points: 505 },
   ];
 
   const feed: FeedPost[] = [
     {
-      id: 'f1', memberId: 'm_sandra', memberName: 'Sandra', avatar: DEMO_AVATARS.m_sandra,
+      id: 'f1', memberId: 'm_sandra', memberName: 'Lily', avatar: DEMO_AVATARS.m_sandra,
       handLabel: 'FFF 2026 222 6666', note: 'Cleared another 2026 — only 4 to go!', photo: null,
       createdAt: now - 2 * HOUR, likes: 5, likedByMe: false,
       comments: [
-        { id: 'c1', author: 'Bev', avatar: DEMO_AVATARS.m_bev, text: 'Get it girl! 🔥', createdAt: now - 1.5 * HOUR },
-        { id: 'c2', author: 'Lois', avatar: DEMO_AVATARS.m_lois, text: 'Teach me your ways', createdAt: now - 1 * HOUR },
+        { id: 'c1', author: 'Nicole', avatar: DEMO_AVATARS.m_bev, text: 'Get it girl! 🔥', createdAt: now - 1.5 * HOUR },
+        { id: 'c2', author: 'Matthew', avatar: DEMO_AVATARS.m_lois, text: 'Teach me your ways', createdAt: now - 1 * HOUR },
       ],
     },
     {
-      id: 'f2', memberId: 'm_bev', memberName: 'Bev', avatar: DEMO_AVATARS.m_bev,
+      id: 'f2', memberId: 'm_bev', memberName: 'Nicole', avatar: DEMO_AVATARS.m_bev,
       handLabel: '11 333 55 777 9999', note: 'Singles night came through 🎉', photo: null,
       createdAt: now - 6 * HOUR, likes: 3, likedByMe: false,
       comments: [
-        { id: 'c3', author: 'Marsha', avatar: DEMO_AVATARS.m_marsha, text: 'Big points!! 👏', createdAt: now - 5 * HOUR },
+        { id: 'c3', author: 'Alison', avatar: DEMO_AVATARS.m_marsha, text: 'Big points!! 👏', createdAt: now - 5 * HOUR },
       ],
     },
     {
-      id: 'f3', memberId: 'm_marsha', memberName: 'Marsha', avatar: DEMO_AVATARS.m_marsha,
+      id: 'f3', memberId: 'm_marsha', memberName: 'Alison', avatar: DEMO_AVATARS.m_marsha,
       handLabel: 'NNNN EEE WWW SSSS', note: '', photo: null,
       createdAt: now - 1 * DAY - 3 * HOUR, likes: 2, likedByMe: false, comments: [],
     },
     {
-      id: 'f4', memberId: 'm_lois', memberName: 'Lois', avatar: DEMO_AVATARS.m_lois,
+      id: 'f4', memberId: 'm_lois', memberName: 'Matthew', avatar: DEMO_AVATARS.m_lois,
       handLabel: '333 666 6666 9999', note: 'Finally got 369!', photo: null,
       createdAt: now - 2 * DAY, likes: 7, likedByMe: false, comments: [],
     },
     // Milestone posts (typed) interleaved through the feed.
     {
-      id: 'f5', memberId: 'm_sandra', memberName: 'Sandra', avatar: DEMO_AVATARS.m_sandra,
+      id: 'f5', memberId: 'm_sandra', memberName: 'Lily', avatar: DEMO_AVATARS.m_sandra,
       kind: 'section_cleared', title: 'Cleared every 2025 hand', handLabel: null,
       note: 'Whole section done — onto Consecutive Run!', photo: null,
       createdAt: now - 9 * HOUR, likes: 9, likedByMe: false, comments: [
-        { id: 'c5', author: 'Marsha', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
+        { id: 'c5', author: 'Alison', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
       ],
     },
     {
-      id: 'f6', memberId: 'm_bev', memberName: 'Bev', avatar: DEMO_AVATARS.m_bev,
+      id: 'f6', memberId: 'm_bev', memberName: 'Nicole', avatar: DEMO_AVATARS.m_bev,
       kind: 'game_won', title: 'Won game night', handLabel: null,
-      note: 'Bev +40 · Sandra +10 · Lois −20 · Marsha −30', photo: null,
+      note: 'Nicole +40 · Lily +10 · Matthew −20 · Alison −30', photo: null,
       createdAt: now - 1 * DAY - 1 * HOUR, likes: 6, likedByMe: false, comments: [],
     },
     {
-      id: 'f7', memberId: 'm_marsha', memberName: 'Marsha', avatar: DEMO_AVATARS.m_marsha,
+      id: 'f7', memberId: 'm_marsha', memberName: 'Alison', avatar: DEMO_AVATARS.m_marsha,
       kind: 'challenge_done', title: 'Finished Summer Kongs', handLabel: null,
       note: 'Season challenge complete 🏅', photo: null,
       createdAt: now - 3 * DAY, likes: 11, likedByMe: false, comments: [],
     },
     {
-      id: 'f8', memberId: 'm_lois', memberName: 'Lois', avatar: DEMO_AVATARS.m_lois,
+      id: 'f8', memberId: 'm_lois', memberName: 'Matthew', avatar: DEMO_AVATARS.m_lois,
       kind: 'card_cleared', title: 'Cleared the whole card!', handLabel: null,
       note: 'All 70 hands. Legendary. 👑', photo: null,
       createdAt: now - 4 * DAY, likes: 23, likedByMe: false, comments: [
-        { id: 'c8', author: 'Sandra', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },
+        { id: 'c8', author: 'Lily', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },
       ],
     },
   ];

@@ -54,7 +54,7 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v3';
+const K_TABLES = 'tables.v4';
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -74,21 +74,21 @@ function seed(): Table[] {
       icon: A('crack', '#D23B4E'),
       inviteCode: 'MAHJ-2026',
       members: [
-        { name: 'Sandra', avatar: A('flower', '#E8455F') },
-        { name: 'Bev', avatar: A('dragon', '#1FA85B', '發') },
-        { name: 'Marsha', avatar: A('bam', '#1FA85B') },
-        { name: 'Lois', avatar: A('dot', '#2F80ED') },
+        { name: 'Lily', avatar: A('flower', '#E8455F') },
+        { name: 'Nicole', avatar: A('dragon', '#1FA85B', '發') },
+        { name: 'Alison', avatar: A('bam', '#1FA85B') },
+        { name: 'Matthew', avatar: A('dot', '#2F80ED') },
       ],
       messages: [
-        { id: 'm1', author: 'Sandra', avatar: A('flower', '#E8455F'), text: 'Who’s in for this week?? 🀄', createdAt: now - 5 * HOUR },
-        { id: 'm2', author: 'Bev', avatar: A('dragon', '#1FA85B', '發'), text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR, reactions: { '❤️': ['Sandra', 'Lois'], '🍪': ['Marsha'] } },
-        { id: 'm3', author: 'Lois', avatar: A('dot', '#2F80ED'), text: 'Vote on a date below!', createdAt: now - 4 * HOUR, reactions: { '👍': ['Sandra'] } },
+        { id: 'm1', author: 'Lily', avatar: A('flower', '#E8455F'), text: 'Who’s in for this week?? 🀄', createdAt: now - 5 * HOUR },
+        { id: 'm2', author: 'Nicole', avatar: A('dragon', '#1FA85B', '發'), text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR, reactions: { '❤️': ['Lily', 'Matthew'], '🍪': ['Alison'] } },
+        { id: 'm3', author: 'Matthew', avatar: A('dot', '#2F80ED'), text: 'Vote on a date below!', createdAt: now - 4 * HOUR, reactions: { '👍': ['Lily'] } },
       ],
       poll: {
         question: 'When should we play next?',
         options: [
-          { id: 'p1', date: isoInDays(3), time: '19:00', votes: ['Sandra', 'Bev'] },
-          { id: 'p2', date: isoInDays(5), time: '13:00', votes: ['Lois'] },
+          { id: 'p1', date: isoInDays(3), time: '19:00', votes: ['Lily', 'Nicole'] },
+          { id: 'p2', date: isoInDays(5), time: '13:00', votes: ['Matthew'] },
           { id: 'p3', date: isoInDays(7), time: '19:00', votes: [] },
         ],
       },
@@ -101,16 +101,16 @@ function seed(): Table[] {
       inviteCode: 'MOMS-7788',
       members: [
         { name: 'Diane', avatar: A('crack', '#E8455F') },
-        { name: 'Pam', avatar: A('joker', '#7C5CE0') },
+        { name: 'Hailey', avatar: A('joker', '#7C5CE0') },
         { name: 'Rae', avatar: A('wind', '#2C3A57', '東') },
       ],
       messages: [
-        { id: 'm4', author: 'Pam', avatar: A('joker', '#7C5CE0'), text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
+        { id: 'm4', author: 'Hailey', avatar: A('joker', '#7C5CE0'), text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
       ],
       poll: {
         question: 'Pick a weekend slot',
         options: [
-          { id: 'p4', date: isoInDays(6), time: '11:00', votes: ['Pam', 'Diane'] },
+          { id: 'p4', date: isoInDays(6), time: '11:00', votes: ['Hailey', 'Diane'] },
           { id: 'p5', date: isoInDays(13), time: '11:00', votes: [] },
         ],
       },
