@@ -346,8 +346,8 @@ a:focus-visible,
 .logo-word {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 46px;
-  letter-spacing: -1.5px;
+  font-size: 54px;
+  letter-spacing: -2px;
   line-height: 0.9;
   color: var(--title-color, var(--ink));
   text-shadow: var(--title-shadow, none);
@@ -1046,11 +1046,12 @@ a.btn {
   width: 100%;
   border: 2.5px solid var(--hairline);
   border-radius: 11px;
-  padding: 13px 15px;
+  padding: 14px 15px;
   font-size: 15px;
   font-weight: 600;
   background: var(--card);
   color: var(--ink);
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.07);
 }
 .field:focus {
   outline: none;
@@ -1196,15 +1197,15 @@ label.lbl {
 .ng-label {
   display: block;
   font-weight: 800;
-  font-size: 9.5px;
+  font-size: 9px;
   letter-spacing: 1.5px;
   color: var(--green);
 }
 .ng-when {
   display: block;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 17px;
+  font-weight: 700;
+  font-size: 18px;
   color: var(--ink);
   line-height: 1.1;
   margin: 1px 0;
@@ -1225,19 +1226,19 @@ label.lbl {
 .feed-streak {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 11px;
   margin-top: 14px;
   padding: 11px 13px;
-  border-radius: 9px;
-  background: color-mix(in srgb, #f5a524 16%, #fff);
-  border: 2px solid color-mix(in srgb, #f5a524 40%, transparent);
-  font-size: 13.5px;
+  border-radius: 11px;
+  background: rgba(245, 165, 36, 0.12);
+  border: 2px solid rgba(245, 165, 36, 0.45);
+  font-size: 13px;
   font-weight: 600;
-  color: var(--ink-soft);
+  color: #7a4a09;
 }
 .feed-streak strong {
   font-weight: 800;
-  color: #c9871a;
+  color: #1a1410;
 }
 .fs-flame {
   display: inline-flex;
@@ -1314,22 +1315,58 @@ label.lbl {
 .score-cta {
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
   margin-top: 14px;
-  padding: 14px;
-  border-radius: 9px;
+  padding: 15px;
+  border-radius: 10px;
   background: var(--brand);
   border: 2.5px solid rgba(20, 22, 42, 0.09);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--brand) 40%, transparent);
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.14);
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+  font-size: 17px;
+  letter-spacing: 1px;
   color: #fff;
-  transition: transform 0.12s ease;
+  text-shadow: 1.5px 1.5px 0 var(--brand-deep);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* diagonal woven stripe overlay (matches the primary-button recipe) */
+.score-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  pointer-events: none;
+  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
 }
 .score-cta:active {
   transform: translateY(2px);
+  box-shadow: 0 3px 10px rgba(20, 22, 42, 0.18);
+}
+/* the two cream tiles flanking the label */
+.score-cta-tile {
+  position: relative;
+  width: 26px;
+  height: 33px;
+  flex: none;
+  border-radius: 4px;
+  background: #fff;
+  border: 2px solid rgba(20, 22, 42, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  text-shadow: none;
+}
+.score-cta-label {
+  position: relative;
 }
 .feed-actions {
   display: flex;
@@ -1455,42 +1492,118 @@ label.lbl {
   background: var(--brand);
   border: 2px solid rgba(20, 22, 42, 0.09);
   border-radius: 20px;
-  padding: 3px 11px;
+  padding: 3px 12px;
   font-weight: 800;
   font-size: 10px;
   letter-spacing: 1px;
-  color: #f4f6fa;
+  color: #ffffff;
 }
 .post-note {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 21px;
+  font-size: 23px;
   letter-spacing: 1px;
-  padding: 2px 0 9px;
+  padding: 2px 0 10px;
   border-bottom: 2px solid rgba(26, 20, 16, 0.12);
   white-space: nowrap;
   overflow: hidden;
 }
-/* Milestone post body (game won / section / card / challenge / joined). */
-.post-milestone {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 11px 13px;
-  border-radius: 9px;
-  border: 2px solid var(--green);
-  background: rgba(20, 22, 42, 0.03);
+/* Milestone post body — a full-bleed gradient achievement banner (game won /
+   section / card / challenge / joined). Gradient + eyebrow color keyed by kind;
+   the banner border stays a hairline, per the design source. */
+.post-banner {
+  position: relative;
+  overflow: hidden;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(20, 22, 42, 0.16);
+  padding: 20px 16px;
+  text-align: center;
+  background: linear-gradient(165deg, #16b89f 0%, #0e9c84 100%);
 }
-.pm-emoji {
-  font-size: 24px;
-  flex: none;
-  line-height: 1;
+.post-banner[data-kind="section_cleared"] {
+  background: linear-gradient(165deg, #1fa15c 0%, #137a41 100%);
 }
-.pm-title {
+.post-banner[data-kind="card_cleared"] {
+  background: linear-gradient(165deg, #7b4fd0 0%, #5a30ae 100%);
+  cursor: pointer;
+}
+.post-banner[data-kind="game_won"] {
+  background: linear-gradient(165deg, #d89426 0%, #ae740e 100%);
+}
+.post-banner[data-kind="joined"] {
+  background: linear-gradient(165deg, #3b9be0 0%, #2563b8 100%);
+}
+.pb-eyebrow {
+  position: relative;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  color: #f5a524;
+  margin-bottom: 6px;
+}
+.post-banner[data-kind="section_cleared"] .pb-eyebrow {
+  color: #ffe08a;
+  letter-spacing: 2.5px;
+}
+.post-banner[data-kind="game_won"] .pb-eyebrow {
+  color: rgba(255, 255, 255, 0.92);
+}
+.pb-title {
+  position: relative;
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 16px;
-  color: var(--ink);
-  line-height: 1.15;
+  font-size: 40px;
+  letter-spacing: -1.5px;
+  color: #ffffff;
+  line-height: 0.92;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+.post-banner[data-kind="game_won"] .pb-title {
+  font-size: 34px;
+  letter-spacing: -1.8px;
+}
+.pb-prog {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 13px;
+}
+.pb-prog-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+.pb-prog-track > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: #f5a524;
+}
+.pb-prog-count {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: #ffffff;
+}
+.pb-place {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.34);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
 }
 .post-cap {
   font-size: 13.5px;
@@ -1660,8 +1773,9 @@ label.lbl {
 
 .acc {
   background: var(--card);
-  border-radius: 18px;
-  box-shadow: var(--shadow-sm);
+  border: 2.5px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 7px 20px rgba(20, 22, 42, 0.11);
   overflow: hidden;
 }
 .acc + .acc {
@@ -1672,8 +1786,8 @@ label.lbl {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px 14px;
+  font-size: 14px;
   font-weight: 800;
   text-align: left;
 }
@@ -1682,17 +1796,18 @@ label.lbl {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   margin-right: 10px;
-  border-radius: 10px;
-  background: var(--tint);
+  border-radius: 9px;
+  background: rgba(20, 22, 42, 0.04);
+  border: 2px solid rgba(20, 22, 42, 0.07);
   color: var(--brand);
 }
 .acc .chev {
   color: var(--brand);
   transition: transform 0.2s ease;
-  font-size: 14px;
+  font-size: 15px;
 }
 .acc[data-open="true"] .chev {
   transform: rotate(90deg);
@@ -2099,6 +2214,8 @@ label.lbl {
   overflow: hidden; /* keep the rounded top corners clipping the band */
   display: flex;
   flex-direction: column;
+  /* Fixed paper-cream sheet body, per the design source — not the themed page. */
+  background: #fbf7ec;
 }
 .log-band {
   position: relative;
@@ -2123,7 +2240,7 @@ label.lbl {
   top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
+  width: 44px;
   height: 5px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
@@ -3178,7 +3295,7 @@ label.lbl {
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 9px;
 }
 .avatar-opt {
   position: relative;
@@ -3195,16 +3312,16 @@ label.lbl {
 }
 .avatar-check {
   position: absolute;
-  top: -7px;
-  right: -7px;
-  width: 20px;
-  height: 20px;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
   border-radius: 999px;
   display: grid;
   place-items: center;
   background: var(--brand);
   color: #fff;
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 900;
   box-shadow: 0 2px 6px rgba(20, 22, 42, 0.25);
 }
@@ -3290,9 +3407,10 @@ label.lbl {
   gap: 12px;
   width: 100%;
   padding: 14px;
-  border-radius: 18px;
+  border: 2.5px solid var(--hairline);
+  border-radius: 8px;
   background: var(--card);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.13);
 }
 .table-row + .table-row {
   margin-top: 10px;
@@ -3312,14 +3430,15 @@ label.lbl {
 }
 .table-name {
   display: block;
-  font-weight: 800;
-  font-size: 16px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 19px;
 }
 .table-meta {
   display: block;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: var(--muted);
+  color: #6a6a74;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3588,7 +3707,7 @@ label.lbl {
   min-height: 0;
 }
 .profile-name {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 800;
   text-transform: uppercase;
   color: #fff;
@@ -3622,16 +3741,17 @@ label.lbl {
   margin-bottom: 16px;
 }
 .stat-mini {
-  background: var(--card);
-  border-radius: 14px;
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2e8 100%);
+  border: 2px solid rgba(20, 22, 42, 0.09);
+  border-radius: 9px;
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.12), inset 0 -4px 7px rgba(20, 22, 42, 0.045);
   padding: 10px 6px;
   text-align: center;
 }
 .stat-mini .sm-num {
   font-size: 18px;
   font-weight: 800;
-  color: var(--brand);
+  color: var(--ink-strong, #1a1410);
   font-family: var(--font-display), system-ui, sans-serif;
 }
 .stat-mini .sm-lab {
@@ -3653,7 +3773,7 @@ label.lbl {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--tint);
+  background: rgba(20, 22, 42, 0.035);
   border-radius: 13px;
   padding: 10px 12px;
 }
@@ -3721,16 +3841,14 @@ label.lbl {
   gap: 3px;
   text-align: center;
   padding: 12px 8px;
-  border-radius: 16px;
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
-  opacity: 0.5;
-  filter: grayscale(0.7);
+  border-radius: 9px;
+  background: rgba(20, 22, 42, 0.035);
+  border: 2px solid rgba(20, 22, 42, 0.06);
 }
 .trophy[data-earned="true"] {
-  opacity: 1;
-  filter: none;
-  box-shadow: 0 0 0 2px var(--brand), var(--shadow-sm);
+  background: #fff;
+  border: 2.5px solid var(--brand);
+  box-shadow: 0 4px 14px rgba(20, 22, 42, 0.1);
 }
 .trophy-emoji {
   font-size: 28px;
@@ -3739,7 +3857,10 @@ label.lbl {
   align-items: center;
   justify-content: center;
   min-height: 30px;
-  color: var(--muted);
+  color: #c2c2ca;
+}
+.trophy[data-earned="true"] .trophy-emoji {
+  color: var(--brand);
 }
 .trophy-name {
   font-size: 11.5px;
@@ -4384,12 +4505,12 @@ label.lbl {
 .level-opt {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
+  gap: 13px;
+  padding: 13px 14px;
+  border-radius: 12px;
   background: var(--card);
-  box-shadow: var(--shadow-sm);
-  border: 2.5px solid transparent;
+  box-shadow: 0 4px 14px rgba(20, 22, 42, 0.1);
+  border: 2.5px solid var(--hairline);
   text-align: left;
 }
 .level-opt[data-active="true"] {
@@ -4405,20 +4526,42 @@ label.lbl {
 .level-name {
   display: block;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 17px;
+  line-height: 1;
   text-transform: uppercase;
   font-family: var(--font-display), system-ui, sans-serif;
 }
 .level-blurb {
   display: block;
+  margin-top: 3px;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--ink-soft);
+  line-height: 1.3;
+  color: var(--muted-2, #6a6a74);
 }
+/* Radio dot: 22px ring; selected fills a 10px inner dot in --brand. */
 .level-check {
   flex: 0 0 auto;
-  color: var(--brand);
-  font-size: 16px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid var(--hairline);
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+.level-opt[data-active="true"] .level-check {
+  border-color: var(--brand);
+}
+.level-check::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: transparent;
+}
+.level-opt[data-active="true"] .level-check::after {
+  background: var(--brand);
 }
 .onboard-note {
   margin: 10px 2px 0;
@@ -4437,9 +4580,10 @@ label.lbl {
   margin: 12px 0 0;
   text-align: center;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 /* ---- Confetti + celebration --------------------------------------------- */
@@ -4611,14 +4755,15 @@ label.lbl {
   display: flex;
   gap: 14px;
   padding: 16px;
-  border-radius: 18px;
+  border: 2.5px solid var(--hairline);
+  border-radius: 10px;
   background: var(--card);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
   text-align: left;
 }
 .card-callout .cc-title {
-  font-weight: 800;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 19px;
   font-family: var(--font-display), system-ui, sans-serif;
   color: var(--ink);
 }
@@ -4634,9 +4779,10 @@ label.lbl {
 }
 .card-callout .cc-fine {
   margin: 10px 0 0;
-  font-size: 10.5px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.5;
   color: var(--muted);
 }
 .tip-label {

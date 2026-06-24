@@ -15,6 +15,16 @@ const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string
   challenge_done: { label: 'CHALLENGE', color: '#F5A524', emoji: '⭐' },
   joined: { label: 'JOINED', color: '#2E86D4', emoji: '➕' },
 };
+
+// The achievement-banner eyebrow per milestone kind (the big two-tone title is
+// the post's own title). game_won shows a place badge instead of a progress bar.
+const KIND_EYEBROW: Partial<Record<FeedKind, string>> = {
+  game_won: '★ GAME NIGHT WON',
+  section_cleared: 'SECTION COMPLETE',
+  card_cleared: '♛ CARD CLEARED',
+  challenge_done: '★ CHALLENGE COMPLETE',
+  joined: '➕ JOINED THE TABLE',
+};
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
@@ -22,6 +32,7 @@ import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import TipCard from './TipCard';
+import { useConfetti } from './Confetti';
 import PageTitle from './PageTitle';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
@@ -204,7 +215,13 @@ export default function GroupTab({
 
       <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
-        ⊕ Score a Game
+        <span className="score-cta-tile" style={{ color: '#C0392B', transform: 'rotate(-7deg)' }} aria-hidden>
+          萬
+        </span>
+        <span className="score-cta-label">SCORE A GAME</span>
+        <span className="score-cta-tile" style={{ color: '#15803D', transform: 'rotate(7deg)' }} aria-hidden>
+          發
+        </span>
       </button>
 
       {addOpen && (
@@ -253,7 +270,7 @@ export default function GroupTab({
                 setDetail(m);
                 void track('leaderboard_member_opened');
               }}
-              style={{ background: m.id === YOU_ID ? 'var(--tint)' : 'transparent' }}
+              style={{ background: m.id === YOU_ID ? '#F4F6FA' : 'transparent' }}
             >
               <div style={{ width: 34, display: 'grid', placeItems: 'center' }} aria-label={`Rank ${i + 1}`}>
                 {i < 9 ? (
@@ -269,7 +286,9 @@ export default function GroupTab({
                   {m.id === YOU_ID && <span style={{ color: 'var(--muted)', fontWeight: 700 }}> · you</span>}
                 </div>
                 <div className="progress" style={{ marginTop: 6, height: 7 }}>
-                  <span style={{ width: `${pct}%`, background: m.avatar.color }} />
+                  <span
+                    style={{ width: `${pct}%`, background: m.avatar.color, animationDelay: `${0.35 + i * 0.1}s` }}
+                  />
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -360,6 +379,7 @@ function FeedCard({
   const [url, setUrl] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [draft, setDraft] = useState('');
+  const { celebrate } = useConfetti();
 
   useEffect(() => {
     if (!post.photo) return;
@@ -405,11 +425,24 @@ function FeedCard({
             </div>
           )
         : post.title && (
-            <div className="post-milestone" style={{ borderColor: badge.color }}>
-              <span className="pm-emoji" aria-hidden>
-                {badge.emoji}
-              </span>
-              <span className="pm-title">{post.title}</span>
+            <div
+              className="post-banner"
+              data-kind={kind}
+              role={kind === 'card_cleared' ? 'button' : undefined}
+              onClick={kind === 'card_cleared' ? () => celebrate({ big: true }) : undefined}
+            >
+              <div className="pb-eyebrow">{KIND_EYEBROW[kind] ?? badge.label}</div>
+              <div className="pb-title">{post.title}</div>
+              {kind === 'game_won' ? (
+                <div className="pb-place">🥇 GAME NIGHT WINNER</div>
+              ) : kind !== 'joined' ? (
+                <div className="pb-prog">
+                  <div className="pb-prog-track">
+                    <span />
+                  </div>
+                  <div className="pb-prog-count">✓</div>
+                </div>
+              ) : null}
             </div>
           )}
       {post.note && <p className="post-cap">{post.note}</p>}

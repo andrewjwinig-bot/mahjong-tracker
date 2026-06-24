@@ -166,7 +166,7 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
                     <span className="level-name">{l.label}</span>
                     <span className="level-blurb">{l.blurb}</span>
                   </span>
-                  <span className="level-check">{experience === l.id ? '●' : '○'}</span>
+                  <span className="level-check" aria-hidden />
                 </button>
               ))}
             </div>

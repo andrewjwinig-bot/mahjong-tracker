@@ -216,7 +216,7 @@ function TablesList({
           const last = t.messages[t.messages.length - 1];
           return (
             <button key={t.id} className="table-row" onClick={() => onOpen(t.id)}>
-              <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={44} />
+              <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={54} />
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <span className="table-name">{t.name}</span>
                 <span className="table-meta">
