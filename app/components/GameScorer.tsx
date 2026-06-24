@@ -37,10 +37,12 @@ export default function GameScorer({
   suggestedNames,
   friends,
   onClose,
+  onGameWon,
 }: {
   suggestedNames: string[];
   friends: Friend[];
   onClose: () => void;
+  onGameWon?: (result: GameResult) => void;
 }) {
   useEscape(onClose);
   const pro = usePro();
@@ -127,8 +129,9 @@ export default function GameScorer({
 
   function endGame() {
     if (game && game.rounds.length > 0) {
-      recordResult(game);
+      const result = recordResult(game);
       setResults(loadResults());
+      onGameWon?.(result);
     }
     clearGame();
     setGame(null);
