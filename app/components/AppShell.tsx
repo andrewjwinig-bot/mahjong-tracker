@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
-import type { Hand, Win, MahjongCard } from '../lib/types';
+import type { Win, MahjongCard } from '../lib/types';
 import { loadCustomCard } from '../lib/customCard';
 import * as db from '../lib/storage';
 import * as social from '../lib/social';
@@ -182,26 +182,6 @@ export default function AppShell() {
   );
 
   // Checking a hand off the card = an instant mahj: bump progress, log it to
-  // your Mahjs journal, auto-post it to the feed, and hand back the Win so the
-  // celebration can offer sharing.
-  const cardMahj = useCallback(
-    (hand: Hand): Win => {
-      const win: Win = {
-        id: crypto.randomUUID(),
-        handId: hand.id,
-        handLabel: hand.notation,
-        note: '',
-        photo: null,
-        createdAt: Date.now(),
-      };
-      bumpHand(hand.id, +1);
-      addWin(win);
-      postToGroup(win);
-      return win;
-    },
-    [bumpHand, addWin, postToGroup],
-  );
-
   const toggleLike = useCallback((id: string, liked: boolean) => {
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -332,7 +312,6 @@ export default function AppShell() {
                 wins={wins}
                 groupName={socialState?.group.name ?? 'your table'}
                 onBump={bumpHand}
-                onMahj={cardMahj}
                 onAddWin={addWin}
                 onRemoveWin={removeWin}
                 onPostToGroup={postToGroup}

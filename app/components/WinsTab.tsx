@@ -192,16 +192,20 @@ export function LogWinSheet({
   card,
   handNotes,
   groupName,
+  initialHandId,
   onClose,
   onSave,
 }: {
   card: MahjongCard;
   handNotes: Record<string, string>;
   groupName: string;
+  /** Pre-select this hand (e.g. tapping a row on the Card). */
+  initialHandId?: string | null;
   onClose: () => void;
   onSave: (win: Win, opts: { shareToGroup: boolean }) => void;
 }) {
-  const [handId, setHandId] = useState<string>('');
+  const initialHand = initialHandId ? card.hands.find((h) => h.id === initialHandId) : null;
+  const [handId, setHandId] = useState<string>(initialHand?.id ?? '');
   const [note, setNote] = useState('');
   const [photo, setPhoto] = useState<Blob | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -255,7 +259,7 @@ export function LogWinSheet({
     burst({ x: window.innerWidth / 2, y: 90 });
   }, [burst]);
 
-  const [cat, setCat] = useState<string>(''); // '' = Freeform
+  const [cat, setCat] = useState<string>(initialHand?.category ?? ''); // '' = Freeform
 
   return (
     <div className="modal-scrim" onClick={onClose}>
