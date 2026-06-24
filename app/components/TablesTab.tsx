@@ -252,44 +252,55 @@ function TablesList({
 
       {creating && (
         <div className="modal-scrim" onClick={() => setCreating(false)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="grab" />
-            <h2>New Table</h2>
-            <p className="sheet-sub">Start a private group with your crew.</p>
-            <label className="lbl">Table name</label>
-            <input
-              className="field"
-              value={name}
-              autoFocus
-              maxLength={28}
-              placeholder="Thursday Night Mahj"
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && create()}
-            />
-
-            <label className="lbl" style={{ marginTop: 14 }}>
-              Table icon
-            </label>
-            <div className="avatar-grid">
-              {TABLE_ICONS.map((t, i) => (
-                <button
-                  key={i}
-                  className="avatar-opt"
-                  data-active={iconIdx === i}
-                  onClick={() => setIconIdx(i)}
-                >
-                  <Tile face={t.face} char={t.char} color={t.color} size={42} />
-                </button>
-              ))}
+          <div className="sheet log-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="log-band">
+              <span className="md-stripe" aria-hidden />
+              <div className="grab light" />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="log-kicker">START A GROUP</div>
+                <div className="log-title">NEW TABLE</div>
+                <div className="log-band-sub">Start a private group with your crew.</div>
+              </div>
             </div>
 
-            <div className="row" style={{ marginTop: 16 }}>
-              <button className="btn ghost" onClick={() => setCreating(false)}>
-                Cancel
-              </button>
-              <button className="btn" onClick={create} disabled={!name.trim()}>
-                Create
-              </button>
+            <div className="log-body">
+              <label className="lbl">Table name</label>
+              <input
+                className="field"
+                value={name}
+                autoFocus
+                maxLength={28}
+                placeholder="Thursday Night Mahj"
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && create()}
+              />
+
+              <label className="lbl" style={{ marginTop: 14 }}>
+                Table icon
+              </label>
+              <div className="avatar-grid">
+                {TABLE_ICONS.map((t, i) => (
+                  <button
+                    key={i}
+                    className="avatar-opt"
+                    data-active={iconIdx === i}
+                    onClick={() => setIconIdx(i)}
+                  >
+                    <Tile face={t.face} char={t.char} color={t.color} size={42} />
+                    {iconIdx === i && <span className="avatar-check" aria-hidden>✓</span>}
+                  </button>
+                ))}
+              </div>
+
+              <div className="log-footer">
+                <button className="act-btn" onClick={() => setCreating(false)}>
+                  CANCEL
+                </button>
+                <button className="mahj-hero log-save" onClick={create} disabled={!name.trim()}>
+                  <span className="mahj-hero-shine" aria-hidden />
+                  <span className="mahj-hero-label">CREATE</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
