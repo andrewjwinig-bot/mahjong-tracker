@@ -310,6 +310,7 @@ export default function AppShell() {
                 handCounts={handCounts}
                 handNotes={handNotes}
                 wins={wins}
+                feed={socialState?.feed ?? []}
                 groupName={socialState?.group.name ?? 'your table'}
                 onBump={bumpHand}
                 onAddWin={addWin}
