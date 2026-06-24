@@ -6,6 +6,7 @@ import { YOU_ID, initialOf } from '../lib/social';
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
+import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import ShareModal from './ShareModal';
 import Avatar from './Avatar';
 import Tile from './Tile';
@@ -25,6 +26,7 @@ interface Props {
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
   onScore: () => void;
+  onOpenTables: () => void;
 }
 
 /** Which hand ids a member has cleared. Real for you; deterministic for demo
@@ -45,6 +47,21 @@ function completedHandIds(
     [ids[i], ids[j]] = [ids[j], ids[i]];
   }
   return new Set(ids.slice(0, Math.min(member.handsCleared, ids.length)));
+}
+
+// "Today" / "Tomorrow" / "Wed Jun 25" + optional time, for the next-game card.
+function gameWhen(date: string, time?: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.round((dt.getTime() - today.getTime()) / 86400000);
+  const day =
+    days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  if (!time) return day;
+  const [hh, mm] = time.split(':').map(Number);
+  const t = new Date(y, m - 1, d, hh, mm).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${day} · ${t}`;
 }
 
 function timeAgo(ts: number): string {
@@ -69,7 +86,16 @@ export default function GroupTab({
   onAddComment,
   onAddFriend,
   onScore,
+  onOpenTables,
 }: Props) {
+  const [nextG, setNextG] = useState<NextGame | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void loadTables().then((t) => alive && setNextG(nextGame(t)));
+    return () => {
+      alive = false;
+    };
+  }, []);
   const [detail, setDetail] = useState<GroupMember | null>(null);
   const [lbMetric, setLbMetric] = useState<'rows' | 'points'>('rows');
   // Track a feed view once per mount (core-loop metric).
@@ -115,6 +141,20 @@ export default function GroupTab({
           {profile.name ? `Hi ${profile.name.split(' ')[0]} — ` : ''}see what your whole crew is calling.
         </p>
       </header>
+
+      {nextG && (
+        <button className="next-game" onClick={onOpenTables}>
+          <Tile face={nextG.icon.face} char={nextG.icon.char} color={nextG.icon.color} size={40} />
+          <span className="ng-body">
+            <span className="ng-label">⏰ NEXT GAME</span>
+            <span className="ng-when">{gameWhen(nextG.date, nextG.time)}</span>
+            <span className="ng-meta">
+              {nextG.tableName} · {nextG.votes} in
+            </span>
+          </span>
+          <span className="ng-chev">›</span>
+        </button>
+      )}
 
       {streak > 1 && (
         <div className="feed-streak">
