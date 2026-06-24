@@ -4301,6 +4301,21 @@ label.lbl {
   color: var(--brand);
   font-family: var(--font-display), system-ui, sans-serif;
 }
+/* Two-tone "LET'S Mahj" wordmark on the sign-up screen (design v6 frame 01). */
+.onboard-logo {
+  display: inline-block;
+  text-align: center;
+}
+.onboard-head .onboard-logo .logo-kicker {
+  color: var(--brand);
+  letter-spacing: 6px;
+}
+.onboard-head .onboard-logo .logo-word {
+  color: var(--brand);
+  font-size: 54px;
+  letter-spacing: -2px;
+  text-shadow: 2.5px 2.5px 0 var(--brand-deep);
+}
 .onboard-head .sub {
   margin: 6px 0 0;
   color: var(--muted);
