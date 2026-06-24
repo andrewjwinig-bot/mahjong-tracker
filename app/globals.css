@@ -427,9 +427,10 @@ a:focus-visible,
 
 .card {
   background: var(--card);
-  border-radius: 22px;
-  box-shadow: var(--shadow-sm);
-  padding: 16px;
+  border: 2.5px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 14px;
 }
 .card + .card {
   margin-top: 14px;
@@ -1049,9 +1050,9 @@ a.btn {
 
 .field {
   width: 100%;
-  border: 2px solid var(--hairline);
-  border-radius: 14px;
-  padding: 12px 14px;
+  border: 2.5px solid var(--hairline);
+  border-radius: 11px;
+  padding: 13px 15px;
   font-size: 15px;
   font-weight: 600;
   background: var(--card);
@@ -1063,12 +1064,13 @@ a.btn {
 }
 label.lbl {
   display: block;
-  font-size: 12px;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 2px;
   color: var(--muted);
-  margin: 0 0 6px 2px;
+  margin: 0 0 7px 2px;
 }
 
 /* ---- Wins feed ----------------------------------------------------------- */
@@ -2460,15 +2462,13 @@ label.lbl {
 /* ---- Settings sections --------------------------------------------------- */
 
 .set-section {
-  margin: 22px 0 12px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid var(--hairline);
-  font-size: 12px;
+  margin: 22px 0 11px;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--brand);
-  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: 2px;
+  color: var(--muted);
 }
 
 /* ======================================================================

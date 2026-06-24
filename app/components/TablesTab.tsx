@@ -10,7 +10,6 @@ import PageTitle from './PageTitle';
 import { track } from '../lib/analytics';
 import Avatar from './Avatar';
 import Tile from './Tile';
-import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
 import { AddFriendSheet } from './GroupTab';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus } from './uiIcons';
@@ -167,7 +166,6 @@ function TablesList({
       <header className="app-header">
         <PageTitle kicker="YOUR" word="Tables" />
         <p className="sub">Your private groups — chat, schedule &amp; share photos.</p>
-        <TileStrip count={7} />
       </header>
 
       <button
