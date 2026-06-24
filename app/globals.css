@@ -1809,6 +1809,10 @@ label.lbl {
   transition: transform 0.2s ease;
   font-size: 15px;
 }
+.acc .acc-sub {
+  font-weight: 700;
+  color: var(--muted);
+}
 .acc[data-open="true"] .chev {
   transform: rotate(90deg);
 }
@@ -4639,13 +4643,34 @@ label.lbl {
   box-shadow: 0 0 0 3px var(--brand), var(--shadow);
   background: linear-gradient(180deg, var(--card), var(--tint));
 }
+/* Log-a-win moment: the emblem flips a full 360° with a spring (design frame 8). */
 .celebrate-card .boom {
   font-size: 56px;
   line-height: 1;
-  animation: boom 0.6s ease;
+  transform-style: preserve-3d;
+  animation: cele-flip 0.78s cubic-bezier(0.34, 1.4, 0.5, 1) both;
 }
 .celebrate-card.big .boom {
   font-size: 72px;
+}
+@keyframes cele-flip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+  45% {
+    transform: rotateY(180deg) scale(1.18);
+  }
+  80% {
+    transform: rotateY(360deg) scale(1.08);
+  }
+  100% {
+    transform: rotateY(360deg) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .celebrate-card .boom {
+    animation: none;
+  }
 }
 
 /* Tip of the day */
@@ -4898,9 +4923,39 @@ label.lbl {
     opacity: 0;
   }
 }
+/* Trophy unlock: the glyph sits on a paper tile with a brand "ink-fill" border
+   and springs in (design frame 8 — locked → earned). */
 .badge-toast .bt-emoji {
-  font-size: 30px;
   flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 50px;
+  font-size: 24px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
+  border: 2px solid var(--brand);
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.12);
+  animation: troph-pop 0.64s cubic-bezier(0.34, 1.5, 0.5, 1) both;
+}
+@keyframes troph-pop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.28) rotate(-8deg);
+  }
+  70% {
+    transform: scale(0.94) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .badge-toast .bt-emoji {
+    animation: none;
+  }
 }
 .badge-toast .bt-title {
   display: block;

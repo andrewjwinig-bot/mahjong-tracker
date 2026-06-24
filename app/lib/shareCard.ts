@@ -3,6 +3,7 @@
 
 import { COLORS, colorNotation } from './theme';
 import type { Win } from './types';
+import { getAccount } from './account';
 
 const W = 1080;
 const H = 1350;
@@ -58,8 +59,15 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
   ctx.fillStyle = '#fff';
   ctx.fillText('2026 Season', 64, 160);
 
+  // A 中 paper tile on the right of the band (design frame 7).
+  drawTile(ctx, W - 176, 40, 110, 138, -6, '中', SC_BRAND, 56);
+
   let cursorY = bandH + 120;
   const pad = 72;
+
+  // A couple of scattered corner tiles, faintly behind the headline.
+  drawTile(ctx, 28, bandH + 30, 96, 122, -15, '發', '#2E86D4', 48);
+  drawTile(ctx, W - 130, bandH + 24, 96, 122, 13, '中', SC_BRAND, 48);
 
   // Two-tone "I GOT MAHJ!" headline (centered).
   ctx.textAlign = 'center';
@@ -100,15 +108,35 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
     cursorY += 50;
   }
 
-  // Date footer (centered, near bottom).
+  // Footer: a hairline rule, then "DATE · @handle" on the left and three mini
+  // suit tiles on the right (design frame 7).
+  const footY = H - 96;
+  ctx.strokeStyle = 'rgba(20,22,42,0.10)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(pad, footY - 36);
+  ctx.lineTo(W - pad, footY - 36);
+  ctx.stroke();
+
+  const date = new Date(win.createdAt)
+    .toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+    .toUpperCase();
+  const handle = getAccount()?.username?.trim().toLowerCase().replace(/\s+/g, '');
   ctx.fillStyle = COLORS.muted;
   ctx.font = `700 30px ${RND}`;
-  const date = new Date(win.createdAt).toLocaleDateString(undefined, {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-  ctx.fillText(date, W / 2, H - 70);
+  ctx.textAlign = 'left';
+  ctx.fillText(handle ? `${date} · @${handle}` : date, pad, footY);
+
+  // Three mini suit tiles, right-aligned.
+  const mt = 50;
+  const mh = 64;
+  const gap = 10;
+  let mx = W - pad - mt * 3 - gap * 2;
+  drawTile(ctx, mx, footY - mh + 22, mt, mh, 0, '萬', SC_BRAND, 28);
+  mx += mt + gap;
+  drawTile(ctx, mx, footY - mh + 22, mt, mh, 0, '發', '#15803D', 28);
+  mx += mt + gap;
+  drawTile(ctx, mx, footY - mh + 22, mt, mh, 0, null, SC_NOTE.nc3, 28);
 
   return await new Promise<Blob>((resolve) =>
     canvas.toBlob((b) => resolve(b ?? new Blob()), 'image/png'),
@@ -233,6 +261,54 @@ export function downloadBlob(blob: Blob, filename: string): void {
 }
 
 // ---- canvas helpers -------------------------------------------------------
+
+// A cream "paper tile" with a centered suit glyph (or a dot ring when glyph is
+// null), optionally rotated about its center. Mirrors the design tile recipe.
+function drawTile(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  rotDeg: number,
+  glyph: string | null,
+  color: string,
+  fontPx: number,
+) {
+  ctx.save();
+  ctx.translate(x + w / 2, y + h / 2);
+  ctx.rotate((rotDeg * Math.PI) / 180);
+  const r = Math.round(w * 0.14);
+  // tile face (subtle top→bottom paper gradient)
+  const g = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+  g.addColorStop(0, '#FFFEFB');
+  g.addColorStop(1, '#F1EBDD');
+  roundRect(ctx, -w / 2, -h / 2, w, h, r);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(20,22,42,0.14)';
+  ctx.stroke();
+  ctx.fillStyle = color;
+  if (glyph) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `800 ${fontPx}px ${RND}`;
+    ctx.fillText(glyph, 0, fontPx * 0.06);
+    ctx.textBaseline = 'alphabetic';
+  } else {
+    // dot suit: a ring + center pip
+    ctx.lineWidth = Math.max(3, fontPx * 0.14);
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.arc(0, 0, fontPx * 0.4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, fontPx * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();

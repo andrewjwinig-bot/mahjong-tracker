@@ -301,6 +301,18 @@ const SUBTITLE: Record<Experience, string> = {
   expert: 'Deep cuts — strategy & defense for sharks. 🐉',
 };
 
+// Split a topic title's parenthetical (e.g. "The Charleston (step-by-step)")
+// into a gray "— step-by-step" subtitle, matching the design source.
+function renderTopicTitle(title: string) {
+  const m = title.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+  if (!m) return title;
+  return (
+    <>
+      {m[1]} <span className="acc-sub">— {m[2]}</span>
+    </>
+  );
+}
+
 export default function LearnTab({
   experience,
   onPractice,
@@ -332,7 +344,7 @@ export default function LearnTab({
               <span className="acc-ico" aria-hidden>
                 {s.icon}
               </span>
-              <span style={{ flex: 1 }}>{s.title}</span>
+              <span style={{ flex: 1 }}>{renderTopicTitle(s.title)}</span>
               <span className="chev">▶</span>
             </button>
             {open === i && <div className="acc-body">{s.body}</div>}
