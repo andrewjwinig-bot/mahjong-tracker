@@ -152,7 +152,12 @@ export function WinCard({
   return (
     <div className="win-row">
       {url ? (
-        <img className="win-thumb" src={url} alt="Win photo" />
+        <img
+          className="win-thumb"
+          src={url}
+          alt="Win photo"
+          style={{ objectPosition: `50% ${win.photoPos ?? 50}%` }}
+        />
       ) : (
         <span className="win-check" aria-hidden>
           ✓
@@ -233,9 +238,38 @@ export function LogWinSheet({
   const [note, setNote] = useState('');
   const [photo, setPhoto] = useState<Blob | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  // Vertical focal point (0–100%) so the user can frame the cover-cropped photo.
+  const [photoPos, setPhotoPos] = useState(50);
   const [shareToGroup, setShareToGroup] = useState(true);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ y: number; pos: number } | null>(null);
+
+  function onDragStart(e: React.PointerEvent) {
+    if (!preview) return;
+    drag.current = { y: e.clientY, pos: photoPos };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }
+  function onDragMove(e: React.PointerEvent) {
+    if (!drag.current) return;
+    const h = frameRef.current?.clientHeight || 240;
+    const delta = e.clientY - drag.current.y;
+    // Pull down → reveal the top of the photo (lower focal %).
+    const next = drag.current.pos - (delta / h) * 100;
+    setPhotoPos(Math.max(0, Math.min(100, next)));
+  }
+  function onDragEnd() {
+    drag.current = null;
+  }
+
+  function removePhoto() {
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+    setPhoto(null);
+    setPhotoPos(50);
+    if (fileRef.current) fileRef.current.value = '';
+  }
 
   const labelFor = (id: string) => {
     const h = card.hands.find((x) => x.id === id);
@@ -257,6 +291,7 @@ export function LogWinSheet({
     try {
       const blob = await downscaleImage(file);
       setPhoto(blob);
+      setPhotoPos(50);
       if (preview) URL.revokeObjectURL(preview);
       setPreview(URL.createObjectURL(blob));
     } catch {
@@ -277,6 +312,7 @@ export function LogWinSheet({
       handLabel: handId ? labelFor(handId) : null,
       note: note.trim(),
       photo,
+      photoPos: photo ? photoPos : undefined,
       createdAt: Date.now(),
     };
     void track('win_logged', { hasPhoto: !!photo, hasHand: !!handId, sharedToGroup: shareToGroup });
@@ -402,7 +438,35 @@ export function LogWinSheet({
             Photo <span style={{ color: 'var(--muted)' }}>— optional</span>
           </label>
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          {previewUrl && <img className="log-photo" src={previewUrl} alt="Preview" />}
+          {previewUrl && (
+            <div
+              className="log-photo-frame"
+              ref={frameRef}
+              onPointerDown={onDragStart}
+              onPointerMove={onDragMove}
+              onPointerUp={onDragEnd}
+              onPointerCancel={onDragEnd}
+            >
+              <img
+                className="log-photo"
+                src={previewUrl}
+                alt="Preview"
+                draggable={false}
+                style={{ objectPosition: `50% ${photoPos}%` }}
+              />
+              <button
+                className="log-photo-del"
+                type="button"
+                onClick={removePhoto}
+                aria-label="Remove photo"
+              >
+                <IconTrash size={15} />
+              </button>
+              <span className="log-photo-hint" aria-hidden>
+                Drag to reposition
+              </span>
+            </div>
+          )}
           <button className="photo-add" onClick={() => fileRef.current?.click()} disabled={busy}>
             <IconCamera size={18} /> {busy ? 'Processing…' : previewUrl ? 'CHANGE PHOTO' : 'ADD PHOTO'}
           </button>

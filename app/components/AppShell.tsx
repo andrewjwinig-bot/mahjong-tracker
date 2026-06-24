@@ -143,6 +143,7 @@ export default function AppShell() {
         handLabel: win.handLabel,
         note: win.note,
         photo: win.photo,
+        photoPos: win.photoPos,
         createdAt: win.createdAt,
         likes: 0,
         likedByMe: false,
