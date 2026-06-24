@@ -346,6 +346,8 @@ function timeAgo(ts: number): string {
 
 /* ---- Chat ---------------------------------------------------------------- */
 
+const REACTIONS = ['👍', '❤️', '😂', '🎉', '🀄', '🍪'];
+
 function ChatView({
   table,
   profile,
@@ -356,6 +358,7 @@ function ChatView({
   onUpdate: (fn: (t: Table) => Table) => void;
 }) {
   const [draft, setDraft] = useState('');
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
 
   function send() {
     const text = draft.trim();
@@ -372,6 +375,25 @@ function ChatView({
     setDraft('');
   }
 
+  function toggleReaction(msgId: string, emoji: string) {
+    onUpdate((t) => ({
+      ...t,
+      messages: t.messages.map((m) => {
+        if (m.id !== msgId) return m;
+        const reactions = { ...(m.reactions ?? {}) };
+        const by = reactions[emoji] ?? [];
+        const next = by.includes(profile.name)
+          ? by.filter((n) => n !== profile.name)
+          : [...by, profile.name];
+        if (next.length) reactions[emoji] = next;
+        else delete reactions[emoji];
+        return { ...m, reactions };
+      }),
+    }));
+    void track('chat_reaction');
+    setPickerFor(null);
+  }
+
   return (
     <div style={{ marginTop: 14 }}>
       {table.messages.length === 0 ? (
@@ -383,13 +405,45 @@ function ChatView({
         <div className="chat-list">
           {table.messages.map((m) => {
             const mine = m.author === profile.name;
+            const chips = Object.entries(m.reactions ?? {}).filter(([, by]) => by.length);
             return (
               <div key={m.id} className={`chat-msg${mine ? ' mine' : ''}`}>
                 {!mine && <Avatar avatar={m.avatar} size={30} />}
-                <div className="chat-bubble">
-                  {!mine && <span className="chat-author">{m.author}</span>}
-                  {m.text}
-                  <span className="chat-time">{timeAgo(m.createdAt)}</span>
+                <div className="chat-col">
+                  <button
+                    className="chat-bubble"
+                    onClick={() => setPickerFor((p) => (p === m.id ? null : m.id))}
+                  >
+                    {!mine && <span className="chat-author">{m.author}</span>}
+                    {m.text}
+                    <span className="chat-time">{timeAgo(m.createdAt)}</span>
+                  </button>
+
+                  {pickerFor === m.id && (
+                    <div className="react-picker">
+                      {REACTIONS.map((e) => (
+                        <button key={e} onClick={() => toggleReaction(m.id, e)}>
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {chips.length > 0 && (
+                    <div className="react-chips">
+                      {chips.map(([emoji, by]) => (
+                        <button
+                          key={emoji}
+                          className="react-chip"
+                          data-mine={by.includes(profile.name)}
+                          onClick={() => toggleReaction(m.id, emoji)}
+                          title={by.join(', ')}
+                        >
+                          {emoji} {by.length}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );
