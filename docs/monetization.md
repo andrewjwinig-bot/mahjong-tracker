@@ -35,6 +35,8 @@ converts the hobbyist audience that dislikes subscriptions.
 | Themes | 5 standard | + Dragon / Joker / Midnight (+ wallpapers) |
 | Avatar / tile packs | basic | full |
 | Private tables | up to **2** (`FREE_TABLE_LIMIT`) | unlimited |
+| Private group size | not gated (generous anti-abuse ceiling only) | not gated |
+| **Public club size** | up to **~8** members | unlimited |
 | Backup / restore, insights | ✅ | ✅ |
 | Cloud sync, push notifications | — | ✅ (with accounts) |
 | Supporter badge | — | ✅ |
