@@ -92,6 +92,50 @@ the table track the **same** game from their own phone in real time.
 **Entry points already in place:** the friend-pick UI and avatars on the
 scoreboard; only the transport (local vs. session) changes.
 
+## Group visibility (public / private) — planned, post-launch
+
+Today every table is **private/invite-only** (joined via `inviteCode`). The
+planned model adds an opt-in **public** visibility for groups that want to be
+discoverable (clubs, "looking for a 4th", community tables).
+
+**Core principle:** making a group public changes *who can find and join it* —
+it must **never** expose the group's internal content. A public group's chat,
+photos, and schedule stay members-only, exactly like a private group. "Public"
+= discoverability + an opt-in to surface a profile presence / publish
+highlights, nothing more.
+
+| | **Private** (default) | **Public** |
+| --- | --- | --- |
+| Who can join | Invite code / friends only | Anyone can find & **request to join** |
+| Shows on member profiles | No | Yes — as an affiliation badge ("Member of Tuesday Game") |
+| Chat / photos / schedule | Members only | **Still members only** |
+| Publishes to a feed | Members' own feeds only | Opt-in **per post** to a wider/club feed |
+| Best for | A friend group | A club, a community table |
+
+**Open decisions:**
+
+- **Join model:** recommend **request-to-join (admin approval)** over open-join,
+  so an admin still controls the table; open-join invites spam.
+- **Who can make a group public:** anyone, or gate it. Public "clubs" are a
+  natural **Pro** feature later (ties to `FREE_TABLE_LIMIT` in
+  `docs/monetization.md`).
+
+**Data-model sketch (when wiring):**
+
+- `tables.visibility` enum (`private` default / `public`); only `public` rows
+  are returned by discovery/search.
+- `join_requests` table (`table_id`, `user_id`, `status`) for request-to-join;
+  RLS so only the table admin can approve.
+- Profile affiliations: a query for the requesting user's `public` table
+  memberships (private memberships are never surfaced).
+- A post's `audience` (members vs. club feed) so public publishing is per-post.
+
+**Sequencing — do NOT ship before its gates:** public groups are
+strangers-visible user-generated content, so they require the cloud backend
+**and** report/block + moderation (see "Privacy & store requirements" below)
+to be live first. Plan: **private-only at launch → public groups as a
+fast-follow** once accounts + moderation land.
+
 ## Privacy & store requirements (gating launch)
 
 - Update the Privacy Policy “practices” to match (accounts, cloud storage,
