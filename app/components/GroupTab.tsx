@@ -8,7 +8,7 @@ import { cloudSearchProfiles, cloudAddFriend, type CloudFriend } from '../lib/cl
 
 // How each feed event renders its badge + milestone emblem.
 const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string }> = {
-  mahj: { label: 'MAHJ', color: 'var(--brand)', emoji: '🀄' },
+  mahj: { label: 'MAHJ', color: '#15803D', emoji: '🀄' },
   game_won: { label: 'GAME WON', color: '#C9871A', emoji: '🏆' },
   section_cleared: { label: 'SECTION', color: '#10B39A', emoji: '✅' },
   card_cleared: { label: 'FULL CARD', color: '#6A3FC0', emoji: '👑' },
