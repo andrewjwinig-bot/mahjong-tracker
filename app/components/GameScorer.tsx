@@ -86,8 +86,15 @@ export default function GameScorer({
     setName(slot, f.name, f.avatar);
   }
 
-  // Friends not already on the roster.
-  const availableFriends = friends.filter((f) => !names.some((n) => n.trim().toLowerCase() === f.name.toLowerCase()));
+  const isOnRoster = (f: Friend) =>
+    names.some((n) => n.trim().toLowerCase() === f.name.toLowerCase());
+
+  // Tap a friend to add them to the roster; tap again to take them back off.
+  function toggleFriend(f: Friend) {
+    const slot = names.findIndex((n) => n.trim().toLowerCase() === f.name.toLowerCase());
+    if (slot !== -1) setName(slot, '', undefined);
+    else addFriend(f);
+  }
 
   function start() {
     const seeds: PlayerSeed[] = names.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avatars[i] }));
@@ -164,37 +171,63 @@ export default function GameScorer({
             <p className="sheet-sub">Track a live game — who won, the hand value, and the payouts.</p>
 
             <label className="lbl">Players</label>
-            {names.map((n, i) => (
-              <div key={i} className="player-slot">
-                {avatars[i] ? (
-                  <Avatar avatar={avatars[i]!} size={34} />
-                ) : (
-                  <span className="player-num">{i + 1}</span>
-                )}
-                <input
-                  className="field"
-                  style={{ flex: 1 }}
-                  value={n}
-                  maxLength={20}
-                  placeholder={`Player ${i + 1}`}
-                  onChange={(e) => setName(i, e.target.value, undefined)}
-                />
-              </div>
-            ))}
+            {names.map((n, i) => {
+              // A slot filled from a friend is locked to that identity — name +
+              // tile icon, no free typing. Remove it to free the seat back up.
+              const locked = !!avatars[i];
+              return (
+                <div key={i} className="player-slot">
+                  {avatars[i] ? (
+                    <Avatar avatar={avatars[i]!} size={34} />
+                  ) : (
+                    <span className="player-num">{i + 1}</span>
+                  )}
+                  {locked ? (
+                    <>
+                      <span className="player-locked">{n}</span>
+                      <button
+                        className="player-remove"
+                        aria-label={`Remove ${n}`}
+                        onClick={() => setName(i, '', undefined)}
+                      >
+                        ×
+                      </button>
+                    </>
+                  ) : (
+                    <input
+                      className="field"
+                      style={{ flex: 1 }}
+                      value={n}
+                      maxLength={20}
+                      placeholder={`Player ${i + 1}`}
+                      onChange={(e) => setName(i, e.target.value, undefined)}
+                    />
+                  )}
+                </div>
+              );
+            })}
 
-            {availableFriends.length > 0 && (
+            {friends.length > 0 && (
               <>
                 <label className="lbl" style={{ marginTop: 12 }}>
                   Add from friends
                 </label>
                 <div className="picker-row">
-                  {availableFriends.map((f) => (
-                    <button key={f.name} className="friend-chip" onClick={() => addFriend(f)}>
-                      <Avatar avatar={f.avatar} size={22} />
-                      {f.name}
-                      <IconPlus size={13} />
-                    </button>
-                  ))}
+                  {friends.map((f) => {
+                    const on = isOnRoster(f);
+                    return (
+                      <button
+                        key={f.name}
+                        className="friend-chip"
+                        data-on={on}
+                        onClick={() => toggleFriend(f)}
+                      >
+                        <Avatar avatar={f.avatar} size={22} />
+                        {f.name}
+                        {on ? <IconCheck size={13} /> : <IconPlus size={13} />}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}

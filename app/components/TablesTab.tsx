@@ -573,10 +573,10 @@ function DatesView({
 
   return (
     <div style={{ marginTop: 14 }}>
-      <div className="cat-head" style={{ margin: '4px 2px 12px' }}>
-        <span className="pill" style={{ background: 'var(--tint)', color: 'var(--brand)' }}>
-          📅 {table.poll.question}
-        </span>
+      <div className="poll-hero">
+        <span className="poll-hero-ic" aria-hidden>📅</span>
+        <h3 className="poll-hero-q">{table.poll.question}</h3>
+        <p className="poll-hero-sub">Vote a date below — most votes wins the night.</p>
       </div>
 
       {table.poll.options.length === 0 && (
