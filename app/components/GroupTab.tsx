@@ -149,9 +149,6 @@ export default function GroupTab({
     <div className="screen">
       <header className="app-header">
         <h1>The Feed</h1>
-        <p className="sub">
-          {profile.name ? `Hi ${profile.name.split(' ')[0]} — ` : ''}see what your whole crew is calling.
-        </p>
       </header>
 
       {nextG && (
@@ -177,14 +174,14 @@ export default function GroupTab({
         </div>
       )}
 
-      <button className="score-cta" onClick={onScore}>
+      <div style={{ margin: '12px 0' }}>
+        <TipCard experience={experience} />
+      </div>
+
+      <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
         ⊕ Score a Game
       </button>
-
-      <div style={{ margin: '14px 0 22px' }}>
-        <TipCard experience={experience} />
-      </div>
 
       {addOpen && (
         <AddFriendSheet

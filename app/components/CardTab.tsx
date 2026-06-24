@@ -24,8 +24,6 @@ interface Props {
   wins: Win[];
   groupName: string;
   onBump: (handId: string, delta: number) => void;
-  /** First-time clear of a hand: posts to the feed, returns the Win to share. */
-  onMahj: (hand: Hand) => Win;
   onAddWin: (win: Win) => void;
   onRemoveWin: (id: string) => void;
   onPostToGroup: (win: Win) => void;
@@ -42,7 +40,6 @@ export default function CardTab({
   wins,
   groupName,
   onBump,
-  onMahj,
   onAddWin,
   onRemoveWin,
   onPostToGroup,
@@ -55,7 +52,14 @@ export default function CardTab({
   const [shareWin, setShareWin] = useState<Win | null>(null);
   const [seasonsOpen, setSeasonsOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
+  // The hand a tapped row pre-selects in the Call Mahj sheet (null = blank).
+  const [logHandId, setLogHandId] = useState<string | null>(null);
   const { celebrate } = useConfetti();
+
+  function openLog(handId?: string) {
+    setLogHandId(handId ?? null);
+    setLogOpen(true);
+  }
 
   const challenge = useMemo(() => activeChallenge(), []);
   const chProg = useMemo(
@@ -88,74 +92,44 @@ export default function CardTab({
 
   const pct = Math.round((stats.cleared / card.hands.length) * 100);
 
-  function gotIt(h: Hand) {
-    const was = countOf(h);
-    if (was !== 0) {
-      onBump(h.id, +1);
-      return;
-    }
-    // First clear → post to feed + full-screen celebration with a share prompt.
-    const win = onMahj(h);
+  // Every win — whether logged from the hero or by tapping a hand row — flows
+  // through the Call Mahj sheet, then here on save: persist, post, and fire the
+  // right celebration + milestone posts.
+  function handleSaveWin(win: Win, opts: { shareToGroup: boolean }) {
+    const h = win.handId ? card.hands.find((x) => x.id === win.handId) ?? null : null;
+    const was = win.handId ? handCounts[win.handId] ?? 0 : 0;
+
+    onAddWin(win);
+    if (win.handId) onBump(win.handId, +1);
+    if (opts.shareToGroup) onPostToGroup(win);
+    setLogOpen(false);
+
     const total = card.hands.length;
-    const newCleared = stats.cleared + 1;
+    const bonus = h && challenge.match(h) ? `${challenge.emoji} ${challenge.season} season bonus!` : undefined;
 
-    // Did this clear finish the whole category, or the entire card?
-    const catHands = card.hands.filter((x) => x.category === h.category);
-    const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
-    const cardDone = newCleared >= total;
+    // First clear of a real card hand → milestone detection + big celebration.
+    if (h && was === 0) {
+      const newCleared = stats.cleared + 1;
+      const catHands = card.hands.filter((x) => x.category === h.category);
+      const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
+      const cardDone = newCleared >= total;
 
-    // Layered milestone posts to the feed (distinct from the mahj post above).
-    if (cardDone) {
-      onMilestone('card_cleared', 'Cleared the whole card!', 'All 70 hands 👑');
-    } else if (catDone) {
-      onMilestone('section_cleared', `Cleared every ${h.category} hand`);
-    }
-    if (challenge.match(h) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
-      onMilestone('challenge_done', `Finished ${challenge.name}`);
-    }
+      if (cardDone) onMilestone('card_cleared', 'Cleared the whole card!', 'All 70 hands 👑');
+      else if (catDone) onMilestone('section_cleared', `Cleared every ${h.category} hand`);
+      if (challenge.match(h) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
+        onMilestone('challenge_done', `Finished ${challenge.name}`);
+      }
 
-    // Season-challenge flair when the cleared hand counts toward the active season.
-    const bonus = challenge.match(h)
-      ? `${challenge.emoji} ${challenge.season} season bonus!`
-      : undefined;
-
-    if (cardDone) {
-      celebrate({
-        title: 'You Cleared The Card!!',
-        emoji: '👑',
-        hype: 'ALL 70 HANDS — LEGENDARY 👑',
-        cleared: newCleared,
-        total,
-        posted: true,
-        big: true,
-        bonus,
-        onShare: () => setShareWin(win),
-      });
-    } else if (catDone) {
-      celebrate({
-        title: 'Category Cleared! 🎉',
-        emoji: '🏆',
-        hype: `Every ${h.category} hand — done!`,
-        handLabel: h.notation,
-        points: h.points,
-        cleared: newCleared,
-        total,
-        posted: true,
-        big: true,
-        bonus,
-        onShare: () => setShareWin(win),
-      });
+      if (cardDone) {
+        celebrate({ title: 'You Cleared The Card!!', emoji: '👑', hype: 'ALL 70 HANDS — LEGENDARY 👑', cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
+      } else if (catDone) {
+        celebrate({ title: 'Category Cleared! 🎉', emoji: '🏆', hype: `Every ${h.category} hand — done!`, handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
+      } else {
+        celebrate({ title: 'I Got Mahj! 🎉', handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, bonus, onShare: () => setShareWin(win), onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win) });
+      }
     } else {
-      celebrate({
-        title: 'I Got Mahj! 🎉',
-        handLabel: h.notation,
-        points: h.points,
-        cleared: newCleared,
-        total,
-        posted: true,
-        bonus,
-        onShare: () => setShareWin(win),
-      });
+      // Repeat win of a cleared hand, or a Freeform mahj.
+      celebrate({ title: 'I Got Mahj! 🎉', handLabel: win.handLabel, points: h?.points, posted: opts.shareToGroup, bonus, onShare: () => setShareWin(win), onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win) });
     }
   }
 
@@ -197,7 +171,7 @@ export default function CardTab({
         <span className="tl-chev">›</span>
       </button>
 
-      <button className="mahj-hero" onClick={() => setLogOpen(true)}>
+      <button className="mahj-hero" onClick={() => openLog()}>
         <span className="mahj-hero-shine" aria-hidden />
         <Tile face="crack" size={34} className="mahj-hero-tile" />
         <span className="mahj-hero-label">CALL MAHJ!</span>
@@ -267,8 +241,8 @@ export default function CardTab({
                   <button
                     className="check"
                     data-checked={count > 0}
-                    onClick={() => gotIt(h)}
-                    aria-label={`Mark "${h.notation}" as won`}
+                    onClick={() => openLog(h.id)}
+                    aria-label={`Log a win for "${h.notation}"`}
                   >
                     {count > 0 ? '✓' : ''}
                     {count > 1 && <span className="count-badge">{count}</span>}
@@ -356,24 +330,9 @@ export default function CardTab({
           card={card}
           handNotes={handNotes}
           groupName={groupName}
+          initialHandId={logHandId}
           onClose={() => setLogOpen(false)}
-          onSave={(win, opts) => {
-            onAddWin(win);
-            if (win.handId) onBump(win.handId, +1);
-            if (opts.shareToGroup) onPostToGroup(win);
-            setLogOpen(false);
-            const pts = win.handId
-              ? card.hands.find((h) => h.id === win.handId)?.points
-              : undefined;
-            celebrate({
-              title: 'I Got Mahj! 🎉',
-              handLabel: win.handLabel,
-              points: pts,
-              posted: opts.shareToGroup,
-              onShare: () => setShareWin(win),
-              onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win),
-            });
-          }}
+          onSave={handleSaveWin}
         />
       )}
     </div>

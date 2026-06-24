@@ -3,16 +3,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { tipsFor, tipOfTheDayIndex } from '../lib/tips';
 import type { Experience } from '../lib/account';
-import { IconShuffle } from './uiIcons';
 
 const DISMISS_KEY = 'mahj.tipDismissed';
 const todayKey = () => new Date().toDateString();
 
 export default function TipCard({ experience }: { experience: Experience }) {
   const tips = useMemo(() => tipsFor(experience), [experience]);
-  const [i, setI] = useState(() => tipOfTheDayIndex(tips.length));
-  const [shuffled, setShuffled] = useState(false);
-  // Dismissed for *today* only — a daily fact should come back tomorrow.
+  const tip = tips[tipOfTheDayIndex(tips.length) % tips.length];
+  // Dismissed for *today* only — a daily tip should come back tomorrow.
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -34,30 +32,19 @@ export default function TipCard({ experience }: { experience: Experience }) {
 
   if (dismissed) return null;
 
+  // The whole card is tappable to dismiss; the × is just an affordance.
   return (
-    <div className="tip-card">
+    <button className="tip-card" onClick={dismiss} aria-label="Dismiss today’s tip">
       <span className="tip-tile" aria-hidden>
         ★
       </span>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="tip-label">{shuffled ? 'PRO TIP' : 'TIP OF THE DAY'}</div>
-        <div className="tip-text">{tips[i % tips.length]}</div>
-      </div>
-      <div className="tip-actions">
-        <button
-          className="tip-shuffle"
-          aria-label="Another tip"
-          onClick={() => {
-            setI((p) => (p + 1) % tips.length);
-            setShuffled(true);
-          }}
-        >
-          <IconShuffle size={16} />
-        </button>
-        <button className="tip-dismiss" aria-label="Dismiss for today" onClick={dismiss}>
-          ×
-        </button>
-      </div>
-    </div>
+      <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+        <span className="tip-label">TIP OF THE DAY</span>
+        <span className="tip-text">{tip}</span>
+      </span>
+      <span className="tip-dismiss" aria-hidden>
+        ×
+      </span>
+    </button>
   );
 }
