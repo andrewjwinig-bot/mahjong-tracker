@@ -31,7 +31,7 @@
   --brand-deep: #0c3325;
   --page: #e8f1ea;
   --ink: #0e3d28;
-  --title-color: #ffffff;
+  --title-color: #0c3325;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
@@ -60,7 +60,7 @@
   --brand-deep: #053219;
   --page: #e9f4ec;
   --ink: #0a3d24;
-  --title-color: #ffffff;
+  --title-color: #053219;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-bam.svg");
 }
@@ -78,7 +78,7 @@
   --brand-deep: #4c0d0b;
   --page: #e7f0ea;
   --ink: #143a2e;
-  --title-color: #f3e6c6;
+  --title-color: #4c0d0b;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-dragon.svg");
 }
@@ -96,7 +96,7 @@
   --brand-deep: #281451;
   --page: #f0ebfa;
   --ink: #2e1a57;
-  --title-color: #ffffff;
+  --title-color: #281451;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-joker.svg");
 }
@@ -105,7 +105,7 @@
   --brand-deep: #0c3325;
   --page: #e8f1ea;
   --ink: #0e3d28;
-  --title-color: #ffffff;
+  --title-color: #0c3325;
   --title-shadow: none;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
@@ -292,7 +292,9 @@ a:focus-visible,
   text-transform: none;
   line-height: 0.95;
   color: var(--title-color, var(--ink));
-  text-shadow: var(--title-shadow, none);
+  /* Soft light halo: keeps the (dark) title legible whether it sits over the
+     lighter page or the darker top of the banner art. */
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55), 0 0 10px rgba(255, 255, 255, 0.4);
 }
 .app-header h1::after {
   content: "";
@@ -334,7 +336,7 @@ a:focus-visible,
   font-size: 42px;
   letter-spacing: -1.5px;
   color: var(--title-color, var(--ink));
-  text-shadow: var(--title-shadow, none);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55), 0 0 10px rgba(255, 255, 255, 0.4);
 }
 .logo-dots {
   font-size: 22px;
@@ -2264,6 +2266,7 @@ label.lbl {
   letter-spacing: -1px;
   line-height: 0.95;
   color: var(--title-color, var(--ink));
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55), 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
 .prof-card {
