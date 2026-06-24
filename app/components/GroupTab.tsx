@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
-import { YOU_ID, initialOf } from '../lib/social';
+import { YOU_ID } from '../lib/social';
+import { isCloudEnabled } from '../lib/supabase';
+import { cloudSearchProfiles, cloudAddFriend, type CloudFriend } from '../lib/cloudFriends';
 
 // How each feed event renders its badge + milestone emblem.
 const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string }> = {
@@ -585,16 +587,6 @@ function MemberDetail({
 
 /* ---- Add friend ---------------------------------------------------------- */
 
-const FRIEND_TILES: TileAvatar[] = [
-  { face: 'crack', color: '#E8455F' },
-  { face: 'bam', color: '#1FA85B' },
-  { face: 'dot', color: '#2F80ED' },
-  { face: 'flower', color: '#E8455F' },
-  { face: 'dragon', char: '發', color: '#1FA85B' },
-  { face: 'joker', color: '#7C5CE0' },
-  { face: 'wind', char: '東', color: '#2C3A57' },
-];
-
 interface NavWithContacts extends Navigator {
   contacts?: { select: (props: string[], opts?: { multiple?: boolean }) => Promise<{ tel?: string[] }[]> };
 }
@@ -637,16 +629,36 @@ export function AddFriendSheet({
   onAdd: (name: string, avatar: TileAvatar) => void;
   onClose: () => void;
 }) {
-  const [name, setName] = useState('');
-  const [idx, setIdx] = useState(-1); // -1 = initial-letter tile
+  // Friends are real accounts — you find them by searching usernames (cloud) or
+  // invite people who aren't on the app yet. No hand-made name + icon.
+  const cloud = isCloudEnabled();
+  const [q, setQ] = useState('');
+  const [results, setResults] = useState<CloudFriend[]>([]);
+  const [searching, setSearching] = useState(false);
 
-  const avatar: TileAvatar =
-    idx === -1 ? { face: 'letter', char: initialOf(name || '?'), color: '#0EAD96' } : FRIEND_TILES[idx];
+  useEffect(() => {
+    if (!cloud || !q.trim()) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+    let live = true;
+    setSearching(true);
+    const t = setTimeout(() => {
+      cloudSearchProfiles(q)
+        .then((r) => live && setResults(r))
+        .finally(() => live && setSearching(false));
+    }, 250);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [q, cloud]);
 
-  function add() {
-    const n = name.trim();
-    if (!n) return;
-    onAdd(n, idx === -1 ? { ...avatar, char: initialOf(n) } : avatar);
+  function addUser(u: CloudFriend) {
+    void cloudAddFriend(u.id);
+    onAdd(u.username, u.avatar);
+    onClose();
   }
 
   return (
@@ -656,7 +668,48 @@ export function AddFriendSheet({
         <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <IconUsers size={20} /> Find Friends
         </h2>
-        <p className="sheet-sub">Invite your contacts, or add someone to your board.</p>
+        <p className="sheet-sub">Search players by username, or invite someone new.</p>
+
+        <label className="lbl">Search players</label>
+        <input
+          className="field"
+          value={q}
+          autoFocus={cloud}
+          maxLength={30}
+          placeholder="@username or name"
+          onChange={(e) => setQ(e.target.value)}
+          disabled={!cloud}
+        />
+
+        {cloud ? (
+          <div className="search-results">
+            {searching && <p className="search-empty">Searching…</p>}
+            {!searching && q.trim() && results.length === 0 && (
+              <p className="search-empty">
+                No players found for “{q.trim()}”. Invite them to join below.
+              </p>
+            )}
+            {results.map((u) => (
+              <div key={u.id} className="search-row">
+                <Avatar avatar={u.avatar} size={36} />
+                <div className="search-id">
+                  <div className="search-name">{u.username}</div>
+                  <div className="search-handle">@{u.handle}</div>
+                </div>
+                <button className="pick-chip" onClick={() => addUser(u)}>
+                  Add
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="gated-note">
+            Searching players who already have accounts unlocks when you sign in — arriving with the
+            App Store release. For now, invite friends to join:
+          </p>
+        )}
+
+        <div style={{ height: 1.5, background: 'var(--hairline)', margin: '16px 0' }} />
 
         <button
           className="btn"
@@ -665,59 +718,10 @@ export function AddFriendSheet({
         >
           <IconContacts size={18} /> Invite From Contacts
         </button>
-        <p
-          style={{
-            textAlign: 'center',
-            color: 'var(--muted)',
-            fontSize: 11.5,
-            fontWeight: 700,
-            margin: '8px 0 4px',
-          }}
-        >
-          Finding friends who already have accounts unlocks with sign-in (coming soon).
-        </p>
 
-        <div
-          style={{
-            height: 1.5,
-            background: 'var(--hairline)',
-            margin: '14px 0 16px',
-          }}
-        />
-
-        <label className="lbl">Add by name</label>
-        <input
-          className="field"
-          value={name}
-          autoFocus
-          maxLength={24}
-          placeholder="e.g. Aunt Carol"
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && add()}
-        />
-
-        <label className="lbl" style={{ marginTop: 14 }}>
-          Their tile
-        </label>
-        <div className="avatar-grid">
-          <button className="avatar-opt" data-active={idx === -1} onClick={() => setIdx(-1)}>
-            <Tile face="letter" char={initialOf(name || '?')} color="#0EAD96" size={42} />
-          </button>
-          {FRIEND_TILES.map((t, i) => (
-            <button key={i} className="avatar-opt" data-active={idx === i} onClick={() => setIdx(i)}>
-              <Tile face={t.face} char={t.char} color={t.color} size={42} />
-            </button>
-          ))}
-        </div>
-
-        <div className="row" style={{ marginTop: 16 }}>
-          <button className="btn ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn" onClick={add} disabled={!name.trim()}>
-            Add Friend
-          </button>
-        </div>
+        <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
+          Done
+        </button>
       </div>
     </div>
   );
