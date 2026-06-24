@@ -317,8 +317,6 @@ export default function AppShell() {
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
                 onTrophies={() => setTrophyOpen(true)}
-                onScore={() => openScorer()}
-                onPractice={() => setPracticeOpen(true)}
               />
             )}
             {tab === 'group' && socialState && (

@@ -29,8 +29,6 @@ interface Props {
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
   onTrophies: () => void;
-  onScore: () => void;
-  onPractice: () => void;
 }
 
 export default function CardTab({
@@ -45,8 +43,6 @@ export default function CardTab({
   onPostToGroup,
   onMilestone,
   onTrophies,
-  onScore,
-  onPractice,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
@@ -177,15 +173,6 @@ export default function CardTab({
         <Tile face="crack" size={34} className="mahj-hero-tile" />
         <span className="mahj-hero-label">CALL MAHJ!</span>
       </button>
-
-      <div className="action-row">
-        <button className="act-btn primary" onClick={onScore}>
-          ⊕ Score Game
-        </button>
-        <button className="act-btn" onClick={onPractice}>
-          ◎ Practice
-        </button>
-      </div>
 
       <div style={{ marginTop: 16 }}>
         <ChallengeCard
