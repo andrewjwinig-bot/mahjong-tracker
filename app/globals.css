@@ -807,7 +807,8 @@ a:focus-visible,
   background: color-mix(in srgb, var(--green) 9%, #fff);
   box-shadow: inset 4px 0 0 var(--green), 0 7px 20px rgba(20, 22, 42, 0.11);
 }
-.hand .notation {
+.hand .notation,
+.line-row .notation {
   flex: 1;
   min-width: 0;
   font-family: var(--font-display), system-ui, sans-serif;
@@ -2040,7 +2041,9 @@ label.lbl {
 /* ---- Log-a-Mahj sheet (matches the design) ------------------------------- */
 .log-sheet {
   padding: 0;
-  overflow: hidden;
+  overflow: hidden; /* keep the rounded top corners clipping the band */
+  display: flex;
+  flex-direction: column;
 }
 .log-band {
   position: relative;
@@ -2099,6 +2102,13 @@ label.lbl {
 }
 .log-body {
   padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
+  /* Scroll the form (not the pinned band) so the Save button is always
+     reachable, even with a tall photo preview. */
+  overflow-y: auto;
+  min-height: 0;
+}
+.log-band {
+  flex: 0 0 auto;
 }
 .chip-wrap {
   display: flex;
