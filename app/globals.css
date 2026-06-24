@@ -296,8 +296,8 @@ a:focus-visible,
 .app-header h1 {
   margin-bottom: 9px;
 }
-/* Two-tone PageTitle masthead on the non-card screens (Feed / Tables / Rules). */
-.app-header:not(.card-header) .logo {
+/* Two-tone PageTitle / logo masthead spacing above its subtitle row. */
+.app-header .logo {
   margin-bottom: 10px;
 }
 .app-header .sub {

@@ -150,6 +150,7 @@ export default function GroupTab({
     <div className="screen">
       <header className="app-header">
         <PageTitle kicker={`${(profile.name.trim().split(/\s+/)[0] || 'Your').toUpperCase()}’S`} word="Feed" />
+        <p className="sub">See what your table’s been up to.</p>
       </header>
 
       {nextG && (

@@ -137,6 +137,7 @@ export default function CardTab({
     <div className="screen">
       <header className="app-header card-header">
         <CardTitle />
+        <p className="sub">Track every hand on this year’s card.</p>
       </header>
 
       <div className="stats" style={{ marginTop: 16 }}>
