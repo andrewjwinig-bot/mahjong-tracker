@@ -35,7 +35,7 @@ converts the hobbyist audience that dislikes subscriptions.
 | Themes | 5 standard | + Dragon / Joker / Midnight (+ wallpapers) |
 | Avatar / tile packs | basic | full |
 | Private tables | up to **2** (`FREE_TABLE_LIMIT`) | unlimited |
-| Private group size | not gated (generous anti-abuse ceiling only) | not gated |
+| **Private group size** | up to **12** members | unlimited |
 | **Public club size** | up to **~8** members | unlimited |
 | Backup / restore, insights | ✅ | ✅ |
 | Cloud sync, push notifications | — | ✅ (with accounts) |
@@ -43,6 +43,13 @@ converts the hobbyist audience that dislikes subscriptions.
 
 **Design principle:** never gate the *live act* of scoring (that's the daily
 habit). Gate the *record and extras* (history, rematch, share, win stats).
+
+**Group size:** private groups are capped at **12** members free / unlimited
+Pro — high enough to clear normal tables and most rotating rosters (so adding a
+friend rarely hits a paywall), while a genuinely large group still converts.
+Public clubs cap lower (~8) since organizing a stranger-discoverable community
+is a power behavior. Number of tables (`FREE_TABLE_LIMIT`) stays the primary
+free lever.
 
 ### Planned: deep win history (Pro) — not built yet
 
