@@ -103,7 +103,7 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
       <div className="onboard-card">
         <div className="onboard-head">
           <h1>Mahjong Tracker</h1>
-          <p className="sub">Clear all 70 hands. Brag to your table.</p>
+          <p className="sub">The Original Mahjong Social Network</p>
           <TileStrip count={7} />
         </div>
 
