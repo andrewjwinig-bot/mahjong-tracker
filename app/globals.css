@@ -2931,13 +2931,16 @@ label.lbl {
    ====================================================================== */
 .member-sheet {
   padding: 0;
-  overflow: hidden;
+  overflow: hidden; /* keep the rounded top corners clipping the band */
+  display: flex;
+  flex-direction: column;
 }
 .md-band {
   position: relative;
   background: var(--brand);
   padding: 22px 20px 18px;
   overflow: hidden;
+  flex: 0 0 auto;
 }
 .md-stripe {
   position: absolute;
@@ -3003,7 +3006,10 @@ label.lbl {
 }
 .md-body {
   padding: 18px;
+  /* Scroll the body (band stays pinned) so long hand lists are reachable. */
   overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .md-stats {
   display: flex;
