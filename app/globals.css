@@ -3120,6 +3120,63 @@ label.lbl {
   font-weight: 700;
   opacity: 0.6;
 }
+.chat-bubble {
+  text-align: left;
+  max-width: 100%;
+}
+/* Bubble + reactions stack as a column so chips sit under the message. */
+.chat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  align-items: flex-start;
+}
+.chat-msg.mine .chat-col {
+  align-items: flex-end;
+}
+.react-picker {
+  display: flex;
+  gap: 3px;
+  padding: 5px 8px;
+  background: #fff;
+  border: 2px solid rgba(20, 22, 42, 0.1);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+.react-picker button {
+  font-size: 19px;
+  line-height: 1;
+  padding: 2px 3px;
+  border-radius: 999px;
+  transition: transform 0.1s ease;
+}
+.react-picker button:active {
+  transform: scale(1.3);
+}
+.react-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.react-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1.5px solid var(--hairline);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  box-shadow: var(--shadow-sm);
+}
+.react-chip[data-mine="true"] {
+  background: var(--tint);
+  border-color: var(--brand);
+  color: var(--brand);
+}
 .chat-compose {
   display: flex;
   gap: 8px;

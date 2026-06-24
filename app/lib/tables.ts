@@ -16,6 +16,8 @@ export interface ChatMsg {
   avatar: TileAvatar;
   text: string;
   createdAt: number;
+  /** Emoji → names who reacted. Tapback-style chat reactions. */
+  reactions?: Record<string, string[]>;
 }
 
 export interface PollOption {
@@ -52,7 +54,7 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v2';
+const K_TABLES = 'tables.v3';
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -79,8 +81,8 @@ function seed(): Table[] {
       ],
       messages: [
         { id: 'm1', author: 'Sandra', avatar: A('flower', '#E8455F'), text: 'Who’s in for this week?? 🀄', createdAt: now - 5 * HOUR },
-        { id: 'm2', author: 'Bev', avatar: A('dragon', '#1FA85B', '發'), text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR },
-        { id: 'm3', author: 'Lois', avatar: A('dot', '#2F80ED'), text: 'Vote on a date below!', createdAt: now - 4 * HOUR },
+        { id: 'm2', author: 'Bev', avatar: A('dragon', '#1FA85B', '發'), text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR, reactions: { '❤️': ['Sandra', 'Lois'], '🍪': ['Marsha'] } },
+        { id: 'm3', author: 'Lois', avatar: A('dot', '#2F80ED'), text: 'Vote on a date below!', createdAt: now - 4 * HOUR, reactions: { '👍': ['Sandra'] } },
       ],
       poll: {
         question: 'When should we play next?',
