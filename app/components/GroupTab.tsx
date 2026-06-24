@@ -90,6 +90,9 @@ function timeAgo(ts: number): string {
   return d === 1 ? 'yesterday' : `${d}d ago`;
 }
 
+const STREAK_DISMISS_KEY = 'mahj.streakDismissed';
+const streakDayKey = () => new Date().toDateString();
+
 export default function GroupTab({
   members,
   feed,
@@ -121,6 +124,24 @@ export default function GroupTab({
   }, []);
 
   const [addOpen, setAddOpen] = useState(false);
+
+  // Streak banner: dismissible for the day, like the Tip — it returns tomorrow.
+  const [streakHidden, setStreakHidden] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(STREAK_DISMISS_KEY) === streakDayKey()) setStreakHidden(true);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  function dismissStreak() {
+    try {
+      localStorage.setItem(STREAK_DISMISS_KEY, streakDayKey());
+    } catch {
+      /* ignore */
+    }
+    setStreakHidden(true);
+  }
 
   // Merge live "you" identity + stats into the leaderboard, then rank.
   const ranked = useMemo(() => {
@@ -169,18 +190,17 @@ export default function GroupTab({
         </button>
       )}
 
-      {streak > 1 && (
+      {streak > 1 && !streakHidden && (
         <div className="feed-streak">
           <span className="fs-flame"><IconFlame size={16} /></span>
-          <span>
+          <span style={{ flex: 1 }}>
             You’re on a <strong>{streak}-day streak</strong> — keep it going!
           </span>
+          <button className="fs-dismiss" onClick={dismissStreak} aria-label="Dismiss streak">
+            ×
+          </button>
         </div>
       )}
-
-      <div style={{ margin: '12px 0' }}>
-        <TipCard experience={experience} />
-      </div>
 
       <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
@@ -281,6 +301,10 @@ export default function GroupTab({
           onClose={() => setDetail(null)}
         />
       )}
+
+      <div style={{ margin: '4px 0 18px' }}>
+        <TipCard experience={experience} />
+      </div>
 
       {/* Feed */}
       <div className="feed-label">
