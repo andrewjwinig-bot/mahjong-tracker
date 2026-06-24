@@ -11,6 +11,7 @@ import Avatar from './Avatar';
 import Tile from './Tile';
 import TileStrip from './TileStrip';
 import ShareModal from './ShareModal';
+import { AddFriendSheet } from './GroupTab';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus } from './uiIcons';
 import Paywall from './Paywall';
 import ProUpsell from './ProUpsell';
@@ -38,11 +39,13 @@ export default function TablesTab({
   openTableId,
   onConsumedOpen,
   onScoreTable,
+  onAddFriend,
 }: {
   profile: Profile;
   openTableId?: string | null;
   onConsumedOpen?: () => void;
   onScoreTable: (members: { name: string; avatar: TileAvatar }[]) => void;
+  onAddFriend: (name: string, avatar: TileAvatar) => void;
 }) {
   const [tables, setTables] = useState<Table[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -99,7 +102,7 @@ export default function TablesTab({
     );
   }
 
-  return <TablesList tables={tables} profile={profile} onOpen={setSelectedId} onCreate={(t) => {
+  return <TablesList tables={tables} profile={profile} onAddFriend={onAddFriend} onOpen={setSelectedId} onCreate={(t) => {
     setTables((prev) => {
       const next = [...(prev ?? []), t];
       void saveTables(next);
@@ -114,11 +117,13 @@ export default function TablesTab({
 function TablesList({
   tables,
   profile,
+  onAddFriend,
   onOpen,
   onCreate,
 }: {
   tables: Table[];
   profile: Profile;
+  onAddFriend: (name: string, avatar: TileAvatar) => void;
   onOpen: (id: string) => void;
   onCreate: (t: Table) => void;
 }) {
@@ -126,6 +131,8 @@ function TablesList({
   const [name, setName] = useState('');
   const [iconIdx, setIconIdx] = useState(0);
   const [paywall, setPaywall] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const pro = usePro();
   const atLimit = !pro && tables.length >= FREE_TABLE_LIMIT;
 
@@ -173,6 +180,36 @@ function TablesList({
         <p style={{ margin: '8px 2px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
           Free includes {FREE_TABLE_LIMIT} tables — go Pro for unlimited.
         </p>
+      )}
+
+      {/* People: add friends to your leaderboard + invite your crew to the app. */}
+      <div className="feed-actions" style={{ marginTop: 12 }}>
+        <button className="feed-btn primary" onClick={() => setAddOpen(true)}>
+          <IconPlus size={16} /> ADD FRIEND
+        </button>
+        <button className="feed-btn pine" onClick={() => setInviteOpen(true)}>
+          <IconShare size={16} /> INVITE
+        </button>
+      </div>
+
+      {addOpen && (
+        <AddFriendSheet
+          onAdd={(n, avatar) => {
+            onAddFriend(n, avatar);
+            setAddOpen(false);
+          }}
+          onClose={() => setAddOpen(false)}
+        />
+      )}
+      {inviteOpen && (
+        <ShareModal
+          payload={{
+            title: 'Invite Your Crew 👯',
+            text: `Come track your mahjong wins with me on Let's Mahj — let's race to clear all 70 hands! 🀄`,
+            url: typeof window !== 'undefined' ? window.location.origin : '',
+          }}
+          onClose={() => setInviteOpen(false)}
+        />
       )}
 
       <div style={{ marginTop: 16 }}>

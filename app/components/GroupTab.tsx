@@ -17,10 +17,9 @@ import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import { loadTables, nextGame, type NextGame } from '../lib/tables';
-import ShareModal from './ShareModal';
 import Avatar from './Avatar';
 import Tile from './Tile';
-import { IconShare, IconPlus, IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
+import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
 
 interface Props {
@@ -114,7 +113,6 @@ export default function GroupTab({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [inviteOpen, setInviteOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
 
   // Merge live "you" identity + stats into the leaderboard, then rank.
@@ -175,19 +173,10 @@ export default function GroupTab({
         </div>
       )}
 
-      <button className="score-cta" onClick={onScore}>
+      <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
         ⊕ Score a Game
       </button>
-
-      <div className="feed-actions">
-        <button className="feed-btn primary" onClick={() => setAddOpen(true)}>
-          <IconPlus size={16} /> ADD FRIEND
-        </button>
-        <button className="feed-btn pine" onClick={() => setInviteOpen(true)}>
-          <IconShare size={16} /> INVITE
-        </button>
-      </div>
 
       {addOpen && (
         <AddFriendSheet
@@ -199,24 +188,18 @@ export default function GroupTab({
         />
       )}
 
-      {inviteOpen && (
-        <ShareModal
-          payload={{
-            title: 'Invite Your Crew 👯',
-            text: `Come track your mahjong wins with me on Mahjong Tracker — let's race to clear all 70 hands! 🀄`,
-            url: typeof window !== 'undefined' ? window.location.origin : '',
-          }}
-          onClose={() => setInviteOpen(false)}
-        />
-      )}
-
       {/* Leaderboard */}
       <div className="lb-card">
         <div className="lb-head">
           <span className="lb-title">
             <IconMedal size={14} /> FRIENDS LEADERBOARD
           </span>
-          <span className="lb-count">{ranked.length} PLAYERS</span>
+          <span className="lb-head-right">
+            <span className="lb-count">{ranked.length} PLAYERS</span>
+            <button className="lb-add" onClick={() => setAddOpen(true)}>
+              + Add
+            </button>
+          </span>
         </div>
 
         <div className="segmented lb-seg">
@@ -640,7 +623,7 @@ async function inviteContacts() {
   window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
 }
 
-function AddFriendSheet({
+export function AddFriendSheet({
   onAdd,
   onClose,
 }: {
