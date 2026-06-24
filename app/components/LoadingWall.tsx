@@ -1,7 +1,9 @@
 // The themed loading state: two rows of cream tiles that ripple left-to-right
-// like a wall being stacked. Shown while the app loads its on-device data.
-export default function LoadingWall() {
+// like a wall being stacked. Shown once per app-open while on-device data loads.
+// Greets the player by name when we know it.
+export default function LoadingWall({ name }: { name?: string }) {
   const tiles = Array.from({ length: 14 }); // 2 rows × 7
+  const first = name?.trim().split(/\s+/)[0];
   return (
     <div className="loading-wall-wrap">
       <div className="loading-wall" aria-hidden>
@@ -14,7 +16,7 @@ export default function LoadingWall() {
           />
         ))}
       </div>
-      <div className="loading-text">Stacking the wall…</div>
+      <div className="loading-text">{first ? `Welcome back, ${first}` : 'Stacking the wall…'}</div>
     </div>
   );
 }

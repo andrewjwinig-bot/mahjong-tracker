@@ -39,6 +39,10 @@ import { recordPlay } from '../lib/streak';
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('group');
   const [loaded, setLoaded] = useState(false);
+  // Welcome animation floor: keep the "Stacking the wall" greeting up for at
+  // least a beat on cold app-open (data loads near-instantly on-device), so it
+  // reads as an intentional welcome. Once per open — not on tab switches.
+  const [minElapsed, setMinElapsed] = useState(false);
   const [handCounts, setHandCounts] = useState<Record<string, number>>({});
   const [handNotes, setHandNotes] = useState<Record<string, string>>({});
   const [wins, setWins] = useState<Win[]>([]);
@@ -100,6 +104,12 @@ export default function AppShell() {
     return () => {
       alive = false;
     };
+  }, []);
+
+  // Hold the welcome animation for a short minimum so it's actually seen.
+  useEffect(() => {
+    const t = setTimeout(() => setMinElapsed(true), 700);
+    return () => clearTimeout(t);
   }, []);
 
   // Live leaderboard stats for the local user, derived from their tracker.
@@ -299,9 +309,9 @@ export default function AppShell() {
 
         <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />
 
-        {!loaded ? (
+        {!loaded || !minElapsed ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
-            <LoadingWall />
+            <LoadingWall name={account?.username} />
           </div>
         ) : (
           <>
