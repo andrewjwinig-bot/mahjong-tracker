@@ -575,7 +575,6 @@ function DatesView({
   return (
     <div style={{ marginTop: 14 }}>
       <div className="poll-hero">
-        <span className="poll-hero-ic" aria-hidden>📅</span>
         <h3 className="poll-hero-q">{table.poll.question}</h3>
         <p className="poll-hero-sub">Vote a date below — most votes wins the night.</p>
       </div>

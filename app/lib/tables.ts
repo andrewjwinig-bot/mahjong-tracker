@@ -54,7 +54,7 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v5';
+const K_TABLES = 'tables.v6';
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -108,7 +108,7 @@ function seed(): Table[] {
         { id: 'm4', author: 'Hailey', avatar: A('joker', '#7C5CE0'), text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
       ],
       poll: {
-        question: 'Pick a weekend slot',
+        question: 'When works for everyone?',
         options: [
           { id: 'p4', date: isoInDays(6), time: '11:00', votes: ['Hailey', 'Greg'] },
           { id: 'p5', date: isoInDays(13), time: '11:00', votes: [] },
