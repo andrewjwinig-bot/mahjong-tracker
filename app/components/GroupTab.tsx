@@ -646,6 +646,19 @@ async function inviteContacts() {
   window.location.href = `sms:?&body=${encodeURIComponent(text)}`;
 }
 
+// On-device directory of discoverable players, so search is usable before the
+// cloud backend is live. Swapped for real account search once cloud is on.
+const SAMPLE_PLAYERS: CloudFriend[] = [
+  { id: 'sp-ruth', username: 'Ruth', handle: 'ruthtiles', avatar: { face: 'crack', color: '#E8455F' } },
+  { id: 'sp-esther', username: 'Esther', handle: 'estherbam', avatar: { face: 'bam', color: '#1FA85B' } },
+  { id: 'sp-grace', username: 'Grace', handle: 'gracem', avatar: { face: 'dot', color: '#2F80ED' } },
+  { id: 'sp-dottie', username: 'Dottie', handle: 'dottie', avatar: { face: 'flower', color: '#E84C8A' } },
+  { id: 'sp-sylvia', username: 'Sylvia', handle: 'sylviak', avatar: { face: 'dragon', char: '中', color: '#C0392B' } },
+  { id: 'sp-joan', username: 'Joan', handle: 'joanjoker', avatar: { face: 'joker', color: '#7C5CE0' } },
+  { id: 'sp-florence', username: 'Florence', handle: 'flo', avatar: { face: 'wind', char: '東', color: '#2C3A57' } },
+  { id: 'sp-marlene', username: 'Marlene', handle: 'marlene', avatar: { face: 'dot', color: '#F5A524' } },
+];
+
 export function AddFriendSheet({
   onAdd,
   onClose,
@@ -654,22 +667,35 @@ export function AddFriendSheet({
   onClose: () => void;
 }) {
   // Friends are real accounts — you find them by searching usernames (cloud) or
-  // invite people who aren't on the app yet. No hand-made name + icon.
+  // a local sample directory (on-device), then invite people who aren't on the
+  // app yet. No hand-made name + icon.
   const cloud = isCloudEnabled();
   const [q, setQ] = useState('');
   const [results, setResults] = useState<CloudFriend[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
-    if (!cloud || !q.trim()) {
+    const query = q.trim();
+    if (!query) {
       setResults([]);
+      setSearching(false);
+      return;
+    }
+    // On-device mode: filter the local sample directory (no network).
+    if (!cloud) {
+      const ql = query.replace(/^@/, '').toLowerCase();
+      setResults(
+        SAMPLE_PLAYERS.filter(
+          (p) => p.username.toLowerCase().includes(ql) || p.handle.toLowerCase().includes(ql),
+        ),
+      );
       setSearching(false);
       return;
     }
     let live = true;
     setSearching(true);
     const t = setTimeout(() => {
-      cloudSearchProfiles(q)
+      cloudSearchProfiles(query)
         .then((r) => live && setResults(r))
         .finally(() => live && setSearching(false));
     }, 250);
@@ -680,7 +706,7 @@ export function AddFriendSheet({
   }, [q, cloud]);
 
   function addUser(u: CloudFriend) {
-    void cloudAddFriend(u.id);
+    if (cloud) void cloudAddFriend(u.id);
     onAdd(u.username, u.avatar);
     onClose();
   }
@@ -698,40 +724,38 @@ export function AddFriendSheet({
         <input
           className="field"
           value={q}
-          autoFocus={cloud}
+          autoFocus
           maxLength={30}
           placeholder="@username or name"
           onChange={(e) => setQ(e.target.value)}
-          disabled={!cloud}
         />
 
-        {cloud ? (
-          <div className="search-results">
-            {searching && <p className="search-empty">Searching…</p>}
-            {!searching && q.trim() && results.length === 0 && (
-              <p className="search-empty">
-                No players found for “{q.trim()}”. Invite them to join below.
-              </p>
-            )}
-            {results.map((u) => (
-              <div key={u.id} className="search-row">
-                <Avatar avatar={u.avatar} size={36} />
-                <div className="search-id">
-                  <div className="search-name">{u.username}</div>
-                  <div className="search-handle">@{u.handle}</div>
-                </div>
-                <button className="pick-chip" onClick={() => addUser(u)}>
-                  Add
-                </button>
+        <div className="search-results">
+          {searching && <p className="search-empty">Searching…</p>}
+          {!searching && q.trim() && results.length === 0 && (
+            <p className="search-empty">
+              No players found for “{q.trim()}”. Invite them to join below.
+            </p>
+          )}
+          {results.map((u) => (
+            <div key={u.id} className="search-row">
+              <Avatar avatar={u.avatar} size={36} />
+              <div className="search-id">
+                <div className="search-name">{u.username}</div>
+                <div className="search-handle">@{u.handle}</div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="gated-note">
-            Searching players who already have accounts unlocks when you sign in — arriving with the
-            App Store release. For now, invite friends to join:
-          </p>
-        )}
+              <button className="pick-chip" onClick={() => addUser(u)}>
+                Add
+              </button>
+            </div>
+          ))}
+          {!cloud && !q.trim() && (
+            <p className="gated-note">
+              Real player search across accounts arrives with sign-in. Try typing a name to find
+              demo players, or invite friends below.
+            </p>
+          )}
+        </div>
 
         <div style={{ height: 1.5, background: 'var(--hairline)', margin: '16px 0' }} />
 
