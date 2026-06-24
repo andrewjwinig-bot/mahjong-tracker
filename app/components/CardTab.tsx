@@ -31,6 +31,7 @@ interface Props {
   onAddWin: (win: Win) => void;
   onRemoveWin: (id: string) => void;
   onPostToGroup: (win: Win) => void;
+  onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
   experience: Experience;
   streak: number;
   onScore: () => void;
@@ -48,6 +49,7 @@ export default function CardTab({
   onAddWin,
   onRemoveWin,
   onPostToGroup,
+  onMilestone,
   experience,
   streak,
   onScore,
@@ -105,6 +107,16 @@ export default function CardTab({
     const catHands = card.hands.filter((x) => x.category === h.category);
     const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
     const cardDone = newCleared >= total;
+
+    // Layered milestone posts to the feed (distinct from the mahj post above).
+    if (cardDone) {
+      onMilestone('card_cleared', 'Cleared the whole card!', 'All 70 hands 👑');
+    } else if (catDone) {
+      onMilestone('section_cleared', `Cleared every ${h.category} hand`);
+    }
+    if (challenge.match(h) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
+      onMilestone('challenge_done', `Finished ${challenge.name}`);
+    }
 
     // Season-challenge flair when the cleared hand counts toward the active season.
     const bonus = challenge.match(h)

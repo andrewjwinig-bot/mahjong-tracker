@@ -1,8 +1,18 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { Comment, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
+import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID, initialOf } from '../lib/social';
+
+// How each feed event renders its badge + milestone emblem.
+const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string }> = {
+  mahj: { label: 'MAHJ', color: 'var(--brand)', emoji: '🀄' },
+  game_won: { label: 'GAME WON', color: '#C9871A', emoji: '🏆' },
+  section_cleared: { label: 'SECTION', color: '#10B39A', emoji: '✅' },
+  card_cleared: { label: 'FULL CARD', color: '#6A3FC0', emoji: '👑' },
+  challenge_done: { label: 'CHALLENGE', color: '#F5A524', emoji: '⭐' },
+  joined: { label: 'JOINED', color: '#2E86D4', emoji: '➕' },
+};
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
@@ -350,6 +360,9 @@ function FeedCard({
     setShowComments(true);
   }
 
+  const kind = post.kind ?? 'mahj';
+  const badge = KIND_BADGE[kind];
+
   return (
     <div className="post">
       {url && <img className="photo" src={url} alt="Mahj photo" style={{ marginBottom: 11 }} />}
@@ -359,19 +372,30 @@ function FeedCard({
           <div className="post-name">{post.memberName}</div>
           <div className="post-time">{timeAgo(post.createdAt).toUpperCase()}</div>
         </div>
-        <span className="post-badge">MAHJ</span>
+        <span className="post-badge" style={{ background: badge.color }}>
+          {badge.label}
+        </span>
       </div>
 
-      {post.handLabel && (
-        <div className="post-note">
-          {colorNotation(post.handLabel).map((g, i, arr) => (
-            <span key={i} className={g.cls}>
-              {g.text}
-              {i < arr.length - 1 ? ' ' : ''}
-            </span>
-          ))}
-        </div>
-      )}
+      {kind === 'mahj'
+        ? post.handLabel && (
+            <div className="post-note">
+              {colorNotation(post.handLabel).map((g, i, arr) => (
+                <span key={i} className={g.cls}>
+                  {g.text}
+                  {i < arr.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </div>
+          )
+        : post.title && (
+            <div className="post-milestone" style={{ borderColor: badge.color }}>
+              <span className="pm-emoji" aria-hidden>
+                {badge.emoji}
+              </span>
+              <span className="pm-title">{post.title}</span>
+            </div>
+          )}
       {post.note && <p className="post-cap">{post.note}</p>}
 
       {/* Like + comment bar */}

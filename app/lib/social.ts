@@ -40,11 +40,22 @@ export interface Comment {
   createdAt: number;
 }
 
+/** The kinds of moments that show in the feed. 'mahj' is a called hand (the
+ *  default + the bulk of the feed); the rest are celebratory milestones. */
+export type FeedKind =
+  | 'mahj'
+  | 'game_won'
+  | 'section_cleared'
+  | 'card_cleared'
+  | 'challenge_done'
+  | 'joined';
+
 export interface FeedPost {
   id: string;
   memberId: string;
   memberName: string;
   avatar: TileAvatar;
+  /** mahj posts: the won hand in colored notation. */
   handLabel: string | null;
   note: string;
   photo: Blob | null;
@@ -52,6 +63,10 @@ export interface FeedPost {
   likes: number;
   likedByMe: boolean;
   comments: Comment[];
+  /** Event type — defaults to 'mahj' for legacy/un-typed posts. */
+  kind?: FeedKind;
+  /** Headline for milestone posts ("Cleared all 2025 hands", "Won game night"). */
+  title?: string;
 }
 
 export interface Group {
@@ -67,10 +82,10 @@ export interface SocialState {
   profile: Profile;
 }
 
-const K_SEEDED = 'social.seeded.v2';
+const K_SEEDED = 'social.seeded.v3';
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
-const K_FEED = 'social.feed.v2';
+const K_FEED = 'social.feed.v3';
 const K_PROFILE = 'social.profile';
 
 const HOUR = 3_600_000;
@@ -140,6 +155,35 @@ async function seedIfNeeded(): Promise<void> {
       id: 'f4', memberId: 'm_lois', memberName: 'Lois', avatar: DEMO_AVATARS.m_lois,
       handLabel: '333 666 6666 9999', note: 'Finally got 369!', photo: null,
       createdAt: now - 2 * DAY, likes: 7, likedByMe: false, comments: [],
+    },
+    // Milestone posts (typed) interleaved through the feed.
+    {
+      id: 'f5', memberId: 'm_sandra', memberName: 'Sandra', avatar: DEMO_AVATARS.m_sandra,
+      kind: 'section_cleared', title: 'Cleared every 2025 hand', handLabel: null,
+      note: 'Whole section done — onto Consecutive Run!', photo: null,
+      createdAt: now - 9 * HOUR, likes: 9, likedByMe: false, comments: [
+        { id: 'c5', author: 'Marsha', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
+      ],
+    },
+    {
+      id: 'f6', memberId: 'm_bev', memberName: 'Bev', avatar: DEMO_AVATARS.m_bev,
+      kind: 'game_won', title: 'Won game night', handLabel: null,
+      note: 'Bev +40 · Sandra +10 · Lois −20 · Marsha −30', photo: null,
+      createdAt: now - 1 * DAY - 1 * HOUR, likes: 6, likedByMe: false, comments: [],
+    },
+    {
+      id: 'f7', memberId: 'm_marsha', memberName: 'Marsha', avatar: DEMO_AVATARS.m_marsha,
+      kind: 'challenge_done', title: 'Finished Summer Kongs', handLabel: null,
+      note: 'Season challenge complete 🏅', photo: null,
+      createdAt: now - 3 * DAY, likes: 11, likedByMe: false, comments: [],
+    },
+    {
+      id: 'f8', memberId: 'm_lois', memberName: 'Lois', avatar: DEMO_AVATARS.m_lois,
+      kind: 'card_cleared', title: 'Cleared the whole card!', handLabel: null,
+      note: 'All 70 hands. Legendary. 👑', photo: null,
+      createdAt: now - 4 * DAY, likes: 23, likedByMe: false, comments: [
+        { id: 'c8', author: 'Sandra', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },
+      ],
     },
   ];
 

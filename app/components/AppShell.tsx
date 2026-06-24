@@ -151,6 +151,34 @@ export default function AppShell() {
     });
   }, []);
 
+  // Post a celebratory milestone to the feed (section/card/challenge cleared,
+  // game won) — distinct from a mahj post, layered on top of it.
+  const postMilestone = useCallback(
+    (kind: social.FeedKind, title: string, note = '') => {
+      setSocialState((prev) => {
+        if (!prev) return prev;
+        const post: social.FeedPost = {
+          id: crypto.randomUUID(),
+          memberId: social.YOU_ID,
+          memberName: prev.profile.name,
+          avatar: prev.profile.avatar,
+          handLabel: null,
+          note,
+          photo: null,
+          createdAt: Date.now(),
+          likes: 0,
+          likedByMe: false,
+          comments: [],
+          kind,
+          title,
+        };
+        void social.addFeedPost(post);
+        return { ...prev, feed: [post, ...prev.feed] };
+      });
+    },
+    [],
+  );
+
   // Checking a hand off the card = an instant mahj: bump progress, log it to
   // your Mahjs journal, auto-post it to the feed, and hand back the Win so the
   // celebration can offer sharing.
@@ -306,6 +334,7 @@ export default function AppShell() {
                 onAddWin={addWin}
                 onRemoveWin={removeWin}
                 onPostToGroup={postToGroup}
+                onMilestone={postMilestone}
                 experience={experience}
                 streak={streak}
                 onScore={() => openScorer()}
@@ -399,6 +428,12 @@ export default function AppShell() {
               .filter((m) => !m.isYou)
               .map((m) => ({ name: m.name, avatar: m.avatar }))
           }
+          onGameWon={(r) => {
+            if (r.winnerName && socialState && r.winnerName === socialState.profile.name) {
+              const line = r.players.map((p) => `${p.name} ${p.score > 0 ? '+' : ''}${p.score}`).join(' · ');
+              postMilestone('game_won', 'Won game night', line);
+            }
+          }}
           onClose={() => {
             setScorerOpen(false);
             setScorerSeed(null);
