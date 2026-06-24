@@ -13,7 +13,7 @@ import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconTap, IconTrophy } from './uiIcons';
+import { IconTrophy } from './uiIcons';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
@@ -192,16 +192,6 @@ export default function CardTab({
           </button>
         ))}
       </div>
-
-      {stats.totalWins === 0 && filter === 'all' && (
-        <div className="coach">
-          <span className="coach-emoji"><IconTap size={20} /></span>
-          <span>
-            <strong>Win a hand?</strong> Tap its checkbox to log your first MAHJ — your card fills in
-            with a tile celebration.
-          </span>
-        </div>
-      )}
 
       {card.categories.map((category) => {
         const hands = card.hands.filter((h) => h.category === category && visible(h));
