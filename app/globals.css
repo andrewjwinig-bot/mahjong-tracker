@@ -1048,6 +1048,52 @@ label.lbl {
 /* ======================================================================
    FEED — match the Card page's design language (design frame 3)
    ====================================================================== */
+/* Pinned "next game" reminder at the top of the Feed (your tables only). */
+.next-game {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  margin-top: 14px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  background: #fff;
+  border: 2.5px solid var(--green);
+  box-shadow: 0 7px 20px rgba(16, 179, 154, 0.16);
+}
+.ng-body {
+  flex: 1;
+  min-width: 0;
+}
+.ng-label {
+  display: block;
+  font-weight: 800;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--green);
+}
+.ng-when {
+  display: block;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 1px 0;
+}
+.ng-meta {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+.ng-chev {
+  flex: none;
+  font-size: 20px;
+  color: var(--muted);
+}
+
 /* Friendly daily streak banner at the top of the Feed home. */
 .feed-streak {
   display: flex;

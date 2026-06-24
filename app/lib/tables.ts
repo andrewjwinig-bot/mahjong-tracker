@@ -128,3 +128,37 @@ export async function loadTables(): Promise<Table[]> {
 export async function saveTables(tables: Table[]): Promise<void> {
   await setMeta(K_TABLES, tables);
 }
+
+export interface NextGame {
+  tableId: string;
+  tableName: string;
+  icon: TileAvatar;
+  date: string;
+  time?: string;
+  votes: number;
+}
+
+/** The soonest upcoming game across the user's tables — the leading (most-voted)
+ *  upcoming date per table, then the soonest of those. Used for the Feed's
+ *  "next game" reminder. Returns null if nothing is on the calendar. */
+export function nextGame(tables: Table[]): NextGame | null {
+  const todayKey = isoInDays(0);
+  let best: NextGame | null = null;
+  for (const t of tables) {
+    const upcoming = t.poll.options.filter((o) => o.date >= todayKey);
+    if (!upcoming.length) continue;
+    const lead = [...upcoming].sort(
+      (a, b) => b.votes.length - a.votes.length || a.date.localeCompare(b.date),
+    )[0];
+    const cand: NextGame = {
+      tableId: t.id,
+      tableName: t.name,
+      icon: t.icon,
+      date: lead.date,
+      time: lead.time,
+      votes: lead.votes.length,
+    };
+    if (!best || cand.date < best.date) best = cand;
+  }
+  return best;
+}

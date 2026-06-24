@@ -324,6 +324,7 @@ export default function AppShell() {
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
                 onScore={() => openScorer()}
+                onOpenTables={() => setTab('tables')}
               />
             )}
             {tab === 'tables' && socialState && (
