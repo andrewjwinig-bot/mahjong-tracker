@@ -3493,26 +3493,74 @@ label.lbl {
 
 /* ---- Profile header (trophies sheet) ------------------------------------ */
 
-.profile-head {
+/* Profile/Trophies sheet — brand header band + scrollable body (design v6). */
+.profile-sheet {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.profile-band {
+  position: relative;
+  flex: 0 0 auto;
+  background: var(--brand);
+  padding: 16px 18px 18px;
+  overflow: hidden;
+}
+.profile-band-row {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 4px 0 8px;
+  gap: 13px;
+}
+.profile-band-tile {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  padding: 4px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.profile-share {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #4a2d04;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.profile-share:active {
+  transform: scale(0.95);
+}
+.profile-body {
+  padding: 16px 16px calc(18px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .profile-name {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--brand);
+  color: #fff;
   font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.3px;
+  text-shadow: 2px 2px 0 var(--brand-deep);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .profile-handle {
-  font-size: 13px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.82);
 }
 .profile-bio {
   margin: 0 2px;
