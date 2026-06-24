@@ -959,6 +959,9 @@ a:focus-visible,
 /* ---- Buttons ------------------------------------------------------------- */
 
 .btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -968,12 +971,40 @@ a:focus-visible,
   text-transform: uppercase;
   letter-spacing: 0.03em;
   padding: 14px 18px;
-  border-radius: 16px;
+  border-radius: 13px;
+  border: 2.5px solid var(--hairline);
   background: linear-gradient(180deg, var(--brand), var(--brand-deep));
   color: var(--on-brand);
   box-shadow: var(--shadow-sm);
   width: 100%;
   transition: transform 0.08s ease;
+}
+/* Primary buttons (design v6): woven diagonal stripe + sweeping shine + a hard
+   two-tone label offset. Ghost buttons opt out. */
+.btn:not(.ghost) {
+  text-shadow: 1.5px 1.5px 0 var(--brand-deep);
+}
+.btn:not(.ghost)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
+  opacity: 0.14;
+  pointer-events: none;
+}
+.btn:not(.ghost)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-130%);
+  animation: mahj-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
 }
 .btn.coral,
 .btn.accent {
@@ -990,12 +1021,14 @@ a:focus-visible,
   background: var(--tint);
   color: var(--brand);
   box-shadow: none;
+  border-color: transparent;
+  text-shadow: none;
 }
 a.btn {
   text-decoration: none;
 }
 .btn:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(2px) scale(0.99);
 }
 .btn:disabled {
   opacity: 0.5;
