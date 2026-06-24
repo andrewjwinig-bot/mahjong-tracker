@@ -337,8 +337,6 @@ export default function AppShell() {
                 onRemoveWin={removeWin}
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
-                experience={experience}
-                streak={streak}
                 onScore={() => openScorer()}
                 onPractice={() => setPracticeOpen(true)}
               />
@@ -351,6 +349,7 @@ export default function AppShell() {
                 youStats={youStats}
                 handCounts={handCounts}
                 streak={streak}
+                experience={experience}
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
