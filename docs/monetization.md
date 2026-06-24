@@ -28,6 +28,10 @@ converts the hobbyist audience that dislikes subscriptions.
 | Saved game history | last **1** game | unlimited |
 | Rematch any past game / share a scorecard | — | ✅ |
 | "Games won" stat on profile | — (played only) | ✅ |
+| **Win history journal ("Your Mahjs")** | recent few | full history |
+| **Win insights** (favorite hands, points over time, best categories, streak history) | summary teaser | full breakdown |
+| **Per-win context** (which table, who was playing) | — | ✅ |
+| **Export win history** (CSV) | — | ✅ |
 | Themes | 5 standard | + Dragon / Joker / Midnight (+ wallpapers) |
 | Avatar / tile packs | basic | full |
 | Private tables | up to **2** (`FREE_TABLE_LIMIT`) | unlimited |
@@ -37,6 +41,28 @@ converts the hobbyist audience that dislikes subscriptions.
 
 **Design principle:** never gate the *live act* of scoring (that's the daily
 habit). Gate the *record and extras* (history, rematch, share, win stats).
+
+### Planned: deep win history (Pro) — not built yet
+
+Win-history depth is a natural Pro lever — it rewards the most engaged players
+without ever blocking a beginner from logging a hand. The intent (last four rows
+of the table above):
+
+- **Journal depth:** free shows a recent handful of "Your Mahjs"; Pro unlocks the
+  full history. Gate in `CardTab` where the `wins` list renders, mirroring the
+  scorer's `FREE_HISTORY` pattern.
+- **Win insights:** a breakdown built on `app/lib/insights.ts` (`computeInsights`)
+  — favorite hands, points over time, strongest categories, streak history. Free
+  sees a teaser/summary; Pro sees the full view.
+- **Per-win context:** record *which table* and *who was playing* when a mahj is
+  logged. This needs a small data-model add (`tableId?` / `players?` on `Win` in
+  `app/lib/types.ts`) plus optional pickers in the log-win sheet.
+- **Export:** CSV of the full win history (reuse `app/lib/dataExport.ts`).
+
+**Sequencing note:** capturing per-win context (table/players) is worth wiring
+*early* — even before the Pro analytics ship — so that by launch users already
+have a rich history to unlock, rather than it starting empty on day one. The
+analytics/gating UI can follow with the backend milestone.
 
 ### Where gating lives in code
 
