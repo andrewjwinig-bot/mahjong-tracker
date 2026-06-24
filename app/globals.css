@@ -4704,6 +4704,50 @@ label.lbl {
 .player-remove:active {
   transform: scale(0.9);
 }
+
+/* Find-friends: search results + the local-mode gated note. */
+.search-results {
+  margin-top: 10px;
+}
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 2px;
+}
+.search-row + .search-row {
+  border-top: 1.5px solid rgba(20, 22, 42, 0.06);
+}
+.search-id {
+  flex: 1;
+  min-width: 0;
+}
+.search-name {
+  font-weight: 800;
+  font-size: 14.5px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-handle {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.search-empty {
+  margin: 10px 2px;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.gated-note {
+  margin: 10px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
 .friend-chip {
   display: inline-flex;
   align-items: center;
