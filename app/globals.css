@@ -31,8 +31,9 @@
   --brand-deep: #0c3325;
   --page: #e8f1ea;
   --ink: #0e3d28;
-  --title-color: #0c3325;
+  --title-color: #ffffff;
   --title-shadow: none;
+  --art-ground: #1c5a3e;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
 
@@ -43,6 +44,7 @@
   --ink: #1a1410;
   --title-color: #4d0f09;
   --title-shadow: none;
+  --art-ground: #f2e8d6;
   --bg-photo: url("/patterns/bg-crak.svg");
 }
 
@@ -53,6 +55,7 @@
   --ink: #143b42;
   --title-color: #0e353c;
   --title-shadow: none;
+  --art-ground: #e3eeef;
   --bg-photo: url("/patterns/bg-wind.svg");
 }
 [data-theme="bam"] {
@@ -60,8 +63,9 @@
   --brand-deep: #053219;
   --page: #e9f4ec;
   --ink: #0a3d24;
-  --title-color: #053219;
+  --title-color: #ffffff;
   --title-shadow: none;
+  --art-ground: #1aa45c;
   --bg-photo: url("/patterns/bg-bam.svg");
 }
 [data-theme="dot"] {
@@ -71,6 +75,7 @@
   --ink: #15386e;
   --title-color: #0a2a4e;
   --title-shadow: none;
+  --art-ground: #eaefea;
   --bg-photo: url("/patterns/bg-dot.svg");
 }
 [data-theme="dragon"] {
@@ -78,8 +83,9 @@
   --brand-deep: #4c0d0b;
   --page: #e7f0ea;
   --ink: #143a2e;
-  --title-color: #4c0d0b;
+  --title-color: #f3e6c6;
   --title-shadow: none;
+  --art-ground: #0e4031;
   --bg-photo: url("/patterns/bg-dragon.svg");
 }
 [data-theme="flower"] {
@@ -89,15 +95,17 @@
   --ink: #7a1e48;
   --title-color: #5c0a30;
   --title-shadow: none;
+  --art-ground: #f7dce9;
   --bg-photo: url("/patterns/bg-flower.svg");
 }
 [data-theme="joker"] {
   --brand: #6a3fc0;
   --brand-deep: #281451;
   --page: #f0ebfa;
-  --ink: #2e1a57;
-  --title-color: #281451;
+  --ink: #3a1e78;
+  --title-color: #ffffff;
   --title-shadow: none;
+  --art-ground: #6a3fc0;
   --bg-photo: url("/patterns/bg-joker.svg");
 }
 [data-theme="felt"] {
@@ -105,8 +113,9 @@
   --brand-deep: #0c3325;
   --page: #e8f1ea;
   --ink: #0e3d28;
-  --title-color: #0c3325;
+  --title-color: #ffffff;
   --title-shadow: none;
+  --art-ground: #1c5a3e;
   --bg-photo: url("/patterns/bg-felt.svg");
 }
 
@@ -138,27 +147,9 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Per the design: the themed art is a banner behind each screen header that
-   fades out toward the bottom (not a full-screen wallpaper). The page itself is
-   the solid --page color (set on <html>); this fixed layer paints only the top
-   band of art, masked to transparent. */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 252px;
-  z-index: -1;
-  background-image: var(--bg-photo);
-  background-size: 440px auto;
-  background-repeat: no-repeat;
-  background-position: center top;
-  opacity: 0.42;
-  -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 50%, transparent 100%);
-  pointer-events: none;
-}
+/* Per the design v6: the themed art is a banner that lives inside each screen's
+   header (see .app-header below), painted over the per-theme --art-ground, not a
+   full-screen wallpaper. The page itself is the solid --page color. */
 
 /* Faint paper-grain texture over every screen (design §B). A fixed multiply
    overlay of tiling fractal noise at ~10% — keeps surfaces from feeling flat. */
@@ -278,8 +269,41 @@ a:focus-visible,
 }
 
 .app-header {
-  padding: 20px 4px 6px;
-  text-align: left;
+  position: relative;
+  margin: -16px -16px 12px;
+  padding: 36px 20px 20px;
+  text-align: center;
+  overflow: hidden;
+  background: var(--art-ground, var(--page));
+  border-bottom: 2.5px solid color-mix(in srgb, var(--brand) 26%, transparent);
+}
+/* themed art texture over the ground, fading toward the content */
+.app-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--bg-photo);
+  background-size: 440px auto;
+  background-repeat: no-repeat;
+  background-position: center top;
+  opacity: 0.5;
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+  pointer-events: none;
+}
+.app-header > * {
+  position: relative;
+  z-index: 1;
+}
+/* centered wordmark + flanking paper tiles */
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.mast-tile {
+  flex: none;
 }
 /* Poster title: heavy Bricolage in the theme's high-contrast title color, with a
    short left-aligned accent underline. (Two-tone offset is off in this build.) */
@@ -296,23 +320,25 @@ a:focus-visible,
 .app-header h1 {
   margin-bottom: 9px;
 }
-/* Two-tone PageTitle / logo masthead spacing above its subtitle row. */
-.app-header .logo {
-  margin-bottom: 10px;
+/* 48×6 accent underline beneath the centered wordmark (design v6). */
+.app-header .logo::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 6px;
+  margin: 11px auto 0;
+  border-radius: 3px;
+  background: var(--brand);
 }
 .app-header .sub {
   display: block;
-  margin: 0 0 16px;
-  color: var(--ink-soft);
+  margin: 9px auto 0;
+  max-width: 32ch;
+  color: var(--title-color, var(--ink));
+  opacity: 0.82;
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
-}
-
-/* Card screen header is left-aligned around the two-tone logo. */
-.app-header.card-header {
-  text-align: left;
-  padding: 18px 4px 6px;
 }
 .logo {
   line-height: 0.82;
@@ -320,10 +346,10 @@ a:focus-visible,
 .logo-kicker {
   font-family: var(--font-app), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 12px;
+  letter-spacing: 5px;
   color: var(--title-color, var(--ink));
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 .logo-word {
   font-family: var(--font-display), system-ui, sans-serif;
