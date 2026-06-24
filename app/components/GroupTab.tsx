@@ -36,7 +36,7 @@ interface Props {
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
   onScore: () => void;
-  onOpenTables: () => void;
+  onOpenTables: (tableId: string) => void;
 }
 
 /** Which hand ids a member has cleared. Real for you; deterministic for demo
@@ -153,7 +153,7 @@ export default function GroupTab({
       </header>
 
       {nextG && (
-        <button className="next-game" onClick={onOpenTables}>
+        <button className="next-game" onClick={() => onOpenTables(nextG.tableId)}>
           <Tile face={nextG.icon.face} char={nextG.icon.char} color={nextG.icon.color} size={40} />
           <span className="ng-body">
             <span className="ng-label">⏰ NEXT GAME</span>
