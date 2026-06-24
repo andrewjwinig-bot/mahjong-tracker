@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import OfficialCardCallout from './OfficialCardCallout';
+import PageTitle from './PageTitle';
 import Tile from './Tile';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
@@ -11,11 +12,8 @@ import {
   IconUsers,
   IconUser,
   IconCard,
-  IconBook,
-  IconBulb,
   IconShield,
   IconHelp,
-  IconSparkle,
   IconCheck,
   IconStar,
 } from './uiIcons';
@@ -160,11 +158,6 @@ function Charleston() {
 
 const SECTIONS: Section[] = [
   {
-    icon: <IconCard size={18} />,
-    title: 'Understanding the tiles',
-    body: <TileGuide />,
-  },
-  {
     icon: <IconTarget size={18} />,
     title: 'How to play (the 60-second version)',
     body: (
@@ -181,6 +174,11 @@ const SECTIONS: Section[] = [
         <p>This app is your scorecard: tap a hand each time you win it and watch your card fill in.</p>
       </>
     ),
+  },
+  {
+    icon: <IconCard size={18} />,
+    title: 'Understanding the tiles',
+    body: <TileGuide />,
   },
   {
     icon: <IconShuffle size={18} />,
@@ -246,39 +244,6 @@ const SECTIONS: Section[] = [
     ),
   },
   {
-    icon: <IconBook size={18} />,
-    title: 'Reading the notation',
-    body: (
-      <>
-        <p>Hands are written in shorthand. A few common symbols:</p>
-        <ul>
-          <li><strong>F</strong> — Flower tile</li>
-          <li><strong>D</strong> — Dragon (color matches the suit)</li>
-          <li><strong>N E W S</strong> — the wind tiles (North, East, West, South)</li>
-          <li><strong>Numbers</strong> — actual number tiles in a suit</li>
-          <li><strong>C</strong> badge — the hand must be played <em>concealed</em></li>
-        </ul>
-        <p>
-          The colors here are decorative — they just help your eye group the tiles. The official card
-          uses color to show which <em>suit</em> each group must be.
-        </p>
-      </>
-    ),
-  },
-  {
-    icon: <IconBulb size={18} />,
-    title: 'Tips',
-    body: (
-      <ul>
-        <li>Log the win the moment it happens — before the tiles get scooped up for the next hand.</li>
-        <li>Snap a quick photo of a pretty hand; it makes a great share card.</li>
-        <li>Chase the <strong>Singles &amp; Pairs</strong> hands when you’re feeling brave — they’re worth the most.</li>
-        <li>Use the <strong>To Go</strong> filter at the start of a session to pick a target.</li>
-        <li>Keep jokers for pungs/kongs — they can’t be used in a pair or a single.</li>
-      </ul>
-    ),
-  },
-  {
     icon: <IconStar size={18} />,
     title: 'Strategy: reading the table',
     levels: ['intermediate', 'expert'],
@@ -328,18 +293,6 @@ const SECTIONS: Section[] = [
       </>
     ),
   },
-  {
-    icon: <IconSparkle size={18} />,
-    title: 'Fun facts',
-    body: (
-      <ul>
-        <li>The National Mah Jongg League was founded in 1937 and still issues a new card every year.</li>
-        <li>Those little “bams,” “cracks,” and “dots” are the three suits — Bamboo, Characters, and Circles.</li>
-        <li>The flowers and jokers are the wild cards that make the wild hands possible.</li>
-        <li>“Mah Jongg” roughly translates to “sparrow” — listen for the clatter of tiles, the “twittering of the sparrows.”</li>
-      </ul>
-    ),
-  },
 ];
 
 const SUBTITLE: Record<Experience, string> = {
@@ -360,7 +313,7 @@ export default function LearnTab({
   return (
     <div className="screen">
       <header className="app-header">
-        <h1>The Rules</h1>
+        <PageTitle kicker="THE" word="Rules" />
         <p className="sub">{SUBTITLE[experience]}</p>
       </header>
 

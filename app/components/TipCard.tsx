@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { tipsFor, tipOfTheDayIndex } from '../lib/tips';
+import { dailyPool, tipOfTheDayIndex } from '../lib/tips';
 import type { Experience } from '../lib/account';
 
 const DISMISS_KEY = 'mahj.tipDismissed';
 const todayKey = () => new Date().toDateString();
 
 export default function TipCard({ experience }: { experience: Experience }) {
-  const tips = useMemo(() => tipsFor(experience), [experience]);
-  const tip = tips[tipOfTheDayIndex(tips.length) % tips.length];
+  const pool = useMemo(() => dailyPool(experience), [experience]);
+  const entry = pool[tipOfTheDayIndex(pool.length) % pool.length];
+  const label = entry.kind === 'fact' ? 'DID YOU KNOW?' : 'TIP OF THE DAY';
   // Dismissed for *today* only — a daily tip should come back tomorrow.
   const [dismissed, setDismissed] = useState(false);
 
@@ -36,11 +37,11 @@ export default function TipCard({ experience }: { experience: Experience }) {
   return (
     <button className="tip-card" onClick={dismiss} aria-label="Dismiss today’s tip">
       <span className="tip-tile" aria-hidden>
-        ★
+        {entry.kind === 'fact' ? '🀄' : '★'}
       </span>
       <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-        <span className="tip-label">TIP OF THE DAY</span>
-        <span className="tip-text">{tip}</span>
+        <span className="tip-label">{label}</span>
+        <span className="tip-text">{entry.text}</span>
       </span>
       <span className="tip-dismiss" aria-hidden>
         ×

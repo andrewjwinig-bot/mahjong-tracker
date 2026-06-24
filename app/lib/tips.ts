@@ -1,8 +1,15 @@
-// Rotating mahjong tips, tailored to the player's experience level. A stable
-// "tip of the day" is chosen by date so it feels like a daily drop; shuffling
-// cycles through the rest of that level's pool.
+// The daily drop: a mix of practical tips (tailored to the player's experience
+// level) and light, shareable fun facts. A stable "of the day" entry is chosen
+// by date so it feels like a fresh drop each morning; tips and facts are
+// interleaved so consecutive days alternate flavor.
 
 import type { Experience } from './account';
+
+export type DailyKind = 'tip' | 'fact';
+export interface Daily {
+  kind: DailyKind;
+  text: string;
+}
 
 const BEGINNER: string[] = [
   'Year hands like 2026 are beginner-friendly — a great way to score your first clears.',
@@ -32,14 +39,40 @@ const EXPERT: string[] = [
   'Count your tiles-away every turn; commit to the fastest hand, not the prettiest.',
 ];
 
-const POOLS: Record<Experience, string[]> = {
+// Light, shareable trivia — not level-specific. Mixed into every pool so the
+// daily drop stays fresh between practical tips.
+const FACTS: string[] = [
+  'The National Mah Jongg League was founded in 1937 and still issues a new card every year.',
+  'The three suits are Bamboo (“bams”), Characters (“cracks”), and Circles (“dots”).',
+  '“Mah Jongg” roughly translates to “sparrow” — the clatter of shuffling tiles is called the “twittering of the sparrows.”',
+  'Flowers and jokers are the wild cards that make the wildest hands possible.',
+  'A brand-new NMJL card is released every spring — the winning hands change completely each year.',
+  'A standard American set has 152 tiles, including 8 jokers and 8 flowers.',
+];
+
+const TIP_POOLS: Record<Experience, string[]> = {
   beginner: BEGINNER,
   intermediate: [...BEGINNER.slice(0, 2), ...INTERMEDIATE],
   expert: [...INTERMEDIATE.slice(0, 2), ...EXPERT],
 };
 
-export function tipsFor(level: Experience): string[] {
-  return POOLS[level];
+// Alternate tip / fact so consecutive days feel fresh; append any leftovers.
+function interleave(tips: Daily[], facts: Daily[]): Daily[] {
+  const out: Daily[] = [];
+  const max = Math.max(tips.length, facts.length);
+  for (let i = 0; i < max; i++) {
+    if (i < tips.length) out.push(tips[i]);
+    if (i < facts.length) out.push(facts[i]);
+  }
+  return out;
+}
+
+/** The level-tailored daily pool: practical tips mixed with fun facts. */
+export function dailyPool(level: Experience): Daily[] {
+  return interleave(
+    TIP_POOLS[level].map((text) => ({ kind: 'tip' as const, text })),
+    FACTS.map((text) => ({ kind: 'fact' as const, text })),
+  );
 }
 
 /** Day-stable index into a pool (changes once per calendar day). */
