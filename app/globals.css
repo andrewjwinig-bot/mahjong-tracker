@@ -510,6 +510,36 @@ a:focus-visible,
   color: var(--muted);
 }
 
+/* Compact "Trophies & Stats" entry on the Card hub (opens the trophy shelf). */
+.trophy-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #fff;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  box-shadow: 0 7px 20px rgba(20, 22, 42, 0.08);
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  color: var(--ink);
+}
+.trophy-link svg {
+  color: #c9871a;
+}
+.trophy-link span:first-of-type {
+  flex: 1;
+  text-align: left;
+}
+.tl-chev {
+  color: var(--muted);
+  font-size: 18px;
+}
+
 /* Card action row: SCORE GAME (accent) + PRACTICE (white). */
 .action-row {
   display: flex;

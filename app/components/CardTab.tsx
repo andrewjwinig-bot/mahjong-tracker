@@ -13,7 +13,7 @@ import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
-import { IconTap } from './uiIcons';
+import { IconTap, IconTrophy } from './uiIcons';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
@@ -30,6 +30,7 @@ interface Props {
   onRemoveWin: (id: string) => void;
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
+  onTrophies: () => void;
   onScore: () => void;
   onPractice: () => void;
 }
@@ -46,6 +47,7 @@ export default function CardTab({
   onRemoveWin,
   onPostToGroup,
   onMilestone,
+  onTrophies,
   onScore,
   onPractice,
 }: Props) {
@@ -188,6 +190,12 @@ export default function CardTab({
           </div>
         </div>
       </div>
+
+      <button className="trophy-link" onClick={onTrophies}>
+        <IconTrophy size={17} />
+        <span>Trophies &amp; Stats</span>
+        <span className="tl-chev">›</span>
+      </button>
 
       <button className="mahj-hero" onClick={() => setLogOpen(true)}>
         <span className="mahj-hero-shine" aria-hidden />

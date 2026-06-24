@@ -21,11 +21,9 @@ interface Props {
   theme: ThemeId;
   experience: Experience;
   email?: string;
-  groupName?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
-  onTrophies: () => void;
   onEditCard: () => void;
   onSignOut?: () => void;
   onClose: () => void;
@@ -69,11 +67,9 @@ export default function SettingsSheet({
   theme,
   experience,
   email,
-  groupName = 'Tuesday Game',
   onSaveProfile,
   onTheme,
   onExperience,
-  onTrophies,
   onEditCard,
   onSignOut,
   onClose,
@@ -211,10 +207,8 @@ export default function SettingsSheet({
       <div className="set-label">GAME</div>
       <div className="set-list">
         <ValueRow label="Card year" value="2026" />
-        <ValueRow label="Default table" value={groupName} />
         <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
-        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
-        <ValueRow label="Trophies & stats" onClick={onTrophies} last />
+        <ValueRow label="My card (bring your own)" onClick={onEditCard} last />
       </div>
 
       <div className="set-label">ACCOUNT</div>
