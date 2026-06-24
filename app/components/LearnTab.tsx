@@ -308,7 +308,7 @@ export default function LearnTab({
   experience: Experience;
   onPractice: () => void;
 }) {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
   const sections = SECTIONS.filter((s) => !s.levels || s.levels.includes(experience));
   return (
     <div className="screen">
