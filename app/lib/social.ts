@@ -65,7 +65,7 @@ export interface FeedPost {
   comments: Comment[];
   /** Event type — defaults to 'mahj' for legacy/un-typed posts. */
   kind?: FeedKind;
-  /** Headline for milestone posts ("Cleared all 2025 hands", "Won game night"). */
+  /** Headline for milestone posts ("Cleared all 2026 hands", "Won game night"). */
   title?: string;
 }
 
@@ -82,10 +82,10 @@ export interface SocialState {
   profile: Profile;
 }
 
-const K_SEEDED = 'social.seeded.v4';
+const K_SEEDED = 'social.seeded.v5';
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
-const K_FEED = 'social.feed.v4';
+const K_FEED = 'social.feed.v5';
 const K_PROFILE = 'social.profile';
 
 const HOUR = 3_600_000;
@@ -159,7 +159,7 @@ async function seedIfNeeded(): Promise<void> {
     // Milestone posts (typed) interleaved through the feed.
     {
       id: 'f5', memberId: 'm_sandra', memberName: 'Lily', avatar: DEMO_AVATARS.m_sandra,
-      kind: 'section_cleared', title: 'Cleared every 2025 hand', handLabel: null,
+      kind: 'section_cleared', title: 'Cleared every 2026 hand', handLabel: null,
       note: 'Whole section done — onto Consecutive Run!', photo: null,
       createdAt: now - 9 * HOUR, likes: 9, likedByMe: false, comments: [
         { id: 'c5', author: 'Alison', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
