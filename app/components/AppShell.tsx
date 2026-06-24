@@ -337,6 +337,7 @@ export default function AppShell() {
                 onRemoveWin={removeWin}
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
+                onTrophies={() => setTrophyOpen(true)}
                 onScore={() => openScorer()}
                 onPractice={() => setPracticeOpen(true)}
               />
@@ -387,7 +388,6 @@ export default function AppShell() {
           theme={theme}
           experience={experience}
           email={account?.email}
-          groupName={socialState.group.name}
           onSignOut={() => {
             clearAccount();
             setSettingsOpen(false);
@@ -396,10 +396,6 @@ export default function AppShell() {
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
           onExperience={changeExperience}
-          onTrophies={() => {
-            setSettingsOpen(false);
-            setTrophyOpen(true);
-          }}
           onEditCard={() => {
             setSettingsOpen(false);
             setEditorOpen(true);
