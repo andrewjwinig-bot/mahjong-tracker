@@ -169,7 +169,7 @@ function TablesList({
       </header>
 
       <button
-        className="btn coral"
+        className="btn"
         style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
         onClick={startCreate}
       >
