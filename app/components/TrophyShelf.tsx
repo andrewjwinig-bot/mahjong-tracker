@@ -199,7 +199,7 @@ export default function TrophyShelf({
         <ShareModal
           payload={{
             title: 'Share Your Stats 🏆',
-            text: `${s.cleared}/${s.total} hands cleared, ${s.mahjs} mahjs, ${earned.length} trophies on Mahjong Tracker! 🀄`,
+            text: `${s.cleared}/${s.total} hands cleared, ${s.mahjs} mahjs, ${earned.length} trophies on Club Mahj! 🀄`,
             url: appUrl(),
             image: () =>
               buildTrophyCard({

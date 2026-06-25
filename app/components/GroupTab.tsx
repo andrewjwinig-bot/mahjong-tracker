@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
-import { cloudSearchProfiles, cloudAddFriend, type CloudFriend } from '../lib/cloudFriends';
+import {
+  cloudSearchProfiles,
+  cloudSendFriendRequest,
+  cloudListIncomingRequests,
+  cloudAcceptRequest,
+  cloudDeclineRequest,
+  cloudListFriends,
+  type CloudFriend,
+} from '../lib/cloudFriends';
 
 // How each feed event renders its badge + milestone emblem.
 const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string }> = {
@@ -199,6 +207,9 @@ interface Props {
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+  /** Moderation (cloud only): flag a post / block its author. */
+  onReport?: (id: string, authorId: string) => void;
+  onBlock?: (authorId: string) => void;
   onScore: () => void;
   onOpenTables: (tableId: string) => void;
 }
@@ -263,9 +274,12 @@ export default function GroupTab({
   onToggleLike,
   onAddComment,
   onAddFriend,
+  onReport,
+  onBlock,
   onScore,
   onOpenTables,
 }: Props) {
+  const cloud = isCloudEnabled();
   const [nextG, setNextG] = useState<NextGame | null>(null);
   useEffect(() => {
     let alive = true;
@@ -283,6 +297,16 @@ export default function GroupTab({
   }, []);
 
   const [addOpen, setAddOpen] = useState(false);
+  // Pending incoming friend-request count, for the badge on the Friends button.
+  const [reqCount, setReqCount] = useState(0);
+  useEffect(() => {
+    if (!cloud) return;
+    let live = true;
+    void cloudListIncomingRequests().then((r) => live && setReqCount(r.length));
+    return () => {
+      live = false;
+    };
+  }, [cloud, addOpen]);
 
   // Streak banner: dismissible for the day, like the Tip — it returns tomorrow.
   const [streakHidden, setStreakHidden] = useState(false);
@@ -387,8 +411,30 @@ export default function GroupTab({
           </span>
           <span className="lb-head-right">
             <span className="lb-count">{ranked.length} PLAYERS</span>
-            <button className="lb-add" onClick={() => setAddOpen(true)}>
-              + Add
+            <button className="lb-add" onClick={() => setAddOpen(true)} style={{ position: 'relative' }}>
+              Friends
+              {cloud && reqCount > 0 && (
+                <span
+                  aria-label={`${reqCount} friend requests`}
+                  style={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -6,
+                    minWidth: 16,
+                    height: 16,
+                    padding: '0 4px',
+                    borderRadius: 8,
+                    background: 'var(--danger, #C0392B)',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    lineHeight: '16px',
+                    textAlign: 'center',
+                  }}
+                >
+                  {reqCount}
+                </span>
+              )}
             </button>
           </span>
         </div>
@@ -478,19 +524,27 @@ export default function GroupTab({
           </div>
           <div className="fe-title">No mahjs called yet</div>
           <div className="fe-sub">
-            Be the first — call Mahj on your Card and it’ll land right here for your crew to see.
+            {cloud
+              ? 'Add friends to see their mahjs here — or call your own on the Card and it lands right here.'
+              : 'Be the first — call Mahj on your Card and it’ll land right here for your crew to see.'}
           </div>
         </div>
       ) : (
-        feed.map((p) => (
-          <FeedCard
-            key={p.id}
-            post={p}
-            profile={profile}
-            onToggleLike={onToggleLike}
-            onAddComment={onAddComment}
-          />
-        ))
+        feed.map((p) => {
+          const isMine = p.memberId === YOU_ID || p.memberName === profile.name;
+          return (
+            <FeedCard
+              key={p.id}
+              post={p}
+              profile={profile}
+              onToggleLike={onToggleLike}
+              onAddComment={onAddComment}
+              canModerate={cloud && !isMine && !!onReport}
+              onReport={onReport}
+              onBlock={onBlock}
+            />
+          );
+        })
       )}
 
       <div style={{ marginTop: 22 }}>
@@ -498,7 +552,9 @@ export default function GroupTab({
       </div>
 
       <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
-        Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).
+        {cloud
+          ? 'The feed is live — posts are from you and friends you’ve added. The leaderboard still shows demo group-mates for now.'
+          : 'Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).'}
       </p>
     </div>
   );
@@ -509,14 +565,22 @@ function FeedCard({
   profile,
   onToggleLike,
   onAddComment,
+  canModerate,
+  onReport,
+  onBlock,
 }: {
   post: FeedPost;
   profile: Profile;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
+  canModerate?: boolean;
+  onReport?: (id: string, authorId: string) => void;
+  onBlock?: (authorId: string) => void;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [moderated, setModerated] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const bannerRef = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
@@ -548,11 +612,14 @@ function FeedCard({
   }, [firesConfetti, kind]);
 
   useEffect(() => {
-    if (!post.photo) return;
-    const u = URL.createObjectURL(post.photo);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [post.photo]);
+    // Prefer the on-device Blob; fall back to the synced cloud URL.
+    if (post.photo) {
+      const u = URL.createObjectURL(post.photo);
+      setUrl(u);
+      return () => URL.revokeObjectURL(u);
+    }
+    setUrl(post.photoUrl ?? null);
+  }, [post.photo, post.photoUrl]);
 
   function submitComment() {
     const text = draft.trim();
@@ -563,6 +630,19 @@ function FeedCard({
   }
 
   const badge = KIND_BADGE[kind];
+
+  if (moderated) {
+    return (
+      <div
+        className="post"
+        style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontWeight: 700, padding: 16 }}
+      >
+        {moderated === 'reported'
+          ? 'Thanks — this post was reported and hidden.'
+          : `You blocked ${post.memberName}. Their posts are hidden.`}
+      </div>
+    );
+  }
 
   return (
     <div className="post">
@@ -576,6 +656,84 @@ function FeedCard({
         <span className="post-badge" style={{ background: badge.color }}>
           {badge.label}
         </span>
+        {canModerate && (
+          <div style={{ position: 'relative' }}>
+            <button
+              aria-label="Post options"
+              onClick={() => setMenuOpen((v) => !v)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 20,
+                lineHeight: 1,
+                padding: '0 4px',
+                color: 'var(--muted)',
+              }}
+            >
+              ⋯
+            </button>
+            {menuOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: '100%',
+                  zIndex: 20,
+                  background: 'var(--card, #fff)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: 10,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                  overflow: 'hidden',
+                  minWidth: 168,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onReport?.(post.id, post.memberId);
+                    setModerated('reported');
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 14px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'var(--ink, #1a1410)',
+                  }}
+                >
+                  Report post
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onBlock?.(post.memberId);
+                    setModerated('blocked');
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 14px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'var(--danger, #C0392B)',
+                  }}
+                >
+                  Block {post.memberName}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {kind === 'mahj'
@@ -826,7 +984,7 @@ interface NavWithContacts extends Navigator {
 async function inviteContacts() {
   void track('invite_contacts_opened');
   const url = typeof window !== 'undefined' ? window.location.origin : '';
-  const text = `Come track mahjong with me on Mahjong Tracker — let's clear all 70 hands! 🀄 ${url}`;
+  const text = `Come track mahjong with me on Club Mahj — let's clear all 70 hands! 🀄 ${url}`;
   const nav = navigator as NavWithContacts;
   // Android Chrome: real contact picker → prefill an SMS invite.
   if (nav.contacts?.select) {
@@ -882,6 +1040,35 @@ export function AddFriendSheet({
   const [q, setQ] = useState('');
   const [results, setResults] = useState<CloudFriend[]>([]);
   const [searching, setSearching] = useState(false);
+  const [requests, setRequests] = useState<CloudFriend[]>([]);
+  const [friends, setFriends] = useState<CloudFriend[]>([]);
+  const [requested, setRequested] = useState<Set<string>>(new Set());
+
+  // Load incoming requests + accepted friends (cloud only) when the sheet opens.
+  useEffect(() => {
+    if (!cloud) return;
+    let live = true;
+    void Promise.all([cloudListIncomingRequests(), cloudListFriends()]).then(([reqs, fr]) => {
+      if (!live) return;
+      setRequests(reqs);
+      setFriends(fr);
+    });
+    return () => {
+      live = false;
+    };
+  }, [cloud]);
+
+  function accept(u: CloudFriend) {
+    void cloudAcceptRequest(u.id);
+    setRequests((r) => r.filter((x) => x.id !== u.id));
+    setFriends((f) => [u, ...f]);
+    onAdd(u.username, u.avatar); // reflect them in the local members list too
+  }
+
+  function decline(u: CloudFriend) {
+    void cloudDeclineRequest(u.id);
+    setRequests((r) => r.filter((x) => x.id !== u.id));
+  }
 
   useEffect(() => {
     const query = q.trim();
@@ -915,10 +1102,19 @@ export function AddFriendSheet({
   }, [q, cloud]);
 
   function addUser(u: CloudFriend) {
-    if (cloud) void cloudAddFriend(u.id);
+    if (cloud) {
+      // Cloud: send a friend request (pending until they accept). Don't add them
+      // to your friends/leaderboard yet — that happens on acceptance.
+      void cloudSendFriendRequest(u.id);
+      setRequested((s) => new Set(s).add(u.id));
+      return;
+    }
+    // On-device demo: instant local add.
     onAdd(u.username, u.avatar);
     onClose();
   }
+
+  const friendIds = new Set(friends.map((f) => f.id));
 
   return (
     <div className="modal-scrim" onClick={onClose}>
@@ -935,6 +1131,46 @@ export function AddFriendSheet({
           <IconUsers size={20} /> Find Friends
         </h2>
         <p className="sheet-sub">Search players by username, or invite someone new.</p>
+
+        {cloud && requests.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <label className="lbl">Friend requests</label>
+            {requests.map((u) => (
+              <div key={u.id} className="search-row">
+                <Avatar avatar={u.avatar} size={36} />
+                <div className="search-id">
+                  <div className="search-name">{u.username}</div>
+                  <div className="search-handle">@{u.handle}</div>
+                </div>
+                <button className="pick-chip" onClick={() => accept(u)}>
+                  Accept
+                </button>
+                <button
+                  className="btn ghost"
+                  style={{ padding: '6px 10px', marginLeft: 6, width: 'auto' }}
+                  onClick={() => decline(u)}
+                >
+                  Decline
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {cloud && friends.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <label className="lbl">Your friends</label>
+            {friends.map((u) => (
+              <div key={u.id} className="search-row">
+                <Avatar avatar={u.avatar} size={36} />
+                <div className="search-id">
+                  <div className="search-name">{u.username}</div>
+                  <div className="search-handle">@{u.handle}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <label className="lbl">Search players</label>
         <input
@@ -960,8 +1196,12 @@ export function AddFriendSheet({
                 <div className="search-name">{u.username}</div>
                 <div className="search-handle">@{u.handle}</div>
               </div>
-              <button className="pick-chip" onClick={() => addUser(u)}>
-                Add
+              <button
+                className="pick-chip"
+                onClick={() => addUser(u)}
+                disabled={cloud && (requested.has(u.id) || friendIds.has(u.id))}
+              >
+                {friendIds.has(u.id) ? 'Friends' : requested.has(u.id) ? 'Requested' : 'Add'}
               </button>
             </div>
           ))}

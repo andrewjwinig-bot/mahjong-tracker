@@ -76,11 +76,11 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
       >
         <div className="grab" />
         <h2>About &amp; Legal</h2>
-        <p className="sheet-sub">Mahjong Tracker · v1.0</p>
+        <p className="sheet-sub">Club Mahj · v1.0</p>
 
         <div className="legal">
           <p>
-            <strong>Not affiliated with the NMJL.</strong> Mahjong Tracker is an independent scorecard
+            <strong>Not affiliated with the NMJL.</strong> Club Mahj is an independent scorecard
             and learning tool. It is not affiliated with, endorsed by, or sponsored by the National
             Mah Jongg League.
           </p>

@@ -27,14 +27,14 @@ const mono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Let’s Mahj — The Original Mahj Social Network',
+  title: 'Club Mahj — The Original Mahj Social Network',
   description:
     'The original mahj social network. Track your American Mahjong wins, clear all 70 hands, score live games, and play along with your table.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Let’s Mahj',
+    title: 'Club Mahj',
   },
   icons: {
     icon: '/icons/icon-192.png',

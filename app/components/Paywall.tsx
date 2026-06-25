@@ -55,7 +55,7 @@ export default function Paywall({
       >
         <div className="grab" />
         <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          Mahjong Tracker Pro <IconCrown size={20} />
+          Club Mahj Pro <IconCrown size={20} />
         </h2>
         <p className="sheet-sub">Unlock the full table.</p>
 
