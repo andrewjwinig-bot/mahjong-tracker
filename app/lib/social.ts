@@ -161,7 +161,7 @@ async function seedIfNeeded(): Promise<void> {
     // Milestone posts (typed) interleaved through the feed.
     {
       id: 'f5', memberId: 'm_sandra', memberName: 'Lily', avatar: DEMO_AVATARS.m_sandra,
-      kind: 'section_cleared', title: 'Cleared every 2026 hand', handLabel: null,
+      kind: 'section_cleared', title: '2026 Cleared!', handLabel: null,
       note: 'Whole section done — onto Consecutive Run!', photo: null,
       createdAt: now - 9 * HOUR, likes: 9, likedByMe: false, comments: [
         { id: 'c5', author: 'Alison', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
@@ -169,19 +169,19 @@ async function seedIfNeeded(): Promise<void> {
     },
     {
       id: 'f6', memberId: 'm_bev', memberName: 'Nicole', avatar: DEMO_AVATARS.m_bev,
-      kind: 'game_won', title: 'Won game night', handLabel: null,
+      kind: 'game_won', title: 'Won game night!', handLabel: null,
       note: 'Nicole +40 · Lily +10 · Matthew −20 · Alison −30', photo: null,
       createdAt: now - 1 * DAY - 1 * HOUR, likes: 6, likedByMe: false, comments: [],
     },
     {
       id: 'f7', memberId: 'm_marsha', memberName: 'Alison', avatar: DEMO_AVATARS.m_marsha,
-      kind: 'challenge_done', title: 'Finished Summer Kongs', handLabel: null,
-      note: 'Season challenge complete 🏅', photo: null,
+      kind: 'challenge_done', title: 'Summer Kongs!', handLabel: null,
+      note: 'Season challenge complete 🥇', photo: null,
       createdAt: now - 3 * DAY, likes: 11, likedByMe: false, comments: [],
     },
     {
       id: 'f8', memberId: 'm_lois', memberName: 'Matthew', avatar: DEMO_AVATARS.m_lois,
-      kind: 'card_cleared', title: 'Cleared the whole card!', handLabel: null,
+      kind: 'card_cleared', title: 'Card cleared!', handLabel: null,
       note: 'All 70 hands. Legendary. 👑', photo: null,
       createdAt: now - 4 * DAY, likes: 23, likedByMe: false, comments: [
         { id: 'c8', author: 'Lily', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },

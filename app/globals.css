@@ -119,7 +119,40 @@
   --bg-photo: url("/patterns/bg-felt.svg");
 }
 
-
+/* Per-theme primary-button overlay pattern (design BTN map) — each theme gets a
+   unique 14%-opacity motif on primary buttons + sheet/share header bands. The
+   nav-rack accent border is the brand at ~30%. */
+:root {
+  --btn-pattern: repeating-linear-gradient(-45deg, #fff 0, #fff 2px, transparent 2px, transparent 11px);
+  --rack-border: color-mix(in srgb, var(--brand) 30%, transparent);
+}
+[data-theme="felt"] {
+  --btn-pattern: repeating-linear-gradient(-45deg, #fff 0, #fff 2px, transparent 2px, transparent 11px);
+}
+[data-theme="crak"] {
+  --btn-pattern: repeating-linear-gradient(0deg, #fff 0 1.5px, transparent 1.5px 13px),
+    repeating-linear-gradient(90deg, #fff 0 1.5px, transparent 1.5px 13px);
+}
+[data-theme="wind"] {
+  --btn-pattern: repeating-linear-gradient(0deg, #fff 0, #fff 2px, transparent 2px, transparent 11px);
+}
+[data-theme="bam"] {
+  --btn-pattern: repeating-linear-gradient(90deg, #fff 0, #fff 2px, transparent 2px, transparent 11px);
+}
+[data-theme="dot"] {
+  --btn-pattern: radial-gradient(#fff 1.5px, transparent 1.9px) 0 0 / 12px 12px;
+}
+[data-theme="flower"] {
+  --btn-pattern: radial-gradient(#fff 1.9px, transparent 2.4px) 0 0 / 15px 15px;
+}
+[data-theme="joker"] {
+  --btn-pattern: repeating-linear-gradient(45deg, #fff 0 1.5px, transparent 1.5px 12px),
+    repeating-linear-gradient(-45deg, #fff 0 1.5px, transparent 1.5px 12px);
+}
+[data-theme="dragon"] {
+  --btn-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='16'%3E%3Cpath d='M0 8 q6 -7 12 0 t12 0' fill='none' stroke='%23FFFFFF' stroke-width='1.7'/%3E%3C/svg%3E")
+    0 0 / 24px 16px;
+}
 
 /* ===========================================================================
    BASE
@@ -620,7 +653,7 @@ a:focus-visible,
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
+  background: var(--btn-pattern, repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px));
   opacity: 0.16;
   pointer-events: none;
 }
@@ -961,14 +994,14 @@ a:focus-visible,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 14px 18px;
-  border-radius: 13px;
+  letter-spacing: 0.5px;
+  padding: 16px 18px;
+  border-radius: 12px;
   border: 2.5px solid var(--hairline);
-  background: linear-gradient(180deg, var(--brand), var(--brand-deep));
+  background: var(--brand);
   color: var(--on-brand);
   box-shadow: var(--shadow-sm);
   width: 100%;
@@ -984,7 +1017,7 @@ a:focus-visible,
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
+  background: var(--btn-pattern, repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px));
   opacity: 0.14;
   pointer-events: none;
 }
@@ -1341,7 +1374,7 @@ label.lbl {
   inset: 0;
   opacity: 0.14;
   pointer-events: none;
-  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
+  background: var(--btn-pattern, repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px));
 }
 .score-cta:active {
   transform: translateY(2px);
@@ -2071,6 +2104,8 @@ label.lbl {
 
 /* ---- Bottom nav ---------------------------------------------------------- */
 
+/* Bottom-nav "rack" (design source): four text labels over the per-theme art;
+   the active tab is a raised cream paper tile with a brand label. */
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -2078,25 +2113,23 @@ label.lbl {
   bottom: 0;
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  /* Themed rack: soft brand wash + woven-tile texture, so the nav reads as part
-     of the active theme rather than a plain white bar. */
-  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 9%, #fff), #fff 70%);
-  border-top: 2.5px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  background-color: var(--page);
+  border-top: 2px solid var(--rack-border, color-mix(in srgb, var(--brand) 30%, transparent));
   box-shadow: 0 -6px 18px rgba(20, 22, 42, 0.06);
   display: flex;
   z-index: 50;
-  overflow: hidden;
 }
+/* Per-theme rack art: the header motif, mirrored, faint along the rack. */
 .bottom-nav::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    -45deg,
-    color-mix(in srgb, var(--brand) 60%, transparent) 0 1.5px,
-    transparent 1.5px 13px
-  );
-  opacity: 0.1;
+  background-image: var(--bg-photo);
+  background-size: 440px auto;
+  background-position: center top;
+  background-repeat: no-repeat;
+  opacity: 0.16;
+  transform: scaleX(-1);
   pointer-events: none;
 }
 .bottom-nav .inner {
@@ -2105,55 +2138,38 @@ label.lbl {
   margin: 0 auto;
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 9px 22px 0;
-}
-.bottom-nav button {
-  flex: none;
-  display: flex;
-  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
-  gap: 5px;
+  padding: 12px 16px 0;
 }
-/* cream tile holding the multi-color illustration */
-.bottom-nav .nav-tile {
-  width: 32px;
-  height: 40px;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
-  border: 1.5px solid rgba(20, 22, 42, 0.14);
+.bottom-nav .nav-tab {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1.5px 3px rgba(20, 22, 42, 0.1), 0 5px 11px rgba(20, 22, 42, 0.06),
-    inset 0 -3px 5px rgba(20, 22, 42, 0.05);
+  padding: 10px 6px;
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
-.bottom-nav button[data-active="true"] .nav-tile {
-  transform: translateY(-3px);
-  box-shadow: 0 3px 6px rgba(20, 22, 42, 0.14), 0 11px 18px rgba(20, 22, 42, 0.12),
-    inset 0 -3px 5px rgba(20, 22, 42, 0.05);
-}
-.bottom-nav .nav-label {
+.bottom-nav .nav-tab-label {
   font-family: var(--font-app), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 8px;
+  font-size: 13px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #9a9aa4;
+  color: #46434c;
 }
-.bottom-nav button[data-active="true"] .nav-label {
+.bottom-nav .nav-tab[data-active="true"] {
+  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
+  border: 2px solid var(--brand);
+  border-radius: 12px;
+  padding: 10px 16px;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 10px rgba(20, 22, 42, 0.16), 0 14px 24px rgba(20, 22, 42, 0.16),
+    inset 0 -3px 6px rgba(20, 22, 42, 0.05);
+}
+.bottom-nav .nav-tab[data-active="true"] .nav-tab-label {
   color: var(--brand);
-}
-.bottom-nav .nav-underline {
-  width: 15px;
-  height: 3px;
-  border-radius: 3px;
-  background: transparent;
-}
-.bottom-nav button[data-active="true"] .nav-underline {
-  background: var(--brand);
+  letter-spacing: 0.5px;
 }
 
 /* ---- Modal / sheet ------------------------------------------------------- */
@@ -2235,7 +2251,7 @@ label.lbl {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px);
+  background: var(--btn-pattern, repeating-linear-gradient(-45deg, #fff 0 2px, transparent 2px 11px));
   opacity: 0.14;
   pointer-events: none;
 }
@@ -4572,6 +4588,7 @@ label.lbl {
   font-size: 17px;
   line-height: 1;
   text-transform: uppercase;
+  color: #1a1410;
   font-family: var(--font-display), system-ui, sans-serif;
 }
 .level-blurb {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
@@ -32,7 +32,51 @@ import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import TipCard from './TipCard';
-import { useConfetti } from './Confetti';
+
+// A self-contained burst of ~20 mini mahjong-tile particles that rain down
+// inside a banner (design frame 8: the FULL CARD post). Mirrors the prototype's
+// confetti() — randomized size, sway, rotation, duration and delay.
+function fireTileRain(el: HTMLElement | null) {
+  if (!el) return;
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const W = el.clientWidth;
+  const H = el.clientHeight;
+  const faces: { g?: string; c?: string; dot?: string; bam?: string }[] = [
+    { g: '萬', c: '#C0392B' }, { g: '發', c: '#15803D' }, { g: '中', c: '#C0392B' },
+    { g: '東', c: '#1A1410' }, { g: '花', c: '#E2568F' }, { dot: '#2E86D4' },
+    { dot: '#C0392B' }, { bam: '#15803D' }, { bam: '#C0392B' },
+  ];
+  const layer = document.createElement('div');
+  layer.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4;border-radius:inherit';
+  el.appendChild(layer);
+  let remaining = 20;
+  const done = () => { if (--remaining <= 0) layer.remove(); };
+  for (let i = 0; i < 20; i++) {
+    const w = 14 + Math.round(Math.random() * 8);
+    const h = Math.round(w * 1.34);
+    const f = faces[Math.floor(Math.random() * faces.length)];
+    const t = document.createElement('div');
+    const x = Math.random() * (W - w);
+    t.style.cssText = `position:absolute;left:${x.toFixed(0)}px;top:${-h - 8}px;width:${w}px;height:${h}px;border-radius:3px;background:linear-gradient(155deg,#FFFEFB,#F0E9DA);border:1.5px solid rgba(20,22,42,0.20);box-shadow:0 2px 5px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center`;
+    if (f.g) t.innerHTML = `<span style="font-family:serif;font-weight:700;font-size:${Math.round(h * 0.56)}px;line-height:1;color:${f.c}">${f.g}</span>`;
+    else if (f.dot) { const s = Math.round(w * 0.6); t.innerHTML = `<svg width="${s}" height="${s}" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" fill="none" stroke="${f.dot}" stroke-width="2.4"/><circle cx="7" cy="7" r="1.8" fill="${f.dot}"/></svg>`; }
+    else t.innerHTML = `<svg width="${Math.round(w * 0.55)}" height="${Math.round(h * 0.55)}" viewBox="0 0 12 18"><rect x="2" y="2" width="3" height="14" rx="1.5" fill="${f.bam}"/><rect x="7" y="2" width="3" height="14" rx="1.5" fill="${f.bam}"/></svg>`;
+    layer.appendChild(t);
+    const sway = (Math.random() - 0.5) * 40;
+    const rot = (Math.random() - 0.5) * 620;
+    const dur = 1500 + Math.random() * 1100;
+    const delay = Math.random() * 500;
+    t.animate(
+      [
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+        { transform: `translate(${(sway * 0.4).toFixed(0)}px,${Math.round(H * 0.3)}px) rotate(${(rot * 0.3).toFixed(0)}deg)`, opacity: 1, offset: 0.15 },
+        { transform: `translate(${sway.toFixed(0)}px,${H + h + 16}px) rotate(${rot.toFixed(0)}deg)`, opacity: 1, offset: 0.85 },
+        { transform: `translate(${sway.toFixed(0)}px,${H + h + 30}px) rotate(${rot.toFixed(0)}deg)`, opacity: 0 },
+      ],
+      { duration: dur, delay, easing: 'cubic-bezier(.35,.45,.5,1)' },
+    ).onfinish = () => { t.remove(); done(); };
+  }
+}
 import PageTitle from './PageTitle';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
@@ -379,7 +423,31 @@ function FeedCard({
   const [url, setUrl] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [draft, setDraft] = useState('');
-  const { celebrate } = useConfetti();
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+  const firedRef = useRef(false);
+
+  const kind = post.kind ?? 'mahj';
+
+  // The FULL CARD banner auto-fires its tile-confetti once when it scrolls
+  // ≥55% into view, and re-fires on tap (design frame 8).
+  useEffect(() => {
+    if (kind !== 'card_cleared') return;
+    const el = bannerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio >= 0.55 && !firedRef.current) {
+            firedRef.current = true;
+            fireTileRain(el);
+          }
+        }
+      },
+      { threshold: 0.55 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [kind]);
 
   useEffect(() => {
     if (!post.photo) return;
@@ -396,7 +464,6 @@ function FeedCard({
     setShowComments(true);
   }
 
-  const kind = post.kind ?? 'mahj';
   const badge = KIND_BADGE[kind];
 
   return (
@@ -428,8 +495,9 @@ function FeedCard({
             <div
               className="post-banner"
               data-kind={kind}
+              ref={kind === 'card_cleared' ? bannerRef : undefined}
               role={kind === 'card_cleared' ? 'button' : undefined}
-              onClick={kind === 'card_cleared' ? () => celebrate({ big: true }) : undefined}
+              onClick={kind === 'card_cleared' ? () => fireTileRain(bannerRef.current) : undefined}
             >
               <div className="pb-eyebrow">{KIND_EYEBROW[kind] ?? badge.label}</div>
               <div className="pb-title">{post.title}</div>
