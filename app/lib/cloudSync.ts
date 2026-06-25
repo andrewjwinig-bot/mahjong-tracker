@@ -12,10 +12,26 @@
 
 import { getSupabase, isCloudEnabled } from './supabase';
 import * as cloud from './cloudGameplay';
+import * as db from './storage';
+import { uploadPhoto } from './cloudStorage';
 import { cloudGetProfile } from './cloudAuth';
 import { cloudSaveProfile } from './cloudProfile';
 import type { Win, MahjongCard, Hand } from './types';
 import type { Profile } from './social';
+
+/**
+ * Ensure a win's photo is in Storage and return its public URL. Uploads the
+ * on-device Blob once (when there's no URL yet), persists the URL back to the
+ * local record so it's never re-uploaded, and returns null when there's no
+ * photo or the upload fails. Safe to call repeatedly.
+ */
+async function ensurePhotoUrl(w: Win): Promise<string | null> {
+  if (w.photoUrl) return w.photoUrl;
+  if (!w.photo) return null;
+  const url = await uploadPhoto(w.photo, 'wins');
+  if (url) await db.saveWin({ ...w, photoUrl: url });
+  return url;
+}
 
 /** True only when cloud is configured AND a user is currently signed in. */
 export async function cloudSignedIn(): Promise<boolean> {
@@ -59,28 +75,33 @@ export async function syncGameplay(local: GameplaySnapshot): Promise<GameplaySna
       handLabel: w.hand_label,
       note: w.note ?? '',
       photo: null,
+      photoUrl: w.photo_url,
       createdAt: new Date(w.created_at).getTime(),
     });
   }
   for (const w of local.wins) {
     const prev = byId.get(w.id);
-    byId.set(w.id, prev ? { ...prev, photo: w.photo ?? prev.photo } : w);
+    byId.set(w.id, prev ? { ...prev, photo: w.photo ?? prev.photo, photoUrl: w.photoUrl ?? prev.photoUrl } : w);
   }
   const wins = [...byId.values()].sort((a, b) => b.createdAt - a.createdAt);
 
   // Push the union up so the cloud holds everything (idempotent upserts).
+  // Upload any not-yet-synced photos and carry their URL into the merged list
+  // so the caller persists it locally (preventing re-uploads next time).
   await cloud.cloudUpsertProgress(handCounts);
   await Promise.all(
-    wins.map((w) =>
-      cloud.cloudUpsertWin({
+    wins.map(async (w) => {
+      const photoUrl = await ensurePhotoUrl(w);
+      w.photoUrl = photoUrl;
+      await cloud.cloudUpsertWin({
         id: w.id,
         hand_id: w.handId,
         hand_label: w.handLabel,
         note: w.note,
-        photo_url: null,
+        photo_url: photoUrl,
         created_at: new Date(w.createdAt).toISOString(),
-      }),
-    ),
+      });
+    }),
   );
 
   return { handCounts, wins };
@@ -141,14 +162,15 @@ export function mirrorHandCount(handId: string, count: number): void {
 }
 
 export function mirrorWin(w: Win): void {
-  void cloudSignedIn().then((ok) => {
+  void cloudSignedIn().then(async (ok) => {
     if (!ok) return;
-    void cloud.cloudUpsertWin({
+    const photoUrl = await ensurePhotoUrl(w);
+    await cloud.cloudUpsertWin({
       id: w.id,
       hand_id: w.handId,
       hand_label: w.handLabel,
       note: w.note,
-      photo_url: null,
+      photo_url: photoUrl,
       created_at: new Date(w.createdAt).toISOString(),
     });
   });

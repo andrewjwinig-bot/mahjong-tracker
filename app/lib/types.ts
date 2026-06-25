@@ -30,6 +30,8 @@ export interface Win {
   handLabel: string | null;
   note: string;
   photo: Blob | null;
+  /** Cloud URL for the photo once uploaded to Storage (cross-device display). */
+  photoUrl?: string | null;
   /** Vertical focal point (0–100%) for cover-cropped displays. Default 50. */
   photoPos?: number;
   createdAt: number;

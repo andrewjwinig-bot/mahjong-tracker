@@ -79,13 +79,16 @@ export async function cloudGetProfile(): Promise<CloudProfile | null> {
 }
 
 /**
- * Delete the signed-in user's data and sign out. Removing the underlying auth
- * record requires a server-side function (service role) — see docs/backend.md;
- * deleting the profile row cascades and removes all of the user's content.
+ * Fully delete the signed-in user's account. Invokes the `delete-account` edge
+ * function, which (with the service role) removes the underlying auth user —
+ * that cascade-deletes the profile row and every piece of the user's data. This
+ * is what makes in-app account deletion an actual *account* deletion (an App
+ * Store requirement), not just a data wipe. Requires the function to be
+ * deployed: `supabase functions deploy delete-account`.
  */
 export async function cloudDeleteAccount(): Promise<void> {
   const sb = await client();
-  const { data } = await sb.auth.getUser();
-  if (data.user) await sb.from('profiles').delete().eq('id', data.user.id);
+  const { error } = await sb.functions.invoke('delete-account', { method: 'POST' });
+  if (error) throw error;
   await sb.auth.signOut();
 }
