@@ -53,10 +53,15 @@ export interface Plan {
 }
 
 export const PLANS: Plan[] = [
-  { id: 'annual', name: 'Annual', price: '$14.99', cadence: '/year', note: 'Best value — under $1.25/mo', highlight: true },
-  { id: 'monthly', name: 'Monthly', price: '$2.99', cadence: '/month' },
+  { id: 'annual', name: 'Annual', price: '$14.99', cadence: '/yr', note: 'Just $1.25/mo, billed yearly', highlight: true },
+  { id: 'monthly', name: 'Monthly', price: '$2.99', cadence: '/mo', note: 'Cancel anytime' },
   { id: 'lifetime', name: 'Lifetime', price: '$24.99', cadence: 'once', note: 'Pay once, yours forever' },
 ];
+
+/** Price string for the CTA / inline use, e.g. "$14.99/yr" or "$24.99 once". */
+export function planPriceLabel(p: Plan): string {
+  return p.cadence === 'once' ? `${p.price} once` : `${p.price}${p.cadence}`;
+}
 
 /** Free plan limits. */
 export const FREE_TABLE_LIMIT = 2;
