@@ -174,6 +174,7 @@ create table if not exists public.custom_cards (
   hands      jsonb not null default '[]',
   updated_at timestamptz not null default now()
 );
+drop trigger if exists custom_cards_touch on public.custom_cards;
 create trigger custom_cards_touch before update on public.custom_cards
   for each row execute function public.touch_updated_at();
 
