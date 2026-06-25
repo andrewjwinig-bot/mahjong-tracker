@@ -354,6 +354,9 @@ export default function AppShell() {
                 openTableId={tablesTarget}
                 onConsumedOpen={() => setTablesTarget(null)}
                 onAddFriend={addFriend}
+                friends={socialState.members
+                  .filter((m) => !m.isYou)
+                  .map((m) => ({ name: m.name, avatar: m.avatar }))}
                 onScoreTable={(members) => {
                   const others = members.filter((m) => m.name !== socialState.profile.name);
                   openScorer({

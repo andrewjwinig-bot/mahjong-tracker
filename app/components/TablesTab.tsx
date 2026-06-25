@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Profile } from '../lib/social';
-import type { ChatMsg, PollOption, Table, TablePhoto } from '../lib/tables';
+import type { ChatMsg, PollOption, Table, TablePhoto, TableMember } from '../lib/tables';
 import { loadTables, saveTables } from '../lib/tables';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
 import { downscaleImage } from '../lib/image';
 import PageTitle from './PageTitle';
@@ -12,7 +13,7 @@ import Avatar from './Avatar';
 import Tile from './Tile';
 import ShareModal from './ShareModal';
 import { AddFriendSheet } from './GroupTab';
-import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus } from './uiIcons';
+import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
 import Paywall from './Paywall';
 import ProUpsell from './ProUpsell';
 import { usePro } from '../lib/usePro';
@@ -40,12 +41,15 @@ export default function TablesTab({
   onConsumedOpen,
   onScoreTable,
   onAddFriend,
+  friends = [],
 }: {
   profile: Profile;
   openTableId?: string | null;
   onConsumedOpen?: () => void;
   onScoreTable: (members: { name: string; avatar: TileAvatar }[]) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+  /** Your in-app friends (the leaderboard crew, minus you) — offered first in the table invite. */
+  friends?: TableMember[];
 }) {
   const [tables, setTables] = useState<Table[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -77,6 +81,15 @@ export default function TablesTab({
     });
   }
 
+  function remove(id: string) {
+    setTables((prev) => {
+      if (!prev) return prev;
+      const next = prev.filter((t) => t.id !== id);
+      void saveTables(next);
+      return next;
+    });
+  }
+
   if (!tables) {
     return (
       <div className="screen">
@@ -95,9 +108,14 @@ export default function TablesTab({
       <TableDetail
         table={selected}
         profile={profile}
+        friends={friends}
         onBack={() => setSelectedId(null)}
         onUpdate={(fn) => update(selected.id, fn)}
         onScore={() => onScoreTable(selected.members)}
+        onLeave={() => {
+          remove(selected.id);
+          setSelectedId(null);
+        }}
       />
     );
   }
@@ -312,18 +330,23 @@ function TablesList({
 function TableDetail({
   table,
   profile,
+  friends,
   onBack,
   onUpdate,
   onScore,
+  onLeave,
 }: {
   table: Table;
   profile: Profile;
+  friends: TableMember[];
   onBack: () => void;
   onUpdate: (fn: (t: Table) => Table) => void;
   onScore: () => void;
+  onLeave: () => void;
 }) {
   const [view, setView] = useState<View>('chat');
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
   return (
     <div className="screen">
@@ -347,7 +370,13 @@ function TableDetail({
 
       <button className="score-cta" style={{ marginTop: 14 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
-        ⊕ Score This Table
+        <span className="score-cta-tile" style={{ color: '#C0392B', transform: 'rotate(-7deg)' }} aria-hidden>
+          萬
+        </span>
+        <span className="score-cta-label">SCORE THIS TABLE</span>
+        <span className="score-cta-tile" style={{ color: '#15803D', transform: 'rotate(7deg)' }} aria-hidden>
+          發
+        </span>
       </button>
 
       <div className="segmented" style={{ marginTop: 14 }}>
@@ -368,14 +397,113 @@ function TableDetail({
       {view === 'dates' && <DatesView table={table} profile={profile} onUpdate={onUpdate} />}
       {view === 'photos' && <PhotosView table={table} profile={profile} onUpdate={onUpdate} />}
 
+      <button
+        className="leave-table"
+        data-confirm={confirmLeave}
+        onClick={() => (confirmLeave ? onLeave() : setConfirmLeave(true))}
+        onBlur={() => setConfirmLeave(false)}
+      >
+        {confirmLeave ? 'Tap again to leave this table' : 'Leave this table'}
+      </button>
+
       {inviteOpen && (
+        <InviteToTableSheet
+          table={table}
+          profile={profile}
+          friends={friends}
+          onAddMember={(m) => onUpdate((t) => ({ ...t, members: [...t.members, m] }))}
+          onClose={() => setInviteOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* Invite to a table: pick from your in-app friends who aren't already here,
+   then fall back to sharing a link/code for someone new. */
+function InviteToTableSheet({
+  table,
+  profile,
+  friends,
+  onAddMember,
+  onClose,
+}: {
+  table: Table;
+  profile: Profile;
+  friends: TableMember[];
+  onAddMember: (m: TableMember) => void;
+  onClose: () => void;
+}) {
+  const swipe = useSwipeDismiss(onClose);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  // Friends not already at the table (you're always implicitly a member).
+  const here = new Set([profile.name, ...table.members.map((m) => m.name)]);
+  const available = friends.filter((f) => !here.has(f.name));
+
+  return (
+    <div className="modal-scrim" onClick={onClose}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
+        <div className="grab" />
+        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <IconUsers size={20} /> Invite To This Table
+        </h2>
+        <p className="sheet-sub">Add a friend, or share the code with someone new.</p>
+
+        <label className="lbl">Your friends</label>
+        <div className="search-results">
+          {available.length === 0 && (
+            <p className="search-empty">
+              {friends.length === 0
+                ? 'Add friends on the Group tab and they’ll show up here.'
+                : 'Everyone you play with is already at this table.'}
+            </p>
+          )}
+          {available.map((f) => (
+            <div key={f.name} className="search-row">
+              <Avatar avatar={f.avatar} size={36} />
+              <div className="search-id">
+                <div className="search-name">{f.name}</div>
+              </div>
+              <button
+                className="pick-chip"
+                onClick={() => onAddMember({ name: f.name, avatar: f.avatar })}
+              >
+                <IconPlus size={14} /> Add
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ height: 1.5, background: 'var(--hairline)', margin: '16px 0' }} />
+
+        <button
+          className="btn green plain"
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+          onClick={() => setShareOpen(true)}
+        >
+          <IconShare size={18} /> Share Invite Link
+        </button>
+        <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
+          Done
+        </button>
+      </div>
+
+      {shareOpen && (
         <ShareModal
           payload={{
             title: 'Invite To This Table 👯',
             text: `Join my mahjong table “${table.name}”! Invite code: ${table.inviteCode}`,
             url: typeof window !== 'undefined' ? window.location.origin : '',
           }}
-          onClose={() => setInviteOpen(false)}
+          onClose={() => setShareOpen(false)}
         />
       )}
     </div>

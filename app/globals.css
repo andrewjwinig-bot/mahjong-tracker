@@ -1353,6 +1353,30 @@ label.lbl {
   margin-right: auto;
 }
 
+/* Leave-table action — quiet by default, turns cinnabar on the confirm tap. */
+.leave-table {
+  display: block;
+  width: 100%;
+  margin: 26px 0 8px;
+  padding: 13px;
+  border-radius: 10px;
+  background: transparent;
+  border: 2px solid var(--hairline);
+  color: var(--muted);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.leave-table[data-confirm="true"] {
+  background: #e8473e;
+  border-color: #e8473e;
+  color: #fff;
+}
+
 /* Primary "Score a Game" CTA (Feed home + Tables detail). */
 .score-cta {
   position: relative;
