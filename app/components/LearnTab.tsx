@@ -279,8 +279,14 @@ const SECTIONS: Section[] = [
     body: (
       <>
         <p>
-          <strong>Is my data private?</strong> Yes — for now everything lives on this device. Cloud
-          accounts &amp; sync arrive with the App Store release.
+          <strong>Is my data private?</strong> You can use the app without an account — then your
+          data stays on your device. If you create an account, your gameplay and profile sync
+          securely to the cloud so you can use them on any device, and you can export or delete
+          everything anytime. See our{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer">
+            Privacy Policy
+          </a>
+          .
         </p>
         <p>
           <strong>Is this the official NMJL card?</strong> No. This is a sample card so you can try the
