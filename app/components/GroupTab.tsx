@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
-import { cloudSearchProfiles, cloudAddFriend, type CloudFriend } from '../lib/cloudFriends';
+import {
+  cloudSearchProfiles,
+  cloudSendFriendRequest,
+  cloudListIncomingRequests,
+  cloudAcceptRequest,
+  cloudDeclineRequest,
+  cloudListFriends,
+  type CloudFriend,
+} from '../lib/cloudFriends';
 
 // How each feed event renders its badge + milestone emblem.
 const KIND_BADGE: Record<FeedKind, { label: string; color: string; emoji: string }> = {
@@ -289,6 +297,16 @@ export default function GroupTab({
   }, []);
 
   const [addOpen, setAddOpen] = useState(false);
+  // Pending incoming friend-request count, for the badge on the Friends button.
+  const [reqCount, setReqCount] = useState(0);
+  useEffect(() => {
+    if (!cloud) return;
+    let live = true;
+    void cloudListIncomingRequests().then((r) => live && setReqCount(r.length));
+    return () => {
+      live = false;
+    };
+  }, [cloud, addOpen]);
 
   // Streak banner: dismissible for the day, like the Tip — it returns tomorrow.
   const [streakHidden, setStreakHidden] = useState(false);
@@ -393,8 +411,30 @@ export default function GroupTab({
           </span>
           <span className="lb-head-right">
             <span className="lb-count">{ranked.length} PLAYERS</span>
-            <button className="lb-add" onClick={() => setAddOpen(true)}>
-              + Add
+            <button className="lb-add" onClick={() => setAddOpen(true)} style={{ position: 'relative' }}>
+              Friends
+              {cloud && reqCount > 0 && (
+                <span
+                  aria-label={`${reqCount} friend requests`}
+                  style={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -6,
+                    minWidth: 16,
+                    height: 16,
+                    padding: '0 4px',
+                    borderRadius: 8,
+                    background: 'var(--danger, #C0392B)',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    lineHeight: '16px',
+                    textAlign: 'center',
+                  }}
+                >
+                  {reqCount}
+                </span>
+              )}
             </button>
           </span>
         </div>
@@ -1000,6 +1040,35 @@ export function AddFriendSheet({
   const [q, setQ] = useState('');
   const [results, setResults] = useState<CloudFriend[]>([]);
   const [searching, setSearching] = useState(false);
+  const [requests, setRequests] = useState<CloudFriend[]>([]);
+  const [friends, setFriends] = useState<CloudFriend[]>([]);
+  const [requested, setRequested] = useState<Set<string>>(new Set());
+
+  // Load incoming requests + accepted friends (cloud only) when the sheet opens.
+  useEffect(() => {
+    if (!cloud) return;
+    let live = true;
+    void Promise.all([cloudListIncomingRequests(), cloudListFriends()]).then(([reqs, fr]) => {
+      if (!live) return;
+      setRequests(reqs);
+      setFriends(fr);
+    });
+    return () => {
+      live = false;
+    };
+  }, [cloud]);
+
+  function accept(u: CloudFriend) {
+    void cloudAcceptRequest(u.id);
+    setRequests((r) => r.filter((x) => x.id !== u.id));
+    setFriends((f) => [u, ...f]);
+    onAdd(u.username, u.avatar); // reflect them in the local members list too
+  }
+
+  function decline(u: CloudFriend) {
+    void cloudDeclineRequest(u.id);
+    setRequests((r) => r.filter((x) => x.id !== u.id));
+  }
 
   useEffect(() => {
     const query = q.trim();
@@ -1033,10 +1102,19 @@ export function AddFriendSheet({
   }, [q, cloud]);
 
   function addUser(u: CloudFriend) {
-    if (cloud) void cloudAddFriend(u.id);
+    if (cloud) {
+      // Cloud: send a friend request (pending until they accept). Don't add them
+      // to your friends/leaderboard yet — that happens on acceptance.
+      void cloudSendFriendRequest(u.id);
+      setRequested((s) => new Set(s).add(u.id));
+      return;
+    }
+    // On-device demo: instant local add.
     onAdd(u.username, u.avatar);
     onClose();
   }
+
+  const friendIds = new Set(friends.map((f) => f.id));
 
   return (
     <div className="modal-scrim" onClick={onClose}>
@@ -1053,6 +1131,46 @@ export function AddFriendSheet({
           <IconUsers size={20} /> Find Friends
         </h2>
         <p className="sheet-sub">Search players by username, or invite someone new.</p>
+
+        {cloud && requests.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <label className="lbl">Friend requests</label>
+            {requests.map((u) => (
+              <div key={u.id} className="search-row">
+                <Avatar avatar={u.avatar} size={36} />
+                <div className="search-id">
+                  <div className="search-name">{u.username}</div>
+                  <div className="search-handle">@{u.handle}</div>
+                </div>
+                <button className="pick-chip" onClick={() => accept(u)}>
+                  Accept
+                </button>
+                <button
+                  className="btn ghost"
+                  style={{ padding: '6px 10px', marginLeft: 6, width: 'auto' }}
+                  onClick={() => decline(u)}
+                >
+                  Decline
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {cloud && friends.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <label className="lbl">Your friends</label>
+            {friends.map((u) => (
+              <div key={u.id} className="search-row">
+                <Avatar avatar={u.avatar} size={36} />
+                <div className="search-id">
+                  <div className="search-name">{u.username}</div>
+                  <div className="search-handle">@{u.handle}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         <label className="lbl">Search players</label>
         <input
@@ -1078,8 +1196,12 @@ export function AddFriendSheet({
                 <div className="search-name">{u.username}</div>
                 <div className="search-handle">@{u.handle}</div>
               </div>
-              <button className="pick-chip" onClick={() => addUser(u)}>
-                Add
+              <button
+                className="pick-chip"
+                onClick={() => addUser(u)}
+                disabled={cloud && (requested.has(u.id) || friendIds.has(u.id))}
+              >
+                {friendIds.has(u.id) ? 'Friends' : requested.has(u.id) ? 'Requested' : 'Add'}
               </button>
             </div>
           ))}
