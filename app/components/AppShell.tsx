@@ -27,6 +27,7 @@ import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
 import GroupTab from './GroupTab';
 import LoadingWall from './LoadingWall';
+import Splash from './Splash';
 import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
@@ -56,6 +57,9 @@ import { recordPlay } from '../lib/streak';
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('group');
   const [loaded, setLoaded] = useState(false);
+  // Cold-launch splash ("Washing the Tiles"). Plays once on mount; a warm resume
+  // doesn't remount React, so it naturally only shows on cold start.
+  const [splashDone, setSplashDone] = useState(false);
   // Welcome animation floor: keep the "Stacking the wall" greeting up for at
   // least a beat on cold app-open (data loads near-instantly on-device), so it
   // reads as an intentional welcome. Once per open — not on tab switches.
@@ -362,13 +366,16 @@ export default function AppShell() {
     void reconcileCloud();
   }, [reconcileCloud]);
 
-  // First launch → onboarding (account + experience level).
-  if (accountChecked && !account) {
-    return <Onboarding onDone={finishOnboarding} />;
-  }
-
   return (
     <ConfettiProvider>
+      {/* Cold-launch splash overlays both onboarding and the app, so it always
+          plays once on a fresh load regardless of auth state. */}
+      {!splashDone && <Splash ready={loaded} onDone={() => setSplashDone(true)} />}
+      {accountChecked && !account ? (
+        // First launch → onboarding (account + experience level).
+        <Onboarding onDone={finishOnboarding} />
+      ) : (
+        <>
       <div className="app">
         <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
           <IconSettings size={22} />
@@ -527,6 +534,8 @@ export default function AppShell() {
             setShowTutorial(false);
           }}
         />
+      )}
+        </>
       )}
     </ConfettiProvider>
   );

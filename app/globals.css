@@ -6023,3 +6023,119 @@ label.lbl {
   }
   .pro-rain { display: none; }
 }
+
+/* ===========================================================================
+   CLUB MAHJ LAUNCH SPLASH — "Washing the Tiles"
+   Exact port of the Shuffle_Splash reference. Scoped under .cmsplash so the
+   reference's class names don't leak into the app. Keyframes are verbatim and
+   referenced by the imperative tile generator (wash1/2/3, tumbleOut, cmRise,
+   cmDot) — do not rename them.
+   ========================================================================== */
+.cmsplash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: "Hanken Grotesk", var(--font-app), sans-serif;
+  background: radial-gradient(120% 92% at 50% 0%, #246b4a 0%, #1a5439 55%, #123f2d 100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.cmsplash.cmsplash-exit {
+  opacity: 0;
+  transform: scale(1.06);
+  pointer-events: none;
+}
+.cmsplash .felt-stripe {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.035) 0, rgba(255, 255, 255, 0.035) 2px, transparent 2px, transparent 13px);
+}
+.cmsplash .felt-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='nz'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23nz)' opacity='0.6'/%3E%3C/svg%3E");
+}
+.cmsplash .cmsplash-tiles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+.cmsplash .vignette {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 300px;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(9, 28, 16, 0.72) 0%, rgba(9, 28, 16, 0.5) 42%, transparent 72%);
+}
+.cmsplash .cmsplash-lock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  text-align: center;
+  pointer-events: none;
+}
+.cmsplash .lock-club {
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 9px;
+  color: #f5d58a;
+  margin-bottom: 7px;
+  padding-left: 9px;
+}
+.cmsplash .lock-mahj {
+  font-family: "Bricolage Grotesque", var(--font-display), "Hanken Grotesk", sans-serif;
+  font-weight: 800;
+  font-size: 58px;
+  letter-spacing: -2.5px;
+  color: #ffffff;
+  text-shadow: 3.5px 3.5px 0 #0c3325;
+  line-height: 0.82;
+}
+.cmsplash .lock-cap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  margin-top: 22px;
+}
+.cmsplash .lock-cap span.t {
+  white-space: nowrap;
+  font-family: "Space Mono", var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(245, 234, 213, 0.82);
+}
+.cmsplash .lock-cap .dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.cmsplash .lock-cap .dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f5d58a;
+  animation: cmDot 1.3s ease-in-out infinite;
+}
+
+/* ── keyframes (verbatim from the design) ── */
+@keyframes wash1 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(2.5px, -1.5px) rotate(2.6deg); } }
+@keyframes wash2 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(-2.5px, 1.5px) rotate(-3deg); } }
+@keyframes wash3 { from { transform: translate(0, 0) rotate(0deg); } to { transform: translate(1.5px, 2.5px) rotate(2deg); } }
+@keyframes tumbleOut {
+  from { transform: translate(var(--sx), var(--sy)) rotate(var(--r0)) scale(0.28); opacity: 0; }
+  16%  { opacity: 1; }
+  to   { transform: translate(0, 0) rotate(var(--rf)) scale(1); opacity: 1; }
+}
+@keyframes cmDot { 0%, 72%, 100% { transform: translateY(0); opacity: 0.4; } 36% { transform: translateY(-5px); opacity: 1; } }
+@keyframes cmRise { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }

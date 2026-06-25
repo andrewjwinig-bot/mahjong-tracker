@@ -54,6 +54,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        {/* CJK serif for the launch-splash tile glyphs (lazy unicode-range). */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&display=swap"
+        />
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script
           dangerouslySetInnerHTML={{
