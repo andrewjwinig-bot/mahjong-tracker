@@ -1,5 +1,7 @@
-// Dependency-free PNG icon generator. Draws the app icon (blue tile w/ a coral
-// dot + green bar) at the sizes a PWA needs. Run: `npm run icons`.
+// Dependency-free PNG icon generator for Club Mahj. Renders the brand mark — two
+// fanned mahjong tiles (a "bam-M" + a flower) on the felt-green radial — as the
+// flattened rasters a PWA / app store needs, plus a monochrome bam-M silhouette
+// for notification / template icons. Run: `npm run icons`.
 const zlib = require('zlib');
 const fs = require('fs');
 const path = require('path');
@@ -11,6 +13,8 @@ function canvas(size) {
   return { size, data: new Uint8Array(size * size * 4) };
 }
 function px(c, x, y, [r, g, b, a]) {
+  x = Math.round(x);
+  y = Math.round(y);
   if (x < 0 || y < 0 || x >= c.size || y >= c.size) return;
   const i = (y * c.size + x) * 4;
   const ia = a / 255;
@@ -19,26 +23,9 @@ function px(c, x, y, [r, g, b, a]) {
   c.data[i + 2] = c.data[i + 2] * (1 - ia) + b * ia;
   c.data[i + 3] = Math.max(c.data[i + 3], a);
 }
-function fillRect(c, x0, y0, w, h, col) {
-  for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) px(c, x, y, col);
-}
-function roundRect(c, x0, y0, w, h, r, col) {
-  for (let y = y0; y < y0 + h; y++) {
-    for (let x = x0; x < x0 + w; x++) {
-      const dx = Math.min(x - x0, x0 + w - 1 - x);
-      const dy = Math.min(y - y0, y0 + h - 1 - y);
-      if (dx < r && dy < r) {
-        const d = Math.hypot(r - dx, r - dy);
-        if (d > r) continue;
-        const a = d > r - 1 ? (r - d) * col[3] : col[3]; // AA edge
-        px(c, x, y, [col[0], col[1], col[2], Math.max(0, Math.min(255, a))]);
-      } else px(c, x, y, col);
-    }
-  }
-}
 function circle(c, cx, cy, r, col) {
-  for (let y = cy - r; y <= cy + r; y++) {
-    for (let x = cx - r; x <= cx + r; x++) {
+  for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
+    for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
       const d = Math.hypot(x - cx, y - cy);
       if (d > r) continue;
       const a = d > r - 1 ? (r - d) * col[3] : col[3];
@@ -47,29 +34,18 @@ function circle(c, cx, cy, r, col) {
   }
 }
 
-const JADE_TOP = [18, 184, 158]; // brand jade, lighter
-const JADE_BOT = [11, 124, 107]; // deeper jade
-const IVORY = [253, 251, 245, 255]; // bone tile
-const SHEEN = [255, 255, 255, 46]; // soft top highlight
-// Joker star gradient stops + outline.
-const CORAL = [232, 69, 95];
-const GOLD = [229, 154, 43];
-const VIOLET = [124, 92, 224];
-const NAVY = [44, 58, 87];
-
-function inPoly(px_, py_, pts) {
+// Anti-aliased polygon fill (3×3 supersample). colFn(x, y) -> [r, g, b, a?].
+function inPoly(qx, qy, pts) {
   let inside = false;
   for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
     const xi = pts[i][0];
     const yi = pts[i][1];
     const xj = pts[j][0];
     const yj = pts[j][1];
-    if (yi > py_ !== yj > py_ && px_ < ((xj - xi) * (py_ - yi)) / (yj - yi) + xi) inside = !inside;
+    if (yi > qy !== yj > qy && qx < ((xj - xi) * (qy - yi)) / (yj - yi) + xi) inside = !inside;
   }
   return inside;
 }
-
-// Anti-aliased polygon fill; colFn(x, y) -> [r, g, b].
 function fillPoly(c, pts, colFn) {
   let minX = Infinity;
   let minY = Infinity;
@@ -91,108 +67,223 @@ function fillPoly(c, pts, colFn) {
       }
       if (cov === 0) continue;
       const col = colFn(x, y);
-      px(c, x, y, [col[0], col[1], col[2], Math.round((cov / 9) * 255)]);
+      const a = (col[3] == null ? 255 : col[3]) * (cov / 9);
+      px(c, x, y, [col[0], col[1], col[2], a]);
     }
   }
 }
 
-// Scale a polygon about a center point (used for outlines).
-function scalePoly(pts, f, cx, cy) {
-  return pts.map((p) => [cx + (p[0] - cx) * f, cy + (p[1] - cy) * f]);
-}
+// ---- color helpers --------------------------------------------------------
+const FELT_R0 = [36, 107, 74]; // #246B4A
+const FELT_R1 = [26, 84, 57]; // #1A5439
+const FELT_R2 = [18, 63, 45]; // #123F2D
+const FACE0 = [255, 255, 255]; // paper face highlight
+const FACE1 = [251, 247, 236]; // #FBF7EC
+const FACE2 = [235, 226, 206]; // #EBE2CE
+const BAM_EDGE = [12, 80, 38]; // #0C5026
+const BAM_MID = [43, 164, 92]; // #2BA45C
+const BAM_NODE = [9, 44, 23]; // node banding
+const PETAL = [224, 78, 152]; // ~#DB2777 mid
+const PETAL_HI = [249, 168, 212]; // #F9A8D4
+const CORE = [245, 205, 120]; // #FBD37A
+const CORE_DEEP = [224, 148, 28]; // #E0941C
+const BORDER = [44, 58, 48];
 
-// A jester-hat lobe (the joker emblem): an outlined point with a bell.
-function lobe(c, baseX, baseY, tipX, tipY, halfBase, col) {
-  const pts = [
-    [baseX - halfBase, baseY],
-    [tipX, tipY],
-    [baseX + halfBase, baseY],
+function mix(a, b, t) {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+}
+function stops3(t, c0, c1, c2) {
+  return t < 0.5 ? mix(c0, c1, t / 0.5) : mix(c1, c2, (t - 0.5) / 0.5);
+}
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+// ---- 2D transform (rotate about a center, then translate) -----------------
+function tile2device(cx, cy, deg) {
+  const a = (deg * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return (lx, ly) => [cx + lx * cos - ly * sin, cy + lx * sin + ly * cos];
+}
+function device2tile(cx, cy, deg) {
+  const a = (deg * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return (dx, dy) => {
+    const x = dx - cx;
+    const y = dy - cy;
+    return [x * cos + y * sin, -x * sin + y * cos];
+  };
+}
+const mapPts = (T, pts) => pts.map(([x, y]) => T(x, y));
+const offset = (pts, ox, oy) => pts.map(([x, y]) => [x + ox, y + oy]);
+
+// Rotated ellipse as a polygon (local space).
+function ellipsePoly(cx, cy, rx, ry, deg, seg = 30) {
+  const a = (deg * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  const pts = [];
+  for (let i = 0; i < seg; i++) {
+    const t = (i / seg) * 2 * Math.PI;
+    const ex = Math.cos(t) * rx;
+    const ey = Math.sin(t) * ry;
+    pts.push([cx + ex * cos - ey * sin, cy + ex * sin + ey * cos]);
+  }
+  return pts;
+}
+const rotPts = (pts, deg) => {
+  const a = (deg * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  return pts.map(([x, y]) => [x * cos - y * sin, x * sin + y * cos]);
+};
+
+// Rounded-rect perimeter polygon, centered on the origin (local tile space).
+function rrPoly(hw, hh, r, seg = 6) {
+  r = Math.min(r, hw, hh);
+  const pts = [];
+  const corners = [
+    [hw - r, -(hh - r), -90, 0],
+    [hw - r, hh - r, 0, 90],
+    [-(hw - r), hh - r, 90, 180],
+    [-(hw - r), -(hh - r), 180, 270],
   ];
-  const cx = (pts[0][0] + pts[1][0] + pts[2][0]) / 3;
-  const cy = (pts[0][1] + pts[1][1] + pts[2][1]) / 3;
-  fillPoly(c, pts, () => NAVY); // outline base
-  fillPoly(c, scalePoly(pts, 0.84, cx, cy), () => col); // colored fill
-  // bell at the tip
-  circle(c, Math.round(tipX), Math.round(tipY), Math.round(halfBase * 0.62), [...NAVY, 255]);
-  circle(c, Math.round(tipX), Math.round(tipY), Math.round(halfBase * 0.42), [...GOLD, 255]);
+  for (const [ccx, ccy, a0, a1] of corners) {
+    for (let s = 0; s <= seg; s++) {
+      const th = ((a0 + ((a1 - a0) * s) / seg) * Math.PI) / 180;
+      pts.push([ccx + r * Math.cos(th), ccy + r * Math.sin(th)]);
+    }
+  }
+  return pts;
 }
 
-// Vertical gradient background fill.
-function gradientV(c, top, bot) {
-  for (let y = 0; y < c.size; y++) {
-    const t = y / (c.size - 1);
-    const col = [
-      Math.round(top[0] + (bot[0] - top[0]) * t),
-      Math.round(top[1] + (bot[1] - top[1]) * t),
-      Math.round(top[2] + (bot[2] - top[2]) * t),
-      255,
-    ];
-    for (let x = 0; x < c.size; x++) px(c, x, y, col);
+// ---- the brand mark -------------------------------------------------------
+// Draw one paper tile (border + gradient face) at center (cx,cy), rotated `deg`.
+function drawTileFace(c, cx, cy, hw, hh, deg) {
+  const T = tile2device(cx, cy, deg);
+  const inv = device2tile(cx, cy, deg);
+  const r = hw * 0.26;
+  const bw = hw * 0.05;
+  fillPoly(c, mapPts(T, rrPoly(hw + bw, hh + bw, r + bw)), () => [...BORDER, 255]);
+  fillPoly(c, mapPts(T, rrPoly(hw, hh, r)), (x, y) => {
+    const [lx, ly] = inv(x, y);
+    const t = clamp01(((lx + hw) / (2 * hw)) * 0.42 + ((ly + hh) / (2 * hh)) * 0.58);
+    return [...stops3(t, FACE0, FACE1, FACE2), 255];
+  });
+}
+
+// Three vertical bamboo sticks (outer tall, middle short → "M") in tile space.
+function drawBam(c, cx, cy, hw, hh, deg) {
+  const T = tile2device(cx, cy, deg);
+  const sw = hw * 0.133; // stick half-width
+  const xs = [-0.433 * hw, 0, 0.433 * hw];
+  const yBottom = hh * 0.63;
+  const tops = [-hh * 0.395, -hh * 0.026, -hh * 0.395];
+  xs.forEach((xc, i) => {
+    const yTop = tops[i];
+    const barHH = (yBottom - yTop) / 2;
+    const barCY = (yBottom + yTop) / 2;
+    // edge-dark bar, then a lighter core down the middle (90° node gradient look)
+    fillPoly(c, mapPts(T, offset(rrPoly(sw, barHH, sw), xc, barCY)), () => [...BAM_EDGE, 255]);
+    fillPoly(c, mapPts(T, offset(rrPoly(sw * 0.52, barHH - sw * 0.4, sw * 0.52), xc, barCY)), () => [...BAM_MID, 255]);
+    // node banding: tall sticks at 31% & 64%, short stick at 47% of bar height
+    const fr = i === 1 ? [0.47] : [0.31, 0.64];
+    fr.forEach((f) => {
+      const yb = yTop + (yBottom - yTop) * f;
+      fillPoly(c, mapPts(T, offset(rrPoly(sw, sw * 0.34, sw * 0.2), xc, yb)), () => [...BAM_NODE, 255]);
+    });
+  });
+}
+
+// Six soft rounded petals around a gold core, centered in the tile.
+function drawFlower(c, cx, cy, hw, hh, deg) {
+  const T = tile2device(cx, cy, deg);
+  const fR = hh * 0.46; // flower radius
+  const dist = fR * 0.52; // petal center distance from flower center
+  const rx = fR * 0.27;
+  const ry = fR * 0.44;
+  for (let k = 0; k < 6; k++) {
+    const ang = k * 60;
+    const petal = rotPts(ellipsePoly(0, -dist, rx, ry, 0), ang);
+    fillPoly(c, mapPts(T, petal), () => [...PETAL, 255]);
+    // soft lighter sheen toward the outer half of the petal (180° gradient look)
+    const sheen = rotPts(ellipsePoly(0, -dist - ry * 0.28, rx * 0.62, ry * 0.5, 0), ang);
+    fillPoly(c, mapPts(T, sheen), () => [...PETAL_HI, 120]);
+  }
+  const [dcx, dcy] = T(0, 0);
+  circle(c, dcx, dcy, fR * 0.34, [...CORE, 255]);
+  circle(c, dcx, dcy, fR * 0.2, [...CORE_DEEP, 255]);
+}
+
+// ---- backgrounds ----------------------------------------------------------
+function feltBackground(c) {
+  const S = c.size;
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const d = clamp01(Math.hypot(x - S / 2, y) / (S * 1.05));
+      const col = d < 0.7 ? mix(FELT_R0, FELT_R1, d / 0.7) : mix(FELT_R1, FELT_R2, (d - 0.7) / 0.3);
+      px(c, x, y, [col[0], col[1], col[2], 255]);
+    }
+  }
+  // 45° white pinstripe at ~4.5% + a soft inner-shadow vignette at the edges
+  const period = Math.max(8, Math.round(S / 13));
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      if ((x + y) % period < 1.5) px(c, x, y, [255, 255, 255, 12]);
+      const d = Math.hypot(x - S / 2, y - S / 2) / (S * 0.5 * Math.SQRT2);
+      const v = clamp01((d - 0.72) / 0.28);
+      if (v > 0) px(c, x, y, [0, 0, 0, v * 30]);
+    }
   }
 }
 
-const GREEN = [31, 168, 91];
-
-// 5x7 block glyphs (each row is 5 bits, MSB = leftmost column).
-const FONT = {
-  M: [0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001],
-  A: [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
-  H: [0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
-  J: [0b00111, 0b00010, 0b00010, 0b00010, 0b10010, 0b10010, 0b01100],
-};
-
-function drawGlyph(c, rows, x0, y0, cell, col) {
-  for (let r = 0; r < 7; r++) {
-    for (let k = 0; k < 5; k++) {
-      if (rows[r] & (1 << (4 - k))) {
-        fillRect(c, Math.round(x0 + k * cell), Math.round(y0 + r * cell),
-          Math.ceil(cell), Math.ceil(cell), [...col, 255]);
+// Clip everything outside an iOS-style rounded square (transparent corners).
+function roundCorners(c, r) {
+  const S = c.size;
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const dx = Math.max(r - (x + 0.5), x + 0.5 - (S - r), 0);
+      const dy = Math.max(r - (y + 0.5), y + 0.5 - (S - r), 0);
+      const cover = Math.max(0, Math.min(1, r - Math.hypot(dx, dy) + 0.5));
+      if (cover < 1) {
+        const i = (y * S + x) * 4;
+        c.data[i + 3] = Math.round(c.data[i + 3] * cover);
       }
     }
   }
 }
 
-// Centered word; each letter takes its own color from `cols`.
-function drawWord(c, word, cx, yTop, cell, cols) {
-  const lw = 5 * cell;
-  const gap = cell;
-  const total = word.length * lw + (word.length - 1) * gap;
-  let x = cx - total / 2;
-  for (let i = 0; i < word.length; i++) {
-    drawGlyph(c, FONT[word[i]], x, yTop, cell, cols[i % cols.length]);
-    x += lw + gap;
-  }
+// ---- compose --------------------------------------------------------------
+function draw(size, { maskable, rounded }) {
+  const c = canvas(size);
+  feltBackground(c);
+  // More padding for maskable (safe zone) so tiles never clip the mask. The fan
+  // is spread enough that all three bam sticks clear the flower tile (reads "M").
+  const hw = size * (maskable ? 0.165 : 0.19);
+  const hh = hw * 1.27;
+  const bamC = [size * 0.38, size * 0.485];
+  const flowerC = [size * 0.62, size * 0.525];
+  drawTileFace(c, bamC[0], bamC[1], hw, hh, -11);
+  drawBam(c, bamC[0], bamC[1], hw, hh, -11);
+  drawTileFace(c, flowerC[0], flowerC[1], hw, hh, 9);
+  drawFlower(c, flowerC[0], flowerC[1], hw, hh, 9);
+  if (rounded) roundCorners(c, size * 0.225); // iOS-style squircle corners
+  return c;
 }
 
-function draw(size, { maskable }) {
+// Monochrome bam-M silhouette on transparent — notification / template icon.
+function drawMono(size, col = [255, 255, 255, 255]) {
   const c = canvas(size);
-  gradientV(c, JADE_TOP, JADE_BOT); // full-bleed jade gradient
-
-  const inset = maskable ? size * 0.22 : size * 0.18; // tile padding
-  const tx = Math.round(inset);
-  const ty = Math.round(inset);
-  const tw = Math.round(size - inset * 2);
-  const r = tw * 0.24;
-
-  roundRect(c, tx, ty, tw, tw, r, IVORY); // ivory mahjong tile
-  // soft top sheen on the tile
-  roundRect(c, tx, ty, tw, Math.round(tw * 0.42), r, SHEEN);
-
-  // joker-tile style: three jester bells over the "MAHJ" wordmark
-  const mx = size / 2;
-  const bellY = Math.round(ty + tw * 0.26);
-  const bellR = Math.round(tw * 0.07);
-  const bellCols = [CORAL, GOLD, VIOLET];
-  [-1, 0, 1].forEach((d, i) => {
-    const bx = Math.round(mx + d * tw * 0.26);
-    circle(c, bx, bellY, bellR + 2, [...NAVY, 255]);
-    circle(c, bx, bellY, bellR, [...bellCols[i], 255]);
+  const sw = size * 0.085; // stick half-width
+  const xs = [-0.3 * size, 0, 0.3 * size].map((v) => v + size / 2);
+  const yBottom = size * 0.76;
+  const tops = [size * 0.24, size * 0.46, size * 0.24];
+  xs.forEach((xc, i) => {
+    const yTop = tops[i];
+    const barHH = (yBottom - yTop) / 2;
+    const barCY = (yBottom + yTop) / 2;
+    fillPoly(c, offset(rrPoly(sw, barHH, sw), xc, barCY), () => col);
   });
-
-  // wordmark
-  const cell = tw / 26;
-  drawWord(c, 'MAHJ', mx, ty + tw * 0.46, cell, [CORAL, GOLD, VIOLET, GREEN]);
-
   return c;
 }
 
@@ -214,8 +305,7 @@ function crc32(buf) {
 function chunk(type, data) {
   const len = Buffer.alloc(4);
   len.writeUInt32BE(data.length, 0);
-  const typeBuf = Buffer.from(type, 'ascii');
-  const body = Buffer.concat([typeBuf, data]);
+  const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
   const crc = Buffer.alloc(4);
   crc.writeUInt32BE(crc32(body), 0);
   return Buffer.concat([len, body, crc]);
@@ -228,7 +318,6 @@ function encodePNG(c) {
   ihdr.writeUInt32BE(size, 4);
   ihdr[8] = 8; // bit depth
   ihdr[9] = 6; // RGBA
-  // raw scanlines with filter byte 0
   const raw = Buffer.alloc(size * (size * 4 + 1));
   for (let y = 0; y < size; y++) {
     raw[y * (size * 4 + 1)] = 0;
@@ -243,12 +332,15 @@ function encodePNG(c) {
 // ---- emit -----------------------------------------------------------------
 fs.mkdirSync(OUT, { recursive: true });
 const targets = [
-  ['icon-192.png', 192, { maskable: false }],
-  ['icon-512.png', 512, { maskable: false }],
-  ['icon-512-maskable.png', 512, { maskable: true }],
-  ['apple-touch-icon.png', 180, { maskable: false }],
+  // 192/512 get pre-rounded squircle corners (PWA / store display).
+  ['icon-192.png', () => draw(192, { rounded: true })],
+  ['icon-512.png', () => draw(512, { rounded: true })],
+  // Maskable + apple-touch stay full-bleed squares — the OS applies its own mask.
+  ['icon-512-maskable.png', () => draw(512, { maskable: true })],
+  ['apple-touch-icon.png', () => draw(180, {})],
+  ['icon-mono.png', () => drawMono(96)],
 ];
-for (const [name, size, opts] of targets) {
-  fs.writeFileSync(path.join(OUT, name), encodePNG(draw(size, opts)));
+for (const [name, make] of targets) {
+  fs.writeFileSync(path.join(OUT, name), encodePNG(make()));
   console.log('wrote', name);
 }
