@@ -280,9 +280,6 @@ export default function GroupTab({
 
   const maxPoints = Math.max(1, ...ranked.map((m) => m.points));
 
-  // Podium tint for the dot-tile ranks: gold / silver / bronze, then standard
-  // dot-blue for everyone below the medals.
-  const rankColor = (i: number) => ['#E0A12B', '#8FA1B6', '#C77B43'][i] ?? '#2F80ED';
 
   return (
     <div className="screen">
@@ -376,40 +373,34 @@ export default function GroupTab({
               }}
               style={{ background: m.id === YOU_ID ? '#F4F6FA' : 'transparent' }}
             >
-              <div style={{ width: 34, display: 'grid', placeItems: 'center' }} aria-label={`Rank ${i + 1}`}>
-                {i < 9 ? (
-                  <Tile face="dot" count={i + 1} color={rankColor(i)} size={30} />
-                ) : (
-                  <span style={{ fontWeight: 900, fontSize: 16 }}>{i + 1}</span>
-                )}
-              </div>
-              <Avatar avatar={m.avatar} size={36} />
+              <Avatar avatar={m.avatar} size={32} />
               <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                <div style={{ fontWeight: 800, fontSize: 15 }}>
-                  {m.name}
-                  {m.id === YOU_ID && <span style={{ color: 'var(--muted)', fontWeight: 700 }}> · you</span>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 3 }}>
+                  <span style={{ fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {m.name}
+                    {m.id === YOU_ID && (
+                      <span style={{ fontFamily: 'var(--font-mono), ui-monospace, monospace', fontSize: 9, color: 'var(--brand)' }}> · YOU</span>
+                    )}
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono), ui-monospace, monospace', fontSize: 11, flex: 'none' }}>
+                    {lbMetric === 'points' ? (
+                      <>
+                        {m.points}
+                        <span style={{ color: 'var(--muted)' }}> pts</span>
+                      </>
+                    ) : (
+                      <>
+                        {m.handsCleared}
+                        <span style={{ color: 'var(--muted)' }}>/{TOTAL_HANDS}</span>
+                      </>
+                    )}
+                  </span>
                 </div>
-                <div className="progress" style={{ marginTop: 6, height: 7 }}>
+                <div className="progress" style={{ marginTop: 0, height: 11 }}>
                   <span
                     style={{ width: `${pct}%`, background: m.avatar.color, animationDelay: `${0.35 + i * 0.1}s` }}
                   />
                 </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: 900, fontSize: 16 }}>
-                  {lbMetric === 'points' ? (
-                    <>
-                      {m.points}
-                      <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}> pts</span>
-                    </>
-                  ) : (
-                    <>
-                      {m.handsCleared}
-                      <span style={{ color: 'var(--muted)', fontSize: 12, fontWeight: 800 }}>/{TOTAL_HANDS}</span>
-                    </>
-                  )}
-                </div>
-                <div style={{ color: 'var(--muted)', fontSize: 11, fontWeight: 800 }}>tap to view</div>
               </div>
             </button>
           );

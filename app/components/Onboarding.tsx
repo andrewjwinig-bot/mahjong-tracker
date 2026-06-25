@@ -91,6 +91,23 @@ function SignupArc() {
   );
 }
 
+// Tap-to-select tile "wobble" (design frame 01 — the level icon shimmies).
+function wobbleTile(el: Element | null) {
+  if (!el || typeof (el as HTMLElement).animate !== 'function') return;
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  (el as HTMLElement).animate(
+    [
+      { transform: 'translateX(0) rotate(0deg)' },
+      { transform: 'translateX(-3px) rotate(-7deg)', offset: 0.15 },
+      { transform: 'translateX(3px) rotate(7deg)', offset: 0.38 },
+      { transform: 'translateX(-2px) rotate(-5deg)', offset: 0.6 },
+      { transform: 'translateX(2px) rotate(4deg)', offset: 0.8 },
+      { transform: 'translateX(0) rotate(0deg)' },
+    ],
+    { duration: 520, easing: 'ease-in-out' },
+  );
+}
+
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const cloud = isCloudEnabled();
 
@@ -242,7 +259,10 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
                   key={l.id}
                   className="level-opt"
                   data-active={experience === l.id}
-                  onClick={() => setExperience(l.id)}
+                  onClick={(e) => {
+                    setExperience(l.id);
+                    wobbleTile(e.currentTarget.querySelector('.level-tile'));
+                  }}
                 >
                   <span className="level-tile" style={{ color: l.color }} aria-hidden>
                     {l.icon}

@@ -148,21 +148,26 @@ export default function TrophyShelf({
               </div>
             </div>
 
-            {topCats.length > 0 && (
-              <div className="cat-bars">
-                {topCats.map((c) => (
-                  <div className="cat-bar-row" key={c.category}>
-                    <span className="cb-name">{c.category}</span>
-                    <span className="progress" style={{ flex: 1, height: 8, marginTop: 0 }}>
-                      <span style={{ width: `${c.pct}%` }} />
-                    </span>
-                    <span className="cb-val">
-                      {c.cleared}/{c.total}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+          </>
+        )}
+
+        {/* Category progress — always shown (reflects the card, even at 0). */}
+        {topCats.length > 0 && (
+          <>
+            <div className="set-section">Category progress</div>
+            <div className="cat-bars">
+              {topCats.map((c) => (
+                <div className="cat-bar-row" key={c.category}>
+                  <span className="cb-name">{c.category}</span>
+                  <span className="progress" style={{ flex: 1, height: 8, marginTop: 0 }}>
+                    <span style={{ width: `${c.pct}%` }} />
+                  </span>
+                  <span className="cb-val">
+                    {c.cleared}/{c.total}
+                  </span>
+                </div>
+              ))}
+            </div>
           </>
         )}
 
