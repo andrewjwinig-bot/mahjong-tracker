@@ -354,7 +354,7 @@ export default function GroupTab({
 
         <div className="segmented lb-seg">
           <button data-active={lbMetric === 'rows'} onClick={() => setLbMetric('rows')}>
-            Rows cleared
+            Hands cleared
           </button>
           <button data-active={lbMetric === 'points'} onClick={() => setLbMetric('points')}>
             Total points
