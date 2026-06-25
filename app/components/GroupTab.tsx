@@ -484,7 +484,9 @@ export default function GroupTab({
           </div>
           <div className="fe-title">No mahjs called yet</div>
           <div className="fe-sub">
-            Be the first — call Mahj on your Card and it’ll land right here for your crew to see.
+            {cloud
+              ? 'Add friends to see their mahjs here — or call your own on the Card and it lands right here.'
+              : 'Be the first — call Mahj on your Card and it’ll land right here for your crew to see.'}
           </div>
         </div>
       ) : (
@@ -511,7 +513,7 @@ export default function GroupTab({
 
       <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
         {cloud
-          ? 'The feed is live — posts are from real players. The leaderboard still shows demo group-mates for now.'
+          ? 'The feed is live — posts are from you and friends you’ve added. The leaderboard still shows demo group-mates for now.'
           : 'Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).'}
       </p>
     </div>

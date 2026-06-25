@@ -91,12 +91,7 @@ export async function cloudListFeed(): Promise<CloudPost[]> {
       .limit(100),
     cloudListBlocked(),
   ]);
-  if (error) {
-    // Temporary: surface the exact PostgREST error while we verify the feed.
-    console.error('[cloudListFeed] query error:', error.message, error);
-    return [];
-  }
-  if (!data) return [];
+  if (error || !data) return [];
   const blockedSet = new Set(blocked);
 
   return (data as unknown as Row[])
