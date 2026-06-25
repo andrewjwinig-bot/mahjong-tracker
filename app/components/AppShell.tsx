@@ -3,8 +3,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
-import { loadCustomCard } from '../lib/customCard';
+import { loadCustomCard, saveCustomCard } from '../lib/customCard';
 import * as db from '../lib/storage';
+import {
+  cloudSignedIn,
+  syncGameplay,
+  syncCustomCard,
+  pushCloudProfile,
+  mirrorHandCount,
+  mirrorWin,
+  mirrorRemoveWin,
+} from '../lib/cloudSync';
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
@@ -71,6 +80,28 @@ export default function AppShell() {
     setScorerOpen(true);
   }, []);
 
+  // Reconcile on-device gameplay with the cloud (no-op unless cloud is on AND
+  // signed in). Two-way merge doubles as the first-login migration: local-only
+  // data is pushed up, cloud-only data is pulled down. Runs in the background
+  // after the local-first load and again right after sign-in / sign-up.
+  const reconcileCloud = useCallback(async () => {
+    if (!(await cloudSignedIn())) return;
+    const [counts, w] = await Promise.all([db.loadHandCounts(), db.loadWins()]);
+    const merged = await syncGameplay({ handCounts: counts, wins: w });
+    if (merged) {
+      setHandCounts(merged.handCounts);
+      setWins(merged.wins);
+      // Persist the merged view locally so it survives the next cold start.
+      await Promise.all(Object.entries(merged.handCounts).map(([h, c]) => db.setHandCount(h, c)));
+      await Promise.all(merged.wins.map((win) => db.saveWin(win)));
+    }
+    const syncedCard = await syncCustomCard(loadCustomCard());
+    if (syncedCard) {
+      setCard(syncedCard);
+      saveCustomCard(syncedCard);
+    }
+  }, []);
+
   // Load all local state once on mount.
   useEffect(() => {
     let alive = true;
@@ -100,11 +131,13 @@ export default function AppShell() {
       setWins(w);
       setSocialState(s);
       setLoaded(true);
+      // Background reconcile with the cloud once the local-first UI is up.
+      void reconcileCloud();
     })();
     return () => {
       alive = false;
     };
-  }, []);
+  }, [reconcileCloud]);
 
   // Hold the welcome animation for a short minimum so it's actually seen.
   useEffect(() => {
@@ -128,6 +161,7 @@ export default function AppShell() {
     setHandCounts((prev) => {
       const next = Math.max(0, (prev[handId] ?? 0) + delta);
       void db.setHandCount(handId, next);
+      mirrorHandCount(handId, next);
       return { ...prev, [handId]: next };
     });
   }, []);
@@ -135,11 +169,13 @@ export default function AppShell() {
   const addWin = useCallback((win: Win) => {
     setWins((prev) => [win, ...prev]);
     void db.saveWin(win);
+    mirrorWin(win);
   }, []);
 
   const removeWin = useCallback((id: string) => {
     setWins((prev) => prev.filter((w) => w.id !== id));
     void db.deleteWin(id);
+    mirrorRemoveWin(id);
   }, []);
 
   const postToGroup = useCallback((win: Win) => {
@@ -246,6 +282,7 @@ export default function AppShell() {
     setSocialState((prev) => {
       if (!prev) return prev;
       void social.saveProfile(profile);
+      void pushCloudProfile(profile);
       // Reflect new identity on your existing posts + comments + member row.
       return {
         ...prev,
@@ -285,13 +322,17 @@ export default function AppShell() {
         : { ...prev.profile.avatar, char: initial };
       const profile: social.Profile = { ...prev.profile, name: a.username, avatar };
       void social.saveProfile(profile);
+      void pushCloudProfile(profile);
       return {
         ...prev,
         profile,
         members: prev.members.map((m) => (m.isYou ? { ...m, name: profile.name, avatar } : m)),
       };
     });
-  }, []);
+    // Now that a session exists, pull this user's cloud data (returning user)
+    // or push the on-device data up (first-login migration for a new signup).
+    void reconcileCloud();
+  }, [reconcileCloud]);
 
   // First launch → onboarding (account + experience level).
   if (accountChecked && !account) {

@@ -29,6 +29,15 @@ export async function cloudSetProgress(handId: string, count: number): Promise<v
   await sb.from('hand_progress').upsert({ user_id: id, hand_id: handId, count });
 }
 
+/** Upsert many hand counts at once (used by the first-login migration / sync). */
+export async function cloudUpsertProgress(counts: Record<string, number>): Promise<void> {
+  const sb = await getSupabase();
+  const id = await uid();
+  if (!sb || !id) return;
+  const rows = Object.entries(counts).map(([hand_id, count]) => ({ user_id: id, hand_id, count }));
+  if (rows.length) await sb.from('hand_progress').upsert(rows);
+}
+
 // ---- Wins journal ---------------------------------------------------------
 
 export interface CloudWin {
@@ -52,16 +61,23 @@ export async function cloudLoadWins(): Promise<CloudWin[]> {
   return (data ?? []) as CloudWin[];
 }
 
-export async function cloudAddWin(w: {
+/**
+ * Insert-or-update a win by its (UUID) id. Passing the client-generated id +
+ * created_at keeps wins reconciled across devices and makes the migration
+ * idempotent (re-running never duplicates). Photos sync separately as URLs.
+ */
+export async function cloudUpsertWin(w: {
+  id: string;
   hand_id: string | null;
   hand_label: string | null;
   note: string;
   photo_url: string | null;
+  created_at: string;
 }): Promise<void> {
   const sb = await getSupabase();
   const id = await uid();
   if (!sb || !id) return;
-  await sb.from('wins').insert({ user_id: id, ...w });
+  await sb.from('wins').upsert({ user_id: id, ...w });
 }
 
 export async function cloudDeleteWin(id: string): Promise<void> {
