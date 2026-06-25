@@ -137,6 +137,50 @@ function fireTileRain(el: HTMLElement | null) {
     ).onfinish = () => { t.remove(); done(); };
   }
 }
+
+// GAME WON gets its own celebration: a burst of gold stars (matching the
+// banner's star motif) that rain + twinkle — distinct from the tile-confetti.
+function fireStarBurst(el: HTMLElement | null) {
+  if (!el) return;
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const W = el.clientWidth;
+  const H = el.clientHeight;
+  const colors = ['#F5A524', '#FFD874', '#FFE08A', '#FFFFFF'];
+  const layer = document.createElement('div');
+  layer.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4;border-radius:inherit';
+  el.appendChild(layer);
+  let remaining = 16;
+  const done = () => { if (--remaining <= 0) layer.remove(); };
+  for (let i = 0; i < 16; i++) {
+    const size = 14 + Math.round(Math.random() * 14);
+    const star = document.createElement('div');
+    const x = Math.random() * (W - size);
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    star.textContent = '★';
+    star.style.cssText = `position:absolute;left:${x.toFixed(0)}px;top:${-size - 8}px;font-size:${size}px;line-height:1;color:${c};text-shadow:0 1px 3px rgba(0,0,0,.25)`;
+    layer.appendChild(star);
+    const sway = (Math.random() - 0.5) * 52;
+    const rot = (Math.random() - 0.5) * 540;
+    const dur = 1400 + Math.random() * 1100;
+    const delay = Math.random() * 450;
+    star.animate(
+      [
+        { transform: 'translate(0,0) rotate(0deg) scale(.5)', opacity: 0 },
+        { transform: `translate(${(sway * 0.4).toFixed(0)}px,${Math.round(H * 0.3)}px) rotate(${(rot * 0.3).toFixed(0)}deg) scale(1)`, opacity: 1, offset: 0.18 },
+        { transform: `translate(${sway.toFixed(0)}px,${H + size + 16}px) rotate(${rot.toFixed(0)}deg) scale(1)`, opacity: 1, offset: 0.85 },
+        { transform: `translate(${sway.toFixed(0)}px,${H + size + 30}px) rotate(${rot.toFixed(0)}deg) scale(.85)`, opacity: 0 },
+      ],
+      { duration: dur, delay, easing: 'cubic-bezier(.35,.5,.5,1)' },
+    ).onfinish = () => { star.remove(); done(); };
+  }
+}
+
+// Fire the right celebration for a milestone banner: the "clear" milestones
+// rain tile-confetti; GAME WON gets the gold star-burst.
+function fireBanner(el: HTMLElement | null, kind: FeedKind) {
+  if (kind === 'game_won') fireStarBurst(el);
+  else fireTileRain(el);
+}
 import PageTitle from './PageTitle';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
@@ -478,11 +522,14 @@ function FeedCard({
   const firedRef = useRef(false);
 
   const kind = post.kind ?? 'mahj';
+  // Every rare milestone banner celebrates with tile-confetti.
+  const firesConfetti =
+    kind === 'card_cleared' || kind === 'section_cleared' || kind === 'challenge_done' || kind === 'game_won';
 
-  // The FULL CARD banner auto-fires its tile-confetti once when it scrolls
+  // A milestone banner auto-fires its tile-confetti once when it scrolls
   // ≥55% into view, and re-fires on tap (design frame 8).
   useEffect(() => {
-    if (kind !== 'card_cleared') return;
+    if (!firesConfetti) return;
     const el = bannerRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
@@ -490,7 +537,7 @@ function FeedCard({
         for (const e of entries) {
           if (e.isIntersecting && e.intersectionRatio >= 0.55 && !firedRef.current) {
             firedRef.current = true;
-            fireTileRain(el);
+            fireBanner(el, kind);
           }
         }
       },
@@ -498,7 +545,7 @@ function FeedCard({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [kind]);
+  }, [firesConfetti, kind]);
 
   useEffect(() => {
     if (!post.photo) return;
@@ -546,9 +593,9 @@ function FeedCard({
             <div
               className="post-banner"
               data-kind={kind}
-              ref={kind === 'card_cleared' ? bannerRef : undefined}
-              role={kind === 'card_cleared' ? 'button' : undefined}
-              onClick={kind === 'card_cleared' ? () => fireTileRain(bannerRef.current) : undefined}
+              ref={firesConfetti ? bannerRef : undefined}
+              role={firesConfetti ? 'button' : undefined}
+              onClick={firesConfetti ? () => fireBanner(bannerRef.current, kind) : undefined}
             >
               <BannerMotif kind={kind} />
               <div className="pb-eyebrow">{post.eyebrow ?? KIND_EYEBROW[kind] ?? badge.label}</div>
