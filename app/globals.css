@@ -1036,13 +1036,13 @@ a:focus-visible,
 }
 .btn.coral,
 .btn.accent {
-  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 82%, #000));
+  background: var(--accent);
 }
 .btn.green {
-  background: linear-gradient(180deg, var(--green), color-mix(in srgb, var(--green) 82%, #000));
+  background: var(--green);
 }
 .btn.danger {
-  background: linear-gradient(180deg, #e8473e, #c9362e);
+  background: #e8473e;
   color: #fff;
 }
 .btn.ghost {
