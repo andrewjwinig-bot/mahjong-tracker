@@ -175,7 +175,14 @@ export default function TrophyShelf({
         <div className="trophy-grid">
           {badges.map((b) => (
             <div className="trophy" data-earned={b.earned} key={b.id} title={b.desc}>
-              <span className="trophy-emoji">{b.earned ? b.emoji : <IconLock size={22} />}</span>
+              <span className="trophy-emoji-wrap">
+                <span className="trophy-emoji">{b.emoji}</span>
+                {!b.earned && (
+                  <span className="trophy-lock" aria-hidden>
+                    <IconLock size={11} />
+                  </span>
+                )}
+              </span>
               <span className="trophy-name">{b.name}</span>
               <span className="trophy-desc">{b.desc}</span>
             </div>

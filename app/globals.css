@@ -3885,6 +3885,14 @@ label.lbl {
   border: 2.5px solid var(--brand);
   box-shadow: 0 4px 14px rgba(20, 22, 42, 0.1);
 }
+/* Wrap holds the emblem + a corner lock chip; only the emblem dims when
+   locked, so the lock chip stays crisp (parent opacity would composite both). */
+.trophy-emoji-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .trophy-emoji {
   font-size: 28px;
   line-height: 1.1;
@@ -3893,6 +3901,26 @@ label.lbl {
   justify-content: center;
   min-height: 30px;
   color: #c2c2ca;
+}
+/* Locked trophies still show their own emblem, just desaturated + dimmed —
+   never a wall of identical padlocks. */
+.trophy[data-earned="false"] .trophy-emoji {
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+.trophy-lock {
+  position: absolute;
+  right: -7px;
+  bottom: -4px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid rgba(20, 22, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
 }
 .trophy[data-earned="true"] .trophy-emoji {
   color: var(--brand);
