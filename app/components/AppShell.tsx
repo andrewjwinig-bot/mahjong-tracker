@@ -386,6 +386,7 @@ export default function AppShell() {
               <CardTab
                 card={card}
                 handCounts={handCounts}
+                bestStreak={bestStreak}
                 handNotes={handNotes}
                 wins={wins}
                 feed={socialState?.feed ?? []}

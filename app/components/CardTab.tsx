@@ -15,6 +15,7 @@ import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
+import { computeBadges } from '../lib/badges';
 import { IconTrophy } from './uiIcons';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -22,6 +23,7 @@ type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 interface Props {
   card: MahjongCard;
   handCounts: Record<string, number>;
+  bestStreak: number;
   handNotes: Record<string, string>;
   wins: Win[];
   feed: FeedPost[];
@@ -37,6 +39,7 @@ interface Props {
 export default function CardTab({
   card,
   handCounts,
+  bestStreak,
   handNotes,
   wins,
   feed,
@@ -68,6 +71,12 @@ export default function CardTab({
   );
 
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
+
+  // Live trophy progress for the Stats & Trophies shortcut.
+  const trophies = useMemo(() => {
+    const badges = computeBadges(card, handCounts, bestStreak);
+    return { earned: badges.filter((b) => b.earned).length, total: badges.length };
+  }, [card, handCounts, bestStreak]);
 
   const stats = useMemo(() => {
     let cleared = 0;
@@ -167,9 +176,19 @@ export default function CardTab({
       </div>
 
       <button className="trophy-link" onClick={onTrophies}>
-        <IconTrophy size={17} />
-        <span>Stats &amp; Trophies</span>
-        <span className="tl-chev">›</span>
+        <span className="tl-emblem" aria-hidden>
+          <IconTrophy size={18} />
+        </span>
+        <span className="tl-text">
+          <span className="tl-title">Stats &amp; Trophies</span>
+          <span className="tl-sub">Badges · streaks · records</span>
+        </span>
+        <span className="tl-right">
+          <span className="tl-count">
+            {trophies.earned}/{trophies.total}
+          </span>
+          <span className="tl-chev" aria-hidden>›</span>
+        </span>
       </button>
 
       <button className="mahj-hero" onClick={() => openLog()}>
