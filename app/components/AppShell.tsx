@@ -31,6 +31,7 @@ import Splash from './Splash';
 import TablesTab from './TablesTab';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
+import ThemeSheet from './ThemeSheet';
 import Onboarding from './Onboarding';
 import TrophyShelf from './TrophyShelf';
 import Tutorial from './Tutorial';
@@ -38,7 +39,7 @@ import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
 import GameScorer from './GameScorer';
 import PracticeSheet from './PracticeSheet';
-import { IconSettings } from './uiIcons';
+import { IconSettings, IconPalette } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
@@ -69,6 +70,7 @@ export default function AppShell() {
   const [wins, setWins] = useState<Win[]>([]);
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
   const [theme, setThemeState] = useState<ThemeId>('felt');
   const [account, setAccount] = useState<Account | null>(null);
   const [experience, setExperienceState] = useState<Experience>('beginner');
@@ -377,6 +379,9 @@ export default function AppShell() {
       ) : (
         <>
       <div className="app">
+        <button className="gear theme-btn" onClick={() => setThemeOpen(true)} aria-label="Change theme">
+          <IconPalette size={22} />
+        </button>
         <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
           <IconSettings size={22} />
         </button>
@@ -471,6 +476,10 @@ export default function AppShell() {
           }}
           onClose={() => setSettingsOpen(false)}
         />
+      )}
+
+      {themeOpen && (
+        <ThemeSheet theme={theme} onTheme={changeTheme} onClose={() => setThemeOpen(false)} />
       )}
 
       {editorOpen && (

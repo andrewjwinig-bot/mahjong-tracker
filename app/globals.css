@@ -6315,3 +6315,16 @@ label.lbl {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Quick theme switcher — palette button sits just left of the gear, opens the
+   one-tap Theme sheet. */
+.theme-btn {
+  right: 62px;
+}
+.theme-sheet-sub {
+  margin: -2px 2px 14px;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+}
