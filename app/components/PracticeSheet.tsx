@@ -152,7 +152,7 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
         </button>
         {!pro && (
           <p style={{ margin: '8px 2px 0', textAlign: 'center', fontSize: 11.5, fontWeight: 700, color: 'var(--muted)' }}>
-            1 free analysis — go Pro for unlimited practice.
+            1 free analysis — go VIP for unlimited practice.
           </p>
         )}
 

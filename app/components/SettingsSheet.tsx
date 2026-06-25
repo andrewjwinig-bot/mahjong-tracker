@@ -11,6 +11,7 @@ import { fxOn, setFx } from '../lib/sound';
 import { getPref, setPref } from '../lib/prefs';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
+import { ProBanner, ProCrown } from './ProUpsell';
 import { IconCard } from './uiIcons';
 import { setPro } from '../lib/pro';
 import { usePro } from '../lib/usePro';
@@ -177,17 +178,22 @@ export default function SettingsSheet({
       </button>
 
       {/* Pro upsell */}
-      <button className="pro-upsell" data-pro={pro} onClick={() => (pro ? undefined : setPaywall(true))}>
-        <span className="pu-stripe" aria-hidden />
-        <span className="pu-tile" aria-hidden>★</span>
-        <span className="pu-body">
-          <span className="pu-title">Club Mahj Pro</span>
-          <span className="pu-sub">
-            {pro ? 'Thanks for going Pro — everything’s unlocked.' : 'Unlimited tables, full stats & every theme.'}
+      {pro ? (
+        <div className="pro-active">
+          <span className="pro-active-tile" aria-hidden>
+            <ProCrown size={22} />
           </span>
-        </span>
-        <span className="pu-cta">{pro ? 'PRO ✓' : 'GO PRO'}</span>
-      </button>
+          <span className="probanner-text">
+            <span className="probanner-title">
+              You’re<span className="probanner-pro"> VIP</span>
+            </span>
+            <span className="probanner-sub">Thanks for joining the club — everything’s unlocked.</span>
+          </span>
+          <span className="pro-active-badge">VIP ✓</span>
+        </div>
+      ) : (
+        <ProBanner onClick={() => setPaywall(true)} sub="Unlimited tables, full stats & every theme." />
+      )}
 
       <div className="set-label">APP THEME</div>
       <div className="theme-grid2">

@@ -195,7 +195,7 @@ function TablesList({
       </button>
       {atLimit && (
         <p style={{ margin: '8px 2px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'var(--muted)' }}>
-          Free includes {FREE_TABLE_LIMIT} tables — go Pro for unlimited.
+          Free includes {FREE_TABLE_LIMIT} tables — go VIP for unlimited.
         </p>
       )}
 
