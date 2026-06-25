@@ -199,6 +199,9 @@ interface Props {
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+  /** Moderation (cloud only): flag a post / block its author. */
+  onReport?: (id: string, authorId: string) => void;
+  onBlock?: (authorId: string) => void;
   onScore: () => void;
   onOpenTables: (tableId: string) => void;
 }
@@ -263,9 +266,12 @@ export default function GroupTab({
   onToggleLike,
   onAddComment,
   onAddFriend,
+  onReport,
+  onBlock,
   onScore,
   onOpenTables,
 }: Props) {
+  const cloud = isCloudEnabled();
   const [nextG, setNextG] = useState<NextGame | null>(null);
   useEffect(() => {
     let alive = true;
@@ -482,15 +488,21 @@ export default function GroupTab({
           </div>
         </div>
       ) : (
-        feed.map((p) => (
-          <FeedCard
-            key={p.id}
-            post={p}
-            profile={profile}
-            onToggleLike={onToggleLike}
-            onAddComment={onAddComment}
-          />
-        ))
+        feed.map((p) => {
+          const isMine = p.memberId === YOU_ID || p.memberName === profile.name;
+          return (
+            <FeedCard
+              key={p.id}
+              post={p}
+              profile={profile}
+              onToggleLike={onToggleLike}
+              onAddComment={onAddComment}
+              canModerate={cloud && !isMine && !!onReport}
+              onReport={onReport}
+              onBlock={onBlock}
+            />
+          );
+        })
       )}
 
       <div style={{ marginTop: 22 }}>
@@ -498,7 +510,9 @@ export default function GroupTab({
       </div>
 
       <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
-        Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).
+        {cloud
+          ? 'The feed is live — posts are from real players. The leaderboard still shows demo group-mates for now.'
+          : 'Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).'}
       </p>
     </div>
   );
@@ -509,14 +523,22 @@ function FeedCard({
   profile,
   onToggleLike,
   onAddComment,
+  canModerate,
+  onReport,
+  onBlock,
 }: {
   post: FeedPost;
   profile: Profile;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
+  canModerate?: boolean;
+  onReport?: (id: string, authorId: string) => void;
+  onBlock?: (authorId: string) => void;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [moderated, setModerated] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const bannerRef = useRef<HTMLDivElement | null>(null);
   const firedRef = useRef(false);
@@ -548,11 +570,14 @@ function FeedCard({
   }, [firesConfetti, kind]);
 
   useEffect(() => {
-    if (!post.photo) return;
-    const u = URL.createObjectURL(post.photo);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [post.photo]);
+    // Prefer the on-device Blob; fall back to the synced cloud URL.
+    if (post.photo) {
+      const u = URL.createObjectURL(post.photo);
+      setUrl(u);
+      return () => URL.revokeObjectURL(u);
+    }
+    setUrl(post.photoUrl ?? null);
+  }, [post.photo, post.photoUrl]);
 
   function submitComment() {
     const text = draft.trim();
@@ -563,6 +588,19 @@ function FeedCard({
   }
 
   const badge = KIND_BADGE[kind];
+
+  if (moderated) {
+    return (
+      <div
+        className="post"
+        style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontWeight: 700, padding: 16 }}
+      >
+        {moderated === 'reported'
+          ? 'Thanks — this post was reported and hidden.'
+          : `You blocked ${post.memberName}. Their posts are hidden.`}
+      </div>
+    );
+  }
 
   return (
     <div className="post">
@@ -576,6 +614,84 @@ function FeedCard({
         <span className="post-badge" style={{ background: badge.color }}>
           {badge.label}
         </span>
+        {canModerate && (
+          <div style={{ position: 'relative' }}>
+            <button
+              aria-label="Post options"
+              onClick={() => setMenuOpen((v) => !v)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 20,
+                lineHeight: 1,
+                padding: '0 4px',
+                color: 'var(--muted)',
+              }}
+            >
+              ⋯
+            </button>
+            {menuOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: '100%',
+                  zIndex: 20,
+                  background: 'var(--card, #fff)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: 10,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                  overflow: 'hidden',
+                  minWidth: 168,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onReport?.(post.id, post.memberId);
+                    setModerated('reported');
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 14px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'var(--ink, #1a1410)',
+                  }}
+                >
+                  Report post
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onBlock?.(post.memberId);
+                    setModerated('blocked');
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 14px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: 13.5,
+                    fontWeight: 700,
+                    color: 'var(--danger, #C0392B)',
+                  }}
+                >
+                  Block {post.memberName}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {kind === 'mahj'

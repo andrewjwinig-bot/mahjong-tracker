@@ -59,6 +59,8 @@ export interface FeedPost {
   handLabel: string | null;
   note: string;
   photo: Blob | null;
+  /** Cloud URL for the photo (cross-device display, when there's no local Blob). */
+  photoUrl?: string | null;
   /** Vertical focal point (0–100%) for cover-cropped displays. Default 50. */
   photoPos?: number;
   createdAt: number;

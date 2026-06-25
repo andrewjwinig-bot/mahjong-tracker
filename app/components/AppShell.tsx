@@ -14,6 +14,14 @@ import {
   mirrorWin,
   mirrorRemoveWin,
 } from '../lib/cloudSync';
+import {
+  loadCloudFeed,
+  mirrorCreatePost,
+  mirrorToggleLike,
+  mirrorAddComment,
+  reportPost as cloudReportPost,
+  blockUser as cloudBlockUser,
+} from '../lib/cloudSocial';
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
@@ -100,6 +108,9 @@ export default function AppShell() {
       setCard(syncedCard);
       saveCustomCard(syncedCard);
     }
+    // Replace the demo feed with the real cloud feed (empty for new users).
+    const cloudFeed = await loadCloudFeed();
+    if (cloudFeed) setSocialState((prev) => (prev ? { ...prev, feed: cloudFeed } : prev));
   }, []);
 
   // Load all local state once on mount.
@@ -196,6 +207,7 @@ export default function AppShell() {
         comments: [],
       };
       void social.addFeedPost(post);
+      mirrorCreatePost(post);
       return { ...prev, feed: [post, ...prev.feed] };
     });
   }, []);
@@ -222,6 +234,7 @@ export default function AppShell() {
           title,
         };
         void social.addFeedPost(post);
+        mirrorCreatePost(post);
         return { ...prev, feed: [post, ...prev.feed] };
       });
     },
@@ -233,6 +246,7 @@ export default function AppShell() {
     setSocialState((prev) => {
       if (!prev) return prev;
       void social.toggleLike(id, liked);
+      mirrorToggleLike(id, liked);
       return {
         ...prev,
         feed: prev.feed.map((p) =>
@@ -253,6 +267,7 @@ export default function AppShell() {
         createdAt: Date.now(),
       };
       void social.addComment(id, comment);
+      mirrorAddComment(id, text);
       return {
         ...prev,
         feed: prev.feed.map((p) =>
@@ -260,6 +275,19 @@ export default function AppShell() {
         ),
       };
     });
+  }, []);
+
+  // Moderation: flag a post for review, or block a user (hides their content
+  // and removes their posts from your feed immediately). Cloud-only.
+  const handleReportPost = useCallback((id: string, authorId: string) => {
+    cloudReportPost(id, authorId);
+  }, []);
+
+  const handleBlockUser = useCallback((memberId: string) => {
+    cloudBlockUser(memberId);
+    setSocialState((prev) =>
+      prev ? { ...prev, feed: prev.feed.filter((p) => p.memberId !== memberId) } : prev,
+    );
   }, []);
 
   const addFriend = useCallback((name: string, avatar: social.TileAvatar) => {
@@ -382,6 +410,8 @@ export default function AppShell() {
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
+                onReport={handleReportPost}
+                onBlock={handleBlockUser}
                 onScore={() => openScorer()}
                 onOpenTables={(id) => {
                   setTablesTarget(id);
