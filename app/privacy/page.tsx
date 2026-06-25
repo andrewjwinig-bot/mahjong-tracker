@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import LegalChrome from '../components/LegalChrome';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy · Mahjong Tracker',
-  description: 'How Mahjong Tracker collects, uses, and protects your information.',
+  title: 'Privacy Policy · Club Mahj',
+  description: 'How Club Mahj collects, uses, and protects your information.',
 };
 
 export default function PrivacyPage() {
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
     <LegalChrome title="Privacy Policy" updated="June 25, 2026">
       <p>
         This Privacy Policy explains how Black Pug Studios LLC (“we,” “us,” or “our”) collects,
-        uses, shares, and protects information in connection with the Mahjong Tracker mobile and web
+        uses, shares, and protects information in connection with the Club Mahj mobile and web
         application and related services (the “App”). By using the App you agree to this Policy.
       </p>
 

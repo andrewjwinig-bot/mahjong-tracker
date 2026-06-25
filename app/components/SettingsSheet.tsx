@@ -181,7 +181,7 @@ export default function SettingsSheet({
         <span className="pu-stripe" aria-hidden />
         <span className="pu-tile" aria-hidden>★</span>
         <span className="pu-body">
-          <span className="pu-title">Let’s Mahj Pro</span>
+          <span className="pu-title">Club Mahj Pro</span>
           <span className="pu-sub">
             {pro ? 'Thanks for going Pro — everything’s unlocked.' : 'Unlimited tables, full stats & every theme.'}
           </span>
@@ -222,13 +222,13 @@ export default function SettingsSheet({
         <button
           className="signout"
           onClick={() => {
-            if (confirm('Sign out of Let’s Mahj? Your saved games stay on this device.')) onSignOut();
+            if (confirm('Sign out of Club Mahj? Your saved games stay on this device.')) onSignOut();
           }}
         >
           SIGN OUT
         </button>
       )}
-      <div className="set-version">Let’s Mahj · v1.0</div>
+      <div className="set-version">Club Mahj · v1.0</div>
     </>
   );
 

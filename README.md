@@ -1,4 +1,4 @@
-# 🀄 Mahjong Tracker
+# 🀄 Club Mahj
 
 A playful, gamified scorecard for American mahjong: track every hand you win,
 learn the tiles, chase seasonal challenges, and play along with friends.

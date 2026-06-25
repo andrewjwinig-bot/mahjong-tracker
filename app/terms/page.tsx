@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import LegalChrome from '../components/LegalChrome';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service · Mahjong Tracker',
-  description: 'The terms that govern your use of Mahjong Tracker.',
+  title: 'Terms of Service · Club Mahj',
+  description: 'The terms that govern your use of Club Mahj.',
 };
 
 export default function TermsPage() {
@@ -14,7 +14,7 @@ export default function TermsPage() {
       </p>
 
       <p>
-        These Terms of Service (“Terms”) govern your access to and use of the Mahjong Tracker mobile
+        These Terms of Service (“Terms”) govern your access to and use of the Club Mahj mobile
         and web application and related services (the “App”), provided by [Developer / Company Name]
         (“we,” “us,” or “our”). By creating an account or using the App, you agree to these Terms and
         to our Privacy Policy. If you do not agree, do not use the App.

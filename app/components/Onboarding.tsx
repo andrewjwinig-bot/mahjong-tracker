@@ -216,7 +216,7 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
       <div className="onboard-card">
         <div className="onboard-head">
           <div className="logo onboard-logo">
-            <div className="logo-kicker">LET’S</div>
+            <div className="logo-kicker">CLUB</div>
             <div className="logo-word">Mahj</div>
           </div>
           <p className="sub">The Original Mahjong Social Network</p>

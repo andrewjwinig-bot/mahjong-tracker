@@ -32,7 +32,7 @@ export async function exportData(): Promise<void> {
   ]);
 
   const payload = {
-    app: 'Mahjong Tracker',
+    app: 'Club Mahj',
     exportedAt: new Date().toISOString(),
     note: 'Photos and on-device social/table content are not included in this export.',
     settings: localStorageDump(),
@@ -67,8 +67,9 @@ export async function importData(file: File): Promise<ImportSummary> {
   } catch {
     throw new Error('That file isn’t valid JSON.');
   }
-  if (!data || data.app !== 'Mahjong Tracker') {
-    throw new Error('That doesn’t look like a Mahjong Tracker backup.');
+  // Accept the current marker and the legacy "Mahjong Tracker" one (pre-rename).
+  if (!data || (data.app !== 'Club Mahj' && data.app !== 'Mahjong Tracker')) {
+    throw new Error('That doesn’t look like a Club Mahj backup.');
   }
 
   const summary: ImportSummary = { hands: 0, notes: 0, wins: 0, profileRestored: false };

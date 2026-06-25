@@ -20,7 +20,7 @@ export default function LegalChrome({
         <p className="legal-updated">Last updated: {updated}</p>
       </header>
       <div className="legal-body">{children}</div>
-      <footer className="legal-foot">© {new Date().getFullYear()} Mahjong Tracker</footer>
+      <footer className="legal-foot">© {new Date().getFullYear()} Black Pug Studios LLC</footer>
     </div>
   );
 }

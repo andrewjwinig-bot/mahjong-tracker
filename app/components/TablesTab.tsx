@@ -222,7 +222,7 @@ function TablesList({
         <ShareModal
           payload={{
             title: 'Invite Your Crew 👯',
-            text: `Come track your mahjong wins with me on Let's Mahj — let's race to clear all 70 hands! 🀄`,
+            text: `Come track your mahjong wins with me on Club Mahj — let's race to clear all 70 hands! 🀄`,
             url: typeof window !== 'undefined' ? window.location.origin : '',
           }}
           onClose={() => setInviteOpen(false)}
@@ -663,7 +663,7 @@ function eventFor(table: Table, opt: PollOption): CalEvent {
     title: `🀄 Mahjong — ${table.name}`,
     start: new Date(y, m - 1, d, hh, mm),
     durationMins: 180,
-    description: `Game night with ${table.name}. Scheduled via Mahjong Tracker.`,
+    description: `Game night with ${table.name}. Scheduled via Club Mahj.`,
   };
 }
 

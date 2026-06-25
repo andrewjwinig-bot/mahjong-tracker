@@ -13,7 +13,7 @@ export default function OfficialCardCallout({ blurb }: { blurb?: string }) {
         <div className="cc-title">Play with the official card</div>
         <p className="cc-blurb">
           {blurb ??
-            'Let’s Mahj is a companion scorecard — for real games, grab your official National Mah Jongg League card. A fresh one comes out every year.'}
+            'Club Mahj is a companion scorecard — for real games, grab your official National Mah Jongg League card. A fresh one comes out every year.'}
         </p>
         <a
           className="btn"
