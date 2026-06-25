@@ -153,11 +153,15 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
       } else {
         await cloudSignIn(email.trim(), password);
         const profile = await cloudGetProfile();
-        finish({
-          username: profile?.username || email.split('@')[0],
-          email,
-          experience: profile?.experience || experience,
-        });
+        // Returning sign-in: skip the first-launch "get the card" prompt.
+        finish(
+          {
+            username: profile?.username || email.split('@')[0],
+            email,
+            experience: profile?.experience || experience,
+          },
+          { showCard: false },
+        );
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Try again.');
@@ -166,7 +170,10 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
     }
   }
 
-  function finish(p: { username: string; email: string; experience: Experience }) {
+  function finish(
+    p: { username: string; email: string; experience: Experience },
+    opts?: { showCard?: boolean },
+  ) {
     const acc: Account = {
       username: p.username || 'You',
       email: p.email.trim().toLowerCase(),
@@ -175,7 +182,11 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
     };
     saveAccount(acc); // password is never stored on-device
     setAccount(acc);
-    setStep('card'); // one-time "get the official card" prompt before entering
+    if (opts?.showCard === false) {
+      onDone(acc); // returning sign-in → straight into the app
+    } else {
+      setStep('card'); // first sign-up: one-time "get the official card" prompt
+    }
   }
 
   // Step 2: encourage buying the official card on first launch.
