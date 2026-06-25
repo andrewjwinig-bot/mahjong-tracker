@@ -133,11 +133,15 @@ export function WinCard({
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
-    if (!win.photo) return;
-    const u = URL.createObjectURL(win.photo);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [win.photo]);
+    // Prefer the on-device Blob; fall back to the synced cloud URL (e.g. a win
+    // restored on another device, where there's no local photo).
+    if (win.photo) {
+      const u = URL.createObjectURL(win.photo);
+      setUrl(u);
+      return () => URL.revokeObjectURL(u);
+    }
+    setUrl(win.photoUrl ?? null);
+  }, [win.photo, win.photoUrl]);
 
   const when = new Date(win.createdAt).toLocaleDateString(undefined, {
     month: 'short',
