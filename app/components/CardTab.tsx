@@ -167,9 +167,14 @@ export default function CardTab({
       </div>
 
       <button className="trophy-link" onClick={onTrophies}>
-        <IconTrophy size={17} />
-        <span>Stats &amp; Trophies</span>
-        <span className="tl-chev">›</span>
+        <span className="tl-emblem" aria-hidden>
+          <IconTrophy size={18} />
+        </span>
+        <span className="tl-text">
+          <span className="tl-title">Stats &amp; Trophies</span>
+          <span className="tl-sub">Badges · streaks · records</span>
+        </span>
+        <span className="tl-chev" aria-hidden>›</span>
       </button>
 
       <button className="mahj-hero" onClick={() => openLog()}>
