@@ -90,8 +90,10 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
             official card.
           </p>
           <p>
-            <strong>Your privacy.</strong> For now everything lives on this device — no account,
-            nothing leaves your phone. Cloud accounts &amp; sync arrive with the App Store release.
+            <strong>Your privacy.</strong>{' '}
+            {cloud
+              ? 'Your account and game data sync securely to the cloud so you can pick up on any device. Back up a copy or delete your account anytime below.'
+              : 'For now everything lives on this device — no account, nothing leaves your phone. Cloud accounts & sync arrive with the App Store release.'}
           </p>
           <p className="legal-fine">Read our policies (they open in your browser):</p>
           <div className="row">
@@ -152,13 +154,14 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
             style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             onClick={() => setConfirming(true)}
           >
-            <IconTrash size={18} /> Delete all my data
+            <IconTrash size={18} /> {cloud ? 'Delete my account' : 'Delete all my data'}
           </button>
         ) : (
           <div className="card" style={{ marginTop: 10, padding: 14 }}>
             <p style={{ margin: '0 0 12px', fontWeight: 700, fontSize: 13.5, color: 'var(--ink-soft)' }}>
-              This permanently erases everything stored on this device — your account, progress, wins,
-              tables, and settings. This can’t be undone.
+              {cloud
+                ? 'This permanently deletes your account and all of your data — on this device and in the cloud (progress, wins, tables, and settings). This can’t be undone.'
+                : 'This permanently erases everything stored on this device — your account, progress, wins, tables, and settings. This can’t be undone.'}
             </p>
             <div className="row" style={{ marginTop: 0 }}>
               <button className="btn ghost" onClick={() => setConfirming(false)} disabled={busy}>
