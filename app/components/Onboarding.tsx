@@ -6,6 +6,7 @@ import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../li
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import OfficialCardCallout from './OfficialCardCallout';
+import { TileFan } from './BrandMark';
 import type { ReactNode } from 'react';
 import type { TileFace } from '../lib/tileArt';
 import type { TileAvatar } from '../lib/social';
@@ -31,65 +32,6 @@ const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode; c
   { id: 'intermediate', label: 'Intermediate', blurb: 'I know the basics and want to improve.', icon: <IconTarget size={20} />, color: '#2E86D4' },
   { id: 'expert', label: 'Expert', blurb: 'Seasoned — give me the deep cuts.', icon: <IconCrown size={20} />, color: '#F5A524' },
 ];
-
-// The 7-tile arc behind the wordmark — exact glyphs, suit colors and tilts from
-// design frame 01 (萬 · bamboo · dot · 中 · flower · 東 · star).
-const ArcBam = () => (
-  <svg width="20" height="20" viewBox="0 0 100 100" aria-hidden>
-    <g fill="#15803D">
-      <rect x="25" y="14" width="12" height="72" rx="6" />
-      <rect x="44" y="14" width="12" height="72" rx="6" />
-      <rect x="63" y="14" width="12" height="72" rx="6" />
-      <rect x="21" y="46" width="58" height="8" rx="4" />
-    </g>
-  </svg>
-);
-const ArcDot = () => (
-  <svg width="20" height="20" viewBox="0 0 100 100" aria-hidden>
-    <circle cx="50" cy="50" r="30" fill="none" stroke="#2E86D4" strokeWidth="11" />
-    <circle cx="50" cy="50" r="12" fill="#2E86D4" />
-  </svg>
-);
-const ArcFlower = () => (
-  <svg width="22" height="22" viewBox="0 0 100 100" aria-hidden>
-    <g fill="#E2568F">
-      {[0, 72, 144, 216, 288].map((a) => (
-        <ellipse key={a} cx="50" cy="23" rx="13" ry="23" transform={`rotate(${a} 50 50)`} />
-      ))}
-    </g>
-    <circle cx="50" cy="50" r="11" fill="#F4C84A" />
-    <circle cx="50" cy="50" r="5" fill="#C97A1A" />
-  </svg>
-);
-const ArcStar = () => (
-  <svg width="22" height="22" viewBox="0 0 100 100" aria-hidden>
-    <path d="M50 8 L61 38 L94 39 L68 60 L77 93 L50 74 L23 93 L32 60 L6 39 L39 38 Z" fill="#F5A524" />
-    <path d="M50 30 L56 45 L72 46 L59 56 L64 72 L50 63 L36 72 L41 56 L28 46 L44 45 Z" fill="#FFD874" />
-    <circle cx="50" cy="52" r="5" fill="#C97A1A" />
-  </svg>
-);
-
-const ARC: { node: ReactNode; rot: number; color?: string }[] = [
-  { node: '萬', rot: -9, color: '#C0392B' },
-  { node: <ArcBam />, rot: 5 },
-  { node: <ArcDot />, rot: -4 },
-  { node: '中', rot: 6, color: '#C0392B' },
-  { node: <ArcFlower />, rot: -5 },
-  { node: '東', rot: 4, color: '#1A1410' },
-  { node: <ArcStar />, rot: -7 },
-];
-
-function SignupArc() {
-  return (
-    <div className="su-arc" aria-hidden>
-      {ARC.map((t, i) => (
-        <span key={i} className="su-tile" style={{ transform: `rotate(${t.rot}deg)`, color: t.color }}>
-          {t.node}
-        </span>
-      ))}
-    </div>
-  );
-}
 
 // Tap-to-select tile "wobble" (design frame 01 — the level icon shimmies).
 function wobbleTile(el: Element | null) {
@@ -215,12 +157,12 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
     <div className="onboard">
       <div className="onboard-card">
         <div className="onboard-head">
+          <TileFan size={132} className="onboard-fan" />
           <div className="logo onboard-logo">
             <div className="logo-kicker">CLUB</div>
             <div className="logo-word">Mahj</div>
           </div>
           <p className="sub">The Original Mahjong Social Network</p>
-          <SignupArc />
         </div>
 
         {!signingIn && (

@@ -383,7 +383,16 @@ a:focus-visible,
   letter-spacing: -2px;
   line-height: 0.9;
   color: var(--title-color, var(--ink));
-  text-shadow: var(--title-shadow, none);
+  /* "Printed tile" offset in the theme's deep tone — surface-dependent: on the
+     white-title felt family it reads as the brand drop-shadow; paper themes
+     (dark title) drop it below so dark-on-dark doesn't muddy. */
+  text-shadow: 2.5px 3px 0 var(--brand-deep);
+}
+[data-theme="crak"] .logo-word,
+[data-theme="wind"] .logo-word,
+[data-theme="dot"] .logo-word,
+[data-theme="flower"] .logo-word {
+  text-shadow: none;
 }
 .logo-dots {
   font-size: 22px;
@@ -4585,7 +4594,6 @@ label.lbl {
   color: var(--title-color, var(--brand));
   font-size: 54px;
   letter-spacing: -2px;
-  text-shadow: var(--title-shadow, none);
 }
 .onboard-head .sub {
   margin: 4px 0 0;
@@ -4593,32 +4601,10 @@ label.lbl {
   font-weight: 700;
   font-size: 13.5px;
 }
-/* Sign-up tile arc (design frame 01): 7 paper tiles, each tilted, with the suit
-   glyph/art in its own color. */
-.su-arc {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 5px;
-  margin: 18px 0 26px;
-}
-.su-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 43px;
-  border-radius: 5px;
-  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
-  border: 2px solid rgba(20, 22, 42, 0.1);
-  box-shadow: 0 3px 9px rgba(20, 22, 42, 0.13), inset 0 -3px 5px rgba(20, 22, 42, 0.05);
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  line-height: 1;
-}
-.su-tile svg {
+/* Club Mahj two-tile fan above the sign-up wordmark (brand lockup). */
+.onboard-fan {
   display: block;
+  margin: 0 auto 4px;
 }
 /* Experience-level icon sits on its own cream paper tile (frame 01). */
 .level-tile {
