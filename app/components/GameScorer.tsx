@@ -289,7 +289,7 @@ export default function GameScorer({
                         {lockedCount} more game{lockedCount === 1 ? '' : 's'} saved
                       </span>
                       <span className="lh-sub">
-                        Go Pro to keep your full history, rematch any game &amp; share scorecards.
+                        Go VIP to keep your full history, rematch any game &amp; share scorecards.
                       </span>
                     </span>
                     <span className="lh-cta">Unlock</span>

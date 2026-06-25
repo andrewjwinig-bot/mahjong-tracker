@@ -185,11 +185,11 @@ export default function SettingsSheet({
           </span>
           <span className="probanner-text">
             <span className="probanner-title">
-              You’re<span className="probanner-pro"> Pro</span>
+              You’re<span className="probanner-pro"> VIP</span>
             </span>
-            <span className="probanner-sub">Thanks for going Pro — everything’s unlocked.</span>
+            <span className="probanner-sub">Thanks for joining the club — everything’s unlocked.</span>
           </span>
-          <span className="pro-active-badge">PRO ✓</span>
+          <span className="pro-active-badge">VIP ✓</span>
         </div>
       ) : (
         <ProBanner onClick={() => setPaywall(true)} sub="Unlimited tables, full stats & every theme." />

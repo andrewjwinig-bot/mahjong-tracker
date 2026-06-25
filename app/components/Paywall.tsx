@@ -51,7 +51,7 @@ export default function Paywall({
 
   return (
     <div className="pro-scrim" onClick={onClose}>
-      <div className="pro-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Club Mahj Pro">
+      <div className="pro-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Club Mahj VIP">
         <div className="pro-grab" />
 
         <div className="pro-head">
@@ -59,7 +59,7 @@ export default function Paywall({
             <ProCrown size={34} />
           </span>
           <div className="pro-eyebrow">UNLOCK EVERYTHING</div>
-          <h2 className="pro-title">Club Mahj Pro</h2>
+          <h2 className="pro-title">Club Mahj VIP</h2>
           <p className="pro-sub">One membership. Every table, theme &amp; tile — yours.</p>
         </div>
 
@@ -100,7 +100,7 @@ export default function Paywall({
 
         <button className="pro-cta" onClick={goPro}>
           <span className="probanner-shine" aria-hidden />
-          Unlock Pro — {planPriceLabel(plan)}
+          Go VIP — {planPriceLabel(plan)}
         </button>
         <button className="pro-restore" onClick={restore}>
           RESTORE PURCHASES
@@ -135,7 +135,7 @@ export default function Paywall({
               <ProCrown size={48} />
             </span>
             <div className="pro-eyebrow">YOU’RE IN</div>
-            <h2 className="pro-cele-title">Welcome to Pro</h2>
+            <h2 className="pro-cele-title">Welcome to the Club</h2>
             <p className="pro-sub">Every table, theme &amp; tile is yours. Pull up a good seat.</p>
           </div>
         </div>

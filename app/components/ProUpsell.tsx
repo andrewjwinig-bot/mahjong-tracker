@@ -31,11 +31,11 @@ export function ProBanner({ onClick, sub }: { onClick: () => void; sub?: string 
       </span>
       <span className="probanner-text">
         <span className="probanner-title">
-          Club Mahj<span className="probanner-pro"> Pro</span>
+          Club Mahj<span className="probanner-pro"> VIP</span>
         </span>
         <span className="probanner-sub">{sub ?? 'Unlimited tables, every theme & cloud sync.'}</span>
       </span>
-      <span className="probanner-cta">GO PRO</span>
+      <span className="probanner-cta">GO VIP</span>
     </button>
   );
 }
