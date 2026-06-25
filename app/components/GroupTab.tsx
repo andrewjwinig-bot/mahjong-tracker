@@ -190,6 +190,7 @@ function fireBanner(el: HTMLElement | null, kind: FeedKind) {
   else fireTileRain(el);
 }
 import PageTitle from './PageTitle';
+import EmptyFeed from './EmptyFeed';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
@@ -516,19 +517,7 @@ export default function GroupTab({
       </div>
 
       {feed.length === 0 ? (
-        <div className="feed-empty">
-          <div className="fe-tiles" aria-hidden>
-            <span className="fe-tile">🀄</span>
-            <span className="fe-tile">🀅</span>
-            <span className="fe-tile">🀆</span>
-          </div>
-          <div className="fe-title">No mahjs called yet</div>
-          <div className="fe-sub">
-            {cloud
-              ? 'Add friends to see their mahjs here — or call your own on the Card and it lands right here.'
-              : 'Be the first — call Mahj on your Card and it’ll land right here for your crew to see.'}
-          </div>
-        </div>
+        <EmptyFeed />
       ) : (
         feed.map((p) => {
           const isMine = p.memberId === YOU_ID || p.memberName === profile.name;

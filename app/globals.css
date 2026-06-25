@@ -6139,3 +6139,179 @@ label.lbl {
 }
 @keyframes cmDot { 0%, 72%, 100% { transform: translateY(0); opacity: 0.4; } 36% { transform: translateY(-5px); opacity: 1; } }
 @keyframes cmRise { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* ===========================================================================
+   EMPTY STATES — "the pinwheel family" (Feed wall-build + Profile toss-in).
+   Exact 1:1 port of the Empty_State_Feed / Empty_State_Profile references.
+   Shared tile/die/glow vocabulary; per-surface formation, sizes, and copy.
+   ========================================================================== */
+.pw-card {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+}
+.pw-card-feed {
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(20, 22, 42, 0.13);
+  padding: 34px 26px 32px;
+}
+.pw-card-profile {
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.12);
+  padding: 24px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.pw-seam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  background: linear-gradient(180deg, rgba(26, 164, 92, 0.06), transparent);
+  pointer-events: none;
+}
+.pw-card-profile .pw-seam {
+  height: 60px;
+}
+.pw-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-stage-feed {
+  height: 172px;
+  margin-bottom: 22px;
+}
+.pw-stage-profile {
+  height: 120px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+.pw-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: pwGlow 3.6s ease-in-out infinite;
+}
+.pw-glow-feed {
+  width: 190px;
+  height: 150px;
+  background: radial-gradient(closest-side, rgba(26, 164, 92, 0.3), transparent);
+}
+.pw-glow-profile {
+  width: 150px;
+  height: 120px;
+  background: radial-gradient(closest-side, rgba(26, 164, 92, 0.28), transparent);
+  animation-name: pwGlowP;
+}
+.pw-field {
+  position: relative;
+}
+.pw-field-feed {
+  width: 151px;
+  height: 151px;
+}
+.pw-field-profile {
+  width: 168px;
+  height: 124px;
+}
+.pw-tile {
+  position: absolute;
+  border-radius: 4px;
+  background: linear-gradient(158deg, #249150 0%, #178043 52%, #0e5a2a 100%);
+  box-shadow: 0 3px 0 #e7dfcb, 0 6px 10px rgba(7, 24, 13, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.pw-die {
+  position: absolute;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffffff, #f0ebde);
+  border: 1px solid rgba(20, 22, 42, 0.1);
+  box-shadow: 0 4px 8px rgba(7, 24, 13, 0.32), inset 0 1px 0 #fff;
+  opacity: 0;
+}
+.pw-die-feed {
+  width: 22px;
+  height: 22px;
+}
+.pw-die-profile {
+  left: 72px;
+  top: 50px;
+  width: 24px;
+  height: 24px;
+  z-index: 5;
+  animation: pwDieIn 0.4s ease-out 0.85s forwards, pwDie 3s ease-in-out 0.85s infinite alternate;
+}
+.pw-pip {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+.pw-title {
+  font-family: "Bricolage Grotesque", var(--font-display), sans-serif;
+  font-weight: 800;
+  color: #15402c;
+  line-height: 1.05;
+}
+.pw-title-feed {
+  font-size: 25px;
+  letter-spacing: -0.4px;
+  margin-bottom: 9px;
+  text-align: center;
+}
+.pw-title-profile {
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.pw-body {
+  color: #6a7a70;
+}
+.pw-body-feed {
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 280px;
+  margin: 0 auto;
+  text-align: center;
+}
+.pw-body-profile {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.pw-body b {
+  font-weight: 700;
+  color: #15803d;
+}
+
+@keyframes pwGlow {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
+  50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.06); }
+}
+@keyframes pwGlowP {
+  0%, 100% { opacity: 0.28; transform: translate(-50%, -50%) scale(0.9); }
+  50% { opacity: 0.46; transform: translate(-50%, -50%) scale(1.06); }
+}
+@keyframes pwSlide {
+  from { opacity: 0; transform: translate(var(--fx), var(--fy)); }
+  to { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes pwToss {
+  from { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--tr0)) scale(0.55); }
+  to { opacity: 1; transform: translate(0, 0) rotate(var(--rf)) scale(1); }
+}
+@keyframes pwDie {
+  0%, 100% { transform: translateY(0) rotate(var(--dr)); }
+  50% { transform: translateY(-3px) rotate(var(--dr)); }
+}
+@keyframes pwDieIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
