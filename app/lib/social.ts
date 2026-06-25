@@ -69,6 +69,12 @@ export interface FeedPost {
   kind?: FeedKind;
   /** Headline for milestone posts ("Cleared all 2026 hands", "Won game night"). */
   title?: string;
+  /** Milestone banner: small eyebrow over the title (e.g. "★ GAME NIGHT WON"). */
+  eyebrow?: string;
+  /** Milestone banner: progress fraction shown by the bar (e.g. "42/42"). */
+  progress?: string;
+  /** game_won banner: the place/points badge (e.g. "🥇 1ST PLACE · +40 PTS"). */
+  place?: string;
 }
 
 export interface Group {
@@ -161,7 +167,7 @@ async function seedIfNeeded(): Promise<void> {
     // Milestone posts (typed) interleaved through the feed.
     {
       id: 'f5', memberId: 'm_sandra', memberName: 'Lily', avatar: DEMO_AVATARS.m_sandra,
-      kind: 'section_cleared', title: '2026 Cleared!', handLabel: null,
+      kind: 'section_cleared', title: '2026 Cleared!', eyebrow: 'SECTION COMPLETE', progress: '4/4', handLabel: null,
       note: 'Whole section done — onto Consecutive Run!', photo: null,
       createdAt: now - 9 * HOUR, likes: 9, likedByMe: false, comments: [
         { id: 'c5', author: 'Alison', avatar: DEMO_AVATARS.m_marsha, text: 'Machine! 🙌', createdAt: now - 8 * HOUR },
@@ -169,19 +175,19 @@ async function seedIfNeeded(): Promise<void> {
     },
     {
       id: 'f6', memberId: 'm_bev', memberName: 'Nicole', avatar: DEMO_AVATARS.m_bev,
-      kind: 'game_won', title: 'Won game night!', handLabel: null,
+      kind: 'game_won', title: 'Won game night!', eyebrow: '★ GAME NIGHT WON', place: '🥇 1ST PLACE · +40 PTS', handLabel: null,
       note: 'Nicole +40 · Lily +10 · Matthew −20 · Alison −30', photo: null,
       createdAt: now - 1 * DAY - 1 * HOUR, likes: 6, likedByMe: false, comments: [],
     },
     {
       id: 'f7', memberId: 'm_marsha', memberName: 'Alison', avatar: DEMO_AVATARS.m_marsha,
-      kind: 'challenge_done', title: 'Summer Kongs!', handLabel: null,
+      kind: 'challenge_done', title: 'Summer Kongs!', eyebrow: '★ SUMMER CHALLENGE · COMPLETE', progress: '42/42', handLabel: null,
       note: 'Season challenge complete 🥇', photo: null,
       createdAt: now - 3 * DAY, likes: 11, likedByMe: false, comments: [],
     },
     {
       id: 'f8', memberId: 'm_lois', memberName: 'Matthew', avatar: DEMO_AVATARS.m_lois,
-      kind: 'card_cleared', title: 'Card cleared!', handLabel: null,
+      kind: 'card_cleared', title: 'Card cleared!', eyebrow: '♛ CARD CLEARED', progress: '70/70', handLabel: null,
       note: 'All 70 hands. Legendary. 👑', photo: null,
       createdAt: now - 4 * DAY, likes: 23, likedByMe: false, comments: [
         { id: 'c8', author: 'Lily', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },

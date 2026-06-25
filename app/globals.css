@@ -1582,6 +1582,12 @@ label.lbl {
 .post-banner[data-kind="game_won"] .pb-eyebrow {
   color: rgba(255, 255, 255, 0.92);
 }
+/* Decorative banner motif — sits faintly behind the title. */
+.pb-motif {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.16;
+}
 .pb-title {
   position: relative;
   font-family: var(--font-display), system-ui, sans-serif;
@@ -1590,6 +1596,8 @@ label.lbl {
   letter-spacing: -1.5px;
   color: #ffffff;
   line-height: 0.92;
+  /* Big titles stay on one row (the copy is sized to fit). */
+  white-space: nowrap;
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18);
 }
 .post-banner[data-kind="game_won"] .pb-title {

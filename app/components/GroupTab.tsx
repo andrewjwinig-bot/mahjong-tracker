@@ -25,6 +25,65 @@ const KIND_EYEBROW: Partial<Record<FeedKind, string>> = {
   challenge_done: '★ CHALLENGE COMPLETE',
   joined: '➕ JOINED THE TABLE',
 };
+
+// Faint decorative motif behind each milestone banner's title (design frame 2):
+// challenge = concentric sunburst, section = stacked bars, card = crown,
+// game won = scattered stars.
+function BannerMotif({ kind }: { kind: FeedKind }) {
+  if (kind === 'challenge_done') {
+    return (
+      <svg className="pb-motif" viewBox="0 0 100 100" style={{ top: -20, right: -16, width: 124, height: 124 }} aria-hidden>
+        <g fill="none" stroke="#fff" strokeWidth="3">
+          <circle cx="50" cy="50" r="15" />
+          <circle cx="50" cy="50" r="27" />
+          <circle cx="50" cy="50" r="39" />
+        </g>
+        <circle cx="50" cy="50" r="6" fill="#fff" />
+        <g stroke="#fff" strokeWidth="3.4" strokeLinecap="round">
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+            <line key={a} x1="50" y1="1" x2="50" y2="9" transform={`rotate(${a} 50 50)`} />
+          ))}
+        </g>
+      </svg>
+    );
+  }
+  if (kind === 'section_cleared') {
+    return (
+      <svg className="pb-motif" viewBox="0 0 150 130" preserveAspectRatio="xMaxYMid slice" style={{ inset: 0, width: '100%', height: '100%', opacity: 0.12 }} aria-hidden>
+        <g fill="#fff">
+          <rect x="20" y="16" width="96" height="12" rx="6" />
+          <rect x="20" y="40" width="124" height="12" rx="6" />
+          <rect x="20" y="64" width="82" height="12" rx="6" />
+          <rect x="20" y="88" width="112" height="12" rx="6" />
+          <rect x="20" y="112" width="70" height="12" rx="6" />
+        </g>
+      </svg>
+    );
+  }
+  if (kind === 'card_cleared') {
+    return (
+      <svg className="pb-motif" viewBox="0 0 130 120" preserveAspectRatio="xMaxYMid slice" style={{ top: 0, right: -8, width: 142, height: '100%' }} aria-hidden>
+        <path d="M20 88 L20 46 L44 68 L65 30 L86 68 L110 46 L110 88 Z" fill="#fff" />
+        <rect x="20" y="90" width="90" height="15" rx="3" fill="#fff" />
+        <circle cx="65" cy="23" r="7" fill="#fff" />
+        <circle cx="20" cy="42" r="5.5" fill="#fff" />
+        <circle cx="110" cy="42" r="5.5" fill="#fff" />
+      </svg>
+    );
+  }
+  if (kind === 'game_won') {
+    return (
+      <svg className="pb-motif" viewBox="0 0 144 130" preserveAspectRatio="xMaxYMid slice" style={{ top: 0, right: 0, width: 150, height: '100%', opacity: 0.17 }} aria-hidden>
+        <text x="104" y="66" textAnchor="middle" fontSize="68" fill="#fff">★</text>
+        <text x="44" y="42" textAnchor="middle" fontSize="32" fill="#fff">★</text>
+        <text x="72" y="114" textAnchor="middle" fontSize="26" fill="#fff">★</text>
+        <circle cx="22" cy="80" r="4.5" fill="#fff" />
+        <circle cx="132" cy="104" r="5.5" fill="#fff" />
+      </svg>
+    );
+  }
+  return null;
+}
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
@@ -500,16 +559,17 @@ function FeedCard({
               role={kind === 'card_cleared' ? 'button' : undefined}
               onClick={kind === 'card_cleared' ? () => fireTileRain(bannerRef.current) : undefined}
             >
-              <div className="pb-eyebrow">{KIND_EYEBROW[kind] ?? badge.label}</div>
+              <BannerMotif kind={kind} />
+              <div className="pb-eyebrow">{post.eyebrow ?? KIND_EYEBROW[kind] ?? badge.label}</div>
               <div className="pb-title">{post.title}</div>
               {kind === 'game_won' ? (
-                <div className="pb-place">🥇 GAME NIGHT WINNER</div>
+                post.place && <div className="pb-place">{post.place}</div>
               ) : kind !== 'joined' ? (
                 <div className="pb-prog">
                   <div className="pb-prog-track">
                     <span />
                   </div>
-                  <div className="pb-prog-count">✓</div>
+                  <div className="pb-prog-count">{post.progress ? `${post.progress} ✓` : '✓'}</div>
                 </div>
               ) : null}
             </div>
