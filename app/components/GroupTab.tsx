@@ -191,6 +191,7 @@ function fireBanner(el: HTMLElement | null, kind: FeedKind) {
 }
 import PageTitle from './PageTitle';
 import EmptyFeed from './EmptyFeed';
+import EmptyProfile from './EmptyProfile';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
@@ -829,6 +830,8 @@ function MemberDetail({
   const swipe = useSwipeDismiss(onClose, { right: true });
   const cleared = completed.size;
   const pct = Math.round((cleared / TOTAL_HANDS) * 100);
+  // Your own record with nothing logged yet → the "No games yet" empty state.
+  const noGames = member.isYou && cleared === 0 && member.points === 0;
   const handle = member.name.toLowerCase().replace(/\s+/g, '');
   // A couple of "recent mahjs" drawn from their cleared hands.
   const recent = SAMPLE_CARD.hands.filter((h) => completed.has(h.id)).slice(0, 2);
@@ -866,6 +869,17 @@ function MemberDetail({
         </div>
 
         <div className="md-body">
+          {noGames ? (
+            <>
+              <EmptyProfile />
+              <div className="md-foot">
+                <button className="md-done" onClick={onClose}>
+                  DONE
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
           {/* Stat tiles */}
           <div className="md-stats">
             <div className="md-stat">
@@ -958,6 +972,8 @@ function MemberDetail({
               {showAll ? 'Hide hands' : '⚇ View all hands'}
             </button>
           </div>
+            </>
+          )}
         </div>
       </div>
     </div>
