@@ -2785,9 +2785,16 @@ label.lbl {
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(20, 22, 42, 0.12);
   background: #fff;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.12s ease;
+}
+/* The whole chip is the tap target; press anywhere to switch theme. */
+.theme-chip:active {
+  transform: scale(0.96);
 }
 .theme-chip[data-active="true"] {
   border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand), 0 3px 10px rgba(20, 22, 42, 0.16);
 }
 .tc-thumb {
   display: block;

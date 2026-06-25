@@ -90,10 +90,13 @@ export interface SocialState {
   profile: Profile;
 }
 
-const K_SEEDED = 'social.seeded.v5';
+// Bumped v5 → v6 to re-seed the demo feed with the corrected milestone
+// banners (short one-line titles, eyebrows, progress fractions, place badge).
+// Existing installs re-seed; the profile key is unversioned so it's preserved.
+const K_SEEDED = 'social.seeded.v6';
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
-const K_FEED = 'social.feed.v5';
+const K_FEED = 'social.feed.v6';
 const K_PROFILE = 'social.profile';
 
 const HOUR = 3_600_000;

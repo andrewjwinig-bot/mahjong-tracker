@@ -4,9 +4,27 @@ import { useState } from 'react';
 import { saveAccount, type Account, type Experience } from '../lib/account';
 import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../lib/cloudAuth';
 import TileStrip from './TileStrip';
+import Tile from './Tile';
 import OfficialCardCallout from './OfficialCardCallout';
 import type { ReactNode } from 'react';
+import type { TileFace } from '../lib/tileArt';
+import type { TileAvatar } from '../lib/social';
 import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
+
+// Pick-your-tile options for sign-up (mirrors the Settings avatar set). 'letter'
+// uses the username's initial; the rest carry their suit glyph + color.
+const TILE_OPTIONS: { key: string; face: TileFace; char?: string; color: string }[] = [
+  { key: 'letter', face: 'letter', color: '#2E86D4' },
+  { key: 'crackZ', face: 'crack', char: '萬', color: '#C0392B' },
+  { key: 'dot', face: 'dot', color: '#2E86D4' },
+  { key: 'bam', face: 'bam', color: '#15803D' },
+  { key: 'flower', face: 'flower', color: '#E2568F' },
+  { key: 'dragonR', face: 'dragon', char: '中', color: '#C0392B' },
+  { key: 'dragonG', face: 'dragon', char: '發', color: '#15803D' },
+  { key: 'wind', face: 'wind', char: '東', color: '#1A1410' },
+  { key: 'joker', face: 'joker', color: '#6A3FC0' },
+  { key: 'crack5', face: 'crack', char: '五', color: '#C9871A' },
+];
 
 const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode; color: string }[] = [
   { id: 'beginner', label: 'Beginner', blurb: 'New to the tiles — show me the ropes.', icon: <IconLeaf size={20} />, color: '#C0392B' },
@@ -76,7 +94,7 @@ function SignupArc() {
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const cloud = isCloudEnabled();
 
-export default function Onboarding({ onDone }: { onDone: (a: Account) => void }) {
+export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: TileAvatar) => void }) {
   const [step, setStep] = useState<'form' | 'card'>('form');
   const [account, setAccount] = useState<Account | null>(null);
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
@@ -84,6 +102,14 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [experience, setExperience] = useState<Experience>('beginner');
+  const [avatarIdx, setAvatarIdx] = useState(0);
+
+  // The tile chosen at sign-up → a TileAvatar (letter face uses the initial).
+  const chosenAvatar = (): TileAvatar => {
+    const opt = TILE_OPTIONS[avatarIdx];
+    const initial = username.trim().charAt(0).toUpperCase() || 'Y';
+    return { face: opt.face, char: opt.face === 'letter' ? initial : opt.char, color: opt.color };
+  };
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -146,10 +172,10 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
             <TileStrip count={7} />
           </div>
           <OfficialCardCallout />
-          <button className="btn" style={{ marginTop: 16 }} onClick={() => onDone(account)}>
+          <button className="btn" style={{ marginTop: 16 }} onClick={() => onDone(account, chosenAvatar())}>
             Start playing
           </button>
-          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => onDone(account)}>
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => onDone(account, chosenAvatar())}>
             I already have my card
           </button>
         </div>
@@ -230,6 +256,30 @@ export default function Onboarding({ onDone }: { onDone: (a: Account) => void })
               ))}
             </div>
             <p className="onboard-note">We’ll tailor the rules &amp; tips to your level.</p>
+
+            <label className="lbl" style={{ marginTop: 16 }}>
+              Your tile
+            </label>
+            <div className="avatar-grid">
+              {TILE_OPTIONS.map((opt, i) => (
+                <button
+                  key={opt.key}
+                  className="avatar-opt"
+                  data-active={avatarIdx === i}
+                  onClick={() => setAvatarIdx(i)}
+                  aria-label={`Tile ${i + 1}`}
+                >
+                  <Tile
+                    face={opt.face}
+                    char={opt.face === 'letter' ? username.trim().charAt(0).toUpperCase() || 'Y' : opt.char}
+                    color={opt.color}
+                    size={34}
+                  />
+                  {avatarIdx === i && <span className="avatar-check">✓</span>}
+                </button>
+              ))}
+            </div>
+            <p className="onboard-note">This is your tile across the feed &amp; tables.</p>
           </>
         )}
 

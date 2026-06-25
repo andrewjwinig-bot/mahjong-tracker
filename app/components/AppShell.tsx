@@ -272,25 +272,23 @@ export default function AppShell() {
     setExperienceState(e);
   }, []);
 
-  const finishOnboarding = useCallback((a: Account) => {
+  const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar) => {
     setAccount(a);
     setExperienceState(a.experience);
     if (!tutorialSeen()) setShowTutorial(true);
-    // Adopt the chosen username as the profile name.
+    // Adopt the chosen username as the profile name + the tile picked at sign-up.
+    const initial = a.username.trim().charAt(0).toUpperCase() || 'Y';
     setSocialState((prev) => {
       if (!prev) return prev;
-      const profile: social.Profile = {
-        ...prev.profile,
-        name: a.username,
-        avatar: { ...prev.profile.avatar, char: a.username.trim().charAt(0).toUpperCase() || 'Y' },
-      };
+      const avatar: social.TileAvatar = pickedAvatar
+        ? { ...pickedAvatar, char: pickedAvatar.face === 'letter' ? initial : pickedAvatar.char }
+        : { ...prev.profile.avatar, char: initial };
+      const profile: social.Profile = { ...prev.profile, name: a.username, avatar };
       void social.saveProfile(profile);
       return {
         ...prev,
         profile,
-        members: prev.members.map((m) =>
-          m.isYou ? { ...m, name: profile.name, avatar: profile.avatar } : m,
-        ),
+        members: prev.members.map((m) => (m.isYou ? { ...m, name: profile.name, avatar } : m)),
       };
     });
   }, []);
