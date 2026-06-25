@@ -13,6 +13,7 @@ import {
 import Tile from './Tile';
 import Paywall from './Paywall';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { usePro } from '../lib/usePro';
 import { setPro } from '../lib/pro';
 import { IconTrash, IconTarget, IconLock } from './uiIcons';
@@ -46,6 +47,7 @@ const PALETTE: RackTile[] = [
 
 export default function PracticeSheet({ card, onClose }: { card: MahjongCard; onClose: () => void }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const pro = usePro();
   const [rack, setRack] = useState<RackTile[]>([]);
   const [results, setResults] = useState<HandMatch[] | null>(null);
@@ -83,7 +85,14 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <IconTarget size={20} /> Practice

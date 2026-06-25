@@ -32,6 +32,7 @@ import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import TipCard from './TipCard';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 // A self-contained burst of ~20 mini mahjong-tile particles that rain down
 // inside a banner (design frame 8: the FULL CARD post). Mirrors the prototype's
@@ -580,6 +581,7 @@ function MemberDetail({
   onClose: () => void;
 }) {
   const [showAll, setShowAll] = useState(false);
+  const swipe = useSwipeDismiss(onClose, { right: true });
   const cleared = completed.size;
   const pct = Math.round((cleared / TOTAL_HANDS) * 100);
   const handle = member.name.toLowerCase().replace(/\s+/g, '');
@@ -588,7 +590,14 @@ function MemberDetail({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet member-sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet member-sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         {/* Cinnabar header band */}
         <div className="md-band">
           <span className="md-stripe" aria-hidden />
@@ -771,6 +780,7 @@ export function AddFriendSheet({
   // a local sample directory (on-device), then invite people who aren't on the
   // app yet. No hand-made name + icon.
   const cloud = isCloudEnabled();
+  const swipe = useSwipeDismiss(onClose);
   const [q, setQ] = useState('');
   const [results, setResults] = useState<CloudFriend[]>([]);
   const [searching, setSearching] = useState(false);
@@ -814,7 +824,14 @@ export function AddFriendSheet({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <IconUsers size={20} /> Find Friends

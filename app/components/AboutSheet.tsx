@@ -5,9 +5,11 @@ import { exportData, importData, deleteAllData } from '../lib/dataExport';
 import { isCloudEnabled, cloudSignOut, cloudDeleteAccount } from '../lib/cloudAuth';
 import { IconDownload, IconSignOut, IconTrash, IconCard } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 export default function AboutSheet({ onClose }: { onClose: () => void }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
@@ -64,7 +66,14 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2>About &amp; Legal</h2>
         <p className="sheet-sub">Mahjong Tracker · v1.0</p>

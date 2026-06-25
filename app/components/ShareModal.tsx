@@ -16,6 +16,7 @@ import {
 } from './brandIcons';
 import { IconArrowRight } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 export interface SharePayload {
   /** Sheet title, e.g. "SHARE YOUR MAHJ! 🀄" */
@@ -59,6 +60,7 @@ function Opt({
 
 export default function ShareModal({ payload, groupName, onShareToGroup, onClose }: Props) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const [status, setStatus] = useState<string | null>(null);
   const { title, text, url } = payload;
   const caption = `${text} ${url}`.trim();
@@ -120,7 +122,14 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2>{title}</h2>
         <p className="sheet-sub">Brag a little — you earned it!</p>

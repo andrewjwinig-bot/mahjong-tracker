@@ -15,6 +15,7 @@ import { IconCard } from './uiIcons';
 import { setPro } from '../lib/pro';
 import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 interface Props {
   profile: Profile;
@@ -75,6 +76,7 @@ export default function SettingsSheet({
   onClose,
 }: Props) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const [view, setView] = useState<'settings' | 'edit'>('settings');
   const [name, setName] = useState(profile.name);
   const [handle, setHandle] = useState(profile.handle);
@@ -332,7 +334,14 @@ export default function SettingsSheet({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet set-sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet set-sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         {view === 'settings' ? settingsView : editView}
       </div>
 

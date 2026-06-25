@@ -13,6 +13,7 @@ import {
 } from './uiIcons';
 import { PLANS, restorePurchases } from '../lib/pro';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 const PERKS: { icon: ReactNode; text: string }[] = [
   { icon: <IconPalette size={20} />, text: 'All premium themes — Dragon, Joker & Midnight' },
@@ -31,6 +32,7 @@ export default function Paywall({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const [plan, setPlan] = useState(PLANS.find((p) => p.highlight)?.id ?? PLANS[0].id);
   const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
 
@@ -43,7 +45,14 @@ export default function Paywall({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           Mahjong Tracker Pro <IconCrown size={20} />
