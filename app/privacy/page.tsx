@@ -8,26 +8,23 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalChrome title="Privacy Policy" updated="[Effective Date]">
-      <p className="legal-banner">
-        Template — review with a qualified attorney before publishing. Replace every [bracketed] value.
-      </p>
-
+    <LegalChrome title="Privacy Policy" updated="June 25, 2026">
       <p>
-        This Privacy Policy explains how [Developer / Company Name] (“we,” “us,” or “our”) collects,
+        This Privacy Policy explains how Black Pug Studios LLC (“we,” “us,” or “our”) collects,
         uses, shares, and protects information in connection with the Mahjong Tracker mobile and web
         application and related services (the “App”). By using the App you agree to this Policy.
       </p>
 
       <h2>1. The short version</h2>
       <ul>
-        <li>Today, the App runs primarily on your device and stores your data locally.</li>
         <li>
-          When account and cloud features launch, we will collect the information you provide (like
-          your email and profile) and gameplay/social content you create, so the App can sync and
-          power social features.
+          You can create an account to sync your data and use social features. When you do, your
+          gameplay and profile are stored in the cloud so they’re available across your devices.
         </li>
-        <li>We do not sell your personal information.</li>
+        <li>
+          You can also use the App without signing in, in which case your data stays on your device.
+        </li>
+        <li>We do not sell your personal information and we show no third-party ads.</li>
         <li>You can access, correct, export, and delete your data, including deleting your account.</li>
       </ul>
 
@@ -95,9 +92,11 @@ export default function PrivacyPage() {
           tables, friends, or public feed.
         </li>
         <li>
-          <strong>Service providers</strong> — vendors who host and operate the App on our behalf
-          (for example, hosting, database/authentication, analytics, crash reporting, and push
-          delivery), bound by contractual confidentiality and security obligations.
+          <strong>Service providers</strong> — vendors who host and operate the App on our behalf,
+          bound by contractual confidentiality and security obligations. These include{' '}
+          <strong>Supabase</strong> (account authentication, database, and photo storage) and{' '}
+          <strong>Vercel</strong> (web hosting and delivery). If we add analytics, crash reporting,
+          push delivery, or in-app purchase processing, those providers are covered here as well.
         </li>
         <li>
           <strong>App stores &amp; platforms</strong> — Apple and Google for purchases and push
@@ -142,7 +141,7 @@ export default function PrivacyPage() {
           complaint with a regulator. We do not discriminate against you for exercising these rights.
         </li>
       </ul>
-      <p>To exercise any right, contact us at [Contact Email].</p>
+      <p>To exercise any right, contact us at andrewjwinig@gmail.com.</p>
 
       <h2>9. Children’s privacy</h2>
       <p>
@@ -165,11 +164,9 @@ export default function PrivacyPage() {
 
       <h2>12. Contact us</h2>
       <p>
-        [Developer / Company Name]
+        Black Pug Studios LLC
         <br />
-        [Mailing Address]
-        <br />
-        [Contact Email]
+        andrewjwinig@gmail.com
       </p>
     </LegalChrome>
   );
