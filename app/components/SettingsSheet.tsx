@@ -157,10 +157,8 @@ export default function SettingsSheet({
   /* ---- Settings view ----------------------------------------------------- */
   const settingsView = (
     <>
+      <div className="grab" />
       <div className="set-head">
-        <button className="set-back" onClick={onClose} aria-label="Close">
-          <BackChevron />
-        </button>
         <h1 className="set-title">Settings</h1>
       </div>
 

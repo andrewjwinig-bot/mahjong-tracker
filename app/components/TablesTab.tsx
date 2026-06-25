@@ -640,28 +640,30 @@ function DatesView({
             <div className="grab" />
             <h2>Add To Calendar 📅</h2>
             <p className="sheet-sub">{prettyDate(calFor.date, calFor.time)} · {table.name}</p>
-            <button
-              className="btn"
-              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-              onClick={() => {
-                downloadICS(eventFor(table, calFor));
-                void track('calendar_added', { kind: 'apple' });
-                setCalFor(null);
-              }}
-            >
-              <IconCalendar size={18} /> Apple Calendar
-            </button>
-            <button
-              className="btn green"
-              style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-              onClick={() => {
-                window.open(googleCalUrl(eventFor(table, calFor)), '_blank', 'noopener,noreferrer');
-                void track('calendar_added', { kind: 'google' });
-                setCalFor(null);
-              }}
-            >
-              <IconCalendar size={18} /> Google Calendar
-            </button>
+            <div className="row" style={{ marginTop: 4 }}>
+              <button
+                className="btn plain"
+                style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                onClick={() => {
+                  downloadICS(eventFor(table, calFor));
+                  void track('calendar_added', { kind: 'apple' });
+                  setCalFor(null);
+                }}
+              >
+                <IconCalendar size={18} /> Apple
+              </button>
+              <button
+                className="btn green plain"
+                style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                onClick={() => {
+                  window.open(googleCalUrl(eventFor(table, calFor)), '_blank', 'noopener,noreferrer');
+                  void track('calendar_added', { kind: 'google' });
+                  setCalFor(null);
+                }}
+              >
+                <IconCalendar size={18} /> Google
+              </button>
+            </div>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setCalFor(null)}>
               Cancel
             </button>

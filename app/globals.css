@@ -1052,6 +1052,15 @@ a:focus-visible,
   border-color: transparent;
   text-shadow: none;
 }
+/* Plain solid button — opt out of the woven pattern, the sweeping shine and
+   the two-tone label offset. Just a flat fill. */
+.btn.plain {
+  text-shadow: none;
+}
+.btn.plain::before,
+.btn.plain::after {
+  display: none;
+}
 a.btn {
   text-decoration: none;
 }
