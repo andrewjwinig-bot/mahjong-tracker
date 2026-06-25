@@ -190,6 +190,8 @@ function fireBanner(el: HTMLElement | null, kind: FeedKind) {
   else fireTileRain(el);
 }
 import PageTitle from './PageTitle';
+import EmptyFeed from './EmptyFeed';
+import EmptyProfile from './EmptyProfile';
 import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
@@ -516,19 +518,7 @@ export default function GroupTab({
       </div>
 
       {feed.length === 0 ? (
-        <div className="feed-empty">
-          <div className="fe-tiles" aria-hidden>
-            <span className="fe-tile">🀄</span>
-            <span className="fe-tile">🀅</span>
-            <span className="fe-tile">🀆</span>
-          </div>
-          <div className="fe-title">No mahjs called yet</div>
-          <div className="fe-sub">
-            {cloud
-              ? 'Add friends to see their mahjs here — or call your own on the Card and it lands right here.'
-              : 'Be the first — call Mahj on your Card and it’ll land right here for your crew to see.'}
-          </div>
-        </div>
+        <EmptyFeed />
       ) : (
         feed.map((p) => {
           const isMine = p.memberId === YOU_ID || p.memberName === profile.name;
@@ -840,6 +830,8 @@ function MemberDetail({
   const swipe = useSwipeDismiss(onClose, { right: true });
   const cleared = completed.size;
   const pct = Math.round((cleared / TOTAL_HANDS) * 100);
+  // Your own record with nothing logged yet → the "No games yet" empty state.
+  const noGames = member.isYou && cleared === 0 && member.points === 0;
   const handle = member.name.toLowerCase().replace(/\s+/g, '');
   // A couple of "recent mahjs" drawn from their cleared hands.
   const recent = SAMPLE_CARD.hands.filter((h) => completed.has(h.id)).slice(0, 2);
@@ -877,6 +869,17 @@ function MemberDetail({
         </div>
 
         <div className="md-body">
+          {noGames ? (
+            <>
+              <EmptyProfile />
+              <div className="md-foot">
+                <button className="md-done" onClick={onClose}>
+                  DONE
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
           {/* Stat tiles */}
           <div className="md-stats">
             <div className="md-stat">
@@ -969,6 +972,8 @@ function MemberDetail({
               {showAll ? 'Hide hands' : '⚇ View all hands'}
             </button>
           </div>
+            </>
+          )}
         </div>
       </div>
     </div>
