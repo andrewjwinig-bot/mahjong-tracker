@@ -12,17 +12,19 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage, SCAN_ENABLED } from '../lib/cardScan';
+import { scanCardImage } from '../lib/cardScan';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 
 export default function CardEditor({
   current,
+  scanEnabled = false,
   onSave,
   onUseSample,
   onClose,
 }: {
   current: MahjongCard;
+  scanEnabled?: boolean;
   onSave: (card: MahjongCard) => void;
   onUseSample: () => void;
   onClose: () => void;
@@ -152,7 +154,7 @@ export default function CardEditor({
         if it must be concealed. Group hands by giving them the same category name.
       </p>
 
-      {SCAN_ENABLED && (
+      {scanEnabled && (
         <>
           <input ref={scanRef} type="file" accept="image/*" capture="environment" hidden onChange={onScanPick} />
           <button

@@ -5,8 +5,30 @@
 
 import type { HandRow } from './customCard';
 
-/** Whether the Scan-my-card affordance is shown. Flip on once it's cleared. */
-export const SCAN_ENABLED = process.env.NEXT_PUBLIC_CARD_SCAN === '1';
+// Whether the Scan-my-card affordance is shown. Runtime-toggleable (Settings)
+// so one deployed build can demo with or without scanning — no rebuild. The env
+// var just sets the default when the user hasn't chosen.
+const SCAN_FLAG_KEY = 'mahj.scanEnabled';
+const SCAN_ENV_DEFAULT = process.env.NEXT_PUBLIC_CARD_SCAN === '1';
+
+export function getScanEnabled(): boolean {
+  try {
+    const v = localStorage.getItem(SCAN_FLAG_KEY);
+    if (v === '1') return true;
+    if (v === '0') return false;
+  } catch {
+    /* ignore */
+  }
+  return SCAN_ENV_DEFAULT;
+}
+
+export function setScanEnabled(on: boolean): void {
+  try {
+    localStorage.setItem(SCAN_FLAG_KEY, on ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+}
 
 export type ScanResult =
   | { ok: true; year?: number; rows: HandRow[] }
