@@ -13,22 +13,34 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'learn', label: 'Rules' },
 ];
 
-export default function BottomNav({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
+export default function BottomNav({
+  tab,
+  onChange,
+  badges,
+}: {
+  tab: Tab;
+  onChange: (t: Tab) => void;
+  badges?: Partial<Record<Tab, number>>;
+}) {
   return (
     <nav className="bottom-nav">
       <div className="inner">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className="nav-tab"
-            data-active={tab === t.id}
-            aria-current={tab === t.id ? 'page' : undefined}
-            onClick={() => onChange(t.id)}
-            aria-label={t.label}
-          >
-            <span className="nav-tab-label">{t.label}</span>
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const count = badges?.[t.id] ?? 0;
+          return (
+            <button
+              key={t.id}
+              className="nav-tab"
+              data-active={tab === t.id}
+              aria-current={tab === t.id ? 'page' : undefined}
+              onClick={() => onChange(t.id)}
+              aria-label={count > 0 ? `${t.label}, ${count} unread` : t.label}
+            >
+              <span className="nav-tab-label">{t.label}</span>
+              {count > 0 && <span className="nav-badge">{count > 9 ? '9+' : count}</span>}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
