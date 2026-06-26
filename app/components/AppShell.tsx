@@ -450,7 +450,22 @@ export default function AppShell() {
                 onRemoveFriend={removeFriend}
                 onReport={handleReportPost}
                 onBlock={handleBlockUser}
-                onScore={() => openScorer()}
+                onScore={() => {
+                  // Same behavior as "Score this table": pre-seed the players if
+                  // you have a small crew (≤3 friends → you + everyone, all
+                  // auto-selected), but with a bigger crew start with nothing
+                  // selected so you pick who's at the table.
+                  const others = socialState.members
+                    .filter((m) => !m.isYou)
+                    .map((m) => ({ name: m.name, avatar: m.avatar }));
+                  openScorer({
+                    suggestedNames:
+                      others.length <= 3
+                        ? [socialState.profile.name, ...others.map((m) => m.name)]
+                        : [socialState.profile.name],
+                    friends: others,
+                  });
+                }}
                 onOpenTables={(id) => {
                   setTablesTarget(id);
                   setTab('tables');
