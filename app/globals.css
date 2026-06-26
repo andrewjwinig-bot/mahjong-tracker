@@ -4639,11 +4639,62 @@ label.lbl {
   font-weight: 800;
   color: var(--muted);
   text-transform: uppercase;
+  z-index: 2;
+}
+/* Stage wraps the per-slide art + copy; re-mounted each step so this replays. */
+.tut-stage {
+  animation: tut-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes tut-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .tut-art {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 132px;
+  margin-bottom: 6px;
+}
+/* Soft accent glow behind the hero tile — tinted per slide via --accent. */
+.tut-pad {
+  position: absolute;
+  width: 158px;
+  height: 158px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent, var(--brand)) 0%, transparent 68%);
+  opacity: 0.2;
+  filter: blur(2px);
+}
+.tut-tile {
+  position: relative;
+  display: inline-flex;
+  transform-origin: 50% 92%;
+  animation: tut-sway 3.6s ease-in-out infinite;
+  filter: drop-shadow(0 10px 18px rgba(26, 20, 16, 0.16));
+}
+@keyframes tut-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+.tut-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent, var(--brand));
+  margin-bottom: 4px;
 }
 .tutorial-card h2 {
   margin: 0;
@@ -4654,10 +4705,11 @@ label.lbl {
   font-family: var(--font-display), system-ui, sans-serif;
 }
 .tut-body {
-  margin: 8px 0 0;
+  margin: 8px auto 0;
+  max-width: 30ch;
   font-size: 14.5px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--ink-soft);
 }
 .tut-dots {
@@ -4671,10 +4723,30 @@ label.lbl {
   height: 8px;
   border-radius: 999px;
   background: var(--tint-deep);
+  transition: width 0.3s ease, background 0.3s ease;
 }
 .tut-dots span[data-on="true"] {
-  background: var(--brand);
+  background: var(--accent, var(--brand));
   width: 22px;
+}
+/* Keep the primary action on one line ("START PLAYING") and give it the lead. */
+.tutorial .row .btn {
+  white-space: nowrap;
+}
+.tutorial .row .btn.ghost {
+  flex: 0 1 38%;
+}
+.tutorial .row .btn:not(.ghost) {
+  flex: 1 1 auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-stage {
+    animation: none;
+  }
+  .tut-tile {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* ---- Onboarding ---------------------------------------------------------- */
