@@ -51,7 +51,7 @@ HOW THESE CARDS ARE LAID OUT
 - The card is divided into sections, each with a heading. Section HEADINGS are short descriptors (e.g. a year, even-number or odd-number groupings, consecutive runs, winds & dragons, 369, quints, singles & pairs) and are typically CENTERED. The hand rows under them are LEFT-justified. Use that difference to tell a heading apart from a hand row, and don't mistake a heading for a hand.
 - Read sections top-to-bottom; within a section read each line top-to-bottom; work left column then right column.
 - Each line is one hand: a sequence of tile groups, then its point value at the right edge, sometimes with a concealed marker.
-- A line may print TWO alternate forms of the same hand separated by "or" (or "-or-"). Transcribe ONLY the first form (its 14 tiles); ignore everything from the "or" onward. Never combine both forms into one line.
+- Store ONLY the single, clean 14-tile sequence — it must read exactly like the printed hand: just tile groups separated by spaces, with NO parentheses and NO "or". If the line shows an alternate form — separated by "or" / "-or-", OR printed in PARENTHESES (alternates, substitutions, or notes) — drop it entirely: transcribe only the first/main 14-tile form and ignore everything from the "or" onward and everything inside ( ). Never include a parenthesis character or the word "or" in the notation.
 
 THE TILE VOCABULARY (use these symbols)
 - Numbers: the digits 1-9 (each digit is one number tile).
