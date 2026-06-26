@@ -177,6 +177,14 @@ export default function SettingsSheet({
         <span className="pc-chev">›</span>
       </button>
 
+      {/* Theme picker — kept right at the top so switching is one tap away. */}
+      <div className="set-label">APP THEME</div>
+      <div className="theme-grid2">
+        {THEMES.map((t) => (
+          <ThemeChip key={t.id} t={t} thumb={72} />
+        ))}
+      </div>
+
       {/* Pro upsell */}
       {pro ? (
         <div className="pro-active">
@@ -194,13 +202,6 @@ export default function SettingsSheet({
       ) : (
         <ProBanner onClick={() => setPaywall(true)} sub="Unlimited tables, full stats & every theme." />
       )}
-
-      <div className="set-label">APP THEME</div>
-      <div className="theme-grid2">
-        {THEMES.map((t) => (
-          <ThemeChip key={t.id} t={t} thumb={72} />
-        ))}
-      </div>
 
       <div className="set-label">PREFERENCES</div>
       <div className="set-list">
