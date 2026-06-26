@@ -766,7 +766,7 @@ function DatesView({
         <div className="modal-scrim" onClick={() => setCalFor(null)}>
           <div className="sheet" onClick={(e) => e.stopPropagation()}>
             <div className="grab" />
-            <h2>Add To Calendar 📅</h2>
+            <h2>Add To Calendar</h2>
             <p className="sheet-sub">{prettyDate(calFor.date, calFor.time)} · {table.name}</p>
             <div className="row" style={{ marginTop: 4 }}>
               <button
