@@ -27,6 +27,8 @@ interface Props {
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
   onEditCard: () => void;
+  scanEnabled: boolean;
+  onScanEnabled: (on: boolean) => void;
   onSignOut?: () => void;
   onClose: () => void;
 }
@@ -73,6 +75,8 @@ export default function SettingsSheet({
   onTheme,
   onExperience,
   onEditCard,
+  scanEnabled,
+  onScanEnabled,
   onSignOut,
   onClose,
 }: Props) {
@@ -217,7 +221,13 @@ export default function SettingsSheet({
       <div className="set-list">
         <ValueRow label="Card year" value="2026" />
         <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
-        <ValueRow label="My card (bring your own)" onClick={onEditCard} last />
+        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
+        <PrefRow
+          label="Card scanning (beta)"
+          on={scanEnabled}
+          onToggle={() => onScanEnabled(!scanEnabled)}
+          last
+        />
       </div>
 
       <div className="set-label">ACCOUNT</div>

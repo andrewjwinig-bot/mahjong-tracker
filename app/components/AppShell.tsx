@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
-import { loadCustomCard, saveCustomCard } from '../lib/customCard';
+import { loadCustomCard, saveCustomCard, sampleOptedIn, setSampleOptIn } from '../lib/customCard';
+import { getScanEnabled, setScanEnabled } from '../lib/cardScan';
 import * as db from '../lib/storage';
 import {
   cloudSignedIn,
@@ -86,6 +87,12 @@ export default function AppShell() {
   const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
+  // Card setup: until a real card is entered (or the sample is accepted), the
+  // Card tab shows a setup prompt rather than placeholder hands.
+  const [sampleOptIn, setSampleOptInState] = useState(false);
+  // Card scanning is a runtime toggle (Settings) so one build can demo with or
+  // without it.
+  const [scanEnabled, setScanEnabledState] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [scorerOpen, setScorerOpen] = useState(false);
   // Optional pre-seeded players for the scorer (e.g. a table's members).
@@ -138,6 +145,8 @@ export default function AppShell() {
     if (acc && !tutorialSeen()) setShowTutorial(true);
     const cc = loadCustomCard();
     if (cc) setCard(cc);
+    setSampleOptInState(sampleOptedIn());
+    setScanEnabledState(getScanEnabled());
     const sd = recordPlay();
     setBestStreak(sd.best);
     (async () => {
@@ -148,6 +157,12 @@ export default function AppShell() {
         social.loadSocial(),
       ]);
       if (!alive) return;
+      // Existing users with tracked progress on the sample card shouldn't get
+      // bounced to the setup prompt — treat prior progress as opting into it.
+      if (!cc && !sampleOptedIn() && (Object.keys(counts).length > 0 || w.length > 0)) {
+        setSampleOptIn(true);
+        setSampleOptInState(true);
+      }
       setHandCounts(counts);
       setHandNotes(notes);
       setWins(w);
@@ -372,6 +387,22 @@ export default function AppShell() {
     setExperienceState(e);
   }, []);
 
+  const changeScanEnabled = useCallback((on: boolean) => {
+    setScanEnabled(on);
+    setScanEnabledState(on);
+  }, []);
+
+  // Accept the built-in sample card (explore without entering a real one).
+  const useSampleCard = useCallback(() => {
+    clearCustomCard();
+    setCard(SAMPLE_CARD);
+    setSampleOptIn(true);
+    setSampleOptInState(true);
+  }, []);
+
+  // No real card entered and the sample hasn't been accepted → show setup.
+  const needsCard = card.source !== 'custom' && !sampleOptIn;
+
   const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar) => {
     setAccount(a);
     setExperienceState(a.experience);
@@ -435,6 +466,10 @@ export default function AppShell() {
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
                 onTrophies={() => setTrophyOpen(true)}
+                needsCard={needsCard}
+                scanEnabled={scanEnabled}
+                onAddCard={() => setEditorOpen(true)}
+                onUseSample={useSampleCard}
               />
             )}
             {tab === 'group' && socialState && (
@@ -514,6 +549,8 @@ export default function AppShell() {
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
           onExperience={changeExperience}
+          scanEnabled={scanEnabled}
+          onScanEnabled={changeScanEnabled}
           onEditCard={() => {
             setSettingsOpen(false);
             setEditorOpen(true);
@@ -525,11 +562,14 @@ export default function AppShell() {
       {editorOpen && (
         <CardEditor
           current={card}
-          onSave={(c) => setCard(c)}
-          onUseSample={() => {
-            clearCustomCard();
-            setCard(SAMPLE_CARD);
+          scanEnabled={scanEnabled}
+          onSave={(c) => {
+            setCard(c);
+            // A real card entered → no longer "just exploring" the sample.
+            setSampleOptIn(false);
+            setSampleOptInState(false);
           }}
+          onUseSample={useSampleCard}
           onClose={() => setEditorOpen(false)}
         />
       )}

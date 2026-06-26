@@ -17,6 +17,7 @@ import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { computeBadges } from '../lib/badges';
 import { IconTrophy } from './uiIcons';
+import EmptyCard from './EmptyCard';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
 
@@ -34,6 +35,11 @@ interface Props {
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
   onTrophies: () => void;
+  /** No card set up yet → show the setup prompt instead of the tracker. */
+  needsCard: boolean;
+  scanEnabled: boolean;
+  onAddCard: () => void;
+  onUseSample: () => void;
 }
 
 export default function CardTab({
@@ -50,6 +56,10 @@ export default function CardTab({
   onPostToGroup,
   onMilestone,
   onTrophies,
+  needsCard,
+  scanEnabled,
+  onAddCard,
+  onUseSample,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
@@ -140,6 +150,18 @@ export default function CardTab({
       // Repeat win of a cleared hand, or a Freeform mahj.
       celebrate({ title: 'I Got Mahj! 🎉', handLabel: win.handLabel, points: h?.points, posted: opts.shareToGroup, bonus, onShare: () => setShareWin(win), onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win) });
     }
+  }
+
+  if (needsCard) {
+    return (
+      <div className="screen">
+        <header className="app-header card-header">
+          <CardTitle />
+          <p className="sub">Track every hand on your card.</p>
+        </header>
+        <EmptyCard scanEnabled={scanEnabled} onAdd={onAddCard} onUseSample={onUseSample} />
+      </div>
+    );
   }
 
   return (

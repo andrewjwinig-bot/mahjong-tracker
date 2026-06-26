@@ -4106,6 +4106,64 @@ label.lbl {
   line-height: 1.4;
   color: #1c5b34;
 }
+
+/* Card tab setup prompt (shown before a card is added). */
+.empty-card {
+  margin-top: 18px;
+  padding: 26px 22px;
+  text-align: center;
+  background: var(--card);
+  border: 2.5px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.empty-card-tiles {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.empty-card-tiles > :nth-child(1) {
+  transform: rotate(-9deg);
+}
+.empty-card-tiles > :nth-child(3) {
+  transform: rotate(9deg);
+}
+.empty-card-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  color: var(--ink);
+}
+.empty-card-blurb {
+  margin: 0 auto 18px;
+  max-width: 34ch;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.empty-card .btn {
+  margin-top: 10px;
+}
+.empty-card-sample {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.empty-card-fine {
+  margin: 16px 0 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted);
+}
 .editor-year {
   margin-bottom: 12px;
 }
