@@ -12,9 +12,14 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage } from '../lib/cardScan';
+import type { ScanRow, ScanSummary } from '../lib/cardScan';
+import CardScanGuide from './CardScanGuide';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+
+// American cards usually carry ~60–70 hands (a genre fact, not card data) —
+// used only to gently flag a likely-missing panel after a scan.
+const TYPICAL_MIN = 55;
 
 export default function CardEditor({
   current,
@@ -39,7 +44,7 @@ export default function CardEditor({
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
-  const [scanning, setScanning] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [scanMsg, setScanMsg] = useState<string | null>(null);
   // Per-row validation flags from the scan (index-aligned with rows); cleared
   // as the user fixes a line. A "review queue" so nothing dubious slips through.
@@ -49,7 +54,6 @@ export default function CardEditor({
   const [scanned, setScanned] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const scanRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let url: string | null = null;
@@ -81,45 +85,37 @@ export default function CardEditor({
     }
   }
 
-  // Snap/upload your card → auto-fill the rows from YOUR photo, for you to
-  // review and correct before saving. The photo is the only data source; the
-  // result stays on your device.
-  async function onScanPick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setScanning(true);
-    setScanMsg(null);
-    try {
-      const blob = await downscaleImage(file, 1600, 0.85);
-      await saveCardPhoto(blob);
-      setPhotoUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return URL.createObjectURL(blob);
-      });
-      const result = await scanCardImage(blob);
-      if (!result.ok) {
-        setScanMsg(result.error);
-        return;
+  // The guided trifold scan finished → adopt its merged rows (each scanned from
+  // YOUR photos, stitched on-device) into the editable review.
+  function applyScan(scanRows: ScanRow[], summary: ScanSummary, scanYear?: number) {
+    if (scanYear) setYear(scanYear);
+    setRows(
+      scanRows.map((r) => ({
+        category: r.category,
+        notation: r.notation,
+        points: r.points,
+        concealed: r.concealed,
+      })),
+    );
+    setFlags(scanRows.map((r) => r.issues ?? []));
+    setScanned(true);
+    setShowAll(false);
+    setGuideOpen(false);
+    // Gentle nudge if it looks like a panel is missing (generic genre range).
+    setScanMsg(
+      summary.handCount < TYPICAL_MIN
+        ? `That’s only ${summary.handCount} hands — most cards have ~60–70, so you may be missing a panel. Add it from the list below, or re-scan.`
+        : null,
+    );
+    // The guide saved the first panel as the reference photo — refresh it.
+    void loadCardPhoto().then((blob) => {
+      if (blob) {
+        setPhotoUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
       }
-      if (result.year) setYear(result.year);
-      setRows(
-        result.rows.map((r) => ({
-          category: r.category,
-          notation: r.notation,
-          points: r.points,
-          concealed: r.concealed,
-        })),
-      );
-      setFlags(result.rows.map((r) => r.issues ?? []));
-      setScanned(true);
-      setShowAll(false);
-      setScanMsg(null);
-    } catch {
-      setScanMsg('Couldn’t process that photo. Try another, well-lit shot.');
-    } finally {
-      setScanning(false);
-      if (scanRef.current) scanRef.current.value = '';
-    }
+    });
   }
 
   async function removePhoto() {
@@ -227,18 +223,18 @@ export default function CardEditor({
 
       {scanEnabled && (
         <>
-          <input ref={scanRef} type="file" accept="image/*" capture="environment" hidden onChange={onScanPick} />
           <button
             className="btn"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-            onClick={() => scanRef.current?.click()}
-            disabled={scanning}
+            onClick={() => setGuideOpen(true)}
           >
-            <IconCamera size={17} /> {scanning ? 'Reading your card…' : 'Scan my card'}
+            <IconCamera size={17} /> Scan my card
           </button>
           {scanMsg && <p className="editor-scan-msg">{scanMsg}</p>}
         </>
       )}
+
+      {guideOpen && <CardScanGuide onComplete={applyScan} onCancel={() => setGuideOpen(false)} />}
 
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
       {photoUrl ? (

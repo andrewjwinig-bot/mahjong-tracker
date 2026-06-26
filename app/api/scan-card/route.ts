@@ -45,12 +45,13 @@ const SCHEMA = {
   required: ['year', 'hands'],
 };
 
-const PROMPT = `You are transcribing a photograph of a single American Mah Jongg "standard hands and rules" card that the user physically owns. Transcribe EVERY hand line exactly as printed — do not invent, merge, reorder, or skip lines. Accuracy and completeness matter more than speed.
+const PROMPT = `You are transcribing a photograph of an American Mah Jongg "standard hands and rules" card that the user physically owns. The photo may be ONE PANEL of a fold-out card, so transcribe every hand line visible in THIS image — do not invent, merge, reorder, or skip lines, and don't worry about sections that aren't in frame. Accuracy and completeness matter more than speed.
 
 HOW THESE CARDS ARE LAID OUT
-- The card is divided into sections, each with a heading. Headings are short descriptors such as a year, even-number or odd-number groupings, consecutive runs, winds & dragons, 369, quints, and singles & pairs. Read sections top-to-bottom; within a section read each line top-to-bottom; work left column then right column.
+- The card is divided into sections, each with a heading. Section HEADINGS are short descriptors (e.g. a year, even-number or odd-number groupings, consecutive runs, winds & dragons, 369, quints, singles & pairs) and are typically CENTERED. The hand rows under them are LEFT-justified. Use that difference to tell a heading apart from a hand row, and don't mistake a heading for a hand.
+- Read sections top-to-bottom; within a section read each line top-to-bottom; work left column then right column.
 - Each line is one hand: a sequence of tile groups, then its point value at the right edge, sometimes with a concealed marker.
-- Some lines show alternate forms of the same hand (often in parentheses). Capture the line as printed; keep the groups in printed order separated by single spaces.
+- A line may print TWO alternate forms of the same hand separated by "or" (or "-or-"). Transcribe ONLY the first form (its 14 tiles); ignore everything from the "or" onward. Never combine both forms into one line.
 
 THE TILE VOCABULARY (use these symbols)
 - Numbers: the digits 1-9 (each digit is one number tile).

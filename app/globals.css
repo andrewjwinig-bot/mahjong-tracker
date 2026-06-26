@@ -4248,6 +4248,163 @@ label.lbl {
   line-height: 1.4;
   color: #8a7a5a;
 }
+
+/* ---- Trifold scan guide -------------------------------------------------- */
+.scan-guide-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 360;
+  background: rgba(20, 22, 42, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.scan-guide {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 22px 20px;
+  text-align: center;
+}
+.tri {
+  perspective: 900px;
+  height: 116px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.tri-inner {
+  display: flex;
+  gap: 4px;
+  transform-style: preserve-3d;
+}
+.tri-panel {
+  position: relative;
+  width: 62px;
+  height: 94px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fffefb, #f1ebdd);
+  border: 2px solid rgba(20, 22, 42, 0.12);
+  box-shadow: 0 4px 12px rgba(20, 22, 42, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.tri-l {
+  transform-origin: right center;
+  animation: tri-open-l 0.7s cubic-bezier(0.34, 1.2, 0.5, 1) both;
+}
+.tri-c {
+  animation: tri-pop 0.5s ease both;
+}
+.tri-r {
+  transform-origin: left center;
+  animation: tri-open-r 0.7s cubic-bezier(0.34, 1.2, 0.5, 1) both;
+}
+@keyframes tri-open-l {
+  from { transform: rotateY(-80deg); opacity: 0; }
+  to { transform: rotateY(0); opacity: 1; }
+}
+@keyframes tri-open-r {
+  from { transform: rotateY(80deg); opacity: 0; }
+  to { transform: rotateY(0); opacity: 1; }
+}
+@keyframes tri-pop {
+  from { transform: scale(0.82); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.tri-num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--brand);
+}
+.tri-lines {
+  width: 38px;
+  height: 30px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(180deg, rgba(20, 22, 42, 0.16) 0 2px, transparent 2px 7px);
+}
+.tri-panel[data-state='pending'] {
+  opacity: 0.45;
+}
+.tri-panel[data-state='active'] {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 55%, transparent), 0 8px 18px rgba(20, 22, 42, 0.2);
+}
+.tri-panel[data-state='done'] {
+  border-color: #1f8a5b;
+}
+.tri-panel[data-state='done']::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(31, 138, 91, 0.14);
+  color: #1f8a5b;
+  font-size: 32px;
+  font-weight: 800;
+}
+.scan-guide-title {
+  margin: 4px 0 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--ink);
+}
+.scan-guide-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.scan-guide-tally {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.sgt-count {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--brand);
+}
+.sgt-panels {
+  color: var(--muted);
+}
+.scan-guide-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9a6a12;
+}
+.scan-guide-err {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #b23121;
+}
+.scan-guide .btn {
+  margin-top: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tri-l,
+  .tri-c,
+  .tri-r {
+    animation: none;
+  }
+}
 .editor-meta {
   display: flex;
   gap: 8px;
