@@ -5552,10 +5552,54 @@ label.lbl {
   transform: translateX(-130%);
   animation: mahjShine 3.4s ease-in-out infinite;
 }
+/* The two START GAME tiles rest at a slight angle and sway loosely (hand-placed
+   feel), at different angles/speeds — exact motion from the design handoff. */
+.start-cta .cta-tile-l {
+  transform: rotate(-7deg);
+  transform-origin: 50% 90%;
+  animation: cta-sway-a 3.6s ease-in-out infinite;
+}
+.start-cta .cta-tile-r {
+  transform: rotate(6deg);
+  transform-origin: 50% 90%;
+  animation: cta-sway-b 4.2s ease-in-out infinite;
+}
+@keyframes cta-sway-a {
+  0%,
+  100% {
+    transform: rotate(-7deg) translateY(0);
+  }
+  35% {
+    transform: rotate(-3deg) translateY(-1.5px);
+  }
+  70% {
+    transform: rotate(-9deg) translateY(0.5px);
+  }
+}
+@keyframes cta-sway-b {
+  0%,
+  100% {
+    transform: rotate(6deg) translateY(0);
+  }
+  40% {
+    transform: rotate(9deg) translateY(-1.5px);
+  }
+  75% {
+    transform: rotate(3deg) translateY(0.5px);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .score-cta-shine {
     animation: none;
     opacity: 0;
+  }
+  .start-cta .cta-tile-l {
+    transform: rotate(-7deg);
+    animation: none;
+  }
+  .start-cta .cta-tile-r {
+    transform: rotate(6deg);
+    animation: none;
   }
 }
 
