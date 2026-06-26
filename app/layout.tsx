@@ -63,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Apply the saved color theme before paint (no flash on reload). */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('mahj.theme');var d={bam:'#E9F4EC',dot:'#EBF1F4',crak:'#F6EEDD',dragon:'#E7F0EA',flower:'#FAECF3',joker:'#F0EBFA',wind:'#EAF2F3'}[t];if(t&&d){document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d);}}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('mahj.theme');var d={bam:'#E9F4EC',dot:'#EBF1F4',crak:'#F6EEDD',dragon:'#E7F0EA',flower:'#FAECF3',joker:'#F0EBFA',wind:'#EAF2F3'}[t];if(t&&d){document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',d);}}catch(e){}})();`,
           }}
         />
         {children}
