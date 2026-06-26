@@ -150,13 +150,9 @@ export default function GameScorer({
 
   const isOnRoster = (f: Friend) =>
     names.some((n) => n.trim().toLowerCase() === f.name.toLowerCase());
-
-  // Tap a friend to add them to the roster; tap again to take them back off.
-  function toggleFriend(f: Friend) {
-    const slot = names.findIndex((n) => n.trim().toLowerCase() === f.name.toLowerCase());
-    if (slot !== -1) setName(slot, '', undefined);
-    else addFriend(f);
-  }
+  // Only friends not yet seated show as chips — a chip disappears when added
+  // and returns (in original order) when its seat is cleared.
+  const availableFriends = friends.filter((f) => !isOnRoster(f));
 
   // Game length: 'open' running tally (default), a set number of hands, or
   // first-to-target score. Chosen on the setup screen before starting.
@@ -366,29 +362,23 @@ export default function GameScorer({
               })}
             </div>
 
-            {friends.length > 0 && (
+            {availableFriends.length > 0 && (
               <>
                 <div className="scorer-label">ADD FROM FRIENDS</div>
                 <div className="friend-chips">
-                  {friends.map((f) => {
-                    const on = isOnRoster(f);
-                    return (
-                      <button
-                        key={f.name}
-                        className="friend-chip2"
-                        data-on={on}
-                        onClick={() => toggleFriend(f)}
-                      >
-                        <span className="friend-chip-tile">
-                          <Avatar avatar={f.avatar} size={20} />
-                        </span>
-                        <span className="friend-chip-name">{f.name}</span>
-                        <span className="friend-chip-plus">
-                          {on ? <IconCheck size={13} /> : '+'}
-                        </span>
-                      </button>
-                    );
-                  })}
+                  {availableFriends.map((f) => (
+                    <button
+                      key={f.name}
+                      className="friend-chip2"
+                      onClick={() => addFriend(f)}
+                    >
+                      <span className="friend-chip-tile">
+                        <Avatar avatar={f.avatar} size={20} />
+                      </span>
+                      <span className="friend-chip-name">{f.name}</span>
+                      <span className="friend-chip-plus">+</span>
+                    </button>
+                  ))}
                 </div>
               </>
             )}
