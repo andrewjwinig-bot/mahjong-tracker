@@ -678,7 +678,7 @@ export default function GameScorer({
                     )}
                     <span className="sp-tile" data-sptile={p.id}>
                       {p.avatar ? (
-                        <Avatar avatar={p.avatar} size={34} />
+                        <Avatar avatar={p.avatar} size={40} />
                       ) : (
                         <span className="sp-tile-num">{i + 1}</span>
                       )}
@@ -697,11 +697,11 @@ export default function GameScorer({
             <div className="scorer-label" style={{ marginTop: 4 }}>RECORD A HAND</div>
 
             <div className="sp-sublabel">Who won?</div>
-            <div className="picker-row">
+            <div className="sp-pillrow">
               {game.players.map((p) => (
                 <button
                   key={p.id}
-                  className="pick-chip"
+                  className="sp-pill"
                   data-active={!wall && winnerId === p.id}
                   onClick={() => {
                     setWall(false);
@@ -713,7 +713,7 @@ export default function GameScorer({
                 </button>
               ))}
               <button
-                className="pick-chip"
+                className="sp-pill"
                 data-active={wall}
                 onClick={() => {
                   setWall(true);
@@ -727,11 +727,11 @@ export default function GameScorer({
             {!wall && (
               <>
                 <div className="sp-sublabel" style={{ marginTop: 16 }}>Hand value</div>
-                <div className="picker-row">
+                <div className="sp-vals">
                   {PRESET_VALUES.map((v) => (
                     <button
                       key={v}
-                      className="pick-chip"
+                      className="sp-val"
                       data-active={value === v}
                       onClick={() => setValue(v)}
                     >
@@ -739,26 +739,26 @@ export default function GameScorer({
                     </button>
                   ))}
                   <input
-                    className="field"
+                    className="sp-valbox"
                     type="number"
                     inputMode="numeric"
                     min={0}
-                    style={{ maxWidth: 84 }}
+                    aria-label="Custom hand value"
                     value={value}
                     onChange={(e) => setValue(Math.max(0, Number(e.target.value) || 0))}
                   />
                 </div>
 
                 <div className="sp-sublabel" style={{ marginTop: 16 }}>How did they win?</div>
-                <div className="segmented">
-                  <button data-active={selfPick} onClick={() => setSelfPick(true)}>
-                    Off the wall (self-pick)
+                <div className="len-seg">
+                  <button className="len-seg-btn" data-active={selfPick} onClick={() => setSelfPick(true)}>
+                    OFF THE WALL (SELF-PICK)
                   </button>
-                  <button data-active={!selfPick} onClick={() => setSelfPick(false)}>
-                    Off a discard
+                  <button className="len-seg-btn" data-active={!selfPick} onClick={() => setSelfPick(false)}>
+                    OFF A DISCARD
                   </button>
                 </div>
-                <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
+                <p style={{ color: '#8c9690', fontSize: 12, fontWeight: 600, margin: '7px 2px 0' }}>
                   {selfPick
                     ? 'Each other player pays double.'
                     : 'The discarder pays double; the others pay single.'}
@@ -767,13 +767,13 @@ export default function GameScorer({
                 {!selfPick && (
                   <>
                     <div className="sp-sublabel" style={{ marginTop: 16 }}>Who discarded it?</div>
-                    <div className="picker-row">
+                    <div className="sp-pillrow">
                       {game.players
                         .filter((p) => p.id !== winnerId)
                         .map((p) => (
                           <button
                             key={p.id}
-                            className="pick-chip"
+                            className="sp-pill"
                             data-active={discarderId === p.id}
                             onClick={() => setDiscarderId(p.id)}
                           >
