@@ -259,6 +259,17 @@ export default function GameScorer({
   const [handTarget, setHandTarget] = useState(8);
   const [scoreTarget, setScoreTarget] = useState(100);
   const goalTarget = goalType === 'hands' ? handTarget : scoreTarget;
+  // Raw text while the target field is being edited. `null` means "not editing",
+  // so the field shows the numeric goalTarget. Keeping a string here lets the user
+  // clear the field to type a fresh number instead of it snapping back to 1.
+  const [targetText, setTargetText] = useState<string | null>(null);
+
+  function commitTarget(raw: string) {
+    const n = Math.max(1, Math.floor(Number(raw) || 0));
+    if (goalType === 'hands') setHandTarget(n);
+    else setScoreTarget(n);
+    setTargetText(null);
+  }
 
   function start() {
     const seeds: PlayerSeed[] = names.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avatars[i] }));
@@ -653,13 +664,13 @@ export default function GameScorer({
 
             <div className="scorer-label">GAME LENGTH</div>
             <div className="len-seg">
-              <button className="len-seg-btn" data-active={goalType === 'open'} onClick={() => setGoalType('open')}>
+              <button className="len-seg-btn" data-active={goalType === 'open'} onClick={() => { setTargetText(null); setGoalType('open'); }}>
                 OPEN
               </button>
-              <button className="len-seg-btn" data-active={goalType === 'hands'} onClick={() => setGoalType('hands')}>
+              <button className="len-seg-btn" data-active={goalType === 'hands'} onClick={() => { setTargetText(null); setGoalType('hands'); }}>
                 # HANDS
               </button>
-              <button className="len-seg-btn" data-active={goalType === 'score'} onClick={() => setGoalType('score')}>
+              <button className="len-seg-btn" data-active={goalType === 'score'} onClick={() => { setTargetText(null); setGoalType('score'); }}>
                 FIRST TO…
               </button>
             </div>
@@ -670,8 +681,12 @@ export default function GameScorer({
                     <button
                       key={v}
                       className="pick-chip"
-                      data-active={goalTarget === v}
-                      onClick={() => (goalType === 'hands' ? setHandTarget(v) : setScoreTarget(v))}
+                      data-active={targetText === null && goalTarget === v}
+                      onClick={() => {
+                        setTargetText(null);
+                        if (goalType === 'hands') setHandTarget(v);
+                        else setScoreTarget(v);
+                      }}
                     >
                       {v}
                     </button>
@@ -682,12 +697,19 @@ export default function GameScorer({
                     inputMode="numeric"
                     min={1}
                     style={{ maxWidth: 84 }}
-                    value={goalTarget}
+                    value={targetText ?? String(goalTarget)}
                     onChange={(e) => {
-                      const n = Math.max(1, Number(e.target.value) || 0);
-                      if (goalType === 'hands') setHandTarget(n);
-                      else setScoreTarget(n);
+                      const raw = e.target.value;
+                      setTargetText(raw);
+                      // Only push a valid number into state; leave it alone while the
+                      // field is empty or mid-edit so the user can retype freely.
+                      const n = Math.floor(Number(raw));
+                      if (raw !== '' && Number.isFinite(n) && n >= 1) {
+                        if (goalType === 'hands') setHandTarget(n);
+                        else setScoreTarget(n);
+                      }
                     }}
+                    onBlur={(e) => commitTarget(e.target.value)}
                   />
                 </div>
                 <p className="len-hint">
