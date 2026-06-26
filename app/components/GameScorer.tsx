@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   type Game,
   type GameGoal,
@@ -22,7 +22,7 @@ import type { TileAvatar } from '../lib/social';
 import type { MahjongCard } from '../lib/types';
 import { colorNotation } from '../lib/theme';
 import Avatar from './Avatar';
-import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock } from './uiIcons';
+import { IconCheck, IconShare, IconLock } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { useConfetti } from './Confetti';
@@ -39,6 +39,44 @@ const PRESET_VALUES = [25, 30, 35, 40, 50];
 
 // Free keeps the most recent game; Pro keeps the full history + rematch-any.
 const FREE_HISTORY = 1;
+
+// Leader-card sparkle ring (5 gold twinkles at fixed offsets / out-of-sync timing).
+const SPARKLES: { px: number; pos: CSSProperties; dur: string; delay: string }[] = [
+  { px: 16, pos: { top: -9, left: '50%', transform: 'translateX(-50%)' }, dur: '1.6s', delay: '.25s' },
+  { px: 12, pos: { top: -3, right: 3 }, dur: '1.9s', delay: '0s' },
+  { px: 11, pos: { top: 20, left: -6 }, dur: '2.1s', delay: '.5s' },
+  { px: 9, pos: { top: 34, right: -4 }, dur: '1.9s', delay: '1s' },
+  { px: 10, pos: { bottom: 16, left: 5 }, dur: '2.3s', delay: '.9s' },
+];
+
+// Two-tone gold star for the band tile (same glyph as the setup sheet header).
+function BandStar() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 100 100" style={{ display: 'block' }}>
+      <path
+        d="M50 13 L60 39.25 L88.04 40.64 L66.17 58.25 L73.51 85.36 L50 70 L26.49 85.36 L33.83 58.25 L11.96 40.64 L40.01 39.25 Z"
+        fill="#F5A524"
+      />
+      <path
+        d="M50 30 L55.88 44.91 L71.87 45.89 L59.51 56.09 L63.52 71.61 L50 63 L36.48 71.61 L40.49 56.09 L28.13 45.89 L44.12 44.91 Z"
+        fill="#FFD874"
+      />
+      <circle cx="50" cy="50" r="5" fill="#C97A1A" />
+    </svg>
+  );
+}
+
+// 4-point gold sparkle for the leader card.
+function Spark() {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 24 24" style={{ display: 'block' }}>
+      <path
+        d="M12 0C13.2 8.4 15.6 10.8 24 12 15.6 13.2 13.2 15.6 12 24 10.8 15.6 8.4 13.2 0 12 8.4 10.8 10.8 8.4 12 0Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 export default function GameScorer({
   suggestedNames,
@@ -60,6 +98,7 @@ export default function GameScorer({
 }) {
   useEscape(onClose);
   const swipe = useSwipeDismiss(onClose);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const pro = usePro();
   const [game, setGame] = useState<Game | null>(() => loadGame());
   const [results, setResults] = useState<GameResult[]>(() => loadResults());
@@ -201,8 +240,114 @@ export default function GameScorer({
     const input: RoundInput = wall
       ? { winnerId: null, handLabel: 'Wall game', value: 0, selfPick: false, discarderId: null }
       : { winnerId, handLabel, value, selfPick, discarderId: selfPick ? null : discarderId };
-    setGame(applyRound(game, input));
+    const next = applyRound(game, input);
+    setGame(next);
+    if (!wall && winnerId) {
+      const last = next.rounds[next.rounds.length - 1];
+      celebrateWin(winnerId, last?.deltas?.[winnerId] ?? 0);
+    }
     resetForm();
+  }
+
+  // The win moment on the scorepad (exact motion from the handoff): the winner's
+  // tile flips, their card pops with a floating "+N", and a shower of gold tiles
+  // rains down the screen. Imperative WAAPI; respects reduced-motion.
+  function celebrateWin(wId: string, gain: number) {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const root = sheetRef.current;
+    if (!root) return;
+    requestAnimationFrame(() => {
+      const byId = (sel: string) =>
+        Array.from(root.querySelectorAll<HTMLElement>(`[${sel}]`)).find(
+          (el) => el.getAttribute(sel) === wId,
+        );
+      const tile = byId('data-sptile');
+      if (tile) {
+        tile.style.transformStyle = 'preserve-3d';
+        tile.animate(
+          [
+            { transform: 'rotateY(0deg) scale(1)' },
+            { transform: 'rotateY(180deg) scale(1.18)', offset: 0.45 },
+            { transform: 'rotateY(360deg) scale(1.06)', offset: 0.8 },
+            { transform: 'rotateY(360deg) scale(1)' },
+          ],
+          { duration: 780, easing: 'cubic-bezier(.34,1.4,.5,1)' },
+        );
+      }
+      const card = byId('data-spcard');
+      if (card) {
+        card.animate(
+          [
+            { transform: 'translateY(0) scale(1)' },
+            { transform: 'translateY(-9px) scale(1.05)', offset: 0.4 },
+            { transform: 'translateY(-4px) scale(1)' },
+          ],
+          { duration: 720, easing: 'cubic-bezier(.34,1.5,.5,1)' },
+        );
+        if (gain > 0) {
+          const f = document.createElement('div');
+          f.textContent = '+' + gain;
+          f.className = 'sp-floatpts';
+          card.appendChild(f);
+          f.animate(
+            [
+              { transform: 'translate(-50%,0) scale(.6)', opacity: 0 },
+              { transform: 'translate(-50%,-24px) scale(1.1)', opacity: 1, offset: 0.4 },
+              { transform: 'translate(-50%,-54px) scale(1)', opacity: 0 },
+            ],
+            { duration: 1200, easing: 'ease-out' },
+          ).onfinish = () => f.remove();
+        }
+      }
+      goldRain();
+    });
+  }
+
+  // 26 gold mahjong tiles falling past the bottom of the screen.
+  function goldRain() {
+    const layer = document.createElement('div');
+    layer.className = 'gold-rain';
+    document.body.appendChild(layer);
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const glyphs = ['中', '發', '東', '南', '西', '北', '花'];
+    for (let i = 0; i < 26; i++) {
+      const w = 15 + Math.round(Math.random() * 10);
+      const h = Math.round(w * 1.34);
+      const t = document.createElement('div');
+      const x = Math.random() * (W - w);
+      const g = glyphs[Math.floor(Math.random() * glyphs.length)];
+      t.className = 'gold-tile';
+      t.style.cssText = `left:${x.toFixed(0)}px;top:${-h - 10}px;width:${w}px;height:${h}px`;
+      t.innerHTML = `<span style="font-size:${Math.round(h * 0.56)}px">${g}</span>`;
+      layer.appendChild(t);
+      const sway = (Math.random() - 0.5) * 60;
+      const rot = (Math.random() - 0.5) * 700;
+      const dur = 1500 + Math.random() * 1200;
+      const delay = Math.random() * 500;
+      t.animate(
+        [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+          {
+            transform: `translate(${(sway * 0.4).toFixed(0)}px,${Math.round(H * 0.28)}px) rotate(${(rot * 0.3).toFixed(0)}deg)`,
+            opacity: 1,
+            offset: 0.12,
+          },
+          {
+            transform: `translate(${sway.toFixed(0)}px,${H + h + 22}px) rotate(${rot.toFixed(0)}deg)`,
+            opacity: 1,
+            offset: 0.85,
+          },
+          {
+            transform: `translate(${sway.toFixed(0)}px,${H + h + 44}px) rotate(${rot.toFixed(0)}deg)`,
+            opacity: 0,
+          },
+        ],
+        { duration: dur, delay, easing: 'cubic-bezier(.3,.5,.45,1)' },
+      );
+    }
+    setTimeout(() => layer.remove(), 3200);
   }
 
   function undo() {
@@ -291,6 +436,7 @@ export default function GameScorer({
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div
+        ref={sheetRef}
         className="sheet scorer"
         onClick={(e) => e.stopPropagation()}
         onTouchStart={swipe.onTouchStart}
@@ -501,44 +647,61 @@ export default function GameScorer({
           </>
         ) : (
           <>
-            <div className="grab" />
-            <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <IconTrophy size={20} /> Scorepad
-            </h2>
-            <p className="sheet-sub">{goalSub}</p>
+            <div className="scorer-band">
+              <span className="grab light" />
+              <span className="scorer-band-tile" aria-hidden>
+                <BandStar />
+              </span>
+              <div className="scorer-band-kicker">LIVE GAME</div>
+              <div className="scorer-band-title">Scorepad</div>
+              <div className="scorer-band-sub">{goalSub}</div>
+            </div>
 
             {/* Scoreboard */}
-            <div className="score-board">
-              {game.players.map((p) => (
-                <div className="score-cell" key={p.id} data-lead={p.id === lead}>
-                  {p.id === lead && (
-                    <span className="score-crown" aria-label="Leading">
-                      <IconTrophy size={14} />
+            <div className="sp-board">
+              {game.players.map((p, i) => {
+                const isLead = p.id === lead && game.rounds.length > 0 && p.score > 0;
+                return (
+                  <div className="sp-card" key={p.id} data-lead={isLead} data-spcard={p.id}>
+                    {isLead && (
+                      <span className="sp-sparkles" aria-hidden>
+                        {SPARKLES.map((s, k) => (
+                          <span
+                            key={k}
+                            className="sp-spark"
+                            style={{ width: s.px, height: s.px, animationDuration: s.dur, animationDelay: s.delay, ...s.pos }}
+                          >
+                            <Spark />
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                    <span className="sp-tile" data-sptile={p.id}>
+                      {p.avatar ? (
+                        <Avatar avatar={p.avatar} size={40} />
+                      ) : (
+                        <span className="sp-tile-num">{i + 1}</span>
+                      )}
                     </span>
-                  )}
-                  {p.avatar && (
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
-                      <Avatar avatar={p.avatar} size={28} />
+                    <div className="sp-name">{p.name}</div>
+                    <div className="sp-score" data-neg={p.score < 0} data-zero={p.score === 0}>
+                      {p.score > 0 ? '+' : ''}
+                      {p.score}
                     </div>
-                  )}
-                  <div className="score-name">{p.name}</div>
-                  <div className="score-num" data-neg={p.score < 0}>
-                    {p.score > 0 ? '+' : ''}
-                    {p.score}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Record a hand */}
-            <div className="set-section">Record a hand</div>
+            <div className="scorer-label" style={{ marginTop: 4 }}>RECORD A HAND</div>
 
-            <label className="lbl">Who won?</label>
-            <div className="picker-row">
+            <div className="sp-sublabel">Who won?</div>
+            <div className="sp-pillrow">
               {game.players.map((p) => (
                 <button
                   key={p.id}
-                  className="pick-chip"
+                  className="sp-pill"
                   data-active={!wall && winnerId === p.id}
                   onClick={() => {
                     setWall(false);
@@ -550,7 +713,7 @@ export default function GameScorer({
                 </button>
               ))}
               <button
-                className="pick-chip"
+                className="sp-pill"
                 data-active={wall}
                 onClick={() => {
                   setWall(true);
@@ -563,14 +726,12 @@ export default function GameScorer({
 
             {!wall && (
               <>
-                <label className="lbl" style={{ marginTop: 12 }}>
-                  Hand value
-                </label>
-                <div className="picker-row">
+                <div className="sp-sublabel" style={{ marginTop: 16 }}>Hand value</div>
+                <div className="sp-vals">
                   {PRESET_VALUES.map((v) => (
                     <button
                       key={v}
-                      className="pick-chip"
+                      className="sp-val"
                       data-active={value === v}
                       onClick={() => setValue(v)}
                     >
@@ -578,28 +739,26 @@ export default function GameScorer({
                     </button>
                   ))}
                   <input
-                    className="field"
+                    className="sp-valbox"
                     type="number"
                     inputMode="numeric"
                     min={0}
-                    style={{ maxWidth: 84 }}
+                    aria-label="Custom hand value"
                     value={value}
                     onChange={(e) => setValue(Math.max(0, Number(e.target.value) || 0))}
                   />
                 </div>
 
-                <label className="lbl" style={{ marginTop: 12 }}>
-                  How did they win?
-                </label>
-                <div className="segmented">
-                  <button data-active={selfPick} onClick={() => setSelfPick(true)}>
-                    Off the wall (self-pick)
+                <div className="sp-sublabel" style={{ marginTop: 16 }}>How did they win?</div>
+                <div className="len-seg">
+                  <button className="len-seg-btn" data-active={selfPick} onClick={() => setSelfPick(true)}>
+                    OFF THE WALL (SELF-PICK)
                   </button>
-                  <button data-active={!selfPick} onClick={() => setSelfPick(false)}>
-                    Off a discard
+                  <button className="len-seg-btn" data-active={!selfPick} onClick={() => setSelfPick(false)}>
+                    OFF A DISCARD
                   </button>
                 </div>
-                <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '6px 2px 0' }}>
+                <p style={{ color: '#8c9690', fontSize: 12, fontWeight: 600, margin: '7px 2px 0' }}>
                   {selfPick
                     ? 'Each other player pays double.'
                     : 'The discarder pays double; the others pay single.'}
@@ -607,16 +766,14 @@ export default function GameScorer({
 
                 {!selfPick && (
                   <>
-                    <label className="lbl" style={{ marginTop: 12 }}>
-                      Who discarded it?
-                    </label>
-                    <div className="picker-row">
+                    <div className="sp-sublabel" style={{ marginTop: 16 }}>Who discarded it?</div>
+                    <div className="sp-pillrow">
                       {game.players
                         .filter((p) => p.id !== winnerId)
                         .map((p) => (
                           <button
                             key={p.id}
-                            className="pick-chip"
+                            className="sp-pill"
                             data-active={discarderId === p.id}
                             onClick={() => setDiscarderId(p.id)}
                           >
@@ -627,9 +784,9 @@ export default function GameScorer({
                   </>
                 )}
 
-                <label className="lbl" style={{ marginTop: 12 }}>
-                  Hand <span style={{ color: 'var(--muted)' }}>— optional</span>
-                </label>
+                <div className="sp-sublabel" style={{ marginTop: 16 }}>
+                  Hand <span style={{ color: '#c2c8c4' }}>— optional</span>
+                </div>
                 {handPickId ? (
                   // A line is chosen — collapse the picker to just the winner,
                   // with "Change" to re-open. Saves space on the record form.
@@ -702,46 +859,37 @@ export default function GameScorer({
               </>
             )}
 
-            <button
-              className="btn"
-              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-              disabled={!canRecord}
-              onClick={record}
-            >
-              <IconCheck size={17} /> Record hand
+            <button className="score-cta sp-record" disabled={!canRecord} onClick={record}>
+              <span className="score-cta-shine" aria-hidden />
+              <span className="score-cta-label sp-record-label">
+                <IconCheck size={18} /> RECORD HAND
+              </span>
             </button>
 
             {/* History */}
             {game.rounds.length > 0 && (
               <>
-                <div className="set-section">History</div>
-                <button
-                  className="btn ghost"
-                  style={{ marginBottom: 10 }}
-                  onClick={undo}
-                >
+                <div className="scorer-label" style={{ marginTop: 18 }}>HISTORY</div>
+                <button className="btn ghost" style={{ marginBottom: 10 }} onClick={undo}>
                   Undo last hand
                 </button>
-                <div className="round-list">
-                  {game.rounds.map((r) => (
-                    <div className="round-row" key={r.id}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="round-title">
-                          {r.winnerId ? `${nameOf(r.winnerId)} won` : 'Wall game'}
-                          {r.value > 0 && ` · ${r.value}`}
+                <div className="sp-hist">
+                  {game.rounds
+                    .map((r, i) => ({ r, n: i + 1 }))
+                    .reverse()
+                    .map(({ r, n }) => (
+                      <div className="sp-hist-row" key={r.id}>
+                        <span className="sp-hist-no">HAND {n}</span>
+                        <span className="sp-hist-text">
+                          {r.winnerId ? `${nameOf(r.winnerId)} won` : 'Wall — no win'}
                           {r.winnerId && (r.selfPick ? ' · self-pick' : ` · off ${nameOf(r.discarderId)}`)}
-                        </div>
-                        {r.handLabel && r.handLabel !== 'Wall game' && (
-                          <div className="round-sub">{r.handLabel}</div>
-                        )}
+                          {r.handLabel && r.handLabel !== 'Wall game' ? ` · ${r.handLabel}` : ''}
+                        </span>
+                        <span className="sp-hist-pts">
+                          {r.winnerId ? `+${Math.max(...Object.values(r.deltas))}` : '—'}
+                        </span>
                       </div>
-                      {r.winnerId && (
-                        <div className="round-pts">
-                          +{Math.max(...Object.values(r.deltas))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </>
             )}
@@ -761,16 +909,13 @@ export default function GameScorer({
                 </div>
               </div>
             ) : (
-              <div className="row" style={{ marginTop: 16 }}>
-                <button
-                  className="btn ghost"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, color: 'var(--accent)' }}
-                  onClick={() => setEndConfirm(true)}
-                >
-                  <IconTrash size={17} /> End game
+              <div className="sp-footer">
+                <button className="sp-endgame" onClick={() => setEndConfirm(true)}>
+                  END GAME
                 </button>
-                <button className="btn" onClick={onClose}>
-                  Done
+                <button className="score-cta sp-done" onClick={onClose}>
+                  <span className="score-cta-shine" aria-hidden />
+                  <span className="score-cta-label">DONE</span>
                 </button>
               </div>
             )}

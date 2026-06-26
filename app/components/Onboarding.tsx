@@ -53,7 +53,11 @@ function wobbleTile(el: Element | null) {
 const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const cloud = isCloudEnabled();
 
-export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: TileAvatar) => void }) {
+export default function Onboarding({
+  onDone,
+}: {
+  onDone: (a: Account, avatar?: TileAvatar, opts?: { isNewUser?: boolean }) => void;
+}) {
   const [step, setStep] = useState<'form' | 'card'>('form');
   const [account, setAccount] = useState<Account | null>(null);
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
@@ -125,7 +129,8 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
     saveAccount(acc); // password is never stored on-device
     setAccount(acc);
     if (opts?.showCard === false) {
-      onDone(acc); // returning sign-in → straight into the app
+      // Returning sign-in → straight into the app, no first-run tour.
+      onDone(acc, undefined, { isNewUser: false });
     } else {
       setStep('card'); // first sign-up: one-time "get the official card" prompt
     }
@@ -142,10 +147,18 @@ export default function Onboarding({ onDone }: { onDone: (a: Account, avatar?: T
             <TileStrip count={7} />
           </div>
           <OfficialCardCallout />
-          <button className="btn" style={{ marginTop: 16 }} onClick={() => onDone(account, chosenAvatar())}>
+          <button
+            className="btn"
+            style={{ marginTop: 16 }}
+            onClick={() => onDone(account, chosenAvatar(), { isNewUser: true })}
+          >
             Start playing
           </button>
-          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => onDone(account, chosenAvatar())}>
+          <button
+            className="btn ghost"
+            style={{ marginTop: 10 }}
+            onClick={() => onDone(account, chosenAvatar(), { isNewUser: true })}
+          >
             I already have my card
           </button>
         </div>

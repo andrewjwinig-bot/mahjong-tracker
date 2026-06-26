@@ -403,10 +403,13 @@ export default function AppShell() {
   // No real card entered and the sample hasn't been accepted → show setup.
   const needsCard = card.source !== 'custom' && !sampleOptIn;
 
-  const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar) => {
+  const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar, opts?: { isNewUser?: boolean }) => {
     setAccount(a);
     setExperienceState(a.experience);
-    if (!tutorialSeen()) setShowTutorial(true);
+    // The first-run tour is for brand-new sign-ups only. A returning sign-in
+    // skips it — and we mark it seen so it won't surface on later app opens.
+    if (opts?.isNewUser === false) setTutorialSeen();
+    else if (!tutorialSeen()) setShowTutorial(true);
     // Adopt the chosen username as the profile name + the tile picked at sign-up.
     const initial = a.username.trim().charAt(0).toUpperCase() || 'Y';
     setSocialState((prev) => {
