@@ -144,12 +144,14 @@ export default function SettingsSheet({
             backgroundImage: `url("${t.wallpaper}")`,
           }}
         />
-        <span className="tc-dot" style={{ background: t.swatch.brand }}>
-          {active ? '✓' : locked ? '★' : ''}
-        </span>
         <span className="tc-foot">
           <span className="tc-sq" style={{ background: t.swatch.brand }} />
           <span className="tc-name">{t.name}</span>
+          {locked ? (
+            <span className="tc-lock" aria-label="Pro theme">🔒</span>
+          ) : active ? (
+            <span className="tc-check" style={{ color: t.swatch.brand }} aria-hidden>✓</span>
+          ) : null}
         </span>
       </button>
     );

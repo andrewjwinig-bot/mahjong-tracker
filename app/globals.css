@@ -2886,6 +2886,7 @@ label.lbl {
   box-shadow: 0 3px 10px rgba(20, 22, 42, 0.12);
   background: #fff;
   cursor: pointer;
+  touch-action: manipulation;
   transition: transform 0.1s ease, box-shadow 0.12s ease;
 }
 /* The whole chip is the tap target; press anywhere to switch theme. */
@@ -2894,7 +2895,17 @@ label.lbl {
 }
 .theme-chip[data-active="true"] {
   border-color: var(--brand);
-  box-shadow: 0 0 0 1px var(--brand), 0 3px 10px rgba(20, 22, 42, 0.16);
+  box-shadow: 0 0 0 2px var(--brand), 0 3px 12px rgba(20, 22, 42, 0.18);
+}
+.tc-lock,
+.tc-check {
+  margin-left: auto;
+  flex: none;
+  font-size: 13px;
+  line-height: 1;
+}
+.tc-check {
+  font-weight: 900;
 }
 .tc-thumb {
   display: block;
