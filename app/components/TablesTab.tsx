@@ -360,7 +360,7 @@ function TableDetail({
           <div className="detail-sub">{table.members.length + 1} players</div>
         </div>
         <button
-          className="btn green"
+          className="btn green plain"
           style={{ width: 'auto', padding: '9px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
           onClick={() => setInviteOpen(true)}
         >
