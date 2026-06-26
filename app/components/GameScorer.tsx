@@ -274,7 +274,17 @@ export default function GameScorer({
             <div className="scorer-band">
               <span className="grab light" />
               <span className="scorer-band-tile" aria-hidden>
-                <IconTrophy size={24} />
+                <svg width="30" height="30" viewBox="0 0 100 100" style={{ display: 'block' }}>
+                  <path
+                    d="M50 13 L60 39.25 L88.04 40.64 L66.17 58.25 L73.51 85.36 L50 70 L26.49 85.36 L33.83 58.25 L11.96 40.64 L40.01 39.25 Z"
+                    fill="#F5A524"
+                  />
+                  <path
+                    d="M50 30 L55.88 44.91 L71.87 45.89 L59.51 56.09 L63.52 71.61 L50 63 L36.48 71.61 L40.49 56.09 L28.13 45.89 L44.12 44.91 Z"
+                    fill="#FFD874"
+                  />
+                  <circle cx="50" cy="50" r="5" fill="#C97A1A" />
+                </svg>
               </span>
               <div className="scorer-band-kicker">LIVE SCORING</div>
               <div className="scorer-band-title">Score a Game</div>
@@ -399,9 +409,9 @@ export default function GameScorer({
 
             <button className="score-cta start-cta" onClick={start}>
               <span className="score-cta-shine" aria-hidden />
-              <span className="score-cta-tile" style={{ color: '#C0392B' }}>萬</span>
+              <span className="score-cta-tile cta-tile-l" style={{ color: '#C0392B' }}>萬</span>
               <span className="score-cta-label">START GAME</span>
-              <span className="score-cta-tile" style={{ color: '#15803D' }}>發</span>
+              <span className="score-cta-tile cta-tile-r" style={{ color: '#15803D' }}>發</span>
             </button>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
               Cancel
