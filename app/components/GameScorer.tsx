@@ -39,6 +39,7 @@ const FREE_HISTORY = 1;
 export default function GameScorer({
   suggestedNames,
   friends,
+  me,
   card,
   handNotes,
   onClose,
@@ -46,6 +47,8 @@ export default function GameScorer({
 }: {
   suggestedNames: string[];
   friends: Friend[];
+  /** You — seeded as player 1 with your tile (removable like a friend). */
+  me?: Friend;
   card: MahjongCard;
   handNotes: Record<string, string>;
   onClose: () => void;
@@ -80,16 +83,19 @@ export default function GameScorer({
     return base.slice(0, 4);
   }, [suggestedNames]);
   const [names, setNames] = useState<string[]>(initialNames);
-  // Auto-select seeded friends (e.g. "Score this table"): any seeded name that
-  // matches a friend starts already picked, with their tile avatar — so a table
-  // opens with its crew selected, not just typed in. Friends beyond the 4 slots
+  // The tile avatar for a seeded name: you (player 1) and any seeded friend
+  // (e.g. "Score this table") start already picked with their tile — so the
+  // setup opens with the crew selected, not just typed in.
+  const avatarForName = useMemo(() => {
+    const roster = me ? [me, ...friends] : friends;
+    return (n: string) =>
+      roster.find((f) => f.name.toLowerCase() === n.trim().toLowerCase())?.avatar;
+  }, [me, friends]);
+  // Auto-select seeded names with their tile avatar. Friends beyond the 4 slots
   // stay available under "Add from friends".
   const initialAvatars = useMemo(
-    () =>
-      initialNames.map(
-        (n) => friends.find((f) => f.name.toLowerCase() === n.trim().toLowerCase())?.avatar,
-      ),
-    [initialNames, friends],
+    () => initialNames.map((n) => avatarForName(n)),
+    [initialNames, avatarForName],
   );
   const [avatars, setAvatars] = useState<(TileAvatar | undefined)[]>(initialAvatars);
 
@@ -174,14 +180,14 @@ export default function GameScorer({
     resetForm();
     setEndConfirm(false);
     setNames(initialNames);
-    setAvatars([undefined, undefined, undefined, undefined]);
+    setAvatars(initialAvatars);
   }
 
   function rematch(r: GameResult) {
     const ns = r.players.map((p) => p.name).slice(0, 4);
     while (ns.length < 4) ns.push('');
     setNames(ns);
-    setAvatars(ns.map((n) => friends.find((f) => f.name.toLowerCase() === n.toLowerCase())?.avatar));
+    setAvatars(ns.map((n) => avatarForName(n)));
   }
 
   const lead = game ? leaderId(game.players) : null;
