@@ -8,7 +8,7 @@
 // and the UI keeps manual entry only.
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 60; // Pro honors this; Hobby caps ~10s.
 
 const MODEL = process.env.CARD_SCAN_MODEL || 'claude-opus-4-8';
 
