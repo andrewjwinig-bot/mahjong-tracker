@@ -1332,42 +1332,68 @@ label.lbl {
 }
 
 /* Friendly daily streak banner at the top of the Feed home. */
-.feed-streak {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin-top: 14px;
-  padding: 11px 13px;
-  border-radius: 11px;
-  background: rgba(245, 165, 36, 0.12);
-  border: 2px solid rgba(245, 165, 36, 0.45);
-  font-size: 13px;
-  font-weight: 600;
-  color: #7a4a09;
-}
-.feed-streak strong {
-  font-weight: 800;
-  color: #1a1410;
-}
-.fs-flame {
+/* Streak as a compact corner chip (mirrors the gear, top-left). Glanceable
+   status, not a banner. Tap → a brief "keep it going" nudge. */
+.streak-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 60;
+  height: 40px;
+  padding: 0 13px 0 11px;
   display: inline-flex;
-  flex: none;
+  align-items: center;
+  gap: 5px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+}
+.streak-chip:active {
+  transform: scale(0.92);
+}
+.sc-flame {
+  display: inline-flex;
   color: #f5a524;
 }
-.fs-dismiss {
-  flex: 0 0 auto;
-  width: 28px;
-  height: 22px;
-  margin: -4px -6px -4px 0;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
+.sc-num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
   line-height: 1;
-  color: #c9871a;
+  color: #1a1410;
 }
-.fs-dismiss:active {
-  transform: scale(0.9);
+.sc-nudge {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  white-space: nowrap;
+  background: #1a1410;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  padding: 7px 11px;
+  border-radius: 9px;
+  box-shadow: var(--shadow);
+  animation: sc-pop 0.18s ease;
+}
+.sc-nudge::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 16px;
+  border: 5px solid transparent;
+  border-bottom-color: #1a1410;
+}
+@keyframes sc-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Welcoming empty state for the Feed. */

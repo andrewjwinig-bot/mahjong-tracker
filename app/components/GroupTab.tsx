@@ -191,7 +191,7 @@ function fireBanner(el: HTMLElement | null, kind: FeedKind) {
 import PageTitle from './PageTitle';
 import EmptyFeed from './EmptyFeed';
 import EmptyProfile from './EmptyProfile';
-import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
+import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers } from './uiIcons';
 import ProUpsell from './ProUpsell';
 
 interface Props {
@@ -202,7 +202,6 @@ interface Props {
   youStats: { handsCleared: number; points: number };
   /** The local user's real per-hand win counts (for your own detail view). */
   handCounts: Record<string, number>;
-  streak: number;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
@@ -260,16 +259,12 @@ function timeAgo(ts: number): string {
   return d === 1 ? 'yesterday' : `${d}d ago`;
 }
 
-const STREAK_DISMISS_KEY = 'mahj.streakDismissed';
-const streakDayKey = () => new Date().toDateString();
-
 export default function GroupTab({
   members,
   feed,
   profile,
   youStats,
   handCounts,
-  streak,
   onToggleLike,
   onAddComment,
   onAddFriend,
@@ -307,24 +302,6 @@ export default function GroupTab({
       live = false;
     };
   }, [cloud, addOpen]);
-
-  // Streak banner: dismissible for the day, like the Tip — it returns tomorrow.
-  const [streakHidden, setStreakHidden] = useState(false);
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(STREAK_DISMISS_KEY) === streakDayKey()) setStreakHidden(true);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  function dismissStreak() {
-    try {
-      localStorage.setItem(STREAK_DISMISS_KEY, streakDayKey());
-    } catch {
-      /* ignore */
-    }
-    setStreakHidden(true);
-  }
 
   // Merge live "you" identity + stats into the leaderboard, then rank.
   const ranked = useMemo(() => {
@@ -370,17 +347,6 @@ export default function GroupTab({
         </button>
       )}
 
-      {streak > 1 && !streakHidden && (
-        <div className="feed-streak">
-          <span className="fs-flame"><IconFlame size={16} /></span>
-          <span style={{ flex: 1 }}>
-            You’re on a <strong>{streak}-day streak</strong> — keep it going!
-          </span>
-          <button className="fs-dismiss" onClick={dismissStreak} aria-label="Dismiss streak">
-            ×
-          </button>
-        </div>
-      )}
 
       <button className="score-cta" style={{ marginBottom: 22 }} onClick={onScore}>
         <span className="mahj-hero-shine" aria-hidden />
