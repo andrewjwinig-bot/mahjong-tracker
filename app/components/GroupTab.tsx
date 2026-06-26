@@ -397,6 +397,7 @@ export default function GroupTab({
 
       {addOpen && (
         <AddFriendSheet
+          members={members}
           onAdd={(name, avatar) => {
             onAddFriend(name, avatar);
             setAddOpen(false);
@@ -1031,9 +1032,11 @@ const SAMPLE_PLAYERS: CloudFriend[] = [
 ];
 
 export function AddFriendSheet({
+  members = [],
   onAdd,
   onClose,
 }: {
+  members?: GroupMember[];
   onAdd: (name: string, avatar: TileAvatar) => void;
   onClose: () => void;
 }) {
@@ -1121,6 +1124,17 @@ export function AddFriendSheet({
 
   const friendIds = new Set(friends.map((f) => f.id));
 
+  // "Your friends" = the crew on your leaderboard (everyone but you), plus any
+  // accepted cloud friends not already in that list (deduped by name).
+  const crew = members.filter((m) => !m.isYou);
+  const crewNames = new Set(crew.map((m) => m.name.toLowerCase()));
+  const yourFriends = [
+    ...crew.map((m) => ({ key: m.id, name: m.name, avatar: m.avatar, sub: `${m.handsCleared}/${TOTAL_HANDS} cleared` })),
+    ...friends
+      .filter((f) => !crewNames.has(f.username.toLowerCase()))
+      .map((f) => ({ key: f.id, name: f.username, avatar: f.avatar, sub: `@${f.handle}` })),
+  ];
+
   return (
     <div className="modal-scrim" onClick={onClose}>
       <div
@@ -1162,15 +1176,15 @@ export function AddFriendSheet({
           </div>
         )}
 
-        {cloud && friends.length > 0 && (
+        {yourFriends.length > 0 && (
           <div style={{ marginBottom: 14 }}>
-            <label className="lbl">Your friends</label>
-            {friends.map((u) => (
-              <div key={u.id} className="search-row">
+            <label className="lbl">Your friends · {yourFriends.length}</label>
+            {yourFriends.map((u) => (
+              <div key={u.key} className="search-row">
                 <Avatar avatar={u.avatar} size={36} />
                 <div className="search-id">
-                  <div className="search-name">{u.username}</div>
-                  <div className="search-handle">@{u.handle}</div>
+                  <div className="search-name">{u.name}</div>
+                  <div className="search-handle">{u.sub}</div>
                 </div>
               </div>
             ))}
