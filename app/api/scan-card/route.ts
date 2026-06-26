@@ -58,7 +58,7 @@ THE TILE VOCABULARY (use these symbols)
 - Flowers: F.
 - Dragons: D for a dragon tile; the white/soap dragon counts as a dragon too.
 - Winds: N, E, W, S.
-- Suits are CRAK, BAM, and DOT. On the card the suit of a number group is shown by its COLOUR, not by a letter. Use colour to determine suit: a group printed in one colour is all one suit; groups printed in different colours are different suits. When a number group's suit is conveyed only by colour, append a suit letter so it is not lost - C = crak, B = bam, D = dot (e.g. a green "111" becomes 111B if green is bam on this card). Keep the same suit letter for every group sharing that colour in the hand, and different letters for different colours.
+- Numbers print as PLAIN DIGITS; their suit (crak / bam / dot) is shown only by the digit's COLOUR, never by a letter. Transcribe number groups as just the digits exactly as printed (e.g. "111 222 333"), groups separated by single spaces. Do NOT append or insert any letter or mark that is not physically printed on the tiles — in particular NEVER add a suit letter such as C, B, or D to a number group. The only letters that belong in a hand are ones actually printed on tiles: F (flower), D (a dragon tile), and N/E/W/S (winds). A space between groups is just a space — never a letter.
 
 RULES YOU MUST APPLY (they catch your own mistakes)
 - Every hand totals EXACTLY 14 tiles. Count the tiles you transcribed for each line. A pair = 2, a pung = 3, a kong = 4, a quint = 5, a sextet = 6, "FF" = 2 flowers, "NEWS" = 4, "DDDD" = 4, "2025" = 4 number tiles, and so on. Put that total in tileCount. If it is not 14, re-examine the line before moving on.
