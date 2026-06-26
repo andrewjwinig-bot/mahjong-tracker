@@ -102,6 +102,9 @@ export default function GameScorer({
     [initialNames, avatarForName],
   );
   const [avatars, setAvatars] = useState<(TileAvatar | undefined)[]>(initialAvatars);
+  // The seat just filled from a friend tap → play its slide-in + tile wiggle
+  // once the DOM has the filled seat (see effect below).
+  const [animSeat, setAnimSeat] = useState<number | null>(null);
 
   function setName(i: number, name: string, avatar?: TileAvatar) {
     setNames((prev) => prev.map((x, j) => (j === i ? name : x)));
@@ -113,7 +116,37 @@ export default function GameScorer({
     let slot = names.findIndex((n) => !n.trim());
     if (slot === -1) slot = 3;
     setName(slot, f.name, f.avatar);
+    setAnimSeat(slot);
   }
+
+  // Add-a-player motion (exact spec): the seat row slides in and its tile gives
+  // a quick wiggle/settle. Runs after the seat renders filled.
+  useEffect(() => {
+    if (animSeat == null) return;
+    setAnimSeat(null);
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const row = document.querySelector<HTMLElement>(`[data-seat="${animSeat}"]`);
+    if (!row) return;
+    row.animate(
+      [
+        { transform: 'translateX(8px) scale(0.97)', opacity: 0.4 },
+        { transform: 'translateX(-3px) scale(1.02)', opacity: 1, offset: 0.6 },
+        { transform: 'translateX(0) scale(1)', opacity: 1 },
+      ],
+      { duration: 420, easing: 'cubic-bezier(.34,1.4,.5,1)' },
+    );
+    const tile = row.querySelector<HTMLElement>('[data-seattile]');
+    tile?.animate(
+      [
+        { transform: 'rotate(0deg)' },
+        { transform: 'rotate(-4deg)', offset: 0.3 },
+        { transform: 'rotate(2.5deg)', offset: 0.6 },
+        { transform: 'rotate(-1deg)', offset: 0.82 },
+        { transform: 'rotate(0deg)' },
+      ],
+      { duration: 620, easing: 'ease-in-out' },
+    );
+  }, [animSeat]);
 
   const isOnRoster = (f: Friend) =>
     names.some((n) => n.trim().toLowerCase() === f.name.toLowerCase());
@@ -298,9 +331,9 @@ export default function GameScorer({
               {names.map((n, i) => {
                 const filled = !!avatars[i];
                 return (
-                  <div key={i} className="seat-row">
+                  <div key={i} className="seat-row" data-seat={i}>
                     {filled ? (
-                      <span className="seat-av">
+                      <span className="seat-av" data-seattile>
                         <Avatar avatar={avatars[i]!} size={46} />
                       </span>
                     ) : (
