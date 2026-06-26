@@ -405,6 +405,10 @@ export default function GroupTab({
             setAddOpen(false);
           }}
           onRemove={onRemoveFriend}
+          onOpenMember={(m) => {
+            setAddOpen(false);
+            setDetail(m);
+          }}
           onClose={() => setAddOpen(false)}
         />
       )}
@@ -1038,11 +1042,13 @@ export function AddFriendSheet({
   members = [],
   onAdd,
   onRemove,
+  onOpenMember,
   onClose,
 }: {
   members?: GroupMember[];
   onAdd: (name: string, avatar: TileAvatar) => void;
   onRemove?: (id: string) => void;
+  onOpenMember?: (m: GroupMember) => void;
   onClose: () => void;
 }) {
   // Friends are real accounts — you find them by searching usernames (cloud) or
@@ -1134,10 +1140,10 @@ export function AddFriendSheet({
   const crew = members.filter((m) => !m.isYou);
   const crewNames = new Set(crew.map((m) => m.name.toLowerCase()));
   const yourFriends = [
-    ...crew.map((m) => ({ key: m.id, id: m.id, name: m.name, avatar: m.avatar, sub: `${m.handsCleared}/${TOTAL_HANDS} cleared`, removable: true })),
+    ...crew.map((m) => ({ key: m.id, id: m.id, name: m.name, avatar: m.avatar, sub: `${m.handsCleared}/${TOTAL_HANDS} cleared`, removable: true, member: m as GroupMember | null })),
     ...friends
       .filter((f) => !crewNames.has(f.username.toLowerCase()))
-      .map((f) => ({ key: f.id, id: f.id, name: f.username, avatar: f.avatar, sub: `@${f.handle}`, removable: false })),
+      .map((f) => ({ key: f.id, id: f.id, name: f.username, avatar: f.avatar, sub: `@${f.handle}`, removable: false, member: null as GroupMember | null })),
   ];
 
   return (
@@ -1184,24 +1190,38 @@ export function AddFriendSheet({
         {yourFriends.length > 0 && (
           <div style={{ marginBottom: 14 }}>
             <label className="lbl">Your friends · {yourFriends.length}</label>
-            {yourFriends.map((u) => (
-              <div key={u.key} className="search-row">
-                <Avatar avatar={u.avatar} size={36} />
-                <div className="search-id">
-                  <div className="search-name">{u.name}</div>
-                  <div className="search-handle">{u.sub}</div>
+            {yourFriends.map((u) => {
+              const openable = !!(u.member && onOpenMember);
+              const Inner = (
+                <>
+                  <Avatar avatar={u.avatar} size={36} />
+                  <div className="search-id">
+                    <div className="search-name">{u.name}</div>
+                    <div className="search-handle">{u.sub}</div>
+                  </div>
+                </>
+              );
+              return (
+                <div key={u.key} className="search-row">
+                  {openable ? (
+                    <button className="friend-open" onClick={() => onOpenMember!(u.member!)}>
+                      {Inner}
+                    </button>
+                  ) : (
+                    Inner
+                  )}
+                  {u.removable && onRemove && (
+                    <button
+                      className="friend-remove"
+                      aria-label={`Remove ${u.name}`}
+                      onClick={() => onRemove(u.id)}
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
-                {u.removable && onRemove && (
-                  <button
-                    className="friend-remove"
-                    aria-label={`Remove ${u.name}`}
-                    onClick={() => onRemove(u.id)}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
