@@ -446,7 +446,9 @@ export default function AppShell() {
           <IconSettings size={22} />
         </button>
 
-        <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />
+        {/* Mount only after the initial load so the "already earned" baseline is
+            captured with real data — otherwise prior trophies re-toast on login. */}
+        {loaded && <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />}
 
         {!loaded || !minElapsed ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
