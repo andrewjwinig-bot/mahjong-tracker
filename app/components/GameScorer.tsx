@@ -72,7 +72,18 @@ export default function GameScorer({
     return base.slice(0, 4);
   }, [suggestedNames]);
   const [names, setNames] = useState<string[]>(initialNames);
-  const [avatars, setAvatars] = useState<(TileAvatar | undefined)[]>([undefined, undefined, undefined, undefined]);
+  // Auto-select seeded friends (e.g. "Score this table"): any seeded name that
+  // matches a friend starts already picked, with their tile avatar — so a table
+  // opens with its crew selected, not just typed in. Friends beyond the 4 slots
+  // stay available under "Add from friends".
+  const initialAvatars = useMemo(
+    () =>
+      initialNames.map(
+        (n) => friends.find((f) => f.name.toLowerCase() === n.trim().toLowerCase())?.avatar,
+      ),
+    [initialNames, friends],
+  );
+  const [avatars, setAvatars] = useState<(TileAvatar | undefined)[]>(initialAvatars);
 
   function setName(i: number, name: string, avatar?: TileAvatar) {
     setNames((prev) => prev.map((x, j) => (j === i ? name : x)));
