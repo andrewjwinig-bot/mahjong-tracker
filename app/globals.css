@@ -3580,6 +3580,34 @@ label.lbl {
 .table-row + .table-row {
   margin-top: 10px;
 }
+/* Unread badge on a table's icon (multiple tables → see which has new chat). */
+.table-icon-wrap {
+  position: relative;
+  flex: none;
+  line-height: 0;
+}
+.table-unread {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #e8473e;
+  color: #fff;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+  border: 2px solid var(--card);
+  box-shadow: 0 1px 3px rgba(20, 22, 42, 0.3);
+}
+/* A table with unread chat gets a subtly stronger border. */
+.table-row[data-unread="true"] {
+  border-color: color-mix(in srgb, #e8473e 35%, var(--hairline));
+}
 .table-row:active {
   transform: scale(0.99);
 }
