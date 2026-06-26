@@ -50,7 +50,8 @@ export default function EmptyCard({
       </button>
 
       <p className="empty-card-fine">
-        Unofficial — not affiliated with or endorsed by the National Mah Jongg League.
+        Unofficial — not affiliated with or endorsed by the National Mah Jongg League. As an Amazon
+        Associate we earn from qualifying purchases.
       </p>
     </div>
   );
