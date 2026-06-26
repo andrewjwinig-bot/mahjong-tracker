@@ -4,6 +4,7 @@ import { useRef, useState, type ReactNode } from 'react';
 import { IconPalette, IconCard, IconUsers, IconCloud, IconBell, IconHeart } from './uiIcons';
 import { PLANS, planPriceLabel, restorePurchases, type Plan } from '../lib/pro';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { ProCrown } from './ProUpsell';
 
 const FEATURES: { icon: ReactNode; text: string; sub?: string }[] = [
@@ -26,6 +27,7 @@ export default function Paywall({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const [planId, setPlanId] = useState<Plan['id']>(PLANS.find((p) => p.highlight)?.id ?? PLANS[0].id);
   const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
   const [celebrating, setCelebrating] = useState(false);
@@ -51,7 +53,16 @@ export default function Paywall({
 
   return (
     <div className="pro-scrim" onClick={onClose}>
-      <div className="pro-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Club Mahj VIP">
+      <div
+        className="pro-sheet"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label="Club Mahj VIP"
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="pro-grab" />
 
         <div className="pro-head">

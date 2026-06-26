@@ -10,6 +10,7 @@ import {
 } from '../lib/challenges';
 import { IconSparkle } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 /** The active-season challenge banner shown on the Card tab. */
 export function ChallengeCard({
@@ -80,10 +81,18 @@ export function SeasonsSheet({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const active = activeChallenge();
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
         <h2>Challenge Seasons</h2>
         <p className="sheet-sub">A new themed goal every season.</p>
