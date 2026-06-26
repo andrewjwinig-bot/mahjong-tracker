@@ -28,10 +28,20 @@ export interface Round {
   createdAt: number;
 }
 
+/** How a game ends. 'open' = endless running tally (end it manually); 'hands' =
+ *  play a set number of hands; 'score' = first player to reach the target wins. */
+export type GoalType = 'open' | 'hands' | 'score';
+export interface GameGoal {
+  type: GoalType;
+  /** Hands to play, or the target score. Ignored for 'open'. */
+  target: number;
+}
+
 export interface Game {
   players: Player[];
   rounds: Round[];
   createdAt: number;
+  goal?: GameGoal;
 }
 
 const KEY = 'mahj.game';
@@ -69,14 +79,24 @@ export interface PlayerSeed {
   avatar?: TileAvatar;
 }
 
-export function newGame(seeds: PlayerSeed[]): Game {
+export function newGame(seeds: PlayerSeed[], goal?: GameGoal): Game {
   const players = seeds.slice(0, 4).map((s, i) => ({
     id: `p${i}_${Math.random().toString(36).slice(2, 7)}`,
     name: s.name.trim() || `Player ${i + 1}`,
     score: 0,
     avatar: s.avatar,
   }));
-  return { players, rounds: [], createdAt: Date.now() };
+  const cleanGoal = goal && goal.type !== 'open' && goal.target > 0 ? goal : undefined;
+  return { players, rounds: [], createdAt: Date.now(), goal: cleanGoal };
+}
+
+/** Has the game hit its chosen goal (set number of hands, or first to target)? */
+export function goalReached(game: Game): boolean {
+  const g = game.goal;
+  if (!g) return false;
+  if (g.type === 'hands') return game.rounds.length >= g.target;
+  if (g.type === 'score') return game.players.some((p) => p.score >= g.target);
+  return false;
 }
 
 export interface RoundInput {
