@@ -39,6 +39,7 @@ import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
 import GameScorer from './GameScorer';
 import PracticeSheet from './PracticeSheet';
+import TipPopup from './TipPopup';
 import { IconSettings } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
@@ -444,7 +445,6 @@ export default function AppShell() {
                 youStats={youStats}
                 handCounts={handCounts}
                 streak={streak}
-                experience={experience}
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
@@ -482,6 +482,9 @@ export default function AppShell() {
         )}
         <BottomNav tab={tab} onChange={setTab} badges={{ tables: tablesUnread }} />
       </div>
+
+      {/* Daily tip — a once-a-day slide-up on first open, not permanent chrome. */}
+      {loaded && minElapsed && <TipPopup experience={experience} />}
 
       {settingsOpen && socialState && (
         <SettingsSheet

@@ -98,7 +98,6 @@ import { track } from '../lib/analytics';
 import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import Tile from './Tile';
-import TipCard from './TipCard';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 // A self-contained burst of ~20 mini mahjong-tile particles that rain down
@@ -192,7 +191,6 @@ function fireBanner(el: HTMLElement | null, kind: FeedKind) {
 import PageTitle from './PageTitle';
 import EmptyFeed from './EmptyFeed';
 import EmptyProfile from './EmptyProfile';
-import type { Experience } from '../lib/account';
 import { IconHeart, IconComment, IconMedal, IconFeed, IconContacts, IconUsers, IconFlame } from './uiIcons';
 import ProUpsell from './ProUpsell';
 
@@ -205,7 +203,6 @@ interface Props {
   /** The local user's real per-hand win counts (for your own detail view). */
   handCounts: Record<string, number>;
   streak: number;
-  experience: Experience;
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
@@ -273,7 +270,6 @@ export default function GroupTab({
   youStats,
   handCounts,
   streak,
-  experience,
   onToggleLike,
   onAddComment,
   onAddFriend,
@@ -515,10 +511,6 @@ export default function GroupTab({
           onClose={() => setDetail(null)}
         />
       )}
-
-      <div style={{ margin: '4px 0 18px' }}>
-        <TipCard experience={experience} />
-      </div>
 
       {/* Feed */}
       <div className="feed-label">

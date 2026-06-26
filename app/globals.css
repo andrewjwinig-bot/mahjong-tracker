@@ -4907,18 +4907,61 @@ label.lbl {
   }
 }
 
-/* Tip of the day */
-.tip-card {
+/* Tip of the day — a once-a-day slide-up popup (not permanent feed chrome). */
+.tip-popup-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-h) + 12px);
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.tip-popup {
+  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 11px;
   width: 100%;
+  max-width: 460px;
   text-align: left;
-  padding: 11px 13px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
   background: #fff;
   border: 2.5px solid rgba(20, 22, 42, 0.09);
-  margin-top: 14px;
+  box-shadow: 0 12px 34px rgba(20, 22, 42, 0.24);
+  animation: tip-rise 0.34s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.tip-popup[data-exiting='true'] {
+  animation: tip-fall 0.26s ease-in forwards;
+}
+@keyframes tip-rise {
+  from {
+    transform: translateY(150%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes tip-fall {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(150%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tip-popup,
+  .tip-popup[data-exiting='true'] {
+    animation: none;
+  }
 }
 .tip-tile {
   flex: 0 0 auto;
