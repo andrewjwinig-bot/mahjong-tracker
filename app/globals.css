@@ -5411,6 +5411,24 @@ label.lbl {
 .search-row + .search-row {
   border-top: 1.5px solid rgba(20, 22, 42, 0.06);
 }
+/* Tappable friend row (opens their profile) — fills the row; the X stays its
+   own target on the right. */
+.friend-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.friend-open:active {
+  opacity: 0.6;
+}
 /* Remove-friend "×" on the right of a friend row. */
 .friend-remove {
   flex: none;
