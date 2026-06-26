@@ -310,6 +310,14 @@ export default function AppShell() {
     });
   }, []);
 
+  const removeFriend = useCallback((id: string) => {
+    setSocialState((prev) => {
+      if (!prev) return prev;
+      void social.removeMember(id);
+      return { ...prev, members: prev.members.filter((m) => m.id !== id) };
+    });
+  }, []);
+
   const saveProfile = useCallback((profile: social.Profile) => {
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -418,6 +426,7 @@ export default function AppShell() {
                 onToggleLike={toggleLike}
                 onAddComment={addCommentToPost}
                 onAddFriend={addFriend}
+                onRemoveFriend={removeFriend}
                 onReport={handleReportPost}
                 onBlock={handleBlockUser}
                 onScore={() => openScorer()}

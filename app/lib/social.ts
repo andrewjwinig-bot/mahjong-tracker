@@ -230,6 +230,14 @@ export async function addMember(member: GroupMember): Promise<void> {
   await setMeta(K_MEMBERS, members);
 }
 
+export async function removeMember(id: string): Promise<void> {
+  const members = await getMeta<GroupMember[]>(K_MEMBERS, []);
+  await setMeta(
+    K_MEMBERS,
+    members.filter((m) => m.id !== id),
+  );
+}
+
 export async function addFeedPost(post: FeedPost): Promise<void> {
   const feed = await getMeta<FeedPost[]>(K_FEED, []);
   feed.unshift(post);

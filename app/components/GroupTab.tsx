@@ -209,6 +209,7 @@ interface Props {
   onToggleLike: (id: string, liked: boolean) => void;
   onAddComment: (id: string, text: string) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
+  onRemoveFriend: (id: string) => void;
   /** Moderation (cloud only): flag a post / block its author. */
   onReport?: (id: string, authorId: string) => void;
   onBlock?: (authorId: string) => void;
@@ -276,6 +277,7 @@ export default function GroupTab({
   onToggleLike,
   onAddComment,
   onAddFriend,
+  onRemoveFriend,
   onReport,
   onBlock,
   onScore,
@@ -402,6 +404,7 @@ export default function GroupTab({
             onAddFriend(name, avatar);
             setAddOpen(false);
           }}
+          onRemove={onRemoveFriend}
           onClose={() => setAddOpen(false)}
         />
       )}
@@ -1034,10 +1037,12 @@ const SAMPLE_PLAYERS: CloudFriend[] = [
 export function AddFriendSheet({
   members = [],
   onAdd,
+  onRemove,
   onClose,
 }: {
   members?: GroupMember[];
   onAdd: (name: string, avatar: TileAvatar) => void;
+  onRemove?: (id: string) => void;
   onClose: () => void;
 }) {
   // Friends are real accounts — you find them by searching usernames (cloud) or
@@ -1129,10 +1134,10 @@ export function AddFriendSheet({
   const crew = members.filter((m) => !m.isYou);
   const crewNames = new Set(crew.map((m) => m.name.toLowerCase()));
   const yourFriends = [
-    ...crew.map((m) => ({ key: m.id, name: m.name, avatar: m.avatar, sub: `${m.handsCleared}/${TOTAL_HANDS} cleared` })),
+    ...crew.map((m) => ({ key: m.id, id: m.id, name: m.name, avatar: m.avatar, sub: `${m.handsCleared}/${TOTAL_HANDS} cleared`, removable: true })),
     ...friends
       .filter((f) => !crewNames.has(f.username.toLowerCase()))
-      .map((f) => ({ key: f.id, name: f.username, avatar: f.avatar, sub: `@${f.handle}` })),
+      .map((f) => ({ key: f.id, id: f.id, name: f.username, avatar: f.avatar, sub: `@${f.handle}`, removable: false })),
   ];
 
   return (
@@ -1186,6 +1191,15 @@ export function AddFriendSheet({
                   <div className="search-name">{u.name}</div>
                   <div className="search-handle">{u.sub}</div>
                 </div>
+                {u.removable && onRemove && (
+                  <button
+                    className="friend-remove"
+                    aria-label={`Remove ${u.name}`}
+                    onClick={() => onRemove(u.id)}
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             ))}
           </div>
