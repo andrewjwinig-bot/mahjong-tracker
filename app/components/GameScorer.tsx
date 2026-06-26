@@ -4,10 +4,12 @@ import { useMemo, useState } from 'react';
 import {
   type Game,
   type GameResult,
+  type GoalType,
   type PlayerSeed,
   type RoundInput,
   applyRound,
   clearGame,
+  goalReached,
   leaderId,
   loadGame,
   loadResults,
@@ -121,9 +123,16 @@ export default function GameScorer({
     else addFriend(f);
   }
 
+  // Game length: 'open' running tally (default), a set number of hands, or
+  // first-to-target score. Chosen on the setup screen before starting.
+  const [goalType, setGoalType] = useState<GoalType>('open');
+  const [handTarget, setHandTarget] = useState(8);
+  const [scoreTarget, setScoreTarget] = useState(100);
+  const goalTarget = goalType === 'hands' ? handTarget : scoreTarget;
+
   function start() {
     const seeds: PlayerSeed[] = names.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avatars[i] }));
-    setGame(newGame(seeds));
+    setGame(newGame(seeds, { type: goalType, target: goalTarget }));
   }
 
   // ---- Record-a-hand form -------------------------------------------------
@@ -192,6 +201,17 @@ export default function GameScorer({
 
   const lead = game ? leaderId(game.players) : null;
   const nameOf = (id: string | null) => game?.players.find((p) => p.id === id)?.name ?? '';
+  // Goal tracking for an in-progress game: progress line + a "game over" banner
+  // once the chosen target (hands played, or first-to-score) is reached.
+  const done = !!game && goalReached(game);
+  const winnerName = lead ? nameOf(lead) : null;
+  const youWon =
+    !!winnerName && !!me && winnerName.trim().toLowerCase() === me.name.trim().toLowerCase();
+  const goalSub = game?.goal
+    ? game.goal.type === 'hands'
+      ? `${Math.min(game.rounds.length, game.goal.target)} / ${game.goal.target} hands`
+      : `First to ${game.goal.target}`
+    : `${game?.rounds.length ?? 0} hand${game?.rounds.length === 1 ? '' : 's'} played`;
 
   return (
     <div className="modal-scrim" onClick={onClose}>
@@ -274,6 +294,55 @@ export default function GameScorer({
               </>
             )}
 
+            <label className="lbl" style={{ marginTop: 14 }}>
+              Game length
+            </label>
+            <div className="segmented">
+              <button data-active={goalType === 'open'} onClick={() => setGoalType('open')}>
+                Open
+              </button>
+              <button data-active={goalType === 'hands'} onClick={() => setGoalType('hands')}>
+                # Hands
+              </button>
+              <button data-active={goalType === 'score'} onClick={() => setGoalType('score')}>
+                First to…
+              </button>
+            </div>
+            {goalType !== 'open' && (
+              <>
+                <div className="picker-row" style={{ marginTop: 10 }}>
+                  {(goalType === 'hands' ? [4, 8, 12, 16] : [50, 100, 150, 200]).map((v) => (
+                    <button
+                      key={v}
+                      className="pick-chip"
+                      data-active={goalTarget === v}
+                      onClick={() => (goalType === 'hands' ? setHandTarget(v) : setScoreTarget(v))}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                  <input
+                    className="field"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    style={{ maxWidth: 84 }}
+                    value={goalTarget}
+                    onChange={(e) => {
+                      const n = Math.max(1, Number(e.target.value) || 0);
+                      if (goalType === 'hands') setHandTarget(n);
+                      else setScoreTarget(n);
+                    }}
+                  />
+                </div>
+                <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '8px 2px 0' }}>
+                  {goalType === 'hands'
+                    ? `Play ${goalTarget} hands, then the highest score wins.`
+                    : `First to ${goalTarget} points wins.`}
+                </p>
+              </>
+            )}
+
             <button className="btn" style={{ marginTop: 14 }} onClick={start}>
               Start Game
             </button>
@@ -345,9 +414,28 @@ export default function GameScorer({
             <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <IconTrophy size={20} /> Scorepad
             </h2>
-            <p className="sheet-sub">
-              {game.rounds.length} hand{game.rounds.length === 1 ? '' : 's'} played
-            </p>
+            <p className="sheet-sub">{goalSub}</p>
+
+            {done && (
+              <div className="game-over">
+                <span className="go-trophy" aria-hidden>
+                  <IconTrophy size={22} />
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="go-title">
+                    {winnerName ? (youWon ? 'You win!' : `${winnerName} wins!`) : "It's a tie!"}
+                  </div>
+                  <div className="go-sub">
+                    {game.goal?.type === 'hands'
+                      ? `${game.goal.target} hands played`
+                      : `First to ${game.goal?.target}`}
+                  </div>
+                </div>
+                <button className="btn go-end" onClick={endGame}>
+                  End &amp; save
+                </button>
+              </div>
+            )}
 
             {/* Scoreboard */}
             <div className="score-board">
