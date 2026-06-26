@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Profile } from '../lib/social';
 import type { ChatMsg, PollOption, Table, TablePhoto, TableMember } from '../lib/tables';
-import { loadTables, saveTables } from '../lib/tables';
+import { loadTables, saveTables, markTableRead } from '../lib/tables';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
 import { downscaleImage } from '../lib/image';
@@ -39,6 +39,7 @@ export default function TablesTab({
   profile,
   openTableId,
   onConsumedOpen,
+  onTablesRead,
   onScoreTable,
   onAddFriend,
   friends = [],
@@ -46,6 +47,7 @@ export default function TablesTab({
   profile: Profile;
   openTableId?: string | null;
   onConsumedOpen?: () => void;
+  onTablesRead?: () => void;
   onScoreTable: (members: { name: string; avatar: TileAvatar }[]) => void;
   onAddFriend: (name: string, avatar: TileAvatar) => void;
   /** Your in-app friends (the leaderboard crew, minus you) — offered first in the table invite. */
@@ -53,6 +55,13 @@ export default function TablesTab({
 }) {
   const [tables, setTables] = useState<Table[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Opening a table = reading its chat: clear its unread and refresh the badge.
+  useEffect(() => {
+    if (!selectedId) return;
+    markTableRead(selectedId);
+    onTablesRead?.();
+  }, [selectedId, onTablesRead]);
 
   useEffect(() => {
     let alive = true;

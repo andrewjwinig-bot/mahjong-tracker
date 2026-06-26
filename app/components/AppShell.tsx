@@ -29,6 +29,7 @@ import GroupTab from './GroupTab';
 import LoadingWall from './LoadingWall';
 import Splash from './Splash';
 import TablesTab from './TablesTab';
+import { loadTables, unreadCount } from '../lib/tables';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
@@ -69,6 +70,11 @@ export default function AppShell() {
   const [wins, setWins] = useState<Win[]>([]);
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Unread chat messages across your tables → a badge on the Tables nav so you
+  // don't miss messages from friends. `unreadTick` bumps to force a recompute
+  // after a table is opened (marked read).
+  const [tablesUnread, setTablesUnread] = useState(0);
+  const [unreadTick, setUnreadTick] = useState(0);
   const [theme, setThemeState] = useState<ThemeId>('felt');
   const [account, setAccount] = useState<Account | null>(null);
   const [experience, setExperienceState] = useState<Experience>('beginner');
@@ -159,6 +165,19 @@ export default function AppShell() {
     const t = setTimeout(() => setMinElapsed(true), 700);
     return () => clearTimeout(t);
   }, []);
+
+  // Recompute the Tables unread badge once we know who "you" are, and whenever
+  // the tab changes or a table is opened/marked read (unreadTick).
+  useEffect(() => {
+    if (!socialState) return;
+    let alive = true;
+    void loadTables().then((tables) => {
+      if (alive) setTablesUnread(unreadCount(tables, socialState.profile.name));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [socialState, tab, unreadTick]);
 
   // Live leaderboard stats for the local user, derived from their tracker.
   const youStats = useMemo(() => {
@@ -441,6 +460,7 @@ export default function AppShell() {
                 profile={socialState.profile}
                 openTableId={tablesTarget}
                 onConsumedOpen={() => setTablesTarget(null)}
+                onTablesRead={() => setUnreadTick((n) => n + 1)}
                 onAddFriend={addFriend}
                 friends={socialState.members
                   .filter((m) => !m.isYou)
@@ -457,7 +477,7 @@ export default function AppShell() {
             {tab === 'learn' && <LearnTab experience={experience} onPractice={() => setPracticeOpen(true)} />}
           </>
         )}
-        <BottomNav tab={tab} onChange={setTab} />
+        <BottomNav tab={tab} onChange={setTab} badges={{ tables: tablesUnread }} />
       </div>
 
       {settingsOpen && socialState && (

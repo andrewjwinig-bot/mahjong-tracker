@@ -2251,12 +2251,31 @@ label.lbl {
   padding: 12px 16px 0;
 }
 .bottom-nav .nav-tab {
+  position: relative;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 6px;
   transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+/* Unread-message count on a nav tab (e.g. Tables chat). */
+.bottom-nav .nav-badge {
+  position: absolute;
+  top: 2px;
+  right: -4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #e8473e;
+  color: #fff;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(20, 22, 42, 0.3);
 }
 .bottom-nav .nav-tab-label {
   font-family: var(--font-app), system-ui, sans-serif;

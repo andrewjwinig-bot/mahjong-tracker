@@ -131,6 +131,41 @@ export async function saveTables(tables: Table[]): Promise<void> {
   await setMeta(K_TABLES, tables);
 }
 
+// ---- Unread chat tracking ------------------------------------------------
+// A per-table "last read" timestamp (localStorage) so the Tables nav can badge
+// unread messages from your crew. Synchronous so marking-read is instant.
+const K_READS = 'mahj.tableReads';
+
+export function getTableReads(): Record<string, number> {
+  try {
+    return JSON.parse(localStorage.getItem(K_READS) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+/** Mark a table's chat as read up to `ts` (defaults to now). */
+export function markTableRead(id: string, ts: number = Date.now()): void {
+  try {
+    const reads = getTableReads();
+    reads[id] = Math.max(reads[id] ?? 0, ts);
+    localStorage.setItem(K_READS, JSON.stringify(reads));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Total unread chat messages across all tables, excluding your own. */
+export function unreadCount(tables: Table[], youName: string): number {
+  const reads = getTableReads();
+  let n = 0;
+  for (const t of tables) {
+    const last = reads[t.id] ?? 0;
+    n += t.messages.filter((m) => m.createdAt > last && m.author !== youName).length;
+  }
+  return n;
+}
+
 export interface NextGame {
   tableId: string;
   tableName: string;
