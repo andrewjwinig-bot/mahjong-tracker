@@ -12,6 +12,7 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
+import { scanCardImage, SCAN_ENABLED } from '../lib/cardScan';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 
@@ -36,7 +37,10 @@ export default function CardEditor({
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanMsg, setScanMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const scanRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let url: string | null = null;
@@ -65,6 +69,39 @@ export default function CardEditor({
     } finally {
       setPhotoBusy(false);
       if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  // Snap/upload your card → auto-fill the rows from YOUR photo, for you to
+  // review and correct before saving. The photo is the only data source; the
+  // result stays on your device.
+  async function onScanPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setScanning(true);
+    setScanMsg(null);
+    try {
+      const blob = await downscaleImage(file, 1600, 0.85);
+      await saveCardPhoto(blob);
+      setPhotoUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return URL.createObjectURL(blob);
+      });
+      const result = await scanCardImage(blob);
+      if (!result.ok) {
+        setScanMsg(result.error);
+        return;
+      }
+      if (result.year) setYear(result.year);
+      setRows(result.rows);
+      setScanMsg(
+        `Filled ${result.rows.length} hand${result.rows.length === 1 ? '' : 's'} from your photo. Check each line against your card and fix any mistakes, then tap Save.`,
+      );
+    } catch {
+      setScanMsg('Couldn’t process that photo. Try another, well-lit shot.');
+    } finally {
+      setScanning(false);
+      if (scanRef.current) scanRef.current.value = '';
     }
   }
 
@@ -114,6 +151,21 @@ export default function CardEditor({
         Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
         if it must be concealed. Group hands by giving them the same category name.
       </p>
+
+      {SCAN_ENABLED && (
+        <>
+          <input ref={scanRef} type="file" accept="image/*" capture="environment" hidden onChange={onScanPick} />
+          <button
+            className="btn"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+            onClick={() => scanRef.current?.click()}
+            disabled={scanning}
+          >
+            <IconCamera size={17} /> {scanning ? 'Reading your card…' : 'Scan my card'}
+          </button>
+          {scanMsg && <p className="editor-scan-msg">{scanMsg}</p>}
+        </>
+      )}
 
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
       {photoUrl ? (
@@ -213,7 +265,8 @@ export default function CardEditor({
 
       <p className="editor-fine">
         Entering your own card keeps it private to your device and ensures the app never ships a copy
-        of any official card.
+        of any official card. Club Mahj is unofficial and is not affiliated with or endorsed by the
+        National Mah Jongg League.
       </p>
 
       {lightbox && photoUrl && (
