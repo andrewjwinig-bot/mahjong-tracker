@@ -549,6 +549,8 @@ export default function AppShell() {
               .filter((m) => !m.isYou)
               .map((m) => ({ name: m.name, avatar: m.avatar }))
           }
+          card={card}
+          handNotes={handNotes}
           onGameWon={(r) => {
             if (r.winnerName && socialState && r.winnerName === socialState.profile.name) {
               const line = r.players.map((p) => `${p.name} ${p.score > 0 ? '+' : ''}${p.score}`).join(' · ');
