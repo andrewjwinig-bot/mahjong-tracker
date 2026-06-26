@@ -42,9 +42,16 @@ interface ConfettiApi {
   burst: (origin?: { x: number; y: number }) => void;
   /** Full-screen tile celebration + the "I Got Mahj!" modal. */
   celebrate: (opts?: CelebrateOpts) => void;
+  /** Full-screen confetti storm + fanfare, with NO modal — for callers that
+   *  show their own celebratory UI (e.g. the scorer's game-over). */
+  storm: () => void;
 }
 
-const ConfettiContext = createContext<ConfettiApi>({ burst: () => {}, celebrate: () => {} });
+const ConfettiContext = createContext<ConfettiApi>({
+  burst: () => {},
+  celebrate: () => {},
+  storm: () => {},
+});
 
 export function useConfetti(): ConfettiApi {
   return useContext(ConfettiContext);
@@ -150,6 +157,23 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
     [spawnBurst],
   );
 
+  // The big confetti storm + fanfare, without the I-Got-Mahj modal — for
+  // callers that present their own celebratory UI on top.
+  const storm = useCallback(() => {
+    const fx = fxOn();
+    if (fx) buzz();
+    if (reduced()) return;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    for (let k = 0; k < 4; k++) {
+      const x = W * (0.2 + Math.random() * 0.6);
+      const y = H * (0.25 + Math.random() * 0.35);
+      setTimeout(() => spawnBurst(x, y, 38, W), k * 320);
+    }
+    spawnRain(70);
+    if (fx) playFanfare();
+  }, [spawnBurst, spawnRain]);
+
   const celebrate = useCallback(
     (opts?: CelebrateOpts) => {
       setCelebration(opts ?? { title: 'I Got Mahj! 🎉' });
@@ -177,7 +201,7 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ConfettiContext.Provider value={{ burst, celebrate }}>
+    <ConfettiContext.Provider value={{ burst, celebrate, storm }}>
       {children}
       <div ref={layerRef} className="confetti-layer" aria-hidden />
       {celebration && (
