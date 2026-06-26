@@ -549,6 +549,11 @@ export default function AppShell() {
               .filter((m) => !m.isYou)
               .map((m) => ({ name: m.name, avatar: m.avatar }))
           }
+          me={
+            socialState
+              ? { name: socialState.profile.name, avatar: socialState.profile.avatar }
+              : undefined
+          }
           card={card}
           handNotes={handNotes}
           onGameWon={(r) => {
