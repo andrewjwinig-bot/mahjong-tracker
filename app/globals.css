@@ -5779,6 +5779,248 @@ label.lbl {
   color: var(--accent);
 }
 
+/* ---- Scorepad · live game (page 2) -------------------------------------- */
+
+.sp-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin: 6px 0 10px;
+}
+.sp-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 5px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--brand) 7%, #fff);
+  border: 2.5px solid rgba(20, 22, 42, 0.06);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+/* Leader (highest score, ≥1 hand): warm gold fill + glow + lift + sparkles. */
+.sp-card[data-lead='true'] {
+  background: linear-gradient(180deg, #fff3d2 0%, #fffdf7 100%);
+  border-color: #efa21c;
+  box-shadow: 0 10px 26px rgba(214, 150, 20, 0.34);
+  transform: translateY(-4px);
+}
+.sp-tile {
+  width: 44px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 50%;
+}
+.sp-tile-num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #6e9a80;
+}
+.sp-name {
+  max-width: 100%;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-score {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 23px;
+  line-height: 1;
+  color: #15803d;
+}
+.sp-score[data-neg='true'] {
+  color: #c9871a;
+}
+.sp-score[data-zero='true'] {
+  color: #7c8a82;
+}
+.sp-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+.sp-spark {
+  position: absolute;
+  display: block;
+  color: #ffd46a;
+  animation: sp-twinkle 2s ease-in-out infinite;
+}
+@keyframes sp-twinkle {
+  0%,
+  100% {
+    transform: scale(0.3) rotate(0deg);
+    opacity: 0;
+  }
+  42% {
+    opacity: 1;
+  }
+  52% {
+    transform: scale(1) rotate(40deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.35;
+  }
+}
+/* Floating "+N" that rises off the winner's card after a recorded hand. */
+.sp-floatpts {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  transform: translateX(-50%);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 25px;
+  color: #15803d;
+  pointer-events: none;
+  z-index: 9;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Record-form small sublabels (WHO WON? / HAND VALUE / …). */
+.sp-sublabel {
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #a0a6a2;
+  margin: 0 2px 9px;
+}
+
+/* RECORD HAND — full-width brand button (stripe + shine, reusing .score-cta). */
+.sp-record {
+  margin-top: 16px;
+}
+.sp-record-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sp-record:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* History rows: HAND N (mono) · text · +N (brand). */
+.sp-hist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sp-hist-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  background: #fff;
+  border: 2px solid rgba(20, 22, 42, 0.08);
+  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.05);
+}
+.sp-hist-no {
+  flex: none;
+  width: 54px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #a0a6a2;
+}
+.sp-hist-text {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-hist-pts {
+  flex: none;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--brand);
+}
+
+/* Footer: soft-gold END GAME + brand striped DONE. */
+.sp-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.sp-endgame {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border-radius: 12px;
+  border: 2.5px solid rgba(201, 135, 26, 0.3);
+  background: rgba(245, 165, 36, 0.1);
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  color: #c9871a;
+  transition: transform 0.12s ease;
+}
+.sp-endgame:active {
+  transform: translateY(1px);
+}
+.sp-done {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+  padding: 15px;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+/* Gold-tile rain (per-hand win celebration). */
+.gold-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+  overflow: hidden;
+}
+.gold-rain .gold-tile {
+  position: absolute;
+  border-radius: 3.5px;
+  background: linear-gradient(158deg, #fce3a0, #f5a524 55%, #d88e12);
+  border: 1px solid rgba(120, 82, 10, 0.5);
+  box-shadow: 0 2px 6px rgba(60, 40, 6, 0.35), inset 0 1px 0 rgba(255, 248, 220, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+.gold-rain .gold-tile span {
+  font-family: serif;
+  font-weight: 700;
+  line-height: 1;
+  color: #5a3d08;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-spark {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* ---- Practice / hand coach ---------------------------------------------- */
 
 .rack {
