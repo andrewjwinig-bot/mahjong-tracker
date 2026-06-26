@@ -22,7 +22,7 @@ import type { TileAvatar } from '../lib/social';
 import type { MahjongCard } from '../lib/types';
 import { colorNotation } from '../lib/theme';
 import Avatar from './Avatar';
-import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock, IconPlus } from './uiIcons';
+import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { useConfetti } from './Confetti';
@@ -269,70 +269,80 @@ export default function GameScorer({
         onTouchEnd={swipe.onTouchEnd}
         style={swipe.style}
       >
-        <div className="grab" />
-
         {!game ? (
           <>
-            <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <IconTrophy size={20} /> Score a Game
-            </h2>
-            <p className="sheet-sub">Track a live game — who won, the hand value, and the payouts.</p>
+            <div className="scorer-band">
+              <span className="grab light" />
+              <span className="scorer-band-tile" aria-hidden>
+                <IconTrophy size={24} />
+              </span>
+              <div className="scorer-band-kicker">LIVE SCORING</div>
+              <div className="scorer-band-title">Score a Game</div>
+              <div className="scorer-band-sub">
+                Track a live game — who won, the hand value &amp; the payouts.
+              </div>
+            </div>
 
-            <label className="lbl">Players</label>
-            {names.map((n, i) => {
-              // A slot filled from a friend is locked to that identity — name +
-              // tile icon, no free typing. Remove it to free the seat back up.
-              const locked = !!avatars[i];
-              return (
-                <div key={i} className="player-slot">
-                  {avatars[i] ? (
-                    <Avatar avatar={avatars[i]!} size={34} />
-                  ) : (
-                    <span className="player-num">{i + 1}</span>
-                  )}
-                  {locked ? (
-                    <>
-                      <span className="player-locked">{n}</span>
+            <div className="scorer-label">PLAYERS</div>
+            <div className="seat-list">
+              {names.map((n, i) => {
+                const filled = !!avatars[i];
+                return (
+                  <div key={i} className="seat-row">
+                    {filled ? (
+                      <span className="seat-av">
+                        <Avatar avatar={avatars[i]!} size={46} />
+                      </span>
+                    ) : (
+                      <span className="seat-tile-empty">{i + 1}</span>
+                    )}
+                    {filled ? (
+                      <span className="seat-field" data-filled="true">
+                        {n}
+                      </span>
+                    ) : (
+                      <input
+                        className="seat-field-input"
+                        value={n}
+                        maxLength={20}
+                        placeholder={`Player ${i + 1}`}
+                        onChange={(e) => setName(i, e.target.value, undefined)}
+                      />
+                    )}
+                    {filled && (
                       <button
-                        className="player-remove"
+                        className="seat-clear"
                         aria-label={`Remove ${n}`}
                         onClick={() => setName(i, '', undefined)}
                       >
-                        ×
+                        ✕
                       </button>
-                    </>
-                  ) : (
-                    <input
-                      className="field"
-                      style={{ flex: 1 }}
-                      value={n}
-                      maxLength={20}
-                      placeholder={`Player ${i + 1}`}
-                      onChange={(e) => setName(i, e.target.value, undefined)}
-                    />
-                  )}
-                </div>
-              );
-            })}
+                    )}
+                  </div>
+                );
+              })}
+            </div>
 
             {friends.length > 0 && (
               <>
-                <label className="lbl" style={{ marginTop: 12 }}>
-                  Add from friends
-                </label>
-                <div className="picker-row">
+                <div className="scorer-label">ADD FROM FRIENDS</div>
+                <div className="friend-chips">
                   {friends.map((f) => {
                     const on = isOnRoster(f);
                     return (
                       <button
                         key={f.name}
-                        className="friend-chip"
+                        className="friend-chip2"
                         data-on={on}
                         onClick={() => toggleFriend(f)}
                       >
-                        <Avatar avatar={f.avatar} size={22} />
-                        {f.name}
-                        {on ? <IconCheck size={13} /> : <IconPlus size={13} />}
+                        <span className="friend-chip-tile">
+                          <Avatar avatar={f.avatar} size={20} />
+                        </span>
+                        <span className="friend-chip-name">{f.name}</span>
+                        <span className="friend-chip-plus">
+                          {on ? <IconCheck size={13} /> : '+'}
+                        </span>
                       </button>
                     );
                   })}
@@ -340,18 +350,16 @@ export default function GameScorer({
               </>
             )}
 
-            <label className="lbl" style={{ marginTop: 14 }}>
-              Game length
-            </label>
-            <div className="segmented">
-              <button data-active={goalType === 'open'} onClick={() => setGoalType('open')}>
-                Open
+            <div className="scorer-label">GAME LENGTH</div>
+            <div className="len-seg">
+              <button className="len-seg-btn" data-active={goalType === 'open'} onClick={() => setGoalType('open')}>
+                OPEN
               </button>
-              <button data-active={goalType === 'hands'} onClick={() => setGoalType('hands')}>
-                # Hands
+              <button className="len-seg-btn" data-active={goalType === 'hands'} onClick={() => setGoalType('hands')}>
+                # HANDS
               </button>
-              <button data-active={goalType === 'score'} onClick={() => setGoalType('score')}>
-                First to…
+              <button className="len-seg-btn" data-active={goalType === 'score'} onClick={() => setGoalType('score')}>
+                FIRST TO…
               </button>
             </div>
             {goalType !== 'open' && (
@@ -381,7 +389,7 @@ export default function GameScorer({
                     }}
                   />
                 </div>
-                <p style={{ color: 'var(--muted)', fontSize: 11.5, fontWeight: 700, margin: '8px 2px 0' }}>
+                <p className="len-hint">
                   {goalType === 'hands'
                     ? `Play ${goalTarget} hands, then the highest score wins.`
                     : `First to ${goalTarget} points wins.`}
@@ -389,8 +397,11 @@ export default function GameScorer({
               </>
             )}
 
-            <button className="btn" style={{ marginTop: 14 }} onClick={start}>
-              Start Game
+            <button className="score-cta start-cta" onClick={start}>
+              <span className="score-cta-shine" aria-hidden />
+              <span className="score-cta-tile" style={{ color: '#C0392B' }}>萬</span>
+              <span className="score-cta-label">START GAME</span>
+              <span className="score-cta-tile" style={{ color: '#15803D' }}>發</span>
             </button>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
               Cancel
@@ -457,6 +468,7 @@ export default function GameScorer({
           </>
         ) : (
           <>
+            <div className="grab" />
             <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <IconTrophy size={20} /> Scorepad
             </h2>
