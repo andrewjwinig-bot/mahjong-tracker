@@ -61,7 +61,10 @@ export default function TablesTab({
     if (!selectedId) return;
     markTableRead(selectedId);
     onTablesRead?.();
-  }, [selectedId, onTablesRead]);
+    // onTablesRead is a stable callback; depending on it can loop if a parent
+    // passes a fresh closure, so key the effect on the opened table only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
 
   useEffect(() => {
     let alive = true;
