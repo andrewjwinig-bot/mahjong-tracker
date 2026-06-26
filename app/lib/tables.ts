@@ -155,15 +155,15 @@ export function markTableRead(id: string, ts: number = Date.now()): void {
   }
 }
 
+/** Unread chat messages in a single table, excluding your own. */
+export function tableUnread(t: Table, youName: string): number {
+  const last = getTableReads()[t.id] ?? 0;
+  return t.messages.filter((m) => m.createdAt > last && m.author !== youName).length;
+}
+
 /** Total unread chat messages across all tables, excluding your own. */
 export function unreadCount(tables: Table[], youName: string): number {
-  const reads = getTableReads();
-  let n = 0;
-  for (const t of tables) {
-    const last = reads[t.id] ?? 0;
-    n += t.messages.filter((m) => m.createdAt > last && m.author !== youName).length;
-  }
-  return n;
+  return tables.reduce((n, t) => n + tableUnread(t, youName), 0);
 }
 
 export interface NextGame {

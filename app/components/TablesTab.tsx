@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Profile } from '../lib/social';
 import type { ChatMsg, PollOption, Table, TablePhoto, TableMember } from '../lib/tables';
-import { loadTables, saveTables, markTableRead } from '../lib/tables';
+import { loadTables, saveTables, markTableRead, tableUnread } from '../lib/tables';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { downloadICS, googleCalUrl, type CalEvent } from '../lib/calendar';
 import { downscaleImage } from '../lib/image';
@@ -241,9 +241,13 @@ function TablesList({
       <div style={{ marginTop: 16 }}>
         {tables.map((t) => {
           const last = t.messages[t.messages.length - 1];
+          const unread = tableUnread(t, profile.name);
           return (
-            <button key={t.id} className="table-row" onClick={() => onOpen(t.id)}>
-              <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={54} />
+            <button key={t.id} className="table-row" data-unread={unread > 0} onClick={() => onOpen(t.id)}>
+              <span className="table-icon-wrap">
+                <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={54} />
+                {unread > 0 && <span className="table-unread">{unread > 9 ? '9+' : unread}</span>}
+              </span>
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
                 <span className="table-name">{t.name}</span>
                 <span className="table-meta">
