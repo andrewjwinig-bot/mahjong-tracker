@@ -126,7 +126,14 @@ function build(): MahjongCard {
   const categories = CATEGORY_ORDER;
   const hands: Hand[] = [];
   for (const category of categories) {
+    // Drop repeated lines within a category — the same notation listed twice
+    // (sometimes differing only by the concealed flag) reads as a duplicate row.
+    // Keep the first occurrence and its original id so logged counts stay valid.
+    const seen = new Set<string>();
     SEED[category].forEach(([notation, points, concealed], i) => {
+      const key = notation.trim();
+      if (seen.has(key)) return;
+      seen.add(key);
       hands.push({ id: `${category}-${i}`, category, notation, points, concealed });
     });
   }

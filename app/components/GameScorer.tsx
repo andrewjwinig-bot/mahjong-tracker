@@ -472,61 +472,74 @@ export default function GameScorer({
                 <label className="lbl" style={{ marginTop: 12 }}>
                   Hand <span style={{ color: 'var(--muted)' }}>— optional</span>
                 </label>
-                <div className="chip-wrap">
-                  <button
-                    className="cat-chip"
-                    data-active={handCat === ''}
-                    onClick={() => {
-                      setHandCat('');
-                      setHandPickId('');
-                    }}
-                  >
-                    None
-                  </button>
-                  {card.categories.map((c) => (
-                    <button
-                      key={c}
-                      className="cat-chip"
-                      data-active={handCat === c}
-                      onClick={() => {
-                        setHandCat(c);
-                        setHandPickId('');
-                      }}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-
-                {handCat !== '' && (
+                {handPickId ? (
+                  // A line is chosen — collapse the picker to just the winner,
+                  // with "Change" to re-open. Saves space on the record form.
                   <div className="line-pick">
-                    <div className="line-pick-head">Pick your line — check the one that won</div>
-                    {card.hands
-                      .filter((h) => h.category === handCat)
-                      .map((h) => {
-                        const picked = handPickId === h.id;
-                        return (
-                          <button
-                            key={h.id}
-                            className="line-row"
-                            data-picked={picked}
-                            onClick={() => setHandPickId(picked ? '' : h.id)}
-                          >
-                            <span className="check" data-checked={picked}>
-                              {picked ? '✓' : ''}
-                            </span>
-                            <span className="notation">
-                              {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
-                                <span key={i} className={g.cls}>
-                                  {g.text}
-                                  {i < arr.length - 1 ? ' ' : ''}
-                                </span>
-                              ))}
-                            </span>
-                          </button>
-                        );
-                      })}
+                    <div className="line-row" data-picked>
+                      <span className="check" data-checked>
+                        ✓
+                      </span>
+                      <span className="notation">
+                        {colorNotation(handLabelFor(handPickId)).map((g, i, arr) => (
+                          <span key={i} className={g.cls}>
+                            {g.text}
+                            {i < arr.length - 1 ? ' ' : ''}
+                          </span>
+                        ))}
+                      </span>
+                      <button className="change-hand" onClick={() => setHandPickId('')}>
+                        Change
+                      </button>
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="chip-wrap">
+                      <button
+                        className="cat-chip"
+                        data-active={handCat === ''}
+                        onClick={() => setHandCat('')}
+                      >
+                        None
+                      </button>
+                      {card.categories.map((c) => (
+                        <button
+                          key={c}
+                          className="cat-chip"
+                          data-active={handCat === c}
+                          onClick={() => setHandCat(c)}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+
+                    {handCat !== '' && (
+                      <div className="line-pick">
+                        <div className="line-pick-head">Pick your line — check the one that won</div>
+                        {card.hands
+                          .filter((h) => h.category === handCat)
+                          .map((h) => (
+                            <button
+                              key={h.id}
+                              className="line-row"
+                              onClick={() => setHandPickId(h.id)}
+                            >
+                              <span className="check" />
+                              <span className="notation">
+                                {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
+                                  <span key={i} className={g.cls}>
+                                    {g.text}
+                                    {i < arr.length - 1 ? ' ' : ''}
+                                  </span>
+                                ))}
+                              </span>
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
