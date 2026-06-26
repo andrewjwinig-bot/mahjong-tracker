@@ -12,23 +12,9 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage, type ScanSummary } from '../lib/cardScan';
+import { scanCardImage } from '../lib/cardScan';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
-
-// A plain-language recap of what the scan found and what to check.
-function summaryMessage(s: ScanSummary | undefined, count: number): string {
-  if (!s) {
-    return `Filled ${count} hand${count === 1 ? '' : 's'} from your photo. Check each line against your card and fix any mistakes, then tap Save.`;
-  }
-  const head = `Imported ${s.handCount} hand${s.handCount === 1 ? '' : 's'}${
-    s.sectionCount ? ` across ${s.sectionCount} section${s.sectionCount === 1 ? '' : 's'}` : ''
-  }.`;
-  if (s.needsReview === 0) {
-    return `${head} Every line is a valid 14-tile hand — still give them a quick look against your photo, then Save.`;
-  }
-  return `${head} ${s.needsReview} line${s.needsReview === 1 ? '' : 's'} need a look (highlighted below). Compare each against your photo and fix it, then Save.`;
-}
 
 export default function CardEditor({
   current,
@@ -58,6 +44,10 @@ export default function CardEditor({
   // Per-row validation flags from the scan (index-aligned with rows); cleared
   // as the user fixes a line. A "review queue" so nothing dubious slips through.
   const [flags, setFlags] = useState<string[][]>([]);
+  // After a scan we show a calm, celebratory result: only the few flagged lines
+  // up front, the full list tucked behind a toggle, and never a blocker.
+  const [scanned, setScanned] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const scanRef = useRef<HTMLInputElement>(null);
 
@@ -121,7 +111,9 @@ export default function CardEditor({
         })),
       );
       setFlags(result.rows.map((r) => r.issues ?? []));
-      setScanMsg(summaryMessage(result.summary, result.rows.length));
+      setScanned(true);
+      setShowAll(false);
+      setScanMsg(null);
     } catch {
       setScanMsg('Couldn’t process that photo. Try another, well-lit shot.');
     } finally {
@@ -164,6 +156,54 @@ export default function CardEditor({
     onClose();
   }
 
+  function renderRow(i: number) {
+    const r = rows[i];
+    return (
+      <div className="editor-row" key={i} data-flag={flags[i]?.length ? true : undefined}>
+        <input
+          className="field"
+          placeholder="Notation, e.g. FF 2026 2026 DDDD"
+          value={r.notation}
+          onChange={(e) => update(i, { notation: e.target.value })}
+        />
+        <div className="editor-meta">
+          <input
+            className="field"
+            placeholder="Category"
+            value={r.category}
+            onChange={(e) => update(i, { category: e.target.value })}
+          />
+          <input
+            className="field"
+            type="number"
+            aria-label="Points"
+            value={r.points}
+            style={{ maxWidth: 76 }}
+            onChange={(e) => update(i, { points: Number(e.target.value) })}
+          />
+          <button
+            className="c-toggle"
+            data-on={r.concealed}
+            aria-label="Concealed"
+            onClick={() => update(i, { concealed: !r.concealed })}
+          >
+            C
+          </button>
+          <button className="row-del" aria-label="Delete hand" onClick={() => removeRow(i)}>
+            ×
+          </button>
+        </div>
+        {flags[i]?.length > 0 && (
+          <ul className="row-issues">
+            {flags[i].map((msg, k) => (
+              <li key={k}>{msg}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="editor">
       <div className="editor-bar">
@@ -178,10 +218,12 @@ export default function CardEditor({
         </button>
       </div>
 
-      <p className="editor-note">
-        Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
-        if it must be concealed. Group hands by giving them the same category name.
-      </p>
+      {!scanned && (
+        <p className="editor-note">
+          Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
+          if it must be concealed. Group hands by giving them the same category name.
+        </p>
+      )}
 
       {scanEnabled && (
         <>
@@ -238,64 +280,60 @@ export default function CardEditor({
         />
       </div>
 
-      {reviewCount > 0 && (
-        <div className="review-banner" role="status">
-          <span className="review-banner-dot" aria-hidden />
-          {reviewCount} line{reviewCount === 1 ? '' : 's'} flagged for review — the highlighted rows below
-          don’t look like complete 14-tile hands. Fix them against your photo, then Save.
-        </div>
-      )}
-
-      <div className="editor-rows">
-        {rows.map((r, i) => (
-          <div className="editor-row" key={i} data-flag={flags[i]?.length ? true : undefined}>
-            <input
-              className="field"
-              placeholder="Notation, e.g. FF 2026 2026 DDDD"
-              value={r.notation}
-              onChange={(e) => update(i, { notation: e.target.value })}
-            />
-            <div className="editor-meta">
-              <input
-                className="field"
-                placeholder="Category"
-                value={r.category}
-                onChange={(e) => update(i, { category: e.target.value })}
-              />
-              <input
-                className="field"
-                type="number"
-                aria-label="Points"
-                value={r.points}
-                style={{ maxWidth: 76 }}
-                onChange={(e) => update(i, { points: Number(e.target.value) })}
-              />
-              <button
-                className="c-toggle"
-                data-on={r.concealed}
-                aria-label="Concealed"
-                onClick={() => update(i, { concealed: !r.concealed })}
-              >
-                C
-              </button>
-              <button className="row-del" aria-label="Delete hand" onClick={() => removeRow(i)}>
-                ×
-              </button>
+      {scanned ? (
+        <>
+          <div className="scan-done">
+            <div className="scan-done-emoji" aria-hidden>🎉</div>
+            <div className="scan-done-title">
+              Your card’s in — {rows.length} hand{rows.length === 1 ? '' : 's'}
             </div>
-            {flags[i]?.length > 0 && (
-              <ul className="row-issues">
-                {flags[i].map((msg, k) => (
-                  <li key={k}>{msg}</li>
-                ))}
-              </ul>
-            )}
+            <div className="scan-done-sub">
+              {reviewCount > 0
+                ? `Pulled from your photo. ${reviewCount} line${reviewCount === 1 ? '' : 's'} worth a quick look — the rest checked out.`
+                : 'Pulled from your photo — every line is a complete 14-tile hand.'}
+            </div>
           </div>
-        ))}
-      </div>
 
-      <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
-        ＋ Add hand
-      </button>
+          {reviewCount > 0 && (
+            <div className="quick-check">
+              <div className="quick-check-head">
+                Quick check · {reviewCount} to confirm
+              </div>
+              <p className="quick-check-hint">
+                These didn’t look like complete hands. Compare each to your photo above and fix it —
+                or leave it and edit anytime.
+              </p>
+              {rows.map((_, i) => (flags[i]?.length ? renderRow(i) : null))}
+            </div>
+          )}
+
+          <button className="btn" style={{ marginTop: 14 }} onClick={save} disabled={!valid}>
+            {reviewCount > 0 ? 'Looks good — start tracking' : 'Start tracking'}
+          </button>
+
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setShowAll((s) => !s)}>
+            {showAll ? 'Hide full list' : `See all ${rows.length} hands`}
+          </button>
+
+          {showAll && (
+            <>
+              <div className="editor-rows" style={{ marginTop: 12 }}>
+                {rows.map((_, i) => renderRow(i))}
+              </div>
+              <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
+                ＋ Add hand
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="editor-rows">{rows.map((_, i) => renderRow(i))}</div>
+          <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
+            ＋ Add hand
+          </button>
+        </>
+      )}
 
       <button
         className="btn ghost"

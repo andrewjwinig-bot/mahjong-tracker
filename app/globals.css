@@ -4181,10 +4181,11 @@ label.lbl {
   flex-direction: column;
   gap: 8px;
 }
-/* Scan flagged a line (wrong tile count / odd points / low confidence). */
+/* Scan flagged a line (wrong tile count / odd points / low confidence). Amber,
+   not alarm-red — "worth a glance", not "error". */
 .editor-row[data-flag='true'] {
-  box-shadow: inset 0 0 0 2px rgba(192, 57, 43, 0.55), var(--shadow-sm);
-  background: rgba(192, 57, 43, 0.05);
+  box-shadow: inset 0 0 0 2px rgba(201, 135, 26, 0.55), var(--shadow-sm);
+  background: rgba(201, 135, 26, 0.06);
 }
 .row-issues {
   margin: 2px 0 0;
@@ -4195,31 +4196,57 @@ label.lbl {
   font-size: 11.5px;
   font-weight: 700;
   line-height: 1.35;
-  color: #b23121;
+  color: #9a6a12;
 }
-/* Live "needs review" banner above the rows. */
-.review-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  margin: 10px 2px 2px;
-  padding: 11px 13px;
-  border-radius: 12px;
-  background: rgba(192, 57, 43, 0.08);
-  border: 2px solid rgba(192, 57, 43, 0.28);
-  font-size: 12.5px;
-  font-weight: 700;
+
+/* Calm post-scan result: celebrate the import first. */
+.scan-done {
+  text-align: center;
+  padding: 16px 12px 4px;
+}
+.scan-done-emoji {
+  font-size: 34px;
+  line-height: 1;
+}
+.scan-done-title {
+  margin-top: 8px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--brand);
+}
+.scan-done-sub {
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.4;
-  color: #9a2a1d;
+  color: var(--ink-soft);
 }
-.review-banner-dot {
-  flex: 0 0 auto;
-  width: 9px;
-  height: 9px;
-  margin-top: 4px;
-  border-radius: 50%;
-  background: #c0392b;
-  box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.18);
+/* Only the few flagged lines, tucked in an amber "quick check" card. */
+.quick-check {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(201, 135, 26, 0.07);
+  border: 2px solid rgba(201, 135, 26, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quick-check-head {
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9a6a12;
+}
+.quick-check-hint {
+  margin: -6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #8a7a5a;
 }
 .editor-meta {
   display: flex;
