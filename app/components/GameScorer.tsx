@@ -16,6 +16,8 @@ import {
   undoLastRound,
 } from '../lib/gameScorer';
 import type { TileAvatar } from '../lib/social';
+import type { MahjongCard } from '../lib/types';
+import { colorNotation } from '../lib/theme';
 import Avatar from './Avatar';
 import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock, IconPlus } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
@@ -37,11 +39,15 @@ const FREE_HISTORY = 1;
 export default function GameScorer({
   suggestedNames,
   friends,
+  card,
+  handNotes,
   onClose,
   onGameWon,
 }: {
   suggestedNames: string[];
   friends: Friend[];
+  card: MahjongCard;
+  handNotes: Record<string, string>;
   onClose: () => void;
   onGameWon?: (result: GameResult) => void;
 }) {
@@ -120,8 +126,16 @@ export default function GameScorer({
   const [value, setValue] = useState(25);
   const [selfPick, setSelfPick] = useState(true);
   const [discarderId, setDiscarderId] = useState<string | null>(null);
-  const [handLabel, setHandLabel] = useState('');
+  // The hand is chosen from the card (like "Call Mahj"), not typed: a category
+  // chip narrows the lines, then you check the one that won. '' category = none.
+  const [handCat, setHandCat] = useState('');
+  const [handPickId, setHandPickId] = useState('');
   const [endConfirm, setEndConfirm] = useState(false);
+
+  const handLabelFor = (id: string) => {
+    const h = card.hands.find((x) => x.id === id);
+    return h ? handNotes[h.id] ?? h.notation : '';
+  };
 
   function resetForm() {
     setWinnerId(null);
@@ -129,15 +143,17 @@ export default function GameScorer({
     setValue(25);
     setSelfPick(true);
     setDiscarderId(null);
-    setHandLabel('');
+    setHandCat('');
+    setHandPickId('');
   }
 
   const canRecord = game && (wall || (winnerId && value > 0 && (selfPick || discarderId)));
 
   function record() {
     if (!game || !canRecord) return;
+    const handLabel = handPickId ? handLabelFor(handPickId) : '';
     const input: RoundInput = wall
-      ? { winnerId: null, handLabel: handLabel || 'Wall game', value: 0, selfPick: false, discarderId: null }
+      ? { winnerId: null, handLabel: 'Wall game', value: 0, selfPick: false, discarderId: null }
       : { winnerId, handLabel, value, selfPick, discarderId: selfPick ? null : discarderId };
     setGame(applyRound(game, input));
     resetForm();
@@ -448,15 +464,64 @@ export default function GameScorer({
                 )}
 
                 <label className="lbl" style={{ marginTop: 12 }}>
-                  Hand (optional)
+                  Hand <span style={{ color: 'var(--muted)' }}>— optional</span>
                 </label>
-                <input
-                  className="field"
-                  value={handLabel}
-                  maxLength={40}
-                  placeholder="e.g. FF 2026 2026 DDDD"
-                  onChange={(e) => setHandLabel(e.target.value)}
-                />
+                <div className="chip-wrap">
+                  <button
+                    className="cat-chip"
+                    data-active={handCat === ''}
+                    onClick={() => {
+                      setHandCat('');
+                      setHandPickId('');
+                    }}
+                  >
+                    None
+                  </button>
+                  {card.categories.map((c) => (
+                    <button
+                      key={c}
+                      className="cat-chip"
+                      data-active={handCat === c}
+                      onClick={() => {
+                        setHandCat(c);
+                        setHandPickId('');
+                      }}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+
+                {handCat !== '' && (
+                  <div className="line-pick">
+                    <div className="line-pick-head">Pick your line — check the one that won</div>
+                    {card.hands
+                      .filter((h) => h.category === handCat)
+                      .map((h) => {
+                        const picked = handPickId === h.id;
+                        return (
+                          <button
+                            key={h.id}
+                            className="line-row"
+                            data-picked={picked}
+                            onClick={() => setHandPickId(picked ? '' : h.id)}
+                          >
+                            <span className="check" data-checked={picked}>
+                              {picked ? '✓' : ''}
+                            </span>
+                            <span className="notation">
+                              {colorNotation(handNotes[h.id] ?? h.notation).map((g, i, arr) => (
+                                <span key={i} className={g.cls}>
+                                  {g.text}
+                                  {i < arr.length - 1 ? ' ' : ''}
+                                </span>
+                              ))}
+                            </span>
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
               </>
             )}
 
