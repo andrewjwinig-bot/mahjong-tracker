@@ -337,6 +337,9 @@ export default function AppShell() {
     });
   }, []);
 
+  // Stable callback so TablesTab's mark-read effect doesn't re-fire in a loop.
+  const onTablesRead = useCallback(() => setUnreadTick((n) => n + 1), []);
+
   const saveProfile = useCallback((profile: social.Profile) => {
     setSocialState((prev) => {
       if (!prev) return prev;
@@ -460,7 +463,7 @@ export default function AppShell() {
                 profile={socialState.profile}
                 openTableId={tablesTarget}
                 onConsumedOpen={() => setTablesTarget(null)}
-                onTablesRead={() => setUnreadTick((n) => n + 1)}
+                onTablesRead={onTablesRead}
                 onAddFriend={addFriend}
                 friends={socialState.members
                   .filter((m) => !m.isYou)
