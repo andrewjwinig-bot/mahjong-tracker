@@ -19,10 +19,12 @@ export default function SWRegister() {
     };
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
 
+    let registration: ServiceWorkerRegistration | null = null;
     const onLoad = () => {
       navigator.serviceWorker
         .register('/sw.js')
         .then((reg) => {
+          registration = reg;
           reg.update();
           // If an updated worker is waiting, activate it immediately.
           if (reg.waiting) reg.waiting.postMessage('skip-waiting');
@@ -39,8 +41,18 @@ export default function SWRegister() {
         .catch(() => {});
     };
     window.addEventListener('load', onLoad);
+
+    // Re-check for a new deployment whenever the app returns to the foreground —
+    // covers installed PWAs that resume without a full reload, where a new
+    // version would otherwise go unnoticed for a long time.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') registration?.update();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
     return () => {
       window.removeEventListener('load', onLoad);
+      document.removeEventListener('visibilitychange', onVisible);
       navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
     };
   }, []);
