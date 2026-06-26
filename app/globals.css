@@ -5411,6 +5411,27 @@ label.lbl {
 .search-row + .search-row {
   border-top: 1.5px solid rgba(20, 22, 42, 0.06);
 }
+/* Remove-friend "×" on the right of a friend row. */
+.friend-remove {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tint);
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  touch-action: manipulation;
+}
+.friend-remove:active {
+  transform: scale(0.92);
+  background: color-mix(in srgb, #e8473e 18%, var(--tint));
+  color: #e8473e;
+}
 .search-id {
   flex: 1;
   min-width: 0;
