@@ -118,9 +118,10 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
     render(true); // cold launch: play the tumble-in once, then the wash loop
   }, []);
 
-  // Keep on screen a minimum ~1.2s so the entrance always completes.
+  // Keep on screen a minimum ~2.6s — long enough for the tumble-in to finish
+  // (~1.1s) and the wash loop to breathe before it dismisses into the app.
   useEffect(() => {
-    const t = setTimeout(() => setMinElapsed(true), 1200);
+    const t = setTimeout(() => setMinElapsed(true), 2600);
     return () => clearTimeout(t);
   }, []);
 
