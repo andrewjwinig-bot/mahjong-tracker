@@ -6315,3 +6315,22 @@ label.lbl {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ===========================================================================
+   FLAT UI DIRECTION — solid fills only (no gradients/stripes/shine on chrome).
+   Drops the woven diagonal stripe + sweeping shine from every primary button,
+   the mahj hero, and the Score CTA; flattens the date-poll header gradient.
+   (Tile artwork, the brand mark, and the launch splash keep their gradients —
+   those are illustration, not UI chrome.)
+   ========================================================================== */
+.btn:not(.ghost)::before,
+.btn:not(.ghost)::after,
+.mahj-hero::before,
+.mahj-hero-shine,
+.score-cta::before,
+.poll-hero::before {
+  display: none;
+}
+.poll-hero {
+  background: var(--brand);
+}
