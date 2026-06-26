@@ -40,7 +40,6 @@ import CardEditor from './CardEditor';
 import GameScorer from './GameScorer';
 import PracticeSheet from './PracticeSheet';
 import TipPopup from './TipPopup';
-import StreakChip from './StreakChip';
 import { IconSettings } from './uiIcons';
 import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
@@ -81,7 +80,8 @@ export default function AppShell() {
   const [account, setAccount] = useState<Account | null>(null);
   const [experience, setExperienceState] = useState<Experience>('beginner');
   const [accountChecked, setAccountChecked] = useState(false);
-  const [streak, setStreak] = useState(0);
+  // Best streak still feeds trophies/badges; the live day-streak is no longer
+  // surfaced in the UI (a daily streak doesn't fit a weekly social game).
   const [bestStreak, setBestStreak] = useState(0);
   const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
@@ -139,7 +139,6 @@ export default function AppShell() {
     const cc = loadCustomCard();
     if (cc) setCard(cc);
     const sd = recordPlay();
-    setStreak(sd.current);
     setBestStreak(sd.best);
     (async () => {
       const [counts, notes, w, s] = await Promise.all([
@@ -412,8 +411,6 @@ export default function AppShell() {
         <button className="gear" onClick={() => setSettingsOpen(true)} aria-label="Settings">
           <IconSettings size={22} />
         </button>
-        {/* Streak as a compact corner chip on the Feed — glanceable, not a banner. */}
-        {loaded && minElapsed && tab === 'group' && <StreakChip streak={streak} />}
 
         <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />
 
