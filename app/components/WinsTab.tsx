@@ -12,6 +12,7 @@ import { useConfetti } from './Confetti';
 import { colorNotation } from '../lib/theme';
 import Tile from './Tile';
 import { IconShare, IconTrash, IconCamera } from './uiIcons';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 interface Props {
   card: MahjongCard;
@@ -330,10 +331,18 @@ export function LogWinSheet({
   }, [burst]);
 
   const [cat, setCat] = useState<string>(initialHand?.category ?? ''); // '' = Freeform
+  const swipe = useSwipeDismiss(onClose);
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet log-sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet log-sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         {/* Celebratory header band */}
         <div className="log-band">
           <div className="grab light" />

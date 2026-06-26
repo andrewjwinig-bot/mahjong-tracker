@@ -19,6 +19,7 @@ import type { TileAvatar } from '../lib/social';
 import Avatar from './Avatar';
 import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock, IconPlus } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { usePro } from '../lib/usePro';
 import { setPro } from '../lib/pro';
 import Paywall from './Paywall';
@@ -45,6 +46,7 @@ export default function GameScorer({
   onGameWon?: (result: GameResult) => void;
 }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const pro = usePro();
   const [game, setGame] = useState<Game | null>(() => loadGame());
   const [results, setResults] = useState<GameResult[]>(() => loadResults());
@@ -171,7 +173,14 @@ export default function GameScorer({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet scorer" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet scorer"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         <div className="grab" />
 
         {!game ? (

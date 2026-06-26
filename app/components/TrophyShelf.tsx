@@ -13,6 +13,7 @@ import Avatar from './Avatar';
 import ShareModal from './ShareModal';
 import { IconShare, IconLock, IconStar, IconFlame, IconTarget, IconTrophy } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 export default function TrophyShelf({
   card,
@@ -32,6 +33,7 @@ export default function TrophyShelf({
   onClose: () => void;
 }) {
   useEscape(onClose);
+  const swipe = useSwipeDismiss(onClose);
   const pro = usePro();
   const [shareOpen, setShareOpen] = useState(false);
   const s = computeStats(card, handCounts);
@@ -55,7 +57,14 @@ export default function TrophyShelf({
 
   return (
     <div className="modal-scrim" onClick={onClose}>
-      <div className="sheet profile-sheet" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="sheet profile-sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
         {/* Cinnabar header band */}
         <div className="profile-band">
           <span className="md-stripe" aria-hidden />
