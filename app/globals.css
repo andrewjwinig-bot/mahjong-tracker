@@ -748,7 +748,7 @@ a:focus-visible,
   position: relative;
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 25px;
   letter-spacing: 0.5px;
   text-shadow: 2px 2px 0 var(--brand-deep);
 }
