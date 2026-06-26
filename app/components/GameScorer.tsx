@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   type Game,
   type GameResult,
@@ -24,6 +24,7 @@ import Avatar from './Avatar';
 import { IconTrophy, IconCheck, IconTrash, IconShare, IconLock, IconPlus } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
+import { useConfetti } from './Confetti';
 import { usePro } from '../lib/usePro';
 import { setPro } from '../lib/pro';
 import Paywall from './Paywall';
@@ -212,6 +213,24 @@ export default function GameScorer({
       ? `${Math.min(game.rounds.length, game.goal.target)} / ${game.goal.target} hands`
       : `First to ${game.goal.target}`
     : `${game?.rounds.length ?? 0} hand${game?.rounds.length === 1 ? '' : 's'} played`;
+  // Final standings (high → low) for the game-over modal.
+  const ranked = game ? [...game.players].sort((a, b) => b.score - a.score) : [];
+
+  // The win moment: when the chosen goal is first reached, fire a confetti
+  // storm and pop the celebratory game-over modal. Re-arms if a hand is undone
+  // back below the goal.
+  const { storm } = useConfetti();
+  const [showGameOver, setShowGameOver] = useState(false);
+  const celebratedRef = useRef(false);
+  useEffect(() => {
+    if (done && !celebratedRef.current) {
+      celebratedRef.current = true;
+      setShowGameOver(true);
+      storm();
+    } else if (!done) {
+      celebratedRef.current = false;
+    }
+  }, [done, storm]);
 
   return (
     <div className="modal-scrim" onClick={onClose}>
@@ -415,27 +434,6 @@ export default function GameScorer({
               <IconTrophy size={20} /> Scorepad
             </h2>
             <p className="sheet-sub">{goalSub}</p>
-
-            {done && (
-              <div className="game-over">
-                <span className="go-trophy" aria-hidden>
-                  <IconTrophy size={22} />
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="go-title">
-                    {winnerName ? (youWon ? 'You win!' : `${winnerName} wins!`) : "It's a tie!"}
-                  </div>
-                  <div className="go-sub">
-                    {game.goal?.type === 'hands'
-                      ? `${game.goal.target} hands played`
-                      : `First to ${game.goal?.target}`}
-                  </div>
-                </div>
-                <button className="btn go-end" onClick={endGame}>
-                  End &amp; save
-                </button>
-              </div>
-            )}
 
             {/* Scoreboard */}
             <div className="score-board">
@@ -716,6 +714,53 @@ export default function GameScorer({
           }}
           onClose={() => setPaywall(false)}
         />
+      )}
+
+      {showGameOver && game && (
+        <div className="celebrate-scrim" onClick={() => setShowGameOver(false)}>
+          <div className="celebrate-card big game-over-card" onClick={(e) => e.stopPropagation()}>
+            <div className="boom">🏆</div>
+            <p className="cele-hype">
+              {game.goal?.type === 'hands'
+                ? `${game.goal.target} hand${game.goal.target === 1 ? '' : 's'} played`
+                : `First to ${game.goal?.target} 🀄`}
+            </p>
+            <h2>{winnerName ? (youWon ? 'You win! 🎉' : `${winnerName} wins! 🎉`) : "It's a tie!"}</h2>
+
+            <div className="go-standings">
+              {ranked.map((p, i) => (
+                <div className="go-stand-row" key={p.id} data-top={i === 0}>
+                  <span className="go-rank">{i + 1}</span>
+                  {p.avatar ? (
+                    <Avatar avatar={p.avatar} size={26} />
+                  ) : (
+                    <span className="go-stand-dot" aria-hidden />
+                  )}
+                  <span className="go-stand-name">{p.name}</span>
+                  <span className="go-stand-score" data-neg={p.score < 0}>
+                    {p.score > 0 ? '+' : ''}
+                    {p.score}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="cele-actions">
+              <button
+                className="btn"
+                onClick={() => {
+                  setShowGameOver(false);
+                  endGame();
+                }}
+              >
+                End &amp; save game
+              </button>
+              <button className="btn ghost" onClick={() => setShowGameOver(false)}>
+                Keep playing
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
