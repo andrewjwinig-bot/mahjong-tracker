@@ -12,9 +12,23 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage } from '../lib/cardScan';
+import { scanCardImage, type ScanSummary } from '../lib/cardScan';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+
+// A plain-language recap of what the scan found and what to check.
+function summaryMessage(s: ScanSummary | undefined, count: number): string {
+  if (!s) {
+    return `Filled ${count} hand${count === 1 ? '' : 's'} from your photo. Check each line against your card and fix any mistakes, then tap Save.`;
+  }
+  const head = `Imported ${s.handCount} hand${s.handCount === 1 ? '' : 's'}${
+    s.sectionCount ? ` across ${s.sectionCount} section${s.sectionCount === 1 ? '' : 's'}` : ''
+  }.`;
+  if (s.needsReview === 0) {
+    return `${head} Every line is a valid 14-tile hand — still give them a quick look against your photo, then Save.`;
+  }
+  return `${head} ${s.needsReview} line${s.needsReview === 1 ? '' : 's'} need a look (highlighted below). Compare each against your photo and fix it, then Save.`;
+}
 
 export default function CardEditor({
   current,
@@ -41,6 +55,9 @@ export default function CardEditor({
   const [photoBusy, setPhotoBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanMsg, setScanMsg] = useState<string | null>(null);
+  // Per-row validation flags from the scan (index-aligned with rows); cleared
+  // as the user fixes a line. A "review queue" so nothing dubious slips through.
+  const [flags, setFlags] = useState<string[][]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const scanRef = useRef<HTMLInputElement>(null);
 
@@ -95,10 +112,16 @@ export default function CardEditor({
         return;
       }
       if (result.year) setYear(result.year);
-      setRows(result.rows);
-      setScanMsg(
-        `Filled ${result.rows.length} hand${result.rows.length === 1 ? '' : 's'} from your photo. Check each line against your card and fix any mistakes, then tap Save.`,
+      setRows(
+        result.rows.map((r) => ({
+          category: r.category,
+          notation: r.notation,
+          points: r.points,
+          concealed: r.concealed,
+        })),
       );
+      setFlags(result.rows.map((r) => r.issues ?? []));
+      setScanMsg(summaryMessage(result.summary, result.rows.length));
     } catch {
       setScanMsg('Couldn’t process that photo. Try another, well-lit shot.');
     } finally {
@@ -117,13 +140,19 @@ export default function CardEditor({
 
   function update(i: number, patch: Partial<HandRow>) {
     setRows((r) => r.map((row, n) => (n === i ? { ...row, ...patch } : row)));
+    // Editing a flagged line is the user resolving it — clear its flag.
+    setFlags((f) => (f[i]?.length ? f.map((x, n) => (n === i ? [] : x)) : f));
   }
   function addRow() {
     setRows((r) => [...r, { category: r[r.length - 1]?.category ?? '', notation: '', points: 25, concealed: false }]);
+    setFlags((f) => [...f, []]);
   }
   function removeRow(i: number) {
     setRows((r) => r.filter((_, n) => n !== i));
+    setFlags((f) => f.filter((_, n) => n !== i));
   }
+
+  const reviewCount = flags.filter((x) => x.length).length;
 
   const valid = rows.some((r) => r.notation.trim());
 
@@ -209,9 +238,17 @@ export default function CardEditor({
         />
       </div>
 
+      {reviewCount > 0 && (
+        <div className="review-banner" role="status">
+          <span className="review-banner-dot" aria-hidden />
+          {reviewCount} line{reviewCount === 1 ? '' : 's'} flagged for review — the highlighted rows below
+          don’t look like complete 14-tile hands. Fix them against your photo, then Save.
+        </div>
+      )}
+
       <div className="editor-rows">
         {rows.map((r, i) => (
-          <div className="editor-row" key={i}>
+          <div className="editor-row" key={i} data-flag={flags[i]?.length ? true : undefined}>
             <input
               className="field"
               placeholder="Notation, e.g. FF 2026 2026 DDDD"
@@ -245,6 +282,13 @@ export default function CardEditor({
                 ×
               </button>
             </div>
+            {flags[i]?.length > 0 && (
+              <ul className="row-issues">
+                {flags[i].map((msg, k) => (
+                  <li key={k}>{msg}</li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </div>
