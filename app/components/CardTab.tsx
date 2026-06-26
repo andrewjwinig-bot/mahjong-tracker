@@ -16,7 +16,7 @@ import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { computeBadges } from '../lib/badges';
-import { IconTrophy } from './uiIcons';
+import { IconTrophy, IconCamera } from './uiIcons';
 import EmptyCard from './EmptyCard';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -171,6 +171,29 @@ export default function CardTab({
         <p className="sub">Track every hand on this year’s card.</p>
       </header>
 
+      {/* Always-visible way to (re)scan or edit the card — so it isn't buried in
+          Settings, and a bad scan is easy to redo. Highlighted on the sample. */}
+      <button className="card-manage" data-sample={card.source !== 'custom'} onClick={onAddCard}>
+        <span className="cm-ic" aria-hidden>
+          <IconCamera size={17} />
+        </span>
+        <span className="cm-text">
+          <span className="cm-title">
+            {card.source === 'custom'
+              ? 'Edit or re-scan my card'
+              : scanEnabled
+                ? 'Scan your real card'
+                : 'Add your real card'}
+          </span>
+          <span className="cm-sub">
+            {card.source === 'custom'
+              ? 'Fix or replace the hands you imported'
+              : 'You’re on the sample — bring in your own to track for real'}
+          </span>
+        </span>
+        <span className="cm-chev" aria-hidden>›</span>
+      </button>
+
       <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
           <div className="num">
@@ -323,17 +346,19 @@ export default function CardTab({
         </section>
       )}
 
-      <p
-        style={{
-          textAlign: 'center',
-          color: 'var(--muted)',
-          fontSize: 12,
-          fontWeight: 700,
-          marginTop: 28,
-        }}
-      >
-        Sample card — illustrative notations, not the official NMJL card.
-      </p>
+      {card.source !== 'custom' && (
+        <p
+          style={{
+            textAlign: 'center',
+            color: 'var(--muted)',
+            fontSize: 12,
+            fontWeight: 700,
+            marginTop: 28,
+          }}
+        >
+          Sample card — illustrative notations, not the official NMJL card.
+        </p>
+      )}
 
       {shareWin && (
         <ShareModal

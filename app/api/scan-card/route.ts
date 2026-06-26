@@ -51,14 +51,14 @@ HOW THESE CARDS ARE LAID OUT
 - The card is divided into sections, each with a heading. Section HEADINGS are short descriptors (e.g. a year, even-number or odd-number groupings, consecutive runs, winds & dragons, 369, quints, singles & pairs) and are typically CENTERED. The hand rows under them are LEFT-justified. Use that difference to tell a heading apart from a hand row, and don't mistake a heading for a hand.
 - Read sections top-to-bottom; within a section read each line top-to-bottom; work left column then right column.
 - Each line is one hand: a sequence of tile groups, then its point value at the right edge, sometimes with a concealed marker.
-- A line may print TWO alternate forms of the same hand separated by "or" (or "-or-"). Transcribe ONLY the first form (its 14 tiles); ignore everything from the "or" onward. Never combine both forms into one line.
+- Store ONLY the single, clean 14-tile sequence — it must read exactly like the printed hand: just tile groups separated by spaces, with NO parentheses and NO "or". If the line shows an alternate form — separated by "or" / "-or-", OR printed in PARENTHESES (alternates, substitutions, or notes) — drop it entirely: transcribe only the first/main 14-tile form and ignore everything from the "or" onward and everything inside ( ). Never include a parenthesis character or the word "or" in the notation.
 
 THE TILE VOCABULARY (use these symbols)
 - Numbers: the digits 1-9 (each digit is one number tile).
 - Flowers: F.
 - Dragons: D for a dragon tile; the white/soap dragon counts as a dragon too.
 - Winds: N, E, W, S.
-- Suits are CRAK, BAM, and DOT. On the card the suit of a number group is shown by its COLOUR, not by a letter. Use colour to determine suit: a group printed in one colour is all one suit; groups printed in different colours are different suits. When a number group's suit is conveyed only by colour, append a suit letter so it is not lost - C = crak, B = bam, D = dot (e.g. a green "111" becomes 111B if green is bam on this card). Keep the same suit letter for every group sharing that colour in the hand, and different letters for different colours.
+- Numbers print as PLAIN DIGITS; their suit (crak / bam / dot) is shown only by the digit's COLOUR, never by a letter. Transcribe number groups as just the digits exactly as printed (e.g. "111 222 333"), groups separated by single spaces. Do NOT append or insert any letter or mark that is not physically printed on the tiles — in particular NEVER add a suit letter such as C, B, or D to a number group. The only letters that belong in a hand are ones actually printed on tiles: F (flower), D (a dragon tile), and N/E/W/S (winds). A space between groups is just a space — never a letter.
 
 RULES YOU MUST APPLY (they catch your own mistakes)
 - Every hand totals EXACTLY 14 tiles. Count the tiles you transcribed for each line. A pair = 2, a pung = 3, a kong = 4, a quint = 5, a sextet = 6, "FF" = 2 flowers, "NEWS" = 4, "DDDD" = 4, "2025" = 4 number tiles, and so on. Put that total in tileCount. If it is not 14, re-examine the line before moving on.
