@@ -334,6 +334,10 @@ export default function AppShell() {
   const changeTheme = useCallback((id: ThemeId) => {
     persistTheme(id);
     setThemeState(id);
+    // Close Settings just after picking so the whole-app reskin is immediately
+    // visible (otherwise the sheet hides the change and it reads as "nothing
+    // happened"). Brief delay lets the selected chip register first.
+    setTimeout(() => setSettingsOpen(false), 320);
   }, []);
 
   const changeExperience = useCallback((e: Experience) => {
