@@ -25,7 +25,6 @@ import Avatar from './Avatar';
 import { IconCheck, IconShare, IconLock } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
-import { useConfetti } from './Confetti';
 import { usePro } from '../lib/usePro';
 import { setPro } from '../lib/pro';
 import Paywall from './Paywall';
@@ -66,7 +65,8 @@ function BandStar() {
   );
 }
 
-// 4-point gold sparkle for the leader card.
+// 4-point gold sparkle for the leader card + the winner modal (color via
+// the parent's `color`; sized by the parent box).
 function Spark() {
   return (
     <svg width="100%" height="100%" viewBox="0 0 24 24" style={{ display: 'block' }}>
@@ -75,6 +75,65 @@ function Spark() {
         fill="currentColor"
       />
     </svg>
+  );
+}
+
+// 5-point star path — matches the design handoff's star() generator exactly.
+function starPath(cx: number, cy: number, r: number, inner: number) {
+  let p = '';
+  for (let i = 0; i < 10; i++) {
+    const rad = i % 2 ? inner : r;
+    const a = (Math.PI / 5) * i - Math.PI / 2;
+    p += (i ? 'L' : 'M') + (cx + Math.cos(a) * rad).toFixed(1) + ',' + (cy + Math.sin(a) * rad).toFixed(1);
+  }
+  return p + 'Z';
+}
+
+// Layered gold trophy star (winner-modal emblem).
+function GoldStar({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{ display: 'block' }}>
+      <path d={starPath(50, 53, 40, 17)} fill="#F5A524" />
+      <path d={starPath(50, 53, 23, 10)} fill="#FFD874" />
+      <circle cx="50" cy="50" r="5" fill="#C97A1A" />
+    </svg>
+  );
+}
+
+// Blue 1-dot tile glyph (END GAME button, left).
+function DotGlyph() {
+  return (
+    <svg viewBox="0 0 100 100" width="19" height="19" style={{ display: 'block', color: '#2E86D4' }}>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="11" />
+      <circle cx="50" cy="50" r="12" fill="currentColor" />
+    </svg>
+  );
+}
+
+// Red 中 dragon tile glyph (END GAME button, right) — framed CJK glyph.
+function DragonGlyph() {
+  const px = 15;
+  return (
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: px * 1.05,
+        height: px * 1.15,
+        boxSizing: 'border-box',
+        border: '3px solid #C0392B',
+        borderRadius: px * 0.18,
+        boxShadow: 'inset 0 0 0 2.5px rgba(255,255,255,0.75)',
+        fontFamily: "var(--font-display), 'Hanken Grotesk', sans-serif",
+        fontWeight: 800,
+        fontSize: px * 0.6,
+        color: '#C0392B',
+        lineHeight: 1,
+      }}
+    >
+      中
+    </span>
   );
 }
 
@@ -99,6 +158,7 @@ export default function GameScorer({
   useEscape(onClose);
   const swipe = useSwipeDismiss(onClose);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const recapRef = useRef<HTMLDivElement>(null);
   const pro = usePro();
   const [game, setGame] = useState<Game | null>(() => loadGame());
   const [results, setResults] = useState<GameResult[]>(() => loadResults());
@@ -350,6 +410,56 @@ export default function GameScorer({
     setTimeout(() => layer.remove(), 3200);
   }
 
+  // Winner-modal confetti (exact port): ~half gold mahjong tiles, half colored
+  // chips, rained over the modal card. Clipped to the modal root (overflow:hidden).
+  function recapConfetti(root: HTMLElement | null) {
+    if (!root) return;
+    const W = root.clientWidth;
+    const H = root.clientHeight;
+    const glyphs = ['中', '發', '東', '南', '西', '北', '花'];
+    const cols = ['#C0392B', '#2E86D4', '#1F8A5B', '#E2568F', '#F5A524'];
+    for (let i = 0; i < 34; i++) {
+      const tile = Math.random() < 0.5;
+      const w = tile ? 14 + Math.round(Math.random() * 9) : 7 + Math.round(Math.random() * 5);
+      const h = tile ? Math.round(w * 1.34) : 11 + Math.round(Math.random() * 7);
+      const el = document.createElement('div');
+      const x = Math.random() * (W - w);
+      if (tile) {
+        const g = glyphs[Math.floor(Math.random() * glyphs.length)];
+        el.style.cssText = `position:absolute;left:${x.toFixed(0)}px;top:${-h - 12}px;width:${w}px;height:${h}px;border-radius:3.5px;background:linear-gradient(158deg,#FCE3A0,#F5A524 55%,#D88E12);border:1px solid rgba(120,82,10,0.5);box-shadow:0 2px 6px rgba(60,40,6,.35),inset 0 1px 0 rgba(255,248,220,.85);display:flex;align-items:center;justify-content:center;z-index:80;pointer-events:none;will-change:transform,opacity`;
+        el.innerHTML = `<span style="font-family:serif;font-weight:700;font-size:${Math.round(h * 0.56)}px;line-height:1;color:#5A3D08">${g}</span>`;
+      } else {
+        const c = cols[Math.floor(Math.random() * cols.length)];
+        el.style.cssText = `position:absolute;left:${x.toFixed(0)}px;top:${-h - 12}px;width:${w}px;height:${h}px;border-radius:2px;background:${c};box-shadow:0 1px 3px rgba(0,0,0,.25);z-index:80;pointer-events:none;will-change:transform,opacity`;
+      }
+      root.appendChild(el);
+      const sway = (Math.random() - 0.5) * 70;
+      const rot = (Math.random() - 0.5) * 760;
+      const dur = 1700 + Math.random() * 1300;
+      const delay = Math.random() * 620;
+      el.animate(
+        [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+          {
+            transform: `translate(${(sway * 0.4).toFixed(0)}px,${Math.round(H * 0.28)}px) rotate(${(rot * 0.3).toFixed(0)}deg)`,
+            opacity: 1,
+            offset: 0.12,
+          },
+          {
+            transform: `translate(${sway.toFixed(0)}px,${H + h + 24}px) rotate(${rot.toFixed(0)}deg)`,
+            opacity: 1,
+            offset: 0.85,
+          },
+          {
+            transform: `translate(${sway.toFixed(0)}px,${H + h + 48}px) rotate(${rot.toFixed(0)}deg)`,
+            opacity: 0,
+          },
+        ],
+        { duration: dur, delay, easing: 'cubic-bezier(.3,.5,.45,1)' },
+      ).onfinish = () => el.remove();
+    }
+  }
+
   function undo() {
     if (game) setGame(undoLastRound(game));
   }
@@ -411,10 +521,8 @@ export default function GameScorer({
   // Final standings (high → low) for the game-over modal.
   const ranked = game ? [...game.players].sort((a, b) => b.score - a.score) : [];
 
-  // The win moment: when the chosen goal is first reached, fire a confetti
-  // storm and pop the celebratory game-over modal. Re-arms if a hand is undone
-  // back below the goal.
-  const { storm } = useConfetti();
+  // The win moment: when the chosen goal is first reached, pop the celebratory
+  // Winner modal. Re-arms if a hand is undone back below the goal.
   const [showGameOver, setShowGameOver] = useState(false);
   // After a game is saved, offer a one-tap rematch with the same crew.
   const [playAgain, setPlayAgain] = useState<{
@@ -427,11 +535,25 @@ export default function GameScorer({
     if (done && !celebratedRef.current) {
       celebratedRef.current = true;
       setShowGameOver(true);
-      storm();
     } else if (!done) {
       celebratedRef.current = false;
     }
-  }, [done, storm]);
+  }, [done]);
+
+  // Rain confetti over the Winner modal while it's open: a burst on appear, then
+  // a couple of loops (gated on reduced-motion).
+  useEffect(() => {
+    if (!showGameOver) return;
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const fire = () => recapConfetti(recapRef.current);
+    const t = setTimeout(fire, 400);
+    const iv = setInterval(fire, 3400);
+    return () => {
+      clearTimeout(t);
+      clearInterval(iv);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showGameOver]);
 
   return (
     <div className="modal-scrim" onClick={onClose}>
@@ -697,11 +819,11 @@ export default function GameScorer({
             <div className="scorer-label" style={{ marginTop: 4 }}>RECORD A HAND</div>
 
             <div className="sp-sublabel">Who won?</div>
-            <div className="sp-pillrow">
+            <div className="sp-who-grid">
               {game.players.map((p) => (
                 <button
                   key={p.id}
-                  className="sp-pill"
+                  className="sp-who-btn"
                   data-active={!wall && winnerId === p.id}
                   onClick={() => {
                     setWall(false);
@@ -712,17 +834,17 @@ export default function GameScorer({
                   {p.name}
                 </button>
               ))}
-              <button
-                className="sp-pill"
-                data-active={wall}
-                onClick={() => {
-                  setWall(true);
-                  setWinnerId(null);
-                }}
-              >
-                Wall (no win)
-              </button>
             </div>
+            <button
+              className="sp-who-wall"
+              data-active={wall}
+              onClick={() => {
+                setWall(true);
+                setWinnerId(null);
+              }}
+            >
+              Wall (no win)
+            </button>
 
             {!wall && (
               <>
@@ -752,7 +874,7 @@ export default function GameScorer({
                 <div className="sp-sublabel" style={{ marginTop: 16 }}>How did they win?</div>
                 <div className="len-seg">
                   <button className="len-seg-btn" data-active={selfPick} onClick={() => setSelfPick(true)}>
-                    OFF THE WALL (SELF-PICK)
+                    OFF THE WALL
                   </button>
                   <button className="len-seg-btn" data-active={!selfPick} onClick={() => setSelfPick(false)}>
                     OFF A DISCARD
@@ -934,42 +1056,90 @@ export default function GameScorer({
       )}
 
       {showGameOver && game && (
-        <div className="celebrate-scrim" onClick={() => setShowGameOver(false)}>
-          <div className="celebrate-card big game-over-card" onClick={(e) => e.stopPropagation()}>
-            <div className="boom">🏆</div>
-            <p className="cele-hype">
-              {game.goal?.type === 'hands'
-                ? `${game.goal.target} hand${game.goal.target === 1 ? '' : 's'} played`
-                : `First to ${game.goal?.target} 🀄`}
-            </p>
-            <h2>{winnerName ? (youWon ? 'You win! 🎉' : `${winnerName} wins! 🎉`) : "It's a tie!"}</h2>
-
-            <div className="go-standings">
-              {ranked.map((p, i) => (
-                <div className="go-stand-row" key={p.id} data-top={i === 0}>
-                  <span className="go-rank">{i + 1}</span>
-                  {p.avatar ? (
-                    <Avatar avatar={p.avatar} size={26} />
-                  ) : (
-                    <span className="go-stand-dot" aria-hidden />
-                  )}
-                  <span className="go-stand-name">{p.name}</span>
-                  <span className="go-stand-score" data-neg={p.score < 0}>
-                    {p.score > 0 ? '+' : ''}
-                    {p.score}
-                  </span>
-                </div>
-              ))}
+        <div className="recap-scrim" ref={recapRef} onClick={() => setShowGameOver(false)}>
+          <div className="recap-card" onClick={(e) => e.stopPropagation()}>
+            {/* emblem: gold glow + 3 sparkles + cream trophy tile w/ shine + gold star */}
+            <div className="recap-emblem">
+              <span className="recap-glow" aria-hidden />
+              <span className="recap-emblem-spark" style={{ top: 6, left: 58, width: 17, height: 17, color: '#FFD46A', animationDuration: '1.8s' }}>
+                <Spark />
+              </span>
+              <span className="recap-emblem-spark" style={{ top: 20, right: 54, width: 13, height: 13, color: '#F5B73C', animationDuration: '2.1s', animationDelay: '.5s' }}>
+                <Spark />
+              </span>
+              <span className="recap-emblem-spark" style={{ bottom: 6, left: 74, width: 11, height: 11, color: '#FFD46A', animationDuration: '2.4s', animationDelay: '.9s' }}>
+                <Spark />
+              </span>
+              <div className="recap-tile">
+                <span className="recap-shine" aria-hidden />
+                <span className="recap-star">
+                  <GoldStar size={60} />
+                </span>
+              </div>
             </div>
 
-            <div className="cele-actions">
-              <button className="btn" onClick={endGame}>
-                End &amp; save game
-              </button>
-              <button className="btn ghost" onClick={() => setShowGameOver(false)}>
-                Keep playing
-              </button>
+            <div className="recap-eyebrow">
+              {game.rounds.length} HAND{game.rounds.length === 1 ? '' : 'S'} PLAYED
             </div>
+            <div className="recap-titlewrap">
+              <span className="recap-title">
+                {winnerName ? (youWon ? 'YOU WIN!' : `${winnerName.toUpperCase()} WINS!`) : "IT'S A TIE!"}
+              </span>
+            </div>
+
+            <div className="recap-ranks">
+              {ranked.map((p, i) => {
+                const isWinner = i === 0 && p.score > 0;
+                return (
+                  <div className="recap-rank" key={p.id} data-winner={isWinner}>
+                    {isWinner && (
+                      <>
+                        <span className="recap-rank-spark" style={{ top: -9, left: 46, width: 14, height: 14, color: '#F5B73C', animationDuration: '1.7s' }}>
+                          <Spark />
+                        </span>
+                        <span className="recap-rank-spark" style={{ bottom: -6, right: 78, width: 10, height: 10, color: '#FFD46A', animationDuration: '2.2s', animationDelay: '.7s' }}>
+                          <Spark />
+                        </span>
+                      </>
+                    )}
+                    <span className="recap-rank-num">{i + 1}</span>
+                    <span className="recap-rank-tile" data-winner={isWinner}>
+                      {p.avatar ? (
+                        <Avatar avatar={p.avatar} size={38} />
+                      ) : (
+                        <span className="sp-tile-num">{i + 1}</span>
+                      )}
+                    </span>
+                    <span className="recap-rank-name">
+                      {p.name}
+                      {isWinner && (
+                        <span className="recap-rank-badge" style={{ color: '#F5A524' }}>
+                          <Spark />
+                        </span>
+                      )}
+                    </span>
+                    <span className="recap-rank-score" data-neg={p.score < 0}>
+                      {p.score > 0 ? `+${p.score}` : p.score < 0 ? `−${Math.abs(p.score)}` : '0'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button className="recap-endgame" onClick={endGame}>
+              <span className="score-cta-shine" aria-hidden />
+              <span className="recap-eg-tile recap-eg-tile-l">
+                <DotGlyph />
+              </span>
+              <span className="recap-eg-label">END GAME</span>
+              <span className="recap-eg-tile recap-eg-tile-r">
+                <DragonGlyph />
+              </span>
+            </button>
+
+            <button className="recap-keep" onClick={() => setShowGameOver(false)}>
+              Keep playing
+            </button>
           </div>
         </div>
       )}

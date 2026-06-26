@@ -30,8 +30,26 @@ export function setScanEnabled(on: boolean): void {
   }
 }
 
+// A scanned row is a normal hand row plus the server's validation metadata, so
+// the editor can flag lines that need a closer look (wrong tile count, odd
+// points, low-confidence read). The extra fields are dropped when the card is
+// saved — only category/notation/points/concealed persist.
+export interface ScanRow extends HandRow {
+  tileCount?: number;
+  confidence?: 'high' | 'medium' | 'low';
+  issues?: string[];
+}
+
+export interface ScanSummary {
+  handCount: number;
+  sectionCount: number;
+  needsReview: number;
+  tileFlags: number;
+  lowConfidence: number;
+}
+
 export type ScanResult =
-  | { ok: true; year?: number; rows: HandRow[] }
+  | { ok: true; year?: number; rows: ScanRow[]; summary?: ScanSummary }
   | { ok: false; error: string };
 
 function blobToBase64(blob: Blob): Promise<string> {
@@ -63,21 +81,27 @@ export async function scanCardImage(blob: Blob): Promise<ScanResult> {
       return { ok: false, error: 'Couldn’t read that photo. Try a clearer, well-lit shot of the whole card.' };
     }
 
-    const data = (await res.json()) as { year?: number; hands?: unknown[] };
-    const rows: HandRow[] = (Array.isArray(data.hands) ? data.hands : [])
-      .map((h) => h as Partial<HandRow>)
+    const data = (await res.json()) as { year?: number; hands?: unknown[]; summary?: ScanSummary };
+    const rows: ScanRow[] = (Array.isArray(data.hands) ? data.hands : [])
+      .map((h) => h as Partial<ScanRow>)
       .filter((h) => typeof h.notation === 'string' && h.notation.trim())
       .map((h) => ({
         category: typeof h.category === 'string' ? h.category : '',
         notation: String(h.notation).trim(),
         points: Number.isFinite(h.points) && (h.points as number) > 0 ? Math.round(h.points as number) : 25,
         concealed: !!h.concealed,
+        tileCount: Number.isFinite(h.tileCount) ? Math.round(h.tileCount as number) : undefined,
+        confidence:
+          h.confidence === 'high' || h.confidence === 'low' || h.confidence === 'medium'
+            ? h.confidence
+            : undefined,
+        issues: Array.isArray(h.issues) ? h.issues.filter((s) => typeof s === 'string') : undefined,
       }));
 
     if (!rows.length) {
       return { ok: false, error: 'No hands found in that photo. Try a clearer shot of the full card.' };
     }
-    return { ok: true, year: data.year, rows };
+    return { ok: true, year: data.year, rows, summary: data.summary };
   } catch {
     return { ok: false, error: 'Couldn’t reach the scanner. Check your connection and try again.' };
   }

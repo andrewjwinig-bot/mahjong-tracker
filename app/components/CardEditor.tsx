@@ -12,9 +12,14 @@ import {
   type HandRow,
 } from '../lib/customCard';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage } from '../lib/cardScan';
+import type { ScanRow, ScanSummary } from '../lib/cardScan';
+import CardScanGuide from './CardScanGuide';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
+
+// American cards usually carry ~60–70 hands (a genre fact, not card data) —
+// used only to gently flag a likely-missing panel after a scan.
+const TYPICAL_MIN = 55;
 
 export default function CardEditor({
   current,
@@ -39,10 +44,16 @@ export default function CardEditor({
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
-  const [scanning, setScanning] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [scanMsg, setScanMsg] = useState<string | null>(null);
+  // Per-row validation flags from the scan (index-aligned with rows); cleared
+  // as the user fixes a line. A "review queue" so nothing dubious slips through.
+  const [flags, setFlags] = useState<string[][]>([]);
+  // After a scan we show a calm, celebratory result: only the few flagged lines
+  // up front, the full list tucked behind a toggle, and never a blocker.
+  const [scanned, setScanned] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const scanRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let url: string | null = null;
@@ -74,37 +85,37 @@ export default function CardEditor({
     }
   }
 
-  // Snap/upload your card → auto-fill the rows from YOUR photo, for you to
-  // review and correct before saving. The photo is the only data source; the
-  // result stays on your device.
-  async function onScanPick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setScanning(true);
-    setScanMsg(null);
-    try {
-      const blob = await downscaleImage(file, 1600, 0.85);
-      await saveCardPhoto(blob);
-      setPhotoUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return URL.createObjectURL(blob);
-      });
-      const result = await scanCardImage(blob);
-      if (!result.ok) {
-        setScanMsg(result.error);
-        return;
+  // The guided trifold scan finished → adopt its merged rows (each scanned from
+  // YOUR photos, stitched on-device) into the editable review.
+  function applyScan(scanRows: ScanRow[], summary: ScanSummary, scanYear?: number) {
+    if (scanYear) setYear(scanYear);
+    setRows(
+      scanRows.map((r) => ({
+        category: r.category,
+        notation: r.notation,
+        points: r.points,
+        concealed: r.concealed,
+      })),
+    );
+    setFlags(scanRows.map((r) => r.issues ?? []));
+    setScanned(true);
+    setShowAll(false);
+    setGuideOpen(false);
+    // Gentle nudge if it looks like a panel is missing (generic genre range).
+    setScanMsg(
+      summary.handCount < TYPICAL_MIN
+        ? `That’s only ${summary.handCount} hands — most cards have ~60–70, so you may be missing a panel. Add it from the list below, or re-scan.`
+        : null,
+    );
+    // The guide saved the first panel as the reference photo — refresh it.
+    void loadCardPhoto().then((blob) => {
+      if (blob) {
+        setPhotoUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
       }
-      if (result.year) setYear(result.year);
-      setRows(result.rows);
-      setScanMsg(
-        `Filled ${result.rows.length} hand${result.rows.length === 1 ? '' : 's'} from your photo. Check each line against your card and fix any mistakes, then tap Save.`,
-      );
-    } catch {
-      setScanMsg('Couldn’t process that photo. Try another, well-lit shot.');
-    } finally {
-      setScanning(false);
-      if (scanRef.current) scanRef.current.value = '';
-    }
+    });
   }
 
   async function removePhoto() {
@@ -117,13 +128,19 @@ export default function CardEditor({
 
   function update(i: number, patch: Partial<HandRow>) {
     setRows((r) => r.map((row, n) => (n === i ? { ...row, ...patch } : row)));
+    // Editing a flagged line is the user resolving it — clear its flag.
+    setFlags((f) => (f[i]?.length ? f.map((x, n) => (n === i ? [] : x)) : f));
   }
   function addRow() {
     setRows((r) => [...r, { category: r[r.length - 1]?.category ?? '', notation: '', points: 25, concealed: false }]);
+    setFlags((f) => [...f, []]);
   }
   function removeRow(i: number) {
     setRows((r) => r.filter((_, n) => n !== i));
+    setFlags((f) => f.filter((_, n) => n !== i));
   }
+
+  const reviewCount = flags.filter((x) => x.length).length;
 
   const valid = rows.some((r) => r.notation.trim());
 
@@ -133,6 +150,54 @@ export default function CardEditor({
     saveCustomCard(card);
     onSave(card);
     onClose();
+  }
+
+  function renderRow(i: number) {
+    const r = rows[i];
+    return (
+      <div className="editor-row" key={i} data-flag={flags[i]?.length ? true : undefined}>
+        <input
+          className="field"
+          placeholder="Notation, e.g. FF 2026 2026 DDDD"
+          value={r.notation}
+          onChange={(e) => update(i, { notation: e.target.value })}
+        />
+        <div className="editor-meta">
+          <input
+            className="field"
+            placeholder="Category"
+            value={r.category}
+            onChange={(e) => update(i, { category: e.target.value })}
+          />
+          <input
+            className="field"
+            type="number"
+            aria-label="Points"
+            value={r.points}
+            style={{ maxWidth: 76 }}
+            onChange={(e) => update(i, { points: Number(e.target.value) })}
+          />
+          <button
+            className="c-toggle"
+            data-on={r.concealed}
+            aria-label="Concealed"
+            onClick={() => update(i, { concealed: !r.concealed })}
+          >
+            C
+          </button>
+          <button className="row-del" aria-label="Delete hand" onClick={() => removeRow(i)}>
+            ×
+          </button>
+        </div>
+        {flags[i]?.length > 0 && (
+          <ul className="row-issues">
+            {flags[i].map((msg, k) => (
+              <li key={k}>{msg}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -149,25 +214,27 @@ export default function CardEditor({
         </button>
       </div>
 
-      <p className="editor-note">
-        Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
-        if it must be concealed. Group hands by giving them the same category name.
-      </p>
+      {!scanned && (
+        <p className="editor-note">
+          Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
+          if it must be concealed. Group hands by giving them the same category name.
+        </p>
+      )}
 
       {scanEnabled && (
         <>
-          <input ref={scanRef} type="file" accept="image/*" capture="environment" hidden onChange={onScanPick} />
           <button
             className="btn"
             style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-            onClick={() => scanRef.current?.click()}
-            disabled={scanning}
+            onClick={() => setGuideOpen(true)}
           >
-            <IconCamera size={17} /> {scanning ? 'Reading your card…' : 'Scan my card'}
+            <IconCamera size={17} /> Scan my card
           </button>
           {scanMsg && <p className="editor-scan-msg">{scanMsg}</p>}
         </>
       )}
+
+      {guideOpen && <CardScanGuide onComplete={applyScan} onCancel={() => setGuideOpen(false)} />}
 
       <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
       {photoUrl ? (
@@ -209,49 +276,60 @@ export default function CardEditor({
         />
       </div>
 
-      <div className="editor-rows">
-        {rows.map((r, i) => (
-          <div className="editor-row" key={i}>
-            <input
-              className="field"
-              placeholder="Notation, e.g. FF 2026 2026 DDDD"
-              value={r.notation}
-              onChange={(e) => update(i, { notation: e.target.value })}
-            />
-            <div className="editor-meta">
-              <input
-                className="field"
-                placeholder="Category"
-                value={r.category}
-                onChange={(e) => update(i, { category: e.target.value })}
-              />
-              <input
-                className="field"
-                type="number"
-                aria-label="Points"
-                value={r.points}
-                style={{ maxWidth: 76 }}
-                onChange={(e) => update(i, { points: Number(e.target.value) })}
-              />
-              <button
-                className="c-toggle"
-                data-on={r.concealed}
-                aria-label="Concealed"
-                onClick={() => update(i, { concealed: !r.concealed })}
-              >
-                C
-              </button>
-              <button className="row-del" aria-label="Delete hand" onClick={() => removeRow(i)}>
-                ×
-              </button>
+      {scanned ? (
+        <>
+          <div className="scan-done">
+            <div className="scan-done-emoji" aria-hidden>🎉</div>
+            <div className="scan-done-title">
+              Your card’s in — {rows.length} hand{rows.length === 1 ? '' : 's'}
+            </div>
+            <div className="scan-done-sub">
+              {reviewCount > 0
+                ? `Pulled from your photo. ${reviewCount} line${reviewCount === 1 ? '' : 's'} worth a quick look — the rest checked out.`
+                : 'Pulled from your photo — every line is a complete 14-tile hand.'}
             </div>
           </div>
-        ))}
-      </div>
 
-      <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
-        ＋ Add hand
-      </button>
+          {reviewCount > 0 && (
+            <div className="quick-check">
+              <div className="quick-check-head">
+                Quick check · {reviewCount} to confirm
+              </div>
+              <p className="quick-check-hint">
+                These didn’t look like complete hands. Compare each to your photo above and fix it —
+                or leave it and edit anytime.
+              </p>
+              {rows.map((_, i) => (flags[i]?.length ? renderRow(i) : null))}
+            </div>
+          )}
+
+          <button className="btn" style={{ marginTop: 14 }} onClick={save} disabled={!valid}>
+            {reviewCount > 0 ? 'Looks good — start tracking' : 'Start tracking'}
+          </button>
+
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setShowAll((s) => !s)}>
+            {showAll ? 'Hide full list' : `See all ${rows.length} hands`}
+          </button>
+
+          {showAll && (
+            <>
+              <div className="editor-rows" style={{ marginTop: 12 }}>
+                {rows.map((_, i) => renderRow(i))}
+              </div>
+              <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
+                ＋ Add hand
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="editor-rows">{rows.map((_, i) => renderRow(i))}</div>
+          <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
+            ＋ Add hand
+          </button>
+        </>
+      )}
 
       <button
         className="btn ghost"
