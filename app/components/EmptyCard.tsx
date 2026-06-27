@@ -36,12 +36,8 @@ export default function EmptyCard({
 
       {scanEnabled ? (
         <>
-          <button
-            className="btn"
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            onClick={onScan}
-          >
-            <IconCamera size={18} /> Scan my card
+          <button className="btn empty-card-scan" onClick={onScan}>
+            <IconCamera size={20} /> Scan my card
           </button>
           <button className="empty-card-manual" onClick={onManual}>
             or enter card manually
@@ -54,13 +50,13 @@ export default function EmptyCard({
       )}
 
       <a
-        className="btn ghost"
+        className="empty-card-official"
         href={OFFICIAL_CARD_URL}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => void track('official_card_clicked')}
       >
-        Get the official card →
+        Get the official card
       </a>
 
       <p className="empty-card-fine">

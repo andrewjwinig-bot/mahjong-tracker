@@ -4293,6 +4293,28 @@ label.lbl {
 .empty-card .btn {
   margin-top: 10px;
 }
+/* Scan is the hero action — biggest button, clear primary path. */
+.empty-card-scan {
+  gap: 9px;
+  font-size: 18px;
+  padding: 18px;
+}
+/* The official-card link is a small, secondary affordance — not a peer of Scan. */
+.empty-card-official {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  margin: 18px auto 0;
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: var(--tint);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
 .empty-card-sample,
 .empty-card-manual {
   display: block;
