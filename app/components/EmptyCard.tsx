@@ -3,6 +3,7 @@
 import Tile from './Tile';
 import { OFFICIAL_CARD_URL } from '../lib/links';
 import { track } from '../lib/analytics';
+import { IconCamera } from './uiIcons';
 
 // Shown on the Card tab before the user has set up a card. The rest of the app
 // (scorer, tables, feed, rules) works without one — this only gates the hand
@@ -10,10 +11,14 @@ import { track } from '../lib/analytics';
 // (when on) and manual entry live together.
 export default function EmptyCard({
   scanEnabled,
-  onAdd,
+  onScan,
+  onManual,
 }: {
   scanEnabled: boolean;
-  onAdd: () => void;
+  /** Jump straight into the photo/upload capture. */
+  onScan: () => void;
+  /** Open the editor to type the card in by hand. */
+  onManual: () => void;
 }) {
   return (
     <div className="empty-card">
@@ -25,13 +30,28 @@ export default function EmptyCard({
       <h2 className="empty-card-title">Add your card to start tracking</h2>
       <p className="empty-card-blurb">
         The hand tracker follows the hands on your own National Mah Jongg League card.
-        {scanEnabled ? ' Scan it or type it in' : ' Enter it'} once, and every hand becomes
-        tappable to log your wins. Everything else in the app works without it.
+        {scanEnabled ? ' Scan it' : ' Enter it'} once, and every hand becomes tappable to log your
+        wins. Everything else in the app works without it.
       </p>
 
-      <button className="btn" onClick={onAdd}>
-        {scanEnabled ? 'Scan or add my card' : 'Add my card'}
-      </button>
+      {scanEnabled ? (
+        <>
+          <button
+            className="btn"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            onClick={onScan}
+          >
+            <IconCamera size={18} /> Scan my card
+          </button>
+          <button className="empty-card-manual" onClick={onManual}>
+            or enter card manually
+          </button>
+        </>
+      ) : (
+        <button className="btn" onClick={onManual}>
+          Add my card
+        </button>
+      )}
 
       <a
         className="btn ghost"

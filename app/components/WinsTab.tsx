@@ -53,9 +53,16 @@ export default function WinsTab({
       </button>
 
       {wins.length === 0 ? (
-        <div className="empty">
-          <div className="big">🀅🀄🀅</div>
-          No mahjs yet. Call “Mahjong!” at your next game and log it here!
+        <div className="empty empty-mahjs">
+          <div className="em-tiles" aria-hidden>
+            <span className="em-tile em-l"><Tile face="bam" color="#1FA85B" size={46} /></span>
+            <span className="em-tile em-c"><Tile face="crack" size={58} /></span>
+            <span className="em-tile em-r"><Tile face="flower" color="#E8455F" size={46} /></span>
+            <span className="em-spark em-spark-1" aria-hidden>✦</span>
+            <span className="em-spark em-spark-2" aria-hidden>✦</span>
+          </div>
+          <div className="em-title">No mahjs yet</div>
+          <div className="em-sub">Call “Mahjong!” at your next game and log it here.</div>
         </div>
       ) : (
         <div style={{ marginTop: 16 }}>

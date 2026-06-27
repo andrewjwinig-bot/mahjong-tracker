@@ -104,6 +104,12 @@ export default function AppShell() {
   // without it.
   const [scanEnabled, setScanEnabledState] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
+  // "Scan my card" opens the editor straight into the capture flow.
+  const [editorAutoScan, setEditorAutoScan] = useState(false);
+  const openEditor = useCallback((scan = false) => {
+    setEditorAutoScan(scan);
+    setEditorOpen(true);
+  }, []);
   const [scorerOpen, setScorerOpen] = useState(false);
   // Optional pre-seeded players for the scorer (e.g. a table's members).
   type ScorerSeed = { suggestedNames: string[]; friends: { name: string; avatar: social.TileAvatar }[] };
@@ -475,7 +481,8 @@ export default function AppShell() {
                 onTrophies={() => setTrophyOpen(true)}
                 needsCard={needsCard}
                 scanEnabled={scanEnabled}
-                onAddCard={() => setEditorOpen(true)}
+                onAddCard={() => openEditor(false)}
+                onScanCard={() => openEditor(true)}
               />
             )}
             {tab === 'group' && socialState && (
@@ -569,8 +576,12 @@ export default function AppShell() {
         <CardEditor
           current={card}
           scanEnabled={scanEnabled}
+          autoScan={editorAutoScan}
           onSave={(c) => setCard(c)}
-          onClose={() => setEditorOpen(false)}
+          onClose={() => {
+            setEditorOpen(false);
+            setEditorAutoScan(false);
+          }}
         />
       )}
 

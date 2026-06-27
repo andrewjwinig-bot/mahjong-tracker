@@ -81,17 +81,19 @@ export default function CardScanGuide({
   const captureLabel = busy
     ? `Reading panel ${done + 1}…`
     : done === 0
-      ? 'Photograph panel 1'
+      ? 'Add panel 1 — photo or upload'
       : `Add panel ${done + 1}`;
 
   return (
     <div className="scan-guide-scrim" onClick={onCancel}>
       <div className="scan-guide" onClick={(e) => e.stopPropagation()}>
+        {/* No `capture` attribute: the OS picker offers both "Take Photo" and
+            "Photo Library", so you can shoot a panel live or upload one you
+            already have. */}
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           hidden
           onChange={onPick}
         />
@@ -110,8 +112,8 @@ export default function CardScanGuide({
 
         <h2 className="scan-guide-title">Scan your card</h2>
         <p className="scan-guide-sub">
-          Your card folds out into <strong>3 panels</strong>. Photograph each one up close — straight
-          on, filling the frame. We’ll stitch them together.
+          Your card folds out into <strong>3 panels</strong>. Photograph (or upload a photo of) each
+          one up close — straight on, filling the frame. We’ll stitch them together.
         </p>
 
         {done > 0 && (

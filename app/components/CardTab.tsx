@@ -39,6 +39,7 @@ interface Props {
   needsCard: boolean;
   scanEnabled: boolean;
   onAddCard: () => void;
+  onScanCard: () => void;
 }
 
 export default function CardTab({
@@ -58,6 +59,7 @@ export default function CardTab({
   needsCard,
   scanEnabled,
   onAddCard,
+  onScanCard,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
@@ -157,7 +159,7 @@ export default function CardTab({
           <CardTitle />
           <p className="sub">Track every hand on your card.</p>
         </header>
-        <EmptyCard scanEnabled={scanEnabled} onAdd={onAddCard} />
+        <EmptyCard scanEnabled={scanEnabled} onScan={onScanCard} onManual={onAddCard} />
       </div>
     );
   }

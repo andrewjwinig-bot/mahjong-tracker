@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { MahjongCard } from '../lib/types';
 import {
   buildCard,
@@ -17,11 +17,14 @@ import { useEscape } from '../lib/useEscape';
 export default function CardEditor({
   current,
   scanEnabled = false,
+  autoScan = false,
   onSave,
   onClose,
 }: {
   current: MahjongCard;
   scanEnabled?: boolean;
+  /** Open straight into the photo/upload capture (from "Scan my card"). */
+  autoScan?: boolean;
   onSave: (card: MahjongCard) => void;
   onClose: () => void;
 }) {
@@ -40,6 +43,13 @@ export default function CardEditor({
   // up front, the full list tucked behind an explicit Edit toggle.
   const [scanned, setScanned] = useState(false);
   const [editing, setEditing] = useState(false);
+
+  // "Scan my card" opens straight into the capture flow, skipping the manual
+  // editor entirely.
+  useEffect(() => {
+    if (autoScan && scanEnabled) setGuideOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // The guided trifold scan finished → adopt its merged rows (each scanned from
   // YOUR photos, stitched on-device) into the editable review.

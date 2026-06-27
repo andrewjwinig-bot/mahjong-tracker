@@ -1916,6 +1916,82 @@ label.lbl {
   margin-bottom: 10px;
 }
 
+/* Animated empty state for "No mahjs yet" — three tiles fanned out, the side
+   tiles swaying and the center crack tile periodically "calling mahj". */
+.empty-mahjs {
+  padding-top: 48px;
+}
+.em-tiles {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 92px;
+  margin-bottom: 18px;
+}
+.em-tile {
+  display: block;
+  filter: drop-shadow(0 6px 12px rgba(20, 24, 38, 0.22));
+}
+.em-l {
+  --r: -14deg;
+  transform: rotate(var(--r)) translateY(2px);
+  animation: emSway 3.4s ease-in-out infinite;
+}
+.em-r {
+  --r: 14deg;
+  transform: rotate(var(--r)) translateY(2px);
+  animation: emSway 3.4s ease-in-out 0.5s infinite;
+}
+.em-c {
+  position: relative;
+  z-index: 1;
+  margin: 0 -2px;
+  animation: emCall 3.8s ease-in-out infinite;
+}
+@keyframes emSway {
+  0%, 100% { transform: rotate(var(--r)) translateY(2px); }
+  50% { transform: rotate(var(--r)) translateY(-6px); }
+}
+@keyframes emCall {
+  0%, 62%, 100% { transform: translateY(0) rotate(-3deg) scale(1); }
+  78% { transform: translateY(-12px) rotate(4deg) scale(1.08); }
+  90% { transform: translateY(0) rotate(-3deg) scale(1); }
+}
+.em-spark {
+  position: absolute;
+  top: 6px;
+  font-size: 15px;
+  color: var(--accent);
+  opacity: 0;
+  animation: emSpark 3.8s ease-in-out infinite;
+}
+.em-spark-1 { left: 30%; animation-delay: 2.9s; }
+.em-spark-2 { right: 30%; top: 14px; font-size: 12px; animation-delay: 3.1s; }
+@keyframes emSpark {
+  0%, 70%, 100% { opacity: 0; transform: scale(0.5); }
+  82% { opacity: 1; transform: scale(1); }
+}
+.em-title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.em-sub {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  max-width: 250px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .em-l, .em-r, .em-c, .em-spark { animation: none; }
+}
+
 /* ---- Learn accordion ----------------------------------------------------- */
 
 .acc {
@@ -4217,14 +4293,16 @@ label.lbl {
 .empty-card .btn {
   margin-top: 10px;
 }
-.empty-card-sample {
+.empty-card-sample,
+.empty-card-manual {
   display: block;
   width: 100%;
-  margin-top: 16px;
+  margin-top: 12px;
   font-size: 12.5px;
   font-weight: 700;
   color: var(--muted);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .empty-card-fine {
   margin: 16px 0 0;
