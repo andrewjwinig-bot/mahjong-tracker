@@ -3,7 +3,6 @@
 import Tile from './Tile';
 import { OFFICIAL_CARD_URL } from '../lib/links';
 import { track } from '../lib/analytics';
-import { IconCamera } from './uiIcons';
 
 // Shown on the Card tab before the user has set up a card. The rest of the app
 // (scorer, tables, feed, rules) works without one — this only gates the hand
@@ -37,7 +36,7 @@ export default function EmptyCard({
       {scanEnabled ? (
         <>
           <button className="btn empty-card-scan" onClick={onScan}>
-            <IconCamera size={20} /> Scan my card
+            Scan my card
           </button>
           <button className="empty-card-manual" onClick={onManual}>
             or enter card manually
