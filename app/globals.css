@@ -8122,3 +8122,14 @@ label.lbl {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+/* Tap-to-roll: a quick tumble (hop + spin) that settles back to the resting
+   angle, then the idle bob resumes. */
+@keyframes pwRoll {
+  0% { transform: translateY(0) rotate(var(--dr)) scale(1); }
+  35% { transform: translateY(-14px) rotate(calc(var(--dr) + 130deg)) scale(1.08); }
+  70% { transform: translateY(0) rotate(calc(var(--dr) + 300deg)) scale(0.98); }
+  100% { transform: translateY(0) rotate(calc(var(--dr) + 360deg)) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-die-feed { animation: pwDieIn .4s ease-out forwards !important; }
+}

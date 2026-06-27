@@ -6,7 +6,7 @@
 // stagger; once assembled (~1.25s) the two dice fade in and idle-bob. Glow
 // pulses behind. Plays once on mount. Constants are verbatim.
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 type Wall = { x: number; y: number; w: number; h: number; fx: number; fy: number };
 
@@ -22,10 +22,26 @@ function buildWalls(): Wall[] {
 
 export default function EmptyFeed() {
   const tiles = useMemo(buildWalls, []);
+  // Tap to roll the dice — the way a game actually starts. `roll` bumps on each
+  // tap; the dice remount (via key) and play a quick tumble, then resume idle.
+  const [roll, setRoll] = useState(0);
+  const rolled = roll > 0;
+  const die1Anim = rolled
+    ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) both, pwDie 3s ease-in-out .55s infinite alternate'
+    : 'pwDieIn .4s ease-out 1.25s forwards, pwDie 3s ease-in-out 1.25s infinite alternate';
+  const die2Anim = rolled
+    ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) .06s both, pwDie 3s ease-in-out .61s infinite alternate'
+    : 'pwDieIn .4s ease-out 1.4s forwards, pwDie 3s ease-in-out 1.4s infinite alternate';
   return (
     <div className="pw-card pw-card-feed">
       <div className="pw-seam" />
-      <div className="pw-stage pw-stage-feed">
+      <div
+        className="pw-stage pw-stage-feed"
+        style={{ cursor: 'pointer' }}
+        onClick={() => setRoll((r) => r + 1)}
+        role="button"
+        aria-label="Roll the dice"
+      >
         <div className="pw-glow pw-glow-feed" />
         <div className="pw-field pw-field-feed">
           {tiles.map((t, idx) => (
@@ -45,12 +61,13 @@ export default function EmptyFeed() {
           ))}
           {/* dice on top (rendered after the tiles) */}
           <div
+            key={`die1-${roll}`}
             className="pw-die pw-die-feed"
             style={{
               left: 54,
               top: 58,
               '--dr': '-12deg',
-              animation: 'pwDieIn .4s ease-out 1.25s forwards, pwDie 3s ease-in-out 1.25s infinite alternate',
+              animation: die1Anim,
             } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: 4, top: 4, background: '#C0392B' }} />
@@ -59,12 +76,13 @@ export default function EmptyFeed() {
             <span className="pw-pip" style={{ right: 4, bottom: 4, background: '#C0392B' }} />
           </div>
           <div
+            key={`die2-${roll}`}
             className="pw-die pw-die-feed"
             style={{
               left: 80,
               top: 80,
               '--dr': '9deg',
-              animation: 'pwDieIn .4s ease-out 1.4s forwards, pwDie 3s ease-in-out 1.4s infinite alternate',
+              animation: die2Anim,
             } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: '50%', top: '50%', background: '#C0392B', transform: 'translate(-50%,-50%)' }} />
