@@ -255,14 +255,22 @@ export default function GameScorer({
 
   // Game length: 'open' running tally (default), a set number of hands, or
   // first-to-target score. Chosen on the setup screen before starting.
+  // Targets are held as strings so the field can be cleared / typed freely
+  // (no clamp-to-1 while editing). They're coerced to a valid integer only when
+  // the game starts.
   const [goalType, setGoalType] = useState<GoalType>('open');
-  const [handTarget, setHandTarget] = useState(8);
-  const [scoreTarget, setScoreTarget] = useState(100);
+  const [handTarget, setHandTarget] = useState('8');
+  const [scoreTarget, setScoreTarget] = useState('100');
   const goalTarget = goalType === 'hands' ? handTarget : scoreTarget;
+  const setGoalTarget = (v: string) => (goalType === 'hands' ? setHandTarget(v) : setScoreTarget(v));
 
   function start() {
     const seeds: PlayerSeed[] = names.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avatars[i] }));
-    setGame(newGame(seeds, { type: goalType, target: goalTarget }));
+    const target =
+      goalType === 'open'
+        ? 0
+        : Math.max(1, parseInt(goalTarget, 10) || (goalType === 'hands' ? 8 : 100));
+    setGame(newGame(seeds, { type: goalType, target }));
   }
 
   // ---- Record-a-hand form -------------------------------------------------
@@ -670,30 +678,27 @@ export default function GameScorer({
                     <button
                       key={v}
                       className="pick-chip"
-                      data-active={goalTarget === v}
-                      onClick={() => (goalType === 'hands' ? setHandTarget(v) : setScoreTarget(v))}
+                      data-active={goalTarget === String(v)}
+                      onClick={() => setGoalTarget(String(v))}
                     >
                       {v}
                     </button>
                   ))}
                   <input
                     className="field"
-                    type="number"
+                    type="text"
                     inputMode="numeric"
-                    min={1}
+                    pattern="[0-9]*"
+                    aria-label={goalType === 'hands' ? 'Number of hands' : 'Target score'}
                     style={{ maxWidth: 84 }}
                     value={goalTarget}
-                    onChange={(e) => {
-                      const n = Math.max(1, Number(e.target.value) || 0);
-                      if (goalType === 'hands') setHandTarget(n);
-                      else setScoreTarget(n);
-                    }}
+                    onChange={(e) => setGoalTarget(e.target.value.replace(/[^0-9]/g, ''))}
                   />
                 </div>
                 <p className="len-hint">
                   {goalType === 'hands'
-                    ? `Play ${goalTarget} hands, then the highest score wins.`
-                    : `First to ${goalTarget} points wins.`}
+                    ? `Play ${goalTarget || '…'} hands, then the highest score wins.`
+                    : `First to ${goalTarget || '…'} points wins.`}
                 </p>
               </>
             )}
