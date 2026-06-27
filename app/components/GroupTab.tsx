@@ -1221,7 +1221,6 @@ export function AddFriendSheet({
         <input
           className="field"
           value={q}
-          autoFocus
           maxLength={30}
           placeholder="@username or name"
           onChange={(e) => setQ(e.target.value)}
