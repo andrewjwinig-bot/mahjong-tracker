@@ -122,7 +122,8 @@ export default function EmptyFeed() {
       </div>
       <div className="pw-title pw-title-feed">No mahjs called yet</div>
       <div className="pw-body pw-body-feed">
-        The wall’s built and the dice are set — call <b>Mahj</b> on your Card and it’ll land right here for your crew.
+        The feed is live — posts are from you and friends you’ve added. Call <b>Mahj</b> on your Card
+        and it’ll land right here for your crew.
       </div>
     </div>
   );

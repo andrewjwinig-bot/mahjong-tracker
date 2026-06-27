@@ -540,12 +540,6 @@ export default function GroupTab({
       <div style={{ marginTop: 22 }}>
         <ProUpsell />
       </div>
-
-      <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 12, fontWeight: 700, marginTop: 22 }}>
-        {cloud
-          ? 'The feed is live — posts are from you and friends you’ve added. The leaderboard still shows demo group-mates for now.'
-          : 'Demo table — group-mates are simulated on-device. Real shared tables arrive with accounts (v2).'}
-      </p>
     </div>
   );
 }
