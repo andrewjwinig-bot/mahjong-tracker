@@ -1286,49 +1286,100 @@ label.lbl {
    FEED — match the Card page's design language (design frame 3)
    ====================================================================== */
 /* Pinned "next game" reminder at the top of the Feed (your tables only). */
+/* Next-game reminder: deep themed card with cream 萬 tiles bobbing around a
+   clear center text pocket. --brand = accent (border/glyph/glow), --brand-deep
+   = card background; both come from the active theme. */
 .next-game {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  text-align: center;
+  margin-top: 14px;
+  padding: 15px 16px;
+  border-radius: 13px;
+  background: linear-gradient(
+    168deg,
+    color-mix(in srgb, var(--brand-deep, #0c3325) 82%, #ffffff) 0%,
+    var(--brand-deep, #0c3325) 100%
+  );
+  border: 2.5px solid var(--brand, #14c2a8);
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.3);
+  cursor: pointer;
+  transition: transform 0.14s ease;
+}
+.next-game:active {
+  transform: scale(0.985);
+}
+.ng-tiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.ng-tile {
+  position: absolute;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
+  border: 1.5px solid rgba(20, 22, 42, 0.12);
+  box-shadow: 0 4px 9px rgba(0, 0, 0, 0.27);
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  text-align: left;
-  margin-top: 14px;
-  padding: 12px 13px;
-  border-radius: 10px;
-  background: #fff;
-  border: 2.5px solid var(--green);
-  box-shadow: 0 7px 20px rgba(16, 179, 154, 0.16);
+  justify-content: center;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  color: var(--brand, #c0392b);
+  transform: rotate(var(--r, 0deg));
+  animation-name: ngTileBob;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
-.ng-body {
-  flex: 1;
-  min-width: 0;
+@keyframes ngTileBob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-2.5px) rotate(var(--r, 0deg));
+  }
+}
+.ng-glow {
+  position: absolute;
+  top: -46px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--brand, #14c2a8) 42%, transparent),
+    transparent 68%
+  );
 }
 .ng-label {
+  position: relative;
   display: block;
+  font-family: var(--font-app), 'Hanken Grotesk', sans-serif;
   font-weight: 800;
   font-size: 9px;
-  letter-spacing: 1.5px;
-  color: var(--green);
+  letter-spacing: 2.5px;
+  color: color-mix(in srgb, var(--brand, #7debd6) 45%, #ffffff);
+  margin-bottom: 5px;
 }
 .ng-when {
+  position: relative;
   display: block;
-  font-family: var(--font-display), system-ui, sans-serif;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
-  font-size: 18px;
-  color: var(--ink);
-  line-height: 1.1;
-  margin: 1px 0;
+  font-size: 21px;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.3px;
 }
-.ng-meta {
-  display: block;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  color: var(--muted);
-}
-.ng-chev {
-  flex: none;
-  font-size: 20px;
-  color: var(--muted);
+@media (prefers-reduced-motion: reduce) {
+  .ng-tile {
+    animation: none;
+  }
 }
 
 /* Friendly daily streak banner at the top of the Feed home. */

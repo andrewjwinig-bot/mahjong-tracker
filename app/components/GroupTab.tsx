@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
@@ -97,7 +97,6 @@ import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
 import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
-import Tile from './Tile';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 // A self-contained burst of ~20 mini mahjong-tile particles that rain down
@@ -233,6 +232,29 @@ function completedHandIds(
   return new Set(ids.slice(0, Math.min(member.handsCleared, ids.length)));
 }
 
+// Cream 萬 tiles scattered around the next-game reminder, center kept clear for
+// the date. Positions tuned to the ~362px feed width. [edge offset, w, h,
+// fontSize, rotation, bob duration, delay].
+const NG_TILES: Array<{
+  x: { left: number } | { right: number };
+  y: { top: number } | { bottom: number };
+  w: number;
+  h: number;
+  fs: number;
+  r: number;
+  dur: number;
+  delay: number;
+}> = [
+  { x: { left: -12 }, y: { top: -11 }, w: 31, h: 39, fs: 18, r: -18, dur: 3.6, delay: 0 },
+  { x: { left: 22 }, y: { top: 29 }, w: 25, h: 31, fs: 14, r: 9, dur: 3.9, delay: 0.5 },
+  { x: { left: 102 }, y: { top: -13 }, w: 24, h: 30, fs: 14, r: 11, dur: 3.5, delay: 0.25 },
+  { x: { right: 102 }, y: { top: -13 }, w: 24, h: 30, fs: 14, r: -11, dur: 3.8, delay: 0.7 },
+  { x: { right: 22 }, y: { top: 29 }, w: 25, h: 31, fs: 14, r: -9, dur: 4.0, delay: 0.4 },
+  { x: { right: -12 }, y: { top: -11 }, w: 31, h: 39, fs: 18, r: 18, dur: 3.6, delay: 0.15 },
+  { x: { left: -6 }, y: { bottom: -12 }, w: 26, h: 33, fs: 15, r: 13, dur: 3.7, delay: 0.6 },
+  { x: { right: -6 }, y: { bottom: -12 }, w: 26, h: 33, fs: 15, r: -13, dur: 3.9, delay: 0.35 },
+];
+
 // "Today" / "Tomorrow" / "Wed Jun 25" + optional time, for the next-game card.
 function gameWhen(date: string, time?: string): string {
   const [y, m, d] = date.split('-').map(Number);
@@ -335,15 +357,31 @@ export default function GroupTab({
 
       {nextG && (
         <button className="next-game" onClick={() => onOpenTables(nextG.tableId)}>
-          <Tile face={nextG.icon.face} char={nextG.icon.char} color={nextG.icon.color} size={40} />
-          <span className="ng-body">
-            <span className="ng-label">⏰ NEXT GAME</span>
-            <span className="ng-when">{gameWhen(nextG.date, nextG.time)}</span>
-            <span className="ng-meta">
-              {nextG.tableName} · {nextG.votes} in
-            </span>
+          <span className="ng-tiles" aria-hidden>
+            {NG_TILES.map((t, i) => (
+              <span
+                key={i}
+                className="ng-tile"
+                style={
+                  {
+                    ...t.x,
+                    ...t.y,
+                    width: t.w,
+                    height: t.h,
+                    fontSize: t.fs,
+                    '--r': `${t.r}deg`,
+                    animationDuration: `${t.dur}s`,
+                    animationDelay: `${t.delay}s`,
+                  } as unknown as CSSProperties
+                }
+              >
+                萬
+              </span>
+            ))}
           </span>
-          <span className="ng-chev">›</span>
+          <span className="ng-glow" aria-hidden />
+          <span className="ng-label">NEXT GAME</span>
+          <span className="ng-when">{gameWhen(nextG.date, nextG.time)}</span>
         </button>
       )}
 
