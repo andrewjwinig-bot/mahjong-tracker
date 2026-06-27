@@ -11,11 +11,9 @@ import { track } from '../lib/analytics';
 export default function EmptyCard({
   scanEnabled,
   onAdd,
-  onUseSample,
 }: {
   scanEnabled: boolean;
   onAdd: () => void;
-  onUseSample: () => void;
 }) {
   return (
     <div className="empty-card">
@@ -44,10 +42,6 @@ export default function EmptyCard({
       >
         Get the official card →
       </a>
-
-      <button className="empty-card-sample" onClick={onUseSample}>
-        Just exploring? Try a sample card
-      </button>
 
       <p className="empty-card-fine">
         Unofficial — not affiliated with or endorsed by the National Mah Jongg League. As an Amazon

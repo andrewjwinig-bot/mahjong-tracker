@@ -18,13 +18,11 @@ export default function CardEditor({
   current,
   scanEnabled = false,
   onSave,
-  onUseSample,
   onClose,
 }: {
   current: MahjongCard;
   scanEnabled?: boolean;
   onSave: (card: MahjongCard) => void;
-  onUseSample: () => void;
   onClose: () => void;
 }) {
   useEscape(onClose);
@@ -236,17 +234,6 @@ export default function CardEditor({
           </button>
         </>
       )}
-
-      <button
-        className="editor-sample-link"
-        onClick={() => {
-          void clearCardPhoto();
-          onUseSample();
-          onClose();
-        }}
-      >
-        Just exploring? Use a sample card
-      </button>
 
       <p className="editor-fine">
         Entering your own card keeps it private to your device and ensures the app never ships a copy

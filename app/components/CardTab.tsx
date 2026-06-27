@@ -39,7 +39,6 @@ interface Props {
   needsCard: boolean;
   scanEnabled: boolean;
   onAddCard: () => void;
-  onUseSample: () => void;
 }
 
 export default function CardTab({
@@ -59,7 +58,6 @@ export default function CardTab({
   needsCard,
   scanEnabled,
   onAddCard,
-  onUseSample,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
@@ -159,7 +157,7 @@ export default function CardTab({
           <CardTitle />
           <p className="sub">Track every hand on your card.</p>
         </header>
-        <EmptyCard scanEnabled={scanEnabled} onAdd={onAddCard} onUseSample={onUseSample} />
+        <EmptyCard scanEnabled={scanEnabled} onAdd={onAddCard} />
       </div>
     );
   }
@@ -171,9 +169,11 @@ export default function CardTab({
         <p className="sub">Track every hand on this year’s card.</p>
       </header>
 
-      {/* A scanned card reads as confident and done for the year; the sample
-          keeps a prominent "bring in your own" call-to-action. Both tap to edit. */}
-      {card.source === 'custom' ? (
+      {/* A scanned (custom) card reads as confident and done for the year. In a
+          demo build the sample is shown plainly as the card — no prompt, no
+          "not scanned" mismatch. The real app never reaches here without a
+          custom card (it shows the empty "add your card" state instead). */}
+      {card.source === 'custom' && (
         <button className="card-manage" data-done onClick={onAddCard}>
           <span className="cm-ic" aria-hidden>✓</span>
           <span className="cm-text">
@@ -183,16 +183,6 @@ export default function CardTab({
             </span>
           </span>
           <span className="cm-edit" aria-hidden>Edit</span>
-        </button>
-      ) : (
-        <button className="card-sample-banner" onClick={onAddCard}>
-          <span className="csb-tag" aria-hidden>SAMPLE</span>
-          <span className="csb-text">
-            <span className="csb-title">These are example hands — not your card</span>
-            <span className="csb-sub">
-              You haven’t scanned a card yet. Tap to {scanEnabled ? 'scan' : 'add'} your real one →
-            </span>
-          </span>
         </button>
       )}
 

@@ -87,28 +87,6 @@ export function clearCustomCard(): void {
   }
 }
 
-// Whether the user has opted to explore with the built-in sample card. Until a
-// real card is entered (or the sample is accepted), the Card tab shows a setup
-// prompt instead of placeholder hands.
-const SAMPLE_KEY = 'mahj.sampleOptIn';
-
-export function sampleOptedIn(): boolean {
-  try {
-    return localStorage.getItem(SAMPLE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-export function setSampleOptIn(on = true): void {
-  try {
-    if (on) localStorage.setItem(SAMPLE_KEY, '1');
-    else localStorage.removeItem(SAMPLE_KEY);
-  } catch {
-    /* ignore */
-  }
-}
-
 export function rowsFromCard(card: MahjongCard): HandRow[] {
   return card.hands.map((h) => ({
     category: h.category,

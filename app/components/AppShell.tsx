@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
-import { loadCustomCard, saveCustomCard, sampleOptedIn, setSampleOptIn, purgeLegacyCardPhoto } from '../lib/customCard';
+import { loadCustomCard, saveCustomCard, purgeLegacyCardPhoto } from '../lib/customCard';
+import { DEMO_MODE } from '../lib/demo';
 import { getScanEnabled, setScanEnabled } from '../lib/cardScan';
 import * as db from '../lib/storage';
 import {
@@ -43,7 +44,6 @@ import GameScorer from './GameScorer';
 import PracticeSheet from './PracticeSheet';
 import TipPopup from './TipPopup';
 import { IconSettings } from './uiIcons';
-import { clearCustomCard } from '../lib/customCard';
 import { ConfettiProvider } from './Confetti';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
@@ -97,9 +97,6 @@ export default function AppShell() {
   const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
-  // Card setup: until a real card is entered (or the sample is accepted), the
-  // Card tab shows a setup prompt rather than placeholder hands.
-  const [sampleOptIn, setSampleOptInState] = useState(false);
   // Card scanning is a runtime toggle (Settings) so one build can demo with or
   // without it.
   const [scanEnabled, setScanEnabledState] = useState(false);
@@ -155,7 +152,6 @@ export default function AppShell() {
     if (acc && !tutorialSeen()) setShowTutorial(true);
     const cc = loadCustomCard();
     if (cc) setCard(cc);
-    setSampleOptInState(sampleOptedIn());
     setScanEnabledState(getScanEnabled());
     const sd = recordPlay();
     setBestStreak(sd.best);
@@ -167,12 +163,6 @@ export default function AppShell() {
         social.loadSocial(),
       ]);
       if (!alive) return;
-      // Existing users with tracked progress on the sample card shouldn't get
-      // bounced to the setup prompt — treat prior progress as opting into it.
-      if (!cc && !sampleOptedIn() && (Object.keys(counts).length > 0 || w.length > 0)) {
-        setSampleOptIn(true);
-        setSampleOptInState(true);
-      }
       setHandCounts(counts);
       setHandNotes(notes);
       setWins(w);
@@ -407,16 +397,10 @@ export default function AppShell() {
     setScanEnabledState(on);
   }, []);
 
-  // Accept the built-in sample card (explore without entering a real one).
-  const useSampleCard = useCallback(() => {
-    clearCustomCard();
-    setCard(SAMPLE_CARD);
-    setSampleOptIn(true);
-    setSampleOptInState(true);
-  }, []);
-
-  // No real card entered and the sample hasn't been accepted → show setup.
-  const needsCard = card.source !== 'custom' && !sampleOptIn;
+  // The real app never shows the sample: it's empty until the user scans their
+  // own card. A demo build (NEXT_PUBLIC_DEMO_MODE=1) presents the sample as the
+  // card, so the tracker is populated for screenshots/showcase.
+  const needsCard = !DEMO_MODE && card.source !== 'custom';
 
   const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar, opts?: { isNewUser?: boolean }) => {
     setAccount(a);
@@ -489,7 +473,6 @@ export default function AppShell() {
                 needsCard={needsCard}
                 scanEnabled={scanEnabled}
                 onAddCard={() => setEditorOpen(true)}
-                onUseSample={useSampleCard}
               />
             )}
             {tab === 'group' && socialState && (
@@ -583,13 +566,7 @@ export default function AppShell() {
         <CardEditor
           current={card}
           scanEnabled={scanEnabled}
-          onSave={(c) => {
-            setCard(c);
-            // A real card entered → no longer "just exploring" the sample.
-            setSampleOptIn(false);
-            setSampleOptInState(false);
-          }}
-          onUseSample={useSampleCard}
+          onSave={(c) => setCard(c)}
           onClose={() => setEditorOpen(false)}
         />
       )}
