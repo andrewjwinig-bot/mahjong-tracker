@@ -3001,9 +3001,15 @@ label.lbl {
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 50px;
   text-align: left;
   padding: 13px 14px;
   border-bottom: 2px solid rgba(26, 20, 16, 0.08);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s ease;
+}
+.set-row:active {
+  background: rgba(20, 22, 42, 0.05);
 }
 .set-row[data-last="true"] {
   border-bottom: none;
@@ -3551,6 +3557,13 @@ label.lbl {
 }
 .theme-card[data-active="true"] {
   border-color: var(--brand);
+}
+.theme-card {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, border-color 0.12s ease;
+}
+.theme-card:active {
+  transform: scale(0.97);
 }
 .theme-card .tile {
   margin-bottom: 6px;

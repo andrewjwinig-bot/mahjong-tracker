@@ -25,6 +25,15 @@ export function useSwipeDismiss(onClose: () => void, opts: Opts = {}) {
   const [dragging, setDragging] = useState(false);
 
   const onTouchStart = useCallback((e: TouchEvent<HTMLElement>) => {
+    // Don't hijack taps on interactive controls. Otherwise the few px of finger
+    // movement in a normal tap can start dragging the sheet, which moves the
+    // target out from under the finger and makes the browser cancel the click —
+    // so toggles, theme cards, and rows feel unresponsive. Let those tap.
+    const el = e.target as HTMLElement | null;
+    if (el?.closest?.('button, a, input, textarea, select, label, [role="switch"], [role="button"]')) {
+      start.current = null;
+      return;
+    }
     const t = e.touches[0];
     start.current = { x: t.clientX, y: t.clientY, top: e.currentTarget.scrollTop || 0 };
     axis.current = null;
