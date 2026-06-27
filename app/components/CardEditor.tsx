@@ -1,25 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { MahjongCard } from '../lib/types';
 import {
   buildCard,
   saveCustomCard,
   rowsFromCard,
-  loadCardPhoto,
-  saveCardPhoto,
   clearCardPhoto,
   type HandRow,
 } from '../lib/customCard';
-import { downscaleImage } from '../lib/image';
 import type { ScanRow, ScanSummary } from '../lib/cardScan';
 import CardScanGuide from './CardScanGuide';
 import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
-
-// American cards usually carry ~60–70 hands (a genre fact, not card data) —
-// used only to gently flag a likely-missing panel after a scan.
-const TYPICAL_MIN = 55;
 
 export default function CardEditor({
   current,
@@ -41,53 +34,18 @@ export default function CardEditor({
       ? rowsFromCard(current)
       : [{ category: '', notation: '', points: 25, concealed: false }],
   );
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState(false);
-  const [photoBusy, setPhotoBusy] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [scanMsg, setScanMsg] = useState<string | null>(null);
   // Per-row validation flags from the scan (index-aligned with rows); cleared
   // as the user fixes a line. A "review queue" so nothing dubious slips through.
   const [flags, setFlags] = useState<string[][]>([]);
-  // After a scan we show a calm, celebratory result: only the few flagged lines
-  // up front, the full list tucked behind a toggle, and never a blocker.
+  // After a scan we show a calm, confident result: only the few flagged lines
+  // up front, the full list tucked behind an explicit Edit toggle.
   const [scanned, setScanned] = useState(false);
-  const [showAll, setShowAll] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    let url: string | null = null;
-    void loadCardPhoto().then((blob) => {
-      if (blob) {
-        url = URL.createObjectURL(blob);
-        setPhotoUrl(url);
-      }
-    });
-    return () => {
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, []);
-
-  async function onPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPhotoBusy(true);
-    try {
-      const blob = await downscaleImage(file, 1600, 0.85);
-      await saveCardPhoto(blob);
-      setPhotoUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return URL.createObjectURL(blob);
-      });
-    } finally {
-      setPhotoBusy(false);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  }
+  const [editing, setEditing] = useState(false);
 
   // The guided trifold scan finished → adopt its merged rows (each scanned from
   // YOUR photos, stitched on-device) into the editable review.
-  function applyScan(scanRows: ScanRow[], summary: ScanSummary, scanYear?: number) {
+  function applyScan(scanRows: ScanRow[], _summary: ScanSummary, scanYear?: number) {
     if (scanYear) setYear(scanYear);
     setRows(
       scanRows.map((r) => ({
@@ -99,31 +57,8 @@ export default function CardEditor({
     );
     setFlags(scanRows.map((r) => r.issues ?? []));
     setScanned(true);
-    setShowAll(false);
+    setEditing(false);
     setGuideOpen(false);
-    // Gentle nudge if it looks like a panel is missing (generic genre range).
-    setScanMsg(
-      summary.handCount < TYPICAL_MIN
-        ? `That’s only ${summary.handCount} hands — most cards have ~60–70, so you may be missing a panel. Add it from the list below, or re-scan.`
-        : null,
-    );
-    // The guide saved the first panel as the reference photo — refresh it.
-    void loadCardPhoto().then((blob) => {
-      if (blob) {
-        setPhotoUrl((prev) => {
-          if (prev) URL.revokeObjectURL(prev);
-          return URL.createObjectURL(blob);
-        });
-      }
-    });
-  }
-
-  async function removePhoto() {
-    await clearCardPhoto();
-    setPhotoUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
   }
 
   function update(i: number, patch: Partial<HandRow>) {
@@ -141,12 +76,13 @@ export default function CardEditor({
   }
 
   const reviewCount = flags.filter((x) => x.length).length;
-
   const valid = rows.some((r) => r.notation.trim());
 
   function save() {
     const card = buildCard(year, rows);
     if (!card.hands.length) return;
+    // We no longer keep a reference photo — purge any saved from older versions.
+    void clearCardPhoto();
     saveCustomCard(card);
     onSave(card);
     onClose();
@@ -200,6 +136,19 @@ export default function CardEditor({
     );
   }
 
+  const yearField = (
+    <div className="editor-year">
+      <label className="lbl">Card year</label>
+      <input
+        className="field"
+        type="number"
+        value={year}
+        style={{ maxWidth: 120 }}
+        onChange={(e) => setYear(Number(e.target.value) || new Date().getFullYear())}
+      />
+    </div>
+  );
+
   return (
     <div className="editor">
       <div className="editor-bar">
@@ -214,79 +163,19 @@ export default function CardEditor({
         </button>
       </div>
 
-      {!scanned && (
-        <p className="editor-note">
-          Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
-          if it must be concealed. Group hands by giving them the same category name.
-        </p>
-      )}
-
-      {scanEnabled && (
-        <>
-          <button
-            className="btn"
-            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-            onClick={() => setGuideOpen(true)}
-          >
-            <IconCamera size={17} /> Scan my card
-          </button>
-          {scanMsg && <p className="editor-scan-msg">{scanMsg}</p>}
-        </>
-      )}
-
       {guideOpen && <CardScanGuide onComplete={applyScan} onCancel={() => setGuideOpen(false)} />}
-
-      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-      {photoUrl ? (
-        <div className="card-photo">
-          <button className="card-photo-thumb" onClick={() => setLightbox(true)} aria-label="View card photo">
-            <img src={photoUrl} alt="Your card reference" />
-          </button>
-          <div className="card-photo-actions">
-            <div className="card-photo-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <IconCamera size={15} /> Reference photo
-            </div>
-            <button className="btn ghost" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
-              {photoBusy ? 'Saving…' : 'Replace'}
-            </button>
-            <button className="btn ghost" onClick={() => void removePhoto()}>
-              Remove
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          className="btn ghost"
-          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-          onClick={() => fileRef.current?.click()}
-          disabled={photoBusy}
-        >
-          {photoBusy ? 'Saving…' : <><IconCamera size={17} /> Add a photo of your card to copy from</>}
-        </button>
-      )}
-
-      <div className="editor-year">
-        <label className="lbl">Card year</label>
-        <input
-          className="field"
-          type="number"
-          value={year}
-          style={{ maxWidth: 120 }}
-          onChange={(e) => setYear(Number(e.target.value) || new Date().getFullYear())}
-        />
-      </div>
 
       {scanned ? (
         <>
           <div className="scan-done">
-            <div className="scan-done-emoji" aria-hidden>🎉</div>
+            <div className="scan-done-emoji" aria-hidden>🀄</div>
             <div className="scan-done-title">
-              Your card’s in — {rows.length} hand{rows.length === 1 ? '' : 's'}
+              Your {year} card — {rows.length} hand{rows.length === 1 ? '' : 's'}
             </div>
             <div className="scan-done-sub">
               {reviewCount > 0
-                ? `Pulled from your photo. ${reviewCount} line${reviewCount === 1 ? '' : 's'} worth a quick look — the rest checked out.`
-                : 'Pulled from your photo — every line is a complete 14-tile hand.'}
+                ? `${reviewCount} line${reviewCount === 1 ? '' : 's'} worth a quick look — the rest checked out.`
+                : 'Locked in for the season — every line is a complete 14-tile hand.'}
             </div>
           </div>
 
@@ -296,8 +185,7 @@ export default function CardEditor({
                 Quick check · {reviewCount} to confirm
               </div>
               <p className="quick-check-hint">
-                These didn’t look like complete hands. Compare each to your photo above and fix it —
-                or leave it and edit anytime.
+                These didn’t look like complete hands. Fix each one — or leave it and edit anytime.
               </p>
               {rows.map((_, i) => (flags[i]?.length ? renderRow(i) : null))}
             </div>
@@ -307,12 +195,13 @@ export default function CardEditor({
             {reviewCount > 0 ? 'Looks good — start tracking' : 'Start tracking'}
           </button>
 
-          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setShowAll((s) => !s)}>
-            {showAll ? 'Hide full list' : `See all ${rows.length} hands`}
+          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setEditing((s) => !s)}>
+            {editing ? 'Hide hands' : 'Edit hands'}
           </button>
 
-          {showAll && (
+          {editing && (
             <>
+              {yearField}
               <div className="editor-rows" style={{ marginTop: 12 }}>
                 {rows.map((_, i) => renderRow(i))}
               </div>
@@ -324,6 +213,23 @@ export default function CardEditor({
         </>
       ) : (
         <>
+          <p className="editor-note">
+            Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
+            if it must be concealed. Group hands by giving them the same category name.
+          </p>
+
+          {scanEnabled && (
+            <button
+              className="btn"
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+              onClick={() => setGuideOpen(true)}
+            >
+              <IconCamera size={17} /> Scan my card
+            </button>
+          )}
+
+          {yearField}
+
           <div className="editor-rows">{rows.map((_, i) => renderRow(i))}</div>
           <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
             ＋ Add hand
@@ -332,15 +238,14 @@ export default function CardEditor({
       )}
 
       <button
-        className="btn ghost"
-        style={{ marginTop: 10 }}
+        className="editor-sample-link"
         onClick={() => {
           void clearCardPhoto();
           onUseSample();
           onClose();
         }}
       >
-        Use sample card instead
+        Just exploring? Use a sample card
       </button>
 
       <p className="editor-fine">
@@ -348,15 +253,6 @@ export default function CardEditor({
         of any official card. Club Mahj is unofficial and is not affiliated with or endorsed by the
         National Mah Jongg League.
       </p>
-
-      {lightbox && photoUrl && (
-        <div className="photo-lightbox" onClick={() => setLightbox(false)}>
-          <img src={photoUrl} alt="Your card reference" />
-          <button className="lightbox-close" aria-label="Close photo">
-            ×
-          </button>
-        </div>
-      )}
     </div>
   );
 }

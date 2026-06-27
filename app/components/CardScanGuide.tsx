@@ -2,7 +2,6 @@
 
 import { useRef, useState } from 'react';
 import { downscaleImage } from '../lib/image';
-import { saveCardPhoto } from '../lib/customCard';
 import { scanCardImage, type ScanRow, type ScanSummary } from '../lib/cardScan';
 import { useEscape } from '../lib/useEscape';
 
@@ -44,7 +43,6 @@ export default function CardScanGuide({
     setMsg(null);
     try {
       const blob = await downscaleImage(file, 1800, 0.85);
-      if (rowsRef.current.length === 0) await saveCardPhoto(blob); // first = reference
       const res = await scanCardImage(blob);
       if (!res.ok) {
         setMsg(res.error);

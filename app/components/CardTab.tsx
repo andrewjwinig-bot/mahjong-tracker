@@ -171,28 +171,31 @@ export default function CardTab({
         <p className="sub">Track every hand on this year’s card.</p>
       </header>
 
-      {/* Always-visible way to (re)scan or edit the card — so it isn't buried in
-          Settings, and a bad scan is easy to redo. Highlighted on the sample. */}
-      <button className="card-manage" data-sample={card.source !== 'custom'} onClick={onAddCard}>
-        <span className="cm-ic" aria-hidden>
-          <IconCamera size={17} />
-        </span>
-        <span className="cm-text">
-          <span className="cm-title">
-            {card.source === 'custom'
-              ? 'Edit or re-scan my card'
-              : scanEnabled
-                ? 'Scan your real card'
-                : 'Add your real card'}
+      {/* A scanned card reads as confident and done for the year; the sample
+          keeps a prominent "bring in your own" call-to-action. Both tap to edit. */}
+      {card.source === 'custom' ? (
+        <button className="card-manage" data-done onClick={onAddCard}>
+          <span className="cm-ic" aria-hidden>✓</span>
+          <span className="cm-text">
+            <span className="cm-title">Your {card.year} card</span>
+            <span className="cm-sub">
+              {card.hands.length} hand{card.hands.length === 1 ? '' : 's'} · set for the season
+            </span>
           </span>
-          <span className="cm-sub">
-            {card.source === 'custom'
-              ? 'Fix or replace the hands you imported'
-              : 'You’re on the sample — bring in your own to track for real'}
+          <span className="cm-edit" aria-hidden>Edit</span>
+        </button>
+      ) : (
+        <button className="card-manage" data-sample onClick={onAddCard}>
+          <span className="cm-ic" aria-hidden>
+            <IconCamera size={17} />
           </span>
-        </span>
-        <span className="cm-chev" aria-hidden>›</span>
-      </button>
+          <span className="cm-text">
+            <span className="cm-title">{scanEnabled ? 'Scan your real card' : 'Add your real card'}</span>
+            <span className="cm-sub">You’re on the sample — bring in your own to track for real</span>
+          </span>
+          <span className="cm-chev" aria-hidden>›</span>
+        </button>
+      )}
 
       <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
