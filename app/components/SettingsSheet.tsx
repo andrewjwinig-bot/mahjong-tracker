@@ -163,7 +163,14 @@ export default function SettingsSheet({
   /* ---- Settings view ----------------------------------------------------- */
   const settingsView = (
     <>
-      <div className="grab" />
+      {/* Drag-to-dismiss lives on this handle only, so taps on the toggles,
+          theme chips, and rows below are never intercepted by the gesture. */}
+      <div
+        className="grab grab-drag"
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+      />
       <div className="set-head">
         <h1 className="set-title">Settings</h1>
       </div>
@@ -369,9 +376,6 @@ export default function SettingsSheet({
       <div
         className="sheet set-sheet"
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={swipe.onTouchStart}
-        onTouchMove={swipe.onTouchMove}
-        onTouchEnd={swipe.onTouchEnd}
         style={swipe.style}
       >
         {view === 'settings' ? settingsView : editView}

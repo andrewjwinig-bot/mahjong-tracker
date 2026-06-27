@@ -2436,6 +2436,25 @@ label.lbl {
   background: var(--tint-deep);
   margin: 0 auto 12px;
 }
+/* Drag handle: a generous invisible hit area (via ::before) makes it easy to
+   grab for drag-to-dismiss, without changing the small visible bar or layout. */
+.grab-drag {
+  position: relative;
+  touch-action: none;
+  cursor: grab;
+}
+.grab-drag::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px;
+  height: 36px;
+}
+.grab-drag:active {
+  cursor: grabbing;
+}
 
 /* ---- Log-a-Mahj sheet (matches the design) ------------------------------- */
 .log-sheet {
@@ -3082,6 +3101,7 @@ label.lbl {
   padding: 13px 14px;
   border-bottom: 2px solid rgba(26, 20, 16, 0.08);
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: background 0.12s ease;
 }
 .set-row:active {
