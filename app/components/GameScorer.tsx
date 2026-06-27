@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   type Game,
-  type GameGoal,
   type GameResult,
   type GoalType,
   type PlayerSeed,
@@ -477,9 +476,6 @@ export default function GameScorer({
 
   function endGame() {
     if (!game) return;
-    const roster = game.players.map((p) => p.name);
-    const rosterAvatars = game.players.map((p) => p.avatar);
-    const goal = game.goal;
     const hadRounds = game.rounds.length > 0;
     if (hadRounds) {
       const result = recordResult(game);
@@ -491,22 +487,15 @@ export default function GameScorer({
     resetForm();
     setEndConfirm(false);
     setShowGameOver(false);
-    // A finished game → offer a one-tap rematch with the same crew; an empty
-    // game just drops back to the seeded setup.
+    // A finished game is already saved to history → close back to the feed. An
+    // empty game just drops back to the seeded setup. (To play again with the
+    // same crew, the setup's Recent games list has a one-tap Rematch.)
     if (hadRounds) {
-      setPlayAgain({ names: roster, avatars: rosterAvatars, goal });
+      onClose();
     } else {
       setNames(initialNames);
       setAvatars(initialAvatars);
     }
-  }
-
-  // Start a fresh game directly with a given roster + goal (used by "Play again").
-  function startWith(ns: string[], avs: (TileAvatar | undefined)[], goal?: GameGoal) {
-    setNames(ns);
-    setAvatars(avs);
-    const seeds: PlayerSeed[] = ns.map((n, i) => ({ name: n.trim() || `Player ${i + 1}`, avatar: avs[i] }));
-    setGame(newGame(seeds, goal));
   }
 
   function rematch(r: GameResult) {
@@ -536,11 +525,6 @@ export default function GameScorer({
   // Winner modal. Re-arms if a hand is undone back below the goal.
   const [showGameOver, setShowGameOver] = useState(false);
   // After a game is saved, offer a one-tap rematch with the same crew.
-  const [playAgain, setPlayAgain] = useState<{
-    names: string[];
-    avatars: (TileAvatar | undefined)[];
-    goal?: GameGoal;
-  } | null>(null);
   const celebratedRef = useRef(false);
   useEffect(() => {
     if (done && !celebratedRef.current) {
@@ -1162,62 +1146,6 @@ export default function GameScorer({
             <button className="recap-keep" onClick={() => setShowGameOver(false)}>
               Keep playing
             </button>
-          </div>
-        </div>
-      )}
-
-      {playAgain && (
-        <div className="celebrate-scrim" onClick={() => setPlayAgain(null)}>
-          <div className="celebrate-card play-again-card" onClick={(e) => e.stopPropagation()}>
-            <div className="boom">🀄</div>
-            <p className="cele-hype">Saved to your history</p>
-            <h2>Play again?</h2>
-            <p className="cele-hand">
-              Same crew
-              {playAgain.goal
-                ? playAgain.goal.type === 'hands'
-                  ? ` · ${playAgain.goal.target} hand${playAgain.goal.target === 1 ? '' : 's'}`
-                  : ` · first to ${playAgain.goal.target}`
-                : ''}
-            </p>
-
-            <div className="go-standings">
-              {playAgain.names
-                .map((n, i) => ({ n, av: playAgain.avatars[i] }))
-                .filter((x) => x.n.trim())
-                .map((x, i) => (
-                  <div className="go-stand-row" key={i}>
-                    {x.av ? (
-                      <Avatar avatar={x.av} size={26} />
-                    ) : (
-                      <span className="go-stand-dot" aria-hidden />
-                    )}
-                    <span className="go-stand-name">{x.n}</span>
-                  </div>
-                ))}
-            </div>
-
-            <div className="cele-actions">
-              <button
-                className="btn"
-                onClick={() => {
-                  const pa = playAgain;
-                  setPlayAgain(null);
-                  startWith(pa.names, pa.avatars, pa.goal);
-                }}
-              >
-                Play again
-              </button>
-              <button
-                className="btn ghost"
-                onClick={() => {
-                  setPlayAgain(null);
-                  onClose();
-                }}
-              >
-                Back to feed
-              </button>
-            </div>
           </div>
         </div>
       )}
