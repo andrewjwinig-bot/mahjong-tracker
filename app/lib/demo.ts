@@ -1,6 +1,38 @@
-// Demo build switch. A demo deployment sets NEXT_PUBLIC_DEMO_MODE=1, which makes
-// the app present the built-in sample card as if it were the user's real,
-// scanned card (for screenshots / showcase). The real app leaves this unset and
-// NEVER shows the sample — the tracker is empty until the user scans their own
-// card. The value is inlined at build time by Next.js.
-export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === '1';
+// Demo vs. real data switch.
+//
+// "Demo" populates the app with seeded content — the sample card, fake friends,
+// a demo feed, and seeded tables — so pages look alive while you design them.
+// "Real" shows the honest empty app: no card until you scan one, no friends,
+// an empty feed, and no tables.
+//
+// Two ways to set it:
+//  • Build-time: NEXT_PUBLIC_DEMO_MODE = '1' (force demo) or '0' (force real).
+//  • Runtime: a Settings toggle writes localStorage so you can flip between the
+//    empty and populated states in the running app to preview both.
+//
+// Default (nothing set): demo ON — handy while building. Flip it off in
+// Settings (or set the env var to '0') to see the real, empty app.
+
+const RUNTIME_KEY = 'mahj.demoData';
+
+export function isDemoMode(): boolean {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === '1') return true;
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === '0') return false;
+  try {
+    const v = localStorage.getItem(RUNTIME_KEY);
+    if (v === '1') return true;
+    if (v === '0') return false;
+  } catch {
+    /* SSR / no storage — fall through to default */
+  }
+  return true;
+}
+
+/** Persist the runtime demo toggle. Reload the app after calling to re-seed. */
+export function setDemoData(on: boolean): void {
+  try {
+    localStorage.setItem(RUNTIME_KEY, on ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+}

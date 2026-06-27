@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
 import { loadCustomCard, saveCustomCard, purgeLegacyCardPhoto } from '../lib/customCard';
-import { DEMO_MODE } from '../lib/demo';
+import { isDemoMode } from '../lib/demo';
 import { getScanEnabled, setScanEnabled } from '../lib/cardScan';
 import * as db from '../lib/storage';
 import {
@@ -97,6 +97,9 @@ export default function AppShell() {
   const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
+  // Demo vs. real data (sample card, friends, feed, tables). Read once on mount
+  // from isDemoMode(); a Settings toggle persists it and reloads the app.
+  const [demo, setDemo] = useState(true);
   // Card scanning is a runtime toggle (Settings) so one build can demo with or
   // without it.
   const [scanEnabled, setScanEnabledState] = useState(false);
@@ -150,6 +153,7 @@ export default function AppShell() {
     setExperienceState(getExperience());
     setAccountChecked(true);
     if (acc && !tutorialSeen()) setShowTutorial(true);
+    setDemo(isDemoMode());
     const cc = loadCustomCard();
     if (cc) setCard(cc);
     setScanEnabledState(getScanEnabled());
@@ -397,10 +401,9 @@ export default function AppShell() {
     setScanEnabledState(on);
   }, []);
 
-  // The real app never shows the sample: it's empty until the user scans their
-  // own card. A demo build (NEXT_PUBLIC_DEMO_MODE=1) presents the sample as the
-  // card, so the tracker is populated for screenshots/showcase.
-  const needsCard = !DEMO_MODE && card.source !== 'custom';
+  // The real app is empty until the user scans their own card; demo mode shows
+  // the sample as the card. (isDemoMode is read once on mount into `demo`.)
+  const needsCard = !demo && card.source !== 'custom';
 
   const finishOnboarding = useCallback((a: Account, pickedAvatar?: social.TileAvatar, opts?: { isNewUser?: boolean }) => {
     setAccount(a);

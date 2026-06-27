@@ -6,6 +6,7 @@
 
 import { getMeta, setMeta } from './storage';
 import type { TileFace } from './tileArt';
+import { isDemoMode } from './demo';
 
 /** A mahjong-tile avatar: your initial on a tile, a favorite suit, or a joker. */
 export interface TileAvatar {
@@ -209,12 +210,21 @@ async function seedIfNeeded(): Promise<void> {
 }
 
 export async function loadSocial(): Promise<SocialState> {
+  const profile = await getMeta<Profile>(K_PROFILE, DEFAULT_PROFILE);
+  // Real app: no seeded crew or feed — just you, with an empty feed.
+  if (!isDemoMode()) {
+    return {
+      group: { id: 'grp_demo', name: 'Tuesday Game', inviteCode: 'MAHJ-2026' },
+      members: [{ id: YOU_ID, name: profile.name, avatar: profile.avatar, isYou: true, handsCleared: 0, points: 0 }],
+      feed: [],
+      profile,
+    };
+  }
   await seedIfNeeded();
-  const [group, members, feed, profile] = await Promise.all([
+  const [group, members, feed] = await Promise.all([
     getMeta<Group>(K_GROUP, { id: 'grp_demo', name: 'Tuesday Game', inviteCode: 'MAHJ-2026' }),
     getMeta<GroupMember[]>(K_MEMBERS, []),
     getMeta<FeedPost[]>(K_FEED, []),
-    getMeta<Profile>(K_PROFILE, DEFAULT_PROFILE),
   ]);
   feed.sort((a, b) => b.createdAt - a.createdAt);
   return { group, members, feed, profile };

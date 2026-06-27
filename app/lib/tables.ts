@@ -4,6 +4,7 @@
 
 import { getMeta, setMeta } from './storage';
 import type { TileAvatar } from './social';
+import { isDemoMode } from './demo';
 
 export interface TableMember {
   name: string;
@@ -119,8 +120,16 @@ function seed(): Table[] {
   ];
 }
 
+// Ids of the built-in demo tables, so the real app can hide them.
+const SEED_IDS = new Set(['t_tuesday', 't_moms']);
+
 export async function loadTables(): Promise<Table[]> {
   const existing = await getMeta<Table[] | null>(K_TABLES, null);
+  // Real app: never seed; hide the built-in demo tables, but keep any table you
+  // actually made/joined.
+  if (!isDemoMode()) {
+    return (existing ?? []).filter((t) => !SEED_IDS.has(t.id));
+  }
   if (existing && existing.length) return existing;
   const seeded = seed();
   await setMeta(K_TABLES, seeded);

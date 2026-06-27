@@ -9,6 +9,7 @@ import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
 import { getPref, setPref } from '../lib/prefs';
+import { isDemoMode, setDemoData } from '../lib/demo';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
 import { ProBanner, ProCrown } from './ProUpsell';
@@ -91,6 +92,7 @@ export default function SettingsSheet({
   const [shareDefault, setShareDefault] = useState(() => getPref('shareDefault', true));
   const [push, setPush] = useState(() => getPref('push', true));
   const [showOnBoards, setShowOnBoards] = useState(() => getPref('leaderboards', true));
+  const [demoOn, setDemoOn] = useState(() => isDemoMode());
   const [aboutOpen, setAboutOpen] = useState(false);
   const pro = usePro();
   const [paywall, setPaywall] = useState(false);
@@ -229,6 +231,26 @@ export default function SettingsSheet({
           last
         />
       </div>
+
+      <div className="set-label">DEMO DATA</div>
+      <div className="set-list">
+        <PrefRow
+          label="Sample card, friends &amp; feed"
+          on={demoOn}
+          onToggle={() => {
+            const n = !demoOn;
+            setDemoOn(n);
+            setDemoData(n);
+            // Re-seed/clear by reloading into the chosen mode.
+            window.location.reload();
+          }}
+          last
+        />
+      </div>
+      <p className="set-hint">
+        On = the app is filled with sample content to preview. Off = the real,
+        empty app. Turn this off before launch.
+      </p>
 
       <div className="set-label">ACCOUNT</div>
       <div className="set-list">
