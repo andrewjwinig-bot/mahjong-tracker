@@ -564,10 +564,6 @@ export default function AppShell() {
           onExperience={changeExperience}
           scanEnabled={scanEnabled}
           onScanEnabled={changeScanEnabled}
-          onEditCard={() => {
-            setSettingsOpen(false);
-            setEditorOpen(true);
-          }}
           onClose={() => setSettingsOpen(false)}
         />
       )}

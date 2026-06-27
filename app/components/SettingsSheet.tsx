@@ -13,7 +13,6 @@ import { isDemoMode, setDemoData } from '../lib/demo';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
 import { ProBanner, ProCrown } from './ProUpsell';
-import { IconCard } from './uiIcons';
 import { setPro } from '../lib/pro';
 import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
@@ -27,7 +26,6 @@ interface Props {
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   onExperience: (e: Experience) => void;
-  onEditCard: () => void;
   scanEnabled: boolean;
   onScanEnabled: (on: boolean) => void;
   onSignOut?: () => void;
@@ -75,7 +73,6 @@ export default function SettingsSheet({
   onSaveProfile,
   onTheme,
   onExperience,
-  onEditCard,
   scanEnabled,
   onScanEnabled,
   onSignOut,
@@ -223,7 +220,6 @@ export default function SettingsSheet({
       <div className="set-list">
         <ValueRow label="Card year" value="2026" />
         <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
-        <ValueRow label="My card (bring your own)" onClick={onEditCard} />
         <PrefRow
           label="Card scanning (beta)"
           on={scanEnabled}
@@ -350,9 +346,6 @@ export default function SettingsSheet({
         ))}
       </div>
       <p className="edit-caption">Tailors your rules &amp; tips.</p>
-      <button className="card-btn" onClick={onEditCard}>
-        <IconCard size={17} /> MY CARD — BRING YOUR OWN
-      </button>
 
       <div className="edit-divider"><span>Appearance</span><i /></div>
       <button className="sound-row" onClick={toggleSound}>
