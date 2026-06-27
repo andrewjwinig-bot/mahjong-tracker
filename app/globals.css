@@ -4237,6 +4237,25 @@ label.lbl {
   color: var(--ink-soft);
   margin: 4px 2px 12px;
 }
+/* "or enter by hand" divider — frames manual entry as the secondary path. */
+.editor-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 2px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.editor-or::before,
+.editor-or::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: rgba(20, 22, 42, 0.08);
+}
 .editor-fine {
   color: var(--muted);
   margin-top: 16px;

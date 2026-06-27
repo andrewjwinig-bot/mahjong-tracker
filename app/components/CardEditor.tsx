@@ -11,7 +11,6 @@ import {
 } from '../lib/customCard';
 import type { ScanRow, ScanSummary } from '../lib/cardScan';
 import CardScanGuide from './CardScanGuide';
-import { IconCamera } from './uiIcons';
 import { useEscape } from '../lib/useEscape';
 
 export default function CardEditor({
@@ -221,19 +220,21 @@ export default function CardEditor({
         </>
       ) : (
         <>
-          <p className="editor-note">
-            Enter the hands from your own card. Type each hand’s notation, points, and tap <strong>C</strong>{' '}
-            if it must be concealed. Group hands by giving them the same category name.
-          </p>
-
-          {scanEnabled && (
-            <button
-              className="btn"
-              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
-              onClick={() => setGuideOpen(true)}
-            >
-              <IconCamera size={17} /> Scan my card
-            </button>
+          {scanEnabled ? (
+            <>
+              <p className="editor-note">
+                Scan your card and we’ll fill in every hand for you — fastest way to get set up.
+              </p>
+              <button className="btn empty-card-scan" onClick={() => setGuideOpen(true)}>
+                Scan my card
+              </button>
+              <div className="editor-or">or enter by hand</div>
+            </>
+          ) : (
+            <p className="editor-note">
+              Enter the hands from your own card. Type each hand’s notation, points, and tap{' '}
+              <strong>C</strong> if it must be concealed. Group hands by giving them the same category name.
+            </p>
           )}
 
           {yearField}
