@@ -1318,17 +1318,9 @@ label.lbl {
 }
 .ng-tile {
   position: absolute;
-  border-radius: 5px;
-  background: linear-gradient(180deg, #fffefb 0%, #f1ebdd 100%);
-  border: 1.5px solid rgba(20, 22, 42, 0.12);
-  box-shadow: 0 4px 9px rgba(0, 0, 0, 0.27);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
-  font-weight: 800;
-  color: var(--brand, #c0392b);
   transform: rotate(var(--r, 0deg));
+  filter: drop-shadow(0 4px 9px rgba(0, 0, 0, 0.27));
   animation-name: ngTileBob;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;

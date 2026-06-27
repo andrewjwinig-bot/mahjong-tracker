@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import Tile from './Tile';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
@@ -232,27 +233,25 @@ function completedHandIds(
   return new Set(ids.slice(0, Math.min(member.handsCleared, ids.length)));
 }
 
-// Cream 萬 tiles scattered around the next-game reminder, center kept clear for
-// the date. Positions tuned to the ~362px feed width. [edge offset, w, h,
-// fontSize, rotation, bob duration, delay].
+// Tiles scattered around the next-game reminder, center kept clear for the
+// date. Each renders the table's own tile avatar (so the art matches the
+// table). `w` is the tile width; positions tuned to the ~362px feed width.
 const NG_TILES: Array<{
   x: { left: number } | { right: number };
   y: { top: number } | { bottom: number };
   w: number;
-  h: number;
-  fs: number;
   r: number;
   dur: number;
   delay: number;
 }> = [
-  { x: { left: -12 }, y: { top: -11 }, w: 31, h: 39, fs: 18, r: -18, dur: 3.6, delay: 0 },
-  { x: { left: 22 }, y: { top: 29 }, w: 25, h: 31, fs: 14, r: 9, dur: 3.9, delay: 0.5 },
-  { x: { left: 102 }, y: { top: -13 }, w: 24, h: 30, fs: 14, r: 11, dur: 3.5, delay: 0.25 },
-  { x: { right: 102 }, y: { top: -13 }, w: 24, h: 30, fs: 14, r: -11, dur: 3.8, delay: 0.7 },
-  { x: { right: 22 }, y: { top: 29 }, w: 25, h: 31, fs: 14, r: -9, dur: 4.0, delay: 0.4 },
-  { x: { right: -12 }, y: { top: -11 }, w: 31, h: 39, fs: 18, r: 18, dur: 3.6, delay: 0.15 },
-  { x: { left: -6 }, y: { bottom: -12 }, w: 26, h: 33, fs: 15, r: 13, dur: 3.7, delay: 0.6 },
-  { x: { right: -6 }, y: { bottom: -12 }, w: 26, h: 33, fs: 15, r: -13, dur: 3.9, delay: 0.35 },
+  { x: { left: -12 }, y: { top: -11 }, w: 31, r: -18, dur: 3.6, delay: 0 },
+  { x: { left: 22 }, y: { top: 29 }, w: 25, r: 9, dur: 3.9, delay: 0.5 },
+  { x: { left: 102 }, y: { top: -13 }, w: 24, r: 11, dur: 3.5, delay: 0.25 },
+  { x: { right: 102 }, y: { top: -13 }, w: 24, r: -11, dur: 3.8, delay: 0.7 },
+  { x: { right: 22 }, y: { top: 29 }, w: 25, r: -9, dur: 4.0, delay: 0.4 },
+  { x: { right: -12 }, y: { top: -11 }, w: 31, r: 18, dur: 3.6, delay: 0.15 },
+  { x: { left: -6 }, y: { bottom: -12 }, w: 26, r: 13, dur: 3.7, delay: 0.6 },
+  { x: { right: -6 }, y: { bottom: -12 }, w: 26, r: -13, dur: 3.9, delay: 0.35 },
 ];
 
 // "Today" / "Tomorrow" / "Wed Jun 25" + optional time, for the next-game card.
@@ -366,16 +365,13 @@ export default function GroupTab({
                   {
                     ...t.x,
                     ...t.y,
-                    width: t.w,
-                    height: t.h,
-                    fontSize: t.fs,
                     '--r': `${t.r}deg`,
                     animationDuration: `${t.dur}s`,
                     animationDelay: `${t.delay}s`,
                   } as unknown as CSSProperties
                 }
               >
-                萬
+                <Tile face={nextG.icon.face} char={nextG.icon.char} color={nextG.icon.color} size={t.w} />
               </span>
             ))}
           </span>
