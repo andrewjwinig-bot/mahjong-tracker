@@ -17,6 +17,20 @@ export function clearCardPhoto(): Promise<void> {
   return db.setMeta(PHOTO_KEY, null);
 }
 
+// One-time housekeeping: older versions saved a reference photo of the card
+// that's no longer used or displayed. Purge it once (guarded by a flag) so it
+// doesn't linger in IndexedDB, without doing the work on every launch.
+const PHOTO_PURGE_KEY = 'customCard.photoPurged';
+export async function purgeLegacyCardPhoto(): Promise<void> {
+  try {
+    if (localStorage.getItem(PHOTO_PURGE_KEY) === '1') return;
+    await clearCardPhoto();
+    localStorage.setItem(PHOTO_PURGE_KEY, '1');
+  } catch {
+    /* ignore — a failed purge just leaves harmless orphaned bytes */
+  }
+}
+
 export interface HandRow {
   category: string;
   notation: string;

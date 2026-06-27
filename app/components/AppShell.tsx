@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
-import { loadCustomCard, saveCustomCard, sampleOptedIn, setSampleOptIn } from '../lib/customCard';
+import { loadCustomCard, saveCustomCard, sampleOptedIn, setSampleOptIn, purgeLegacyCardPhoto } from '../lib/customCard';
 import { getScanEnabled, setScanEnabled } from '../lib/cardScan';
 import * as db from '../lib/storage';
 import {
@@ -180,6 +180,8 @@ export default function AppShell() {
       setLoaded(true);
       // Background reconcile with the cloud once the local-first UI is up.
       void reconcileCloud();
+      // One-time cleanup of the no-longer-used card reference photo.
+      void purgeLegacyCardPhoto();
     })();
     return () => {
       alive = false;
