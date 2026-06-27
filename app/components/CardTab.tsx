@@ -16,7 +16,7 @@ import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress } from '../lib/challenges';
 import { computeBadges } from '../lib/badges';
-import { IconTrophy, IconCamera } from './uiIcons';
+import { IconTrophy } from './uiIcons';
 import EmptyCard from './EmptyCard';
 
 type Filter = 'all' | 'remaining' | 'won' | 'challenge';
@@ -185,15 +185,14 @@ export default function CardTab({
           <span className="cm-edit" aria-hidden>Edit</span>
         </button>
       ) : (
-        <button className="card-manage" data-sample onClick={onAddCard}>
-          <span className="cm-ic" aria-hidden>
-            <IconCamera size={17} />
+        <button className="card-sample-banner" onClick={onAddCard}>
+          <span className="csb-tag" aria-hidden>SAMPLE</span>
+          <span className="csb-text">
+            <span className="csb-title">These are example hands — not your card</span>
+            <span className="csb-sub">
+              You haven’t scanned a card yet. Tap to {scanEnabled ? 'scan' : 'add'} your real one →
+            </span>
           </span>
-          <span className="cm-text">
-            <span className="cm-title">{scanEnabled ? 'Scan your real card' : 'Add your real card'}</span>
-            <span className="cm-sub">You’re on the sample — bring in your own to track for real</span>
-          </span>
-          <span className="cm-chev" aria-hidden>›</span>
         </button>
       )}
 
