@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { MahjongCard, Win } from '../lib/types';
 import type { FeedPost } from '../lib/social';
-import { downscaleImage } from '../lib/image';
+import { downscaleImage, rotateImage } from '../lib/image';
 import { buildShareCard } from '../lib/shareCard';
 import { captionFor, appUrl } from '../lib/share';
 import { recordShare, track } from '../lib/analytics';
@@ -11,7 +11,7 @@ import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
 import { colorNotation } from '../lib/theme';
 import Tile from './Tile';
-import { IconShare, IconTrash, IconCamera } from './uiIcons';
+import { IconShare, IconTrash, IconCamera, IconRotate } from './uiIcons';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
 interface Props {
@@ -81,7 +81,7 @@ export default function WinsTab({
             onAddWin(win);
             // Logging a MAHJ advances your card (and the leaderboard)…
             if (win.handId) onBump(win.handId, +1);
-            // …and optionally lands in the feed.
+            // …and optionally posts into your table's chat.
             if (opts.shareToGroup) onPostToGroup(win);
             setOpen(false);
             const pts = win.handId
@@ -276,6 +276,23 @@ export function LogWinSheet({
     if (fileRef.current) fileRef.current.value = '';
   }
 
+  async function rotate() {
+    if (!photo || busy) return;
+    setBusy(true);
+    try {
+      const rotated = await rotateImage(photo, 1);
+      setPhoto(rotated);
+      // Orientation changed — reset the focal point to center.
+      setPhotoPos(50);
+      if (preview) URL.revokeObjectURL(preview);
+      setPreview(URL.createObjectURL(rotated));
+    } catch {
+      alert('Sorry, that photo couldn’t be rotated. Try a different one.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const labelFor = (id: string) => {
     const h = card.hands.find((x) => x.id === id);
     return h ? handNotes[h.id] ?? h.notation : null;
@@ -467,16 +484,29 @@ export function LogWinSheet({
                 draggable={false}
                 style={{ objectPosition: `50% ${photoPos}%` }}
               />
-              <button
-                className="log-photo-del"
-                type="button"
-                onClick={removePhoto}
-                aria-label="Remove photo"
-              >
-                <IconTrash size={15} />
-              </button>
+              <div className="log-photo-tools">
+                <button
+                  className="log-photo-tool"
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); void rotate(); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  disabled={busy}
+                  aria-label="Rotate photo"
+                >
+                  <IconRotate size={15} />
+                </button>
+                <button
+                  className="log-photo-tool"
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); removePhoto(); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label="Remove photo"
+                >
+                  <IconTrash size={15} />
+                </button>
+              </div>
               <span className="log-photo-hint" aria-hidden>
-                Drag to reposition
+                Drag to reposition · tap ⟳ to rotate
               </span>
             </div>
           )}

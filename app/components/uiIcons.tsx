@@ -74,6 +74,25 @@ export const IconCalendar = ({ size }: P) => (
   </Carved>
 );
 
+// Rotate (clockwise) — a circular arrow. Stroke-based so the open arc reads
+// cleanly on every browser (no mask box quirk).
+export const IconRotate = ({ size = 22 }: P) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+    <path d="M21 4v5h-5" />
+  </svg>
+);
+
 export const IconCamera = ({ size }: P) => (
   <Carved size={size}>
     <path

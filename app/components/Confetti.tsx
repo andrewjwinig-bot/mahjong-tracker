@@ -12,11 +12,11 @@ export interface CelebrateOpts {
   /** Progress toward clearing the card. */
   cleared?: number;
   total?: number;
-  /** Whether this mahj was already posted to the feed. */
+  /** Whether this mahj was already posted to your table chat. */
   posted?: boolean;
   /** Surface a Share action. */
   onShare?: () => void;
-  /** Surface a "Post to feed" action (when not already posted). */
+  /** Surface a "Post to chat" action (when not already posted). */
   onPost?: () => void;
   /** Override the boom emoji + hype line. */
   emoji?: string;
@@ -248,7 +248,7 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
         )}
 
         {opts.bonus && <p className="cele-bonus">{opts.bonus}</p>}
-        {posted && <p className="cele-posted">✓ Posted to your feed</p>}
+        {posted && <p className="cele-posted">✓ Posted to your table chat</p>}
 
         <div className="cele-actions">
           {opts.onShare && (
@@ -272,7 +272,7 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
                 setPosted(true);
               }}
             >
-              <IconFeed size={17} /> Post to Feed
+              <IconFeed size={17} /> Post to chat
             </button>
           )}
           <button className="btn ghost" onClick={onClose}>

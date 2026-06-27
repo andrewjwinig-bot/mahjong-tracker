@@ -131,6 +131,34 @@ export async function saveTables(tables: Table[]): Promise<void> {
   await setMeta(K_TABLES, tables);
 }
 
+/**
+ * The table that corresponds to your primary group — matched by invite code,
+ * then by name — falling back to your first table. Used to route a shared mahj
+ * into the chat of the crew you actually play with. Returns null if you have
+ * no tables yet.
+ */
+export async function resolveGroupTableId(group: { inviteCode?: string; name?: string }): Promise<string | null> {
+  const tables = await loadTables();
+  if (!tables.length) return null;
+  if (group.inviteCode) {
+    const byCode = tables.find((t) => t.inviteCode === group.inviteCode);
+    if (byCode) return byCode.id;
+  }
+  if (group.name) {
+    const byName = tables.find((t) => t.name === group.name);
+    if (byName) return byName.id;
+  }
+  return tables[0].id;
+}
+
+/** Append a chat message to a table and persist. No-op if the table is gone. */
+export async function appendTableMessage(tableId: string, msg: ChatMsg): Promise<void> {
+  const tables = await loadTables();
+  if (!tables.some((t) => t.id === tableId)) return;
+  const next = tables.map((t) => (t.id === tableId ? { ...t, messages: [...t.messages, msg] } : t));
+  await saveTables(next);
+}
+
 // ---- Unread chat tracking ------------------------------------------------
 // A per-table "last read" timestamp (localStorage) so the Tables nav can badge
 // unread messages from your crew. Synchronous so marking-read is instant.

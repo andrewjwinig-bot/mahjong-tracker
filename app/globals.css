@@ -2482,10 +2482,14 @@ label.lbl {
   -webkit-user-drag: none;
   user-select: none;
 }
-.log-photo-del {
+.log-photo-tools {
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  gap: 6px;
+}
+.log-photo-tool {
   width: 30px;
   height: 30px;
   border-radius: 999px;
@@ -2494,8 +2498,11 @@ label.lbl {
   background: rgba(20, 22, 42, 0.62);
   color: #fff;
 }
-.log-photo-del:active {
+.log-photo-tool:active {
   transform: scale(0.9);
+}
+.log-photo-tool:disabled {
+  opacity: 0.5;
 }
 .log-photo-hint {
   position: absolute;

@@ -30,7 +30,8 @@ import GroupTab from './GroupTab';
 import LoadingWall from './LoadingWall';
 import Splash from './Splash';
 import TablesTab from './TablesTab';
-import { loadTables, unreadCount } from '../lib/tables';
+import { loadTables, unreadCount, resolveGroupTableId, appendTableMessage } from '../lib/tables';
+import type { ChatMsg } from '../lib/tables';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
@@ -56,6 +57,15 @@ import {
   type Experience,
 } from '../lib/account';
 import { recordPlay } from '../lib/streak';
+
+/** The chat line posted to your table when you share a mahj. */
+function mahjChatText(win: Win): string {
+  let text = '🀄 I got mahj!';
+  if (win.handLabel) text += ` — ${win.handLabel}`;
+  if (win.note) text += ` · ${win.note}`;
+  if (win.photo || win.photoUrl) text += ' 📷';
+  return text;
+}
 
 export default function AppShell() {
   const [tab, setTab] = useState<Tab>('group');
@@ -228,28 +238,31 @@ export default function AppShell() {
     mirrorRemoveWin(id);
   }, []);
 
-  const postToGroup = useCallback((win: Win) => {
-    setSocialState((prev) => {
-      if (!prev) return prev;
-      const post: social.FeedPost = {
+  // Sharing a mahj drops it into the chat of the table you play with (the crew
+  // behind your group), so it lands where your friends actually talk — not in a
+  // separate feed they'd never check. Routed to the table matching your group.
+  const postToGroup = useCallback(
+    (win: Win) => {
+      if (!socialState) return;
+      const { profile, group } = socialState;
+      const msg: ChatMsg = {
         id: crypto.randomUUID(),
-        memberId: social.YOU_ID,
-        memberName: prev.profile.name,
-        avatar: prev.profile.avatar,
-        handLabel: win.handLabel,
-        note: win.note,
-        photo: win.photo,
-        photoPos: win.photoPos,
+        author: profile.name,
+        avatar: profile.avatar,
+        text: mahjChatText(win),
         createdAt: win.createdAt,
-        likes: 0,
-        likedByMe: false,
-        comments: [],
       };
-      void social.addFeedPost(post);
-      mirrorCreatePost(post);
-      return { ...prev, feed: [post, ...prev.feed] };
-    });
-  }, []);
+      void (async () => {
+        const tableId = await resolveGroupTableId(group);
+        if (tableId) {
+          await appendTableMessage(tableId, msg);
+          // Nudge the Tables badge/state to recompute on next read.
+          setUnreadTick((n) => n + 1);
+        }
+      })();
+    },
+    [socialState],
+  );
 
   // Post a celebratory milestone to the feed (section/card/challenge cleared,
   // game won) — distinct from a mahj post, layered on top of it.

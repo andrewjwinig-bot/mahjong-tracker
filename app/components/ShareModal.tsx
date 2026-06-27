@@ -134,7 +134,7 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
         <h2>{title}</h2>
         <p className="sheet-sub">Brag a little — you earned it!</p>
 
-        {/* In-app: share to the group feed */}
+        {/* In-app: drop it into your table's chat */}
         {groupName && onShareToGroup && (
           <button
             className="share-hero"
@@ -151,7 +151,7 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
               <span className="t" style={{ display: 'block' }}>
                 Share to {groupName}
               </span>
-              <span className="s">Drop it in your group&rsquo;s feed</span>
+              <span className="s">Drop it in your table&rsquo;s chat</span>
             </span>
             <span style={{ display: 'inline-flex', color: 'var(--muted)' }}><IconArrowRight size={20} /></span>
           </button>
