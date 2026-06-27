@@ -1,10 +1,11 @@
 'use client';
 
-// Club Mahj — Feed empty state ("No mahjs called yet"). EXACT port of the
+// Club Mahj — Feed empty state ("No mahjs called yet"). Port of the
 // Empty_State_Feed reference: four walls in a pinwheel/windmill layout build
 // tile-by-tile clockwise (top L→R, right T→B, bottom R→L, left B→T), 0.045s
 // stagger; once assembled (~1.25s) the two dice fade in and idle-bob. Glow
-// pulses behind. Plays once on mount. Constants are verbatim.
+// pulses behind. The build replays each time the card scrolls into view (and
+// the dice re-roll on tap), so it isn't missed playing off-screen.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -22,51 +23,63 @@ function buildWalls(): Wall[] {
 
 export default function EmptyFeed() {
   const tiles = useMemo(buildWalls, []);
-  // Hold the build paused until the card scrolls into view, then play it once —
-  // otherwise it finishes off-screen and looks like nothing happened.
   const cardRef = useRef<HTMLDivElement>(null);
-  const [started, setStarted] = useState(false);
+  // `playKey` bumps each time the card (re)enters the viewport, which remounts
+  // the field and restarts the build animation — so you actually see it, and
+  // it replays if you scroll away and back. 0 = not seen yet (tiles hidden).
+  const [playKey, setPlayKey] = useState(0);
+  const [roll, setRoll] = useState(0);
   useEffect(() => {
     const el = cardRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') {
-      setStarted(true);
+      setPlayKey(1);
       return;
     }
+    let inView = false;
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setStarted(true);
-          io.disconnect();
+        const vis = entries.some((e) => e.isIntersecting);
+        if (vis && !inView) {
+          inView = true;
+          setRoll(0);
+          setPlayKey((k) => k + 1);
+        } else if (!vis) {
+          inView = false;
         }
       },
-      { threshold: 0.35 },
+      // Wait until it's clearly on screen so the build doesn't play half-hidden.
+      { threshold: 0.5 },
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  const playState = started ? 'running' : 'paused';
-  // Tap to roll the dice — the way a game actually starts. `roll` bumps on each
-  // tap; the dice remount (via key) and play a quick tumble, then resume idle.
-  const [roll, setRoll] = useState(0);
+
+  const playing = playKey > 0;
   const rolled = roll > 0;
-  const die1Anim = rolled
-    ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) both, pwDie 3s ease-in-out .55s infinite alternate'
-    : 'pwDieIn .4s ease-out 1.25s forwards, pwDie 3s ease-in-out 1.25s infinite alternate';
-  const die2Anim = rolled
-    ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) .06s both, pwDie 3s ease-in-out .61s infinite alternate'
-    : 'pwDieIn .4s ease-out 1.4s forwards, pwDie 3s ease-in-out 1.4s infinite alternate';
+  const die1Anim = !playing
+    ? 'none'
+    : rolled
+      ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) both, pwDie 3s ease-in-out .55s infinite alternate'
+      : 'pwDieIn .4s ease-out 1.25s forwards, pwDie 3s ease-in-out 1.25s infinite alternate';
+  const die2Anim = !playing
+    ? 'none'
+    : rolled
+      ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) .06s both, pwDie 3s ease-in-out .61s infinite alternate'
+      : 'pwDieIn .4s ease-out 1.4s forwards, pwDie 3s ease-in-out 1.4s infinite alternate';
+
   return (
     <div className="pw-card pw-card-feed" ref={cardRef}>
       <div className="pw-seam" />
       <div
         className="pw-stage pw-stage-feed"
         style={{ cursor: 'pointer' }}
-        onClick={() => setRoll((r) => r + 1)}
+        onClick={() => playing && setRoll((r) => r + 1)}
         role="button"
         aria-label="Roll the dice"
       >
         <div className="pw-glow pw-glow-feed" />
-        <div className="pw-field pw-field-feed">
+        {/* Remounts on each viewport entry (key=playKey) to replay the build. */}
+        <div className="pw-field pw-field-feed" key={playKey}>
           {tiles.map((t, idx) => (
             <div
               key={idx}
@@ -78,8 +91,10 @@ export default function EmptyFeed() {
                 height: t.h,
                 '--fx': `${t.fx}px`,
                 '--fy': `${t.fy}px`,
-                animation: `pwSlide 0.42s cubic-bezier(.2,.7,.3,1) ${(idx * 0.045).toFixed(3)}s both`,
-                animationPlayState: playState,
+                opacity: playing ? undefined : 0,
+                animation: playing
+                  ? `pwSlide 0.42s cubic-bezier(.2,.7,.3,1) ${(idx * 0.045).toFixed(3)}s both`
+                  : 'none',
               } as React.CSSProperties}
             />
           ))}
@@ -87,13 +102,7 @@ export default function EmptyFeed() {
           <div
             key={`die1-${roll}`}
             className="pw-die pw-die-feed"
-            style={{
-              left: 54,
-              top: 58,
-              '--dr': '-12deg',
-              animation: die1Anim,
-              animationPlayState: playState,
-            } as React.CSSProperties}
+            style={{ left: 54, top: 58, '--dr': '-12deg', animation: die1Anim } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: 4, top: 4, background: '#C0392B' }} />
             <span className="pw-pip" style={{ right: 4, top: 4, background: '#1A1410' }} />
@@ -103,13 +112,7 @@ export default function EmptyFeed() {
           <div
             key={`die2-${roll}`}
             className="pw-die pw-die-feed"
-            style={{
-              left: 80,
-              top: 80,
-              '--dr': '9deg',
-              animation: die2Anim,
-              animationPlayState: playState,
-            } as React.CSSProperties}
+            style={{ left: 80, top: 80, '--dr': '9deg', animation: die2Anim } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: '50%', top: '50%', background: '#C0392B', transform: 'translate(-50%,-50%)' }} />
             <span className="pw-pip" style={{ left: 5, top: 5, background: '#1A1410' }} />

@@ -8151,5 +8151,6 @@ label.lbl {
   100% { opacity: 1; transform: translateY(0) rotate(calc(var(--dr) + 360deg)) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
+  .pw-field-feed .pw-tile { animation: none !important; opacity: 1 !important; }
   .pw-die-feed { animation: pwDieIn .4s ease-out forwards !important; }
 }
