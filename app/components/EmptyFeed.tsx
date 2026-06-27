@@ -6,7 +6,7 @@
 // stagger; once assembled (~1.25s) the two dice fade in and idle-bob. Glow
 // pulses behind. Plays once on mount. Constants are verbatim.
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Wall = { x: number; y: number; w: number; h: number; fx: number; fy: number };
 
@@ -22,6 +22,29 @@ function buildWalls(): Wall[] {
 
 export default function EmptyFeed() {
   const tiles = useMemo(buildWalls, []);
+  // Hold the build paused until the card scrolls into view, then play it once —
+  // otherwise it finishes off-screen and looks like nothing happened.
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setStarted(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setStarted(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const playState = started ? 'running' : 'paused';
   // Tap to roll the dice — the way a game actually starts. `roll` bumps on each
   // tap; the dice remount (via key) and play a quick tumble, then resume idle.
   const [roll, setRoll] = useState(0);
@@ -33,7 +56,7 @@ export default function EmptyFeed() {
     ? 'pwRoll .55s cubic-bezier(.2,.7,.3,1) .06s both, pwDie 3s ease-in-out .61s infinite alternate'
     : 'pwDieIn .4s ease-out 1.4s forwards, pwDie 3s ease-in-out 1.4s infinite alternate';
   return (
-    <div className="pw-card pw-card-feed">
+    <div className="pw-card pw-card-feed" ref={cardRef}>
       <div className="pw-seam" />
       <div
         className="pw-stage pw-stage-feed"
@@ -56,6 +79,7 @@ export default function EmptyFeed() {
                 '--fx': `${t.fx}px`,
                 '--fy': `${t.fy}px`,
                 animation: `pwSlide 0.42s cubic-bezier(.2,.7,.3,1) ${(idx * 0.045).toFixed(3)}s both`,
+                animationPlayState: playState,
               } as React.CSSProperties}
             />
           ))}
@@ -68,6 +92,7 @@ export default function EmptyFeed() {
               top: 58,
               '--dr': '-12deg',
               animation: die1Anim,
+              animationPlayState: playState,
             } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: 4, top: 4, background: '#C0392B' }} />
@@ -83,6 +108,7 @@ export default function EmptyFeed() {
               top: 80,
               '--dr': '9deg',
               animation: die2Anim,
+              animationPlayState: playState,
             } as React.CSSProperties}
           >
             <span className="pw-pip" style={{ left: '50%', top: '50%', background: '#C0392B', transform: 'translate(-50%,-50%)' }} />
