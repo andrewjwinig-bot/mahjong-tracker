@@ -139,16 +139,13 @@ export default function CardTab({
         onMilestone('challenge_done', `Finished ${challenge.name}`);
       }
 
+      // Only the big milestones still pop a celebration; a regular mahj logs
+      // quietly (it's already saved + posted, and shows in your list).
       if (cardDone) {
         celebrate({ title: 'You Cleared The Card!!', emoji: '👑', hype: 'ALL 70 HANDS — LEGENDARY 👑', cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
       } else if (catDone) {
         celebrate({ title: 'Category Cleared! 🎉', emoji: '🏆', hype: `Every ${h.category} hand — done!`, handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
-      } else {
-        celebrate({ title: 'I Got Mahj! 🎉', handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, bonus, onShare: () => setShareWin(win), onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win) });
       }
-    } else {
-      // Repeat win of a cleared hand, or a Freeform mahj.
-      celebrate({ title: 'I Got Mahj! 🎉', handLabel: win.handLabel, points: h?.points, posted: opts.shareToGroup, bonus, onShare: () => setShareWin(win), onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win) });
     }
   }
 

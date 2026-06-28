@@ -36,8 +36,6 @@ export default function WinsTab({
   onPostToGroup,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [shareWin, setShareWin] = useState<Win | null>(null);
-  const { celebrate } = useConfetti();
 
   return (
     <div className="screen">
@@ -88,35 +86,11 @@ export default function WinsTab({
             onAddWin(win);
             // Logging a MAHJ advances your card (and the leaderboard)…
             if (win.handId) onBump(win.handId, +1);
-            // …and optionally posts into your table's chat.
+            // …and optionally posts into your table's chat. It logs quietly —
+            // no celebration modal — and shows in your list below.
             if (opts.shareToGroup) onPostToGroup(win);
             setOpen(false);
-            const pts = win.handId
-              ? card.hands.find((h) => h.id === win.handId)?.points
-              : undefined;
-            celebrate({
-              title: 'I Got Mahj! 🎉',
-              handLabel: win.handLabel,
-              points: pts,
-              posted: opts.shareToGroup,
-              onShare: () => setShareWin(win),
-              onPost: opts.shareToGroup ? undefined : () => onPostToGroup(win),
-            });
           }}
-        />
-      )}
-
-      {shareWin && (
-        <ShareModal
-          payload={{
-            title: 'Share Your Mahj! 🀄',
-            text: captionFor(shareWin),
-            url: appUrl(),
-            image: () => buildShareCard(shareWin, shareWin.handLabel),
-          }}
-          groupName={groupName}
-          onShareToGroup={() => onPostToGroup(shareWin)}
-          onClose={() => setShareWin(null)}
         />
       )}
     </div>
