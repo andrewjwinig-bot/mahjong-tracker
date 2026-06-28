@@ -11,9 +11,11 @@ export type TileFace =
   | 'wind'
   | 'dragon'
   | 'joker'
-  | 'letter'; // a lettered tile (M / A / H / J)
+  | 'letter' // a lettered tile (M / A / H / J)
+  | 'icon'; // illustrated mahjong icon (key carried in `char`), see tileIcons.ts
 
 import { BAMBOO_LETTERS } from './bambooLetters';
+import { TILE_ICONS } from './tileIcons';
 
 const CRACK = '#E8455F';
 const BAM = '#1FA85B';
@@ -61,6 +63,65 @@ function letterMotif(char: string | undefined, color: string): string {
     <svg x="9.5" y="11" width="29" height="40" viewBox="${L.vb}" preserveAspectRatio="xMidYMid meet">
       <path d="${L.d}" fill="url(#${id})" fill-rule="evenodd"/>
     </svg>`;
+}
+
+// Which icons recolor to the chosen tile color: `true` = every path along a
+// dark→light ramp of the color; an array = only those path indices.
+const ICON_TINT: Record<string, true | number[]> = {
+  red_dragon_curled: true,
+  bamboo_sprig: true,
+  character_wan: true,
+  green_dragon: true,
+  red_dragon: true,
+  bird: [0], // body tints; red crest stays fixed
+  joker: true,
+  pink_flower: [1], // center dot only
+};
+// Per-icon zoom (shrinks the viewBox around center so the art renders larger).
+const ICON_SCALE: Record<string, number> = { red_dragon_curled: 1.08, bamboo_sprig: 1.18, bird: 1.06 };
+const TONE_SPREAD = 1.32;
+
+function relLum(hex: string): number {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+}
+
+// An illustrated mahjong icon (key in `char`), tinted toward the chosen color.
+function iconMotif(key: string | undefined, color: string): string {
+  const ic = key ? TILE_ICONS[key] : undefined;
+  if (!ic) return charMotif('?', color, 26);
+  const tint = key ? ICON_TINT[key] : undefined;
+  let ramp: Record<string, string> | null = null;
+  if (tint) {
+    const uniq = [...new Set(ic.paths.map((p) => p.fill))].sort((a, b) => relLum(a) - relLum(b));
+    const n = uniq.length;
+    ramp = {};
+    uniq.forEach((f, i) => {
+      const pos = n === 1 ? 0.5 : i / (n - 1);
+      ramp![f] =
+        pos < 0.5
+          ? mixHex(color, '#06150e', (1 - (0.5 - pos) * TONE_SPREAD) * 100)
+          : mixHex(color, '#ffffff', (1 - (pos - 0.5) * TONE_SPREAD) * 100);
+    });
+  }
+  const tintPath = (i: number) => tint === true || (Array.isArray(tint) && tint.indexOf(i) !== -1);
+  const body = ic.paths
+    .map((p, i) => `<path d="${p.d}" fill="${ramp && tintPath(i) ? ramp[p.fill] : p.fill}" fill-rule="${p.fr}"/>`)
+    .join('');
+  // Apply per-icon zoom by shrinking the viewBox around its center.
+  let vb = ic.vb;
+  const s = ICON_SCALE[key ?? ''];
+  if (s && s !== 1) {
+    const [mx, my, w, h] = ic.vb.split(/\s+/).map(Number);
+    const w2 = w / s;
+    const h2 = h / s;
+    vb = `${mx + (w - w2) / 2} ${my + (h - h2) / 2} ${w2} ${h2}`;
+  }
+  // Fill most of the tile body, centered.
+  return `<svg x="6" y="6" width="36" height="52" viewBox="${vb}" preserveAspectRatio="xMidYMid meet">${body}</svg>`;
 }
 
 function dotMotif(): string {
@@ -181,6 +242,8 @@ function motifFor(face: TileFace, char?: string, color?: string, count?: number)
       return charMotif(char ?? '中', color ?? CRACK);
     case 'letter':
       return letterMotif(char, color ?? BAM_DK);
+    case 'icon':
+      return iconMotif(char, color ?? BAM_DK);
   }
 }
 

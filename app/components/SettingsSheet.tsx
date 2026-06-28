@@ -38,20 +38,20 @@ const CameraMark = () => (
   </svg>
 );
 
-// The "YOUR TILE" face set (design: a 5-col grid of single-color tiles).
-// `pro` marks VIP-only flair (Flower + the Star/Joker) — the monogram and the
-// plain suits stay free so everyone has a strong default.
+// The "YOUR TILE" set: tile 0 is the bamboo monogram of the name's initial;
+// tiles 1–9 are illustrated mahjong icons (tinted to the chosen tile color).
+// `pro` marks VIP-only flair (the joker + pink flower); the rest stay free.
 const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string; pro?: boolean }[] = [
   { key: 'letter', face: 'letter' },
-  { key: 'dot', face: 'dot' },
-  { key: 'bam', face: 'bam' },
-  { key: 'crack', face: 'crack' },
-  { key: 'flower', face: 'flower', pro: true },
-  { key: 'wind', face: 'wind', char: '風' },
-  { key: 'dragonR', face: 'dragon', char: '中', fixedColor: '#C0392B' },
-  { key: 'dragonG', face: 'dragon', char: '發', fixedColor: '#1F8A5B' },
-  { key: 'joker', face: 'joker', pro: true },
-  { key: 'crackZ', face: 'crack', char: '萬' },
+  { key: 'red_dragon_curled', face: 'icon', char: 'red_dragon_curled' },
+  { key: 'bamboo_sprig', face: 'icon', char: 'bamboo_sprig' },
+  { key: 'character_wan', face: 'icon', char: 'character_wan' },
+  { key: 'peony', face: 'icon', char: 'peony' },
+  { key: 'bird', face: 'icon', char: 'bird' },
+  { key: 'green_dragon', face: 'icon', char: 'green_dragon' },
+  { key: 'red_dragon', face: 'icon', char: 'red_dragon' },
+  { key: 'joker', face: 'icon', char: 'joker', pro: true },
+  { key: 'pink_flower', face: 'icon', char: 'pink_flower', pro: true },
 ];
 
 // Design tile-color swatches.
@@ -227,7 +227,7 @@ export default function SettingsSheet({
                 } as CSSProperties
               }
             >
-              {p.flip ? '' : previewChar || letter}
+              {p.flip ? '' : letter}
             </span>
           ))}
         </span>

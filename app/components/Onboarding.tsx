@@ -12,19 +12,19 @@ import type { TileFace } from '../lib/tileArt';
 import type { TileAvatar } from '../lib/social';
 import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
 
-// Pick-your-tile options for sign-up (mirrors the Settings avatar set). 'letter'
-// uses the username's initial; the rest carry their suit glyph + color.
+// Pick-your-tile options for sign-up (mirrors the Settings avatar set). Tile 0
+// is the bamboo monogram of the username's initial; the rest are illustrated
+// mahjong icons, tinted by their color. VIP-only tiles (joker, pink flower)
+// are not offered at sign-up.
 const TILE_OPTIONS: { key: string; face: TileFace; char?: string; color: string }[] = [
-  { key: 'letter', face: 'letter', color: '#2E86D4' },
-  { key: 'crackZ', face: 'crack', char: '萬', color: '#C0392B' },
-  { key: 'dot', face: 'dot', color: '#2E86D4' },
-  { key: 'bam', face: 'bam', color: '#15803D' },
-  { key: 'flower', face: 'flower', color: '#E2568F' },
-  { key: 'dragonR', face: 'dragon', char: '中', color: '#C0392B' },
-  { key: 'dragonG', face: 'dragon', char: '發', color: '#15803D' },
-  { key: 'wind', face: 'wind', char: '東', color: '#1A1410' },
-  { key: 'joker', face: 'joker', color: '#6A3FC0' },
-  { key: 'crack5', face: 'crack', char: '五', color: '#C9871A' },
+  { key: 'letter', face: 'letter', color: '#15803D' },
+  { key: 'red_dragon_curled', face: 'icon', char: 'red_dragon_curled', color: '#C0392B' },
+  { key: 'bamboo_sprig', face: 'icon', char: 'bamboo_sprig', color: '#15803D' },
+  { key: 'character_wan', face: 'icon', char: 'character_wan', color: '#C0392B' },
+  { key: 'peony', face: 'icon', char: 'peony', color: '#DB2777' },
+  { key: 'bird', face: 'icon', char: 'bird', color: '#2E7D5B' },
+  { key: 'green_dragon', face: 'icon', char: 'green_dragon', color: '#15803D' },
+  { key: 'red_dragon', face: 'icon', char: 'red_dragon', color: '#C0392B' },
 ];
 
 const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode; color: string }[] = [
