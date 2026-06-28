@@ -70,6 +70,22 @@ export const EXPERIENCE_LABEL: Record<Experience, string> = {
   expert: 'Expert',
 };
 
+const LEVEL_ORDER: Experience[] = ['beginner', 'intermediate', 'expert'];
+
+/**
+ * Auto-progression: as someone actually plays, their experience level advances
+ * so the tips deepen — set once at onboarding, then leveled up in the
+ * background (never demoted). Thresholds are gentle and tunable: a few sessions
+ * in → intermediate; a regular player → expert. Based on total mahjs logged and
+ * distinct card hands cleared.
+ */
+export function earnedLevel(current: Experience, stats: { mahjs: number; cleared: number }): Experience {
+  let earned: Experience = 'beginner';
+  if (stats.mahjs >= 25 || stats.cleared >= 20) earned = 'expert';
+  else if (stats.mahjs >= 8 || stats.cleared >= 6) earned = 'intermediate';
+  return LEVEL_ORDER.indexOf(earned) > LEVEL_ORDER.indexOf(current) ? earned : current;
+}
+
 const K_TUT = 'mahj.tut';
 
 export function tutorialSeen(): boolean {

@@ -25,14 +25,11 @@ interface Props {
   email?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
-  onExperience: (e: Experience) => void;
   scanEnabled: boolean;
   onScanEnabled: (on: boolean) => void;
   onSignOut?: () => void;
   onClose: () => void;
 }
-
-const LEVELS: Experience[] = ['beginner', 'intermediate', 'expert'];
 
 // Small inline marks matching the design.
 const BackChevron = () => (
@@ -72,7 +69,6 @@ export default function SettingsSheet({
   email,
   onSaveProfile,
   onTheme,
-  onExperience,
   scanEnabled,
   onScanEnabled,
   onSignOut,
@@ -341,17 +337,6 @@ export default function SettingsSheet({
 
       <div className="set-label">BIO</div>
       <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
-
-      <div className="edit-divider"><span>Gameplay</span><i /></div>
-      <div className="set-label">EXPERIENCE LEVEL</div>
-      <div className="level-seg">
-        {LEVELS.map((l) => (
-          <button key={l} data-active={experience === l} onClick={() => onExperience(l)}>
-            {EXPERIENCE_LABEL[l]}
-          </button>
-        ))}
-      </div>
-      <p className="edit-caption">Tailors your rules &amp; tips.</p>
 
       <div className="edit-divider"><span>Appearance</span><i /></div>
       <button className="sound-row" onClick={toggleSound}>

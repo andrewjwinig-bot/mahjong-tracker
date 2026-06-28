@@ -50,6 +50,7 @@ import {
   getAccount,
   getExperience,
   setExperience as persistExperience,
+  earnedLevel,
   clearAccount,
   tutorialSeen,
   setTutorialSeen,
@@ -397,10 +398,18 @@ export default function AppShell() {
     setThemeState(id);
   }, []);
 
-  const changeExperience = useCallback((e: Experience) => {
-    persistExperience(e);
-    setExperienceState(e);
-  }, []);
+  // Experience auto-levels up in the background as you play (set once at
+  // onboarding, never demoted), so the tips deepen over time instead of leaving
+  // a beginner on beginner tips forever. Recomputes when wins/progress change.
+  useEffect(() => {
+    const mahjs = wins.length;
+    const cleared = Object.values(handCounts).filter((c) => c > 0).length;
+    setExperienceState((prev) => {
+      const next = earnedLevel(prev, { mahjs, cleared });
+      if (next !== prev) persistExperience(next);
+      return next;
+    });
+  }, [wins, handCounts]);
 
   const changeScanEnabled = useCallback((on: boolean) => {
     setScanEnabled(on);
@@ -561,7 +570,6 @@ export default function AppShell() {
           }}
           onSaveProfile={saveProfile}
           onTheme={changeTheme}
-          onExperience={changeExperience}
           scanEnabled={scanEnabled}
           onScanEnabled={changeScanEnabled}
           onClose={() => setSettingsOpen(false)}
