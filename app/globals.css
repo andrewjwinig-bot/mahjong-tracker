@@ -3310,7 +3310,6 @@ label.lbl {
 }
 
 .field2,
-.handle-field,
 .bio {
   width: 100%;
   box-sizing: border-box;
@@ -3340,50 +3339,6 @@ label.lbl {
   outline: none;
   margin-bottom: 26px;
 }
-.handle-field {
-  display: flex;
-  align-items: center;
-  padding: 0 13px;
-  margin-bottom: 16px;
-}
-.handle-field .handle-at {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 15px;
-  color: #b6b6be;
-  flex: none;
-}
-.handle-field input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  padding: 12px 8px;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 14px;
-  color: #1a1410;
-  background: transparent;
-  outline: none;
-}
-.handle-locked {
-  margin-bottom: 0;
-  opacity: 0.72;
-}
-.handle-locked .handle-locked-value {
-  flex: 1;
-  min-width: 0;
-  padding: 12px 8px;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 14px;
-  color: #1a1410;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.handle-locked .handle-lock {
-  flex: none;
-  font-size: 12px;
-  opacity: 0.6;
-}
-
 .edit-divider {
   display: flex;
   align-items: center;

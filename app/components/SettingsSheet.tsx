@@ -389,14 +389,6 @@ export default function SettingsSheet({
       <div className="set-label">NAME</div>
       <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
 
-      <div className="set-label">HANDLE</div>
-      <div className="handle-field handle-locked">
-        <span className="handle-at">@</span>
-        <span className="handle-locked-value">{handle || 'you'}</span>
-        <span className="handle-lock" aria-hidden>🔒</span>
-      </div>
-      <p className="set-hint">Your handle is permanent — it can&apos;t be changed once set.</p>
-
       <div className="set-label">BIO</div>
       <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
 
