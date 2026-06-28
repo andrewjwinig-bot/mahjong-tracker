@@ -225,7 +225,6 @@ export default function SettingsSheet({
 
       <div className="set-label">GAME</div>
       <div className="set-list">
-        <ValueRow label="Card year" value="2026" />
         <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
         <PrefRow
           label="Card scanning (beta)"

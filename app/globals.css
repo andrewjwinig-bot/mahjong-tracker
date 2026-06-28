@@ -4558,64 +4558,6 @@ label.lbl {
   border-radius: 999px;
   background: color-mix(in srgb, var(--brand) 10%, transparent);
 }
-/* Unmistakable "this is a sample, not your card" banner on the My Card page. */
-.card-sample-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-top: 14px;
-  padding: 13px 14px;
-  border-radius: 16px;
-  text-align: left;
-  background: rgba(201, 135, 26, 0.1);
-  border: 2px solid rgba(201, 135, 26, 0.34);
-  box-shadow: var(--shadow-sm);
-}
-.csb-tag {
-  flex: none;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  color: #fff;
-  background: #c9871a;
-  padding: 5px 9px;
-  border-radius: 8px;
-}
-.csb-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.csb-title {
-  font-family: var(--font-app), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 14px;
-  color: #7a5410;
-}
-.csb-sub {
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: #8a6a30;
-}
-
-/* Demoted sample option in the editor — a quiet side-door, not a peer action. */
-.editor-sample-link {
-  display: block;
-  width: 100%;
-  margin-top: 18px;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 12.5px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 /* ---- Trifold scan guide -------------------------------------------------- */
 .scan-guide-scrim {
   position: fixed;
