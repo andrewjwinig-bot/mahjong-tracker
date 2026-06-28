@@ -21,7 +21,6 @@ import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 interface Props {
   profile: Profile;
   theme: ThemeId;
-  email?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
   scanEnabled: boolean;
@@ -61,10 +60,51 @@ const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: s
 // Design tile-color swatches.
 const COLOR_SWATCHES = ['#10B39A', '#C0392B', '#2E86D4', '#6A3FC0', '#F5A524', '#1F8A5B', '#14162A'];
 
+// Deterministic, seeded scatter of decorative tiles on the right side of the
+// profile tile (kept clear of the avatar/name on the left). Computed once.
+interface ScatterTile {
+  right: number; top: number; w: number; h: number; fs: number;
+  flip: boolean; rot: number; dur: number; delay: number;
+}
+function makeScatter(): ScatterTile[] {
+  let s = 730421;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  const sizes = [
+    { w: 27, h: 34, fs: 15 },
+    { w: 23, h: 29, fs: 13 },
+    { w: 20, h: 26, fs: 12 },
+    { w: 18, h: 23, fs: 11 },
+  ];
+  const out: (ScatterTile & { cx: number; cy: number; rad: number })[] = [];
+  let attempts = 0;
+  while (out.length < 17 && attempts < 1400) {
+    attempts++;
+    const sz = sizes[Math.floor(rnd() * sizes.length)];
+    const cx = rnd() * 152;
+    const cy = 1 + rnd() * 82;
+    const rad = Math.hypot(sz.w, sz.h) / 2;
+    let ok = true;
+    for (const p of out) {
+      if (Math.hypot(cx - p.cx, cy - p.cy) < rad + p.rad + 2) { ok = false; break; }
+    }
+    if (!ok) continue;
+    out.push({
+      cx, cy, rad, w: sz.w, h: sz.h, fs: sz.fs,
+      right: +(cx - sz.w / 2).toFixed(1),
+      top: +(cy - sz.h / 2).toFixed(1),
+      flip: rnd() < 0.32,
+      rot: +(rnd() * 320 - 160).toFixed(1),
+      dur: +(3.1 + rnd() * 1.6).toFixed(2),
+      delay: +(rnd() * 1.1).toFixed(2),
+    });
+  }
+  return out;
+}
+const SCATTER = makeScatter();
+
 export default function SettingsSheet({
   profile,
   theme,
-  email,
   onSaveProfile,
   onTheme,
   scanEnabled,
@@ -163,21 +203,45 @@ export default function SettingsSheet({
         onTouchMove={swipe.onTouchMove}
         onTouchEnd={swipe.onTouchEnd}
       />
-      <div className="set-head">
-        <h1 className="set-title">Settings</h1>
+      <div className="set-head-main">
+        <h1 className="set-title-main">Settings</h1>
+        <button className="set-close" onClick={onClose} aria-label="Close settings">✕</button>
       </div>
 
-      {/* Profile card → Edit Profile */}
-      <button className="prof-card" onClick={() => setView('edit')}>
-        <Tile face={avatar.face} char={previewChar} color={avatar.color} size={48} />
-        <span className="pc-body">
-          <span className="pc-name">{name || 'You'}</span>
-          <span className="pc-meta">
-            @{handle || 'you'}
-            {email ? ` · ${email}` : ''}
-          </span>
+      {/* Profile tile → Edit Profile. Deep themed hero with a bobbing tile
+          scatter (right side), corner glow, and the user's avatar. */}
+      <button className="prof-tile" onClick={() => setView('edit')}>
+        <span className="pt-scatter" aria-hidden>
+          {SCATTER.map((p, i) => (
+            <span
+              key={i}
+              className={`pt-tile${p.flip ? ' flip' : ''}`}
+              style={
+                {
+                  right: p.right,
+                  top: p.top,
+                  width: p.w,
+                  height: p.h,
+                  fontSize: p.fs,
+                  color: avatar.color,
+                  '--r': `${p.rot}deg`,
+                  animationDuration: `${p.dur}s`,
+                  animationDelay: `${p.delay}s`,
+                } as CSSProperties
+              }
+            >
+              {p.flip ? '' : previewChar || letter}
+            </span>
+          ))}
         </span>
-        <span className="pc-chev">›</span>
+        <span className="pt-glow" aria-hidden />
+        <span className="pt-avatar">
+          <Tile face={avatar.face} char={previewChar} color={avatar.color} size={50} />
+        </span>
+        <span className="pt-text">
+          <span className="pt-name">{name || 'You'}</span>
+          <span className="pt-handle">@{handle || 'you'}</span>
+        </span>
       </button>
 
       {/* Theme picker — kept right at the top so switching is one tap away. */}

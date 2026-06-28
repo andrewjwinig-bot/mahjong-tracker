@@ -561,7 +561,6 @@ export default function AppShell() {
         <SettingsSheet
           profile={socialState.profile}
           theme={theme}
-          email={account?.email}
           onSignOut={() => {
             clearAccount();
             setSettingsOpen(false);
