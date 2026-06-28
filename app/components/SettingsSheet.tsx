@@ -338,19 +338,6 @@ export default function SettingsSheet({
       <div className="set-label">BIO</div>
       <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
 
-      <div className="edit-divider"><span>Appearance</span><i /></div>
-      <button className="sound-row" onClick={toggleSound}>
-        <span className="sr-label">Sound &amp; haptics</span>
-        <span className="ios-toggle" data-on={fx} aria-hidden><span className="ios-knob" /></span>
-      </button>
-
-      <div className="set-label">COLOR THEME</div>
-      <div className="theme-grid2" style={{ marginBottom: 22 }}>
-        {THEMES.map((t) => (
-          <ThemeChip key={t.id} t={t} thumb={54} />
-        ))}
-      </div>
-
       <button className="save-changes" onClick={saveProfile}>SAVE CHANGES</button>
     </>
   );
