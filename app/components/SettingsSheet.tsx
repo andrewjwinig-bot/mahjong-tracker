@@ -6,7 +6,6 @@ import type { Profile, TileAvatar } from '../lib/social';
 import { initialOf } from '../lib/social';
 import type { TileFace } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
-import { EXPERIENCE_LABEL, type Experience } from '../lib/account';
 import { fxOn, setFx } from '../lib/sound';
 import { getPref, setPref } from '../lib/prefs';
 import { isDemoMode, setDemoData } from '../lib/demo';
@@ -21,7 +20,6 @@ import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 interface Props {
   profile: Profile;
   theme: ThemeId;
-  experience: Experience;
   email?: string;
   onSaveProfile: (p: Profile) => void;
   onTheme: (id: ThemeId) => void;
@@ -65,7 +63,6 @@ const COLOR_SWATCHES = ['#10B39A', '#C0392B', '#2E86D4', '#6A3FC0', '#F5A524', '
 export default function SettingsSheet({
   profile,
   theme,
-  experience,
   email,
   onSaveProfile,
   onTheme,
@@ -180,7 +177,6 @@ export default function SettingsSheet({
             @{handle || 'you'}
             {email ? ` · ${email}` : ''}
           </span>
-          <span className="pc-level">★ {EXPERIENCE_LABEL[experience].toUpperCase()}</span>
         </span>
         <span className="pc-chev">›</span>
       </button>
@@ -221,7 +217,6 @@ export default function SettingsSheet({
 
       <div className="set-label">GAME</div>
       <div className="set-list">
-        <ValueRow label="Experience level" value={EXPERIENCE_LABEL[experience]} onClick={() => setView('edit')} />
         <PrefRow
           label="Card scanning (beta)"
           on={scanEnabled}
