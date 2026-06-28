@@ -30,11 +30,6 @@ interface Props {
 }
 
 // Small inline marks matching the design.
-const BackChevron = () => (
-  <svg width="11" height="13" viewBox="0 0 11 13" aria-hidden>
-    <path d="M8 1L2 6.5 8 12" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 const CameraMark = () => (
   <svg width="14" height="13" viewBox="0 0 20 18" aria-hidden>
     <rect x="1.3" y="3.5" width="17.4" height="13" rx="2.6" fill="none" stroke="#fff" strokeWidth="2" />
@@ -58,7 +53,7 @@ const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: s
 ];
 
 // Design tile-color swatches.
-const COLOR_SWATCHES = ['#10B39A', '#C0392B', '#2E86D4', '#6A3FC0', '#F5A524', '#1F8A5B', '#14162A'];
+const COLOR_SWATCHES = ['#15803D', '#C0392B', '#3B6FE0', '#6A3FC0', '#E0A21B', '#2E7D5B', '#14162A'];
 
 // Deterministic, seeded scatter of decorative tiles on the right side of the
 // profile tile (kept clear of the avatar/name on the left). Computed once.
@@ -333,67 +328,83 @@ export default function SettingsSheet({
 
   /* ---- Edit Profile view ------------------------------------------------- */
   const editView = (
-    <>
-      <div className="set-head" style={{ marginBottom: 4 }}>
-        <button className="set-back" onClick={() => setView('settings')} aria-label="Back">
-          <BackChevron />
-        </button>
-        <h1 className="set-title">Edit profile</h1>
+    <div className="edit-screen">
+      {/* Header band — grab handle implies swipe-down; tapping it returns to Settings */}
+      <div className="edit-band" onClick={() => setView('settings')}>
+        <span className="edit-band-hatch" aria-hidden />
+        <span className="grab edit-band-grab" aria-hidden />
+        <span className="edit-band-tiles" aria-hidden>
+          <Tile face="dragon" char="中" color="#C0392B" size={30} />
+          <Tile face="dragon" char="發" color="#1F8A5B" size={26} />
+          <Tile face="dot" size={24} />
+        </span>
+        <h1 className="edit-band-title">Edit profile</h1>
       </div>
-      <p className="edit-sub">Your tile, name &amp; how you play.</p>
 
-      {/* Avatar + camera badge */}
-      <div className="edit-avatar-wrap">
-        <div className="edit-avatar">
-          <Tile face={avatar.face} char={previewChar} color={avatar.color} size={72} />
-          <span className="edit-cam" aria-hidden>
+      {/* Pinned identity header — overlaps the band, live-previews the profile */}
+      <div className="id-header">
+        <span className="id-glow" aria-hidden />
+        <div className="id-stack">
+          <span className="id-back" aria-hidden />
+          <span className="id-front">
+            <Tile face={avatar.face} char={previewChar} color={avatar.color} size={82} />
+          </span>
+          <span className="id-cam" aria-hidden>
             <CameraMark />
           </span>
         </div>
+        <div className="id-name">{name || 'You'}</div>
+        <div className="id-handle">@{handle || 'you'}</div>
       </div>
 
-      <div className="set-label">YOUR TILE</div>
-      <div className="face-grid">
-        {FACE_OPTIONS.map((opt) => (
-          <button
-            key={opt.key}
-            className="face-cell"
-            data-active={isActiveFace(opt)}
-            onClick={() => pickFace(opt)}
-          >
-            <Tile
-              face={opt.face}
-              char={opt.face === 'letter' ? letter : opt.char}
-              color={opt.fixedColor ?? avatar.color}
-              size={34}
+      {/* Form */}
+      <div className="edit-form">
+        <div className="set-label">YOUR TILE</div>
+        <div className="face-grid">
+          {FACE_OPTIONS.map((opt) => (
+            <button
+              key={opt.key}
+              className="face-cell"
+              data-active={isActiveFace(opt)}
+              onClick={() => pickFace(opt)}
+            >
+              <Tile
+                face={opt.face}
+                char={opt.face === 'letter' ? letter : opt.char}
+                color={opt.fixedColor ?? avatar.color}
+                size={36}
+              />
+            </button>
+          ))}
+        </div>
+
+        <div className="set-label">TILE COLOR</div>
+        <div className="swatch-row2">
+          {COLOR_SWATCHES.map((c) => (
+            <button
+              key={c}
+              className="swatch2"
+              data-active={avatar.color.toLowerCase() === c.toLowerCase()}
+              style={{ background: c, color: c }}
+              onClick={() => setAvatar((a) => ({ ...a, color: c }))}
+              aria-label={`Use ${c}`}
             />
-            {isActiveFace(opt) && <span className="face-check">✓</span>}
-          </button>
-        ))}
+          ))}
+        </div>
+
+        <div className="set-label">NAME</div>
+        <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
+
+        <div className="set-label">BIO</div>
+        <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
       </div>
 
-      <div className="set-label">TILE COLOR</div>
-      <div className="swatch-row2">
-        {COLOR_SWATCHES.map((c) => (
-          <button
-            key={c}
-            className="swatch2"
-            data-active={avatar.color.toLowerCase() === c.toLowerCase()}
-            style={{ background: c, boxShadow: `0 0 0 ${avatar.color.toLowerCase() === c.toLowerCase() ? 3 : 0}px ${c}, 0 2px 6px rgba(20,22,42,0.18)` }}
-            onClick={() => setAvatar((a) => ({ ...a, color: c }))}
-            aria-label={`Use ${c}`}
-          />
-        ))}
+      {/* Save bar */}
+      <div className="edit-savebar">
+        <button className="edit-cancel" onClick={() => setView('settings')}>CANCEL</button>
+        <button className="save-changes edit-save" onClick={saveProfile}>SAVE CHANGES</button>
       </div>
-
-      <div className="set-label">NAME</div>
-      <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
-
-      <div className="set-label">BIO</div>
-      <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
-
-      <button className="save-changes" onClick={saveProfile}>SAVE CHANGES</button>
-    </>
+    </div>
   );
 
   return (

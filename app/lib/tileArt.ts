@@ -13,6 +13,8 @@ export type TileFace =
   | 'joker'
   | 'letter'; // a lettered tile (M / A / H / J)
 
+import { BAMBOO_LETTERS } from './bambooLetters';
+
 const CRACK = '#E8455F';
 const BAM = '#1FA85B';
 const BAM_DK = '#0F7D42';
@@ -24,6 +26,42 @@ const NAVY = '#2C3A57';
 const CJK = "'PingFang SC','Hiragino Sans GB','Heiti SC','Microsoft YaHei',sans-serif";
 
 let jokerSeq = 0;
+let gradSeq = 0;
+
+// Mix two #rrggbb hex colors in sRGB (matches CSS color-mix(in srgb)).
+function mixHex(a: string, b: string, aPct: number): string {
+  const pa = aPct / 100;
+  const pb = 1 - pa;
+  const ca = parseInt(a.slice(1), 16);
+  const cb = parseInt(b.slice(1), 16);
+  const ch = (sh: number) => {
+    const va = (ca >> sh) & 255;
+    const vb = (cb >> sh) & 255;
+    return Math.round(va * pa + vb * pb);
+  };
+  const to2 = (n: number) => n.toString(16).padStart(2, '0');
+  return `#${to2(ch(16))}${to2(ch(8))}${to2(ch(0))}`;
+}
+
+// The monogram as a real bamboo letterform (A–Z), tinted by the tile color with
+// a subtle vertical depth gradient. Non A–Z chars fall back to a plain glyph.
+function letterMotif(char: string | undefined, color: string): string {
+  const raw = (char ?? 'M').trim().toUpperCase();
+  const L = /^[A-Z]$/.test(raw) ? BAMBOO_LETTERS[raw] : undefined;
+  if (!L) return charMotif(raw || 'M', color, 30);
+  const id = `bmb${gradSeq++}`;
+  const top = mixHex(color, '#ffffff', 82);
+  const bot = mixHex(color, '#06301b', 80);
+  // Centered bamboo glyph box inside the 48×64 tile, optically nudged right.
+  return `<defs><linearGradient id="${id}" x1="0.18" y1="0" x2="0.82" y2="1">
+      <stop offset="0" stop-color="${top}"/>
+      <stop offset="0.48" stop-color="${color}"/>
+      <stop offset="1" stop-color="${bot}"/>
+    </linearGradient></defs>
+    <svg x="9.5" y="11" width="29" height="40" viewBox="${L.vb}" preserveAspectRatio="xMidYMid meet">
+      <path d="${L.d}" fill="url(#${id})" fill-rule="evenodd"/>
+    </svg>`;
+}
 
 function dotMotif(): string {
   return `<circle cx="24" cy="31" r="13" fill="none" stroke="${DOT}" stroke-width="5"/>
@@ -142,7 +180,7 @@ function motifFor(face: TileFace, char?: string, color?: string, count?: number)
     case 'dragon':
       return charMotif(char ?? '中', color ?? CRACK);
     case 'letter':
-      return charMotif(char ?? 'M', color ?? CRACK, 30);
+      return letterMotif(char, color ?? BAM_DK);
   }
 }
 
