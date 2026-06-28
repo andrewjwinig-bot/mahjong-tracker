@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
+import { themeArt, CARD_TOKENS, SCRIM } from '../lib/themeArt';
 import Tile from './Tile';
 import type { Profile, TileAvatar } from '../lib/social';
 import { initialOf } from '../lib/social';
@@ -121,34 +122,32 @@ export default function SettingsSheet({
   }
 
   // A theme chip — banner thumbnail + accent dot (check when active) + name.
-  // Shared between the Settings grid and the Edit-Profile grid (thumb height
-  // differs slightly per the design).
-  function ThemeChip({ t, thumb }: { t: (typeof THEMES)[number]; thumb: number }) {
+  // Full-bleed generated art + centered name; selected = brand-colored border
+  // (no check). Pro themes show a gold lock and open the paywall instead.
+  function ThemeChip({ t }: { t: (typeof THEMES)[number] }) {
     const active = theme === t.id;
     const locked = !!t.pro && !pro;
+    const tok = CARD_TOKENS[t.id];
     return (
       <button
-        className="theme-chip"
-        data-active={active}
+        className="tcard"
+        data-selected={active || undefined}
+        data-locked={locked || undefined}
         onClick={() => (locked ? setPaywall(true) : onTheme(t.id))}
+        style={
+          {
+            '--art': themeArt(t.id),
+            '--ground': tok.ground,
+            '--name-color': tok.name,
+            '--name-shadow': tok.shadow,
+            '--scrim': SCRIM[tok.scrim],
+          } as CSSProperties
+        }
       >
-        <span
-          className="tc-thumb"
-          style={{
-            height: thumb,
-            backgroundColor: t.swatch.page,
-            backgroundImage: `url("${t.wallpaper}")`,
-          }}
-        />
-        <span className="tc-foot">
-          <span className="tc-sq" style={{ background: t.swatch.brand }} />
-          <span className="tc-name">{t.name}</span>
-          {locked ? (
-            <span className="tc-lock" aria-label="Pro theme">🔒</span>
-          ) : active ? (
-            <span className="tc-check" style={{ color: t.swatch.brand }} aria-hidden>✓</span>
-          ) : null}
-        </span>
+        <span className="tcard-art" aria-hidden />
+        <span className="tcard-scrim" aria-hidden />
+        <span className="tcard-name">{t.name}</span>
+        {locked && <span className="tcard-pro" aria-label="Pro theme">🔒 PRO</span>}
       </button>
     );
   }
@@ -184,9 +183,11 @@ export default function SettingsSheet({
       {/* Theme picker — kept right at the top so switching is one tap away. */}
       <div className="set-label">APP THEME</div>
       <div className="theme-grid2">
-        {THEMES.map((t) => (
-          <ThemeChip key={t.id} t={t} thumb={72} />
-        ))}
+        {[...THEMES]
+          .sort((a, b) => Number(!!a.pro) - Number(!!b.pro))
+          .map((t) => (
+            <ThemeChip key={t.id} t={t} />
+          ))}
       </div>
 
       {/* Pro upsell */}

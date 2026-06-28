@@ -69,6 +69,7 @@ export const THEMES: ThemeDef[] = [
     id: 'flower',
     name: 'Flower',
     tagline: 'Petal pink',
+    pro: true,
     tile: { face: 'flower' },
     wallpaper: '/patterns/bg-flower.svg',
     swatch: { brand: '#DB2777', green: '#10B39A', accent: '#F5A524', page: '#FAECF3' },

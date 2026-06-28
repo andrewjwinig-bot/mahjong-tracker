@@ -3007,80 +3007,73 @@ label.lbl {
 
 .theme-grid2 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 11px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   margin-bottom: 24px;
 }
-.theme-chip {
+/* App Theme picker tile: full-bleed generated art with the name centered in a
+   theme-aware color. Selected = brand-colored border (no checkmark). */
+.tcard {
   position: relative;
-  text-align: left;
-  border: 2.5px solid rgba(20, 22, 42, 0.09);
-  border-radius: 10px;
+  height: 114px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(20, 22, 42, 0.12);
-  background: #fff;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  box-shadow: 0 3px 10px rgba(20, 22, 42, 0.07);
   cursor: pointer;
   touch-action: manipulation;
-  transition: transform 0.1s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
 }
-/* The whole chip is the tap target; press anywhere to switch theme. */
-.theme-chip:active {
-  transform: scale(0.96);
+.tcard:active {
+  transform: scale(0.97);
 }
-.theme-chip[data-active="true"] {
+.tcard[data-selected] {
   border-color: var(--brand);
-  box-shadow: 0 0 0 2px var(--brand), 0 3px 12px rgba(20, 22, 42, 0.18);
+  box-shadow: 0 8px 22px rgba(20, 22, 42, 0.18);
 }
-.tc-lock,
-.tc-check {
-  margin-left: auto;
-  flex: none;
-  font-size: 13px;
-  line-height: 1;
-}
-.tc-check {
-  font-weight: 900;
-}
-.tc-thumb {
-  display: block;
-  width: 100%;
-  background-size: 200% auto;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
-.tc-dot {
+.tcard-art {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 1px 4px rgba(20, 22, 42, 0.25);
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 11px;
-  line-height: 1;
+  inset: 0;
+  background-color: var(--ground);
+  background-image: var(--art);
+  background-size: cover;
+  background-position: center;
 }
-.tc-foot {
+.tcard-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+}
+.tcard-name {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 11px;
+  justify-content: center;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 31px;
+  letter-spacing: -0.7px;
+  color: var(--name-color);
+  text-shadow: var(--name-shadow);
 }
-.tc-sq {
-  width: 13px;
-  height: 13px;
-  flex: none;
-  border-radius: 4px;
-}
-.tc-name {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  color: #1a1410;
+.tcard-pro {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #fcd884, #e59a16);
+  border: 1.5px solid rgba(120, 82, 10, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-app), 'Hanken Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #3a2607;
 }
 
 .set-list {
