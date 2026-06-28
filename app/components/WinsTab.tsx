@@ -160,7 +160,7 @@ export function WinCard({
               </span>
             ))
           ) : (
-            <span style={{ color: 'var(--muted)' }}>Freeform mahj</span>
+            <span style={{ color: 'var(--muted)' }}>Mahj</span>
           )}
         </div>
         <div className="win-meta">
@@ -328,7 +328,7 @@ export function LogWinSheet({
     burst({ x: window.innerWidth / 2, y: 90 });
   }, [burst]);
 
-  const [cat, setCat] = useState<string>(initialHand?.category ?? ''); // '' = Freeform
+  const [cat, setCat] = useState<string>(initialHand?.category ?? ''); // '' = no category picked yet
   const swipe = useSwipeDismiss(onClose);
 
   return (
@@ -383,9 +383,6 @@ export function LogWinSheet({
           ) : (
             <>
               <div className="chip-wrap">
-                <button className="cat-chip" data-active={cat === ''} onClick={() => { setCat(''); setHandId(''); }}>
-                  Freeform
-                </button>
                 {card.categories.map((c) => (
                   <button
                     key={c}

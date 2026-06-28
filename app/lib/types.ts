@@ -24,7 +24,7 @@ export interface MahjongCard {
 /** A logged win in the local Wins journal. Photo is stored as a Blob in IndexedDB. */
 export interface Win {
   id: string;
-  /** Hand id this win is for, or null for a freeform win. */
+  /** Hand id this win is for, or null if not tied to a specific hand. */
   handId: string | null;
   /** Cached notation label so the feed renders even if the card changes. */
   handLabel: string | null;
