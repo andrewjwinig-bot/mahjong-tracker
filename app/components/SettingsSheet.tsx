@@ -116,7 +116,7 @@ export default function SettingsSheet({
   const swipe = useSwipeDismiss(onClose);
   const [view, setView] = useState<'settings' | 'edit'>('settings');
   const [name, setName] = useState(profile.name);
-  const [handle, setHandle] = useState(profile.handle);
+  const [handle] = useState(profile.handle);
   const [bio, setBio] = useState(profile.bio);
   const [avatar, setAvatar] = useState<TileAvatar>(profile.avatar);
   const [fx, setFxState] = useState(fxOn());
@@ -390,10 +390,12 @@ export default function SettingsSheet({
       <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
 
       <div className="set-label">HANDLE</div>
-      <div className="handle-field">
+      <div className="handle-field handle-locked">
         <span className="handle-at">@</span>
-        <input value={handle} maxLength={20} placeholder="handle" onChange={(e) => setHandle(e.target.value)} />
+        <span className="handle-locked-value">{handle || 'you'}</span>
+        <span className="handle-lock" aria-hidden>🔒</span>
       </div>
+      <p className="set-hint">Your handle is permanent — it can&apos;t be changed once set.</p>
 
       <div className="set-label">BIO</div>
       <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
