@@ -5,7 +5,7 @@ import { themeArt, CARD_TOKENS, SCRIM } from '../lib/themeArt';
 import Tile from './Tile';
 import type { Profile, TileAvatar } from '../lib/social';
 import { initialOf } from '../lib/social';
-import type { TileFace } from '../lib/tileArt';
+import { type TileFace, tileArtSVG } from '../lib/tileArt';
 import { THEMES, type ThemeId } from '../lib/themePrefs';
 import { fxOn, setFx } from '../lib/sound';
 import { getPref, setPref } from '../lib/prefs';
@@ -127,6 +127,8 @@ export default function SettingsSheet({
 
   const letter = initialOf(name);
   const previewChar = avatar.face === 'letter' ? letter : avatar.char;
+  // The avatar's art (motif only) echoed in the face-up profile-card scatter tiles.
+  const scatterArt = tileArtSVG(avatar.face, { char: previewChar, color: avatar.color });
 
   function pickFace(opt: (typeof FACE_OPTIONS)[number]) {
     setAvatar({
@@ -219,16 +221,13 @@ export default function SettingsSheet({
                   top: p.top,
                   width: p.w,
                   height: p.h,
-                  fontSize: p.fs,
-                  color: avatar.color,
                   '--r': `${p.rot}deg`,
                   animationDuration: `${p.dur}s`,
                   animationDelay: `${p.delay}s`,
                 } as CSSProperties
               }
-            >
-              {p.flip ? '' : letter}
-            </span>
+              dangerouslySetInnerHTML={p.flip ? undefined : { __html: scatterArt }}
+            />
           ))}
         </span>
         <span className="pt-glow" aria-hidden />

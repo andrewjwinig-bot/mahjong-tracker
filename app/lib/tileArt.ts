@@ -260,6 +260,17 @@ export function tileSVG(
   </svg>`;
 }
 
+/** Just the tile's art (motif only, no tile body) as a standalone SVG — used
+ *  to echo a user's avatar on small decorative surfaces like the scatter tiles. */
+export function tileArtSVG(
+  face: TileFace,
+  opts: { char?: string; color?: string; count?: number } = {},
+): string {
+  return `<svg viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" width="100%" height="100%">
+    ${motifFor(face, opts.char, opts.color, opts.count)}
+  </svg>`;
+}
+
 /** Faces used for celebratory confetti — real mahjong tiles only. */
 export const CONFETTI_FACES: { face: TileFace; char?: string; color?: string }[] = [
   { face: 'crack' },
