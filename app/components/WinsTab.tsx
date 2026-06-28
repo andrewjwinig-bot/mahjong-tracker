@@ -205,6 +205,7 @@ export function LogWinSheet({
   handNotes,
   groupName,
   initialHandId,
+  manual = false,
   onClose,
   onSave,
 }: {
@@ -213,6 +214,9 @@ export function LogWinSheet({
   groupName: string;
   /** Pre-select this hand (e.g. tapping a row on the Card). */
   initialHandId?: string | null;
+  /** No card yet — let the user type the winning hand by hand instead of
+   *  picking from a card they haven't scanned. */
+  manual?: boolean;
   onClose: () => void;
   onSave: (win: Win, opts: { shareToGroup: boolean }) => void;
 }) {
@@ -311,8 +315,8 @@ export function LogWinSheet({
   function save() {
     const win: Win = {
       id: crypto.randomUUID(),
-      handId: handId || null,
-      handLabel: handId ? labelFor(handId) : null,
+      handId: manual ? null : handId || null,
+      handLabel: manual ? manualLabel.trim() || null : handId ? labelFor(handId) : null,
       note: note.trim(),
       photo,
       photoPos: photo ? photoPos : undefined,
@@ -329,6 +333,7 @@ export function LogWinSheet({
   }, [burst]);
 
   const [cat, setCat] = useState<string>(initialHand?.category ?? ''); // '' = no category picked yet
+  const [manualLabel, setManualLabel] = useState('');
   const swipe = useSwipeDismiss(onClose);
 
   return (
@@ -353,6 +358,21 @@ export function LogWinSheet({
         </div>
 
         <div className="log-body">
+          {manual ? (
+            <>
+              <label className="lbl">
+                Your winning hand <span style={{ color: 'var(--muted)' }}>— optional</span>
+              </label>
+              <input
+                className="field"
+                placeholder="Type your hand, e.g. FF 2026 2026 DDDD"
+                value={manualLabel}
+                maxLength={60}
+                onChange={(e) => setManualLabel(e.target.value)}
+              />
+            </>
+          ) : (
+          <>
           <label className="lbl">Which hand?</label>
 
           {handId && !picking ? (
@@ -429,6 +449,8 @@ export function LogWinSheet({
                 </div>
               )}
             </>
+          )}
+          </>
           )}
 
           <label className="lbl" style={{ marginTop: 16 }}>

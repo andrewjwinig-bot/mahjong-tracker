@@ -157,6 +157,49 @@ export default function CardTab({
           <p className="sub">Track every hand on your card.</p>
         </header>
         <EmptyCard scanEnabled={scanEnabled} onScan={onScanCard} onManual={onAddCard} />
+
+        {/* You can log a mahj even without a card — type the hand by hand.
+            Scanning your card adds the tap-to-track hand list on top. */}
+        <div className="no-card-mahj">
+          <span className="ncm-or">or</span>
+          <p className="ncm-text">Already won a hand? Log it now — no card needed.</p>
+          <button className="mahj-hero" onClick={() => openLog()}>
+            <span className="mahj-hero-shine" aria-hidden />
+            <Tile face="crack" size={32} className="mahj-hero-tile" />
+            <span className="mahj-hero-label">CALL MAHJ!</span>
+          </button>
+        </div>
+
+        {wins.length > 0 && (
+          <section style={{ marginTop: 22 }}>
+            <div className="cat-bar">
+              <span className="cat-name" style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+                <IconTrophy size={15} /> Your Mahjs
+              </span>
+              <span className="cat-count">{wins.length} logged</span>
+            </div>
+            {wins.map((w) => (
+              <WinCard
+                key={w.id}
+                win={w}
+                groupName={groupName}
+                onRemove={() => onRemoveWin(w.id)}
+                onPostToGroup={onPostToGroup}
+              />
+            ))}
+          </section>
+        )}
+
+        {logOpen && (
+          <LogWinSheet
+            card={card}
+            handNotes={handNotes}
+            groupName={groupName}
+            manual
+            onClose={() => setLogOpen(false)}
+            onSave={handleSaveWin}
+          />
+        )}
       </div>
     );
   }
