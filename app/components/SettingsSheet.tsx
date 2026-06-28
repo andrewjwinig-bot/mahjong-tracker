@@ -39,16 +39,18 @@ const CameraMark = () => (
 );
 
 // The "YOUR TILE" face set (design: a 5-col grid of single-color tiles).
-const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string }[] = [
+// `pro` marks VIP-only flair (Flower + the Star/Joker) — the monogram and the
+// plain suits stay free so everyone has a strong default.
+const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string; pro?: boolean }[] = [
   { key: 'letter', face: 'letter' },
   { key: 'dot', face: 'dot' },
   { key: 'bam', face: 'bam' },
   { key: 'crack', face: 'crack' },
-  { key: 'flower', face: 'flower' },
+  { key: 'flower', face: 'flower', pro: true },
   { key: 'wind', face: 'wind', char: '風' },
   { key: 'dragonR', face: 'dragon', char: '中', fixedColor: '#C0392B' },
   { key: 'dragonG', face: 'dragon', char: '發', fixedColor: '#1F8A5B' },
-  { key: 'joker', face: 'joker' },
+  { key: 'joker', face: 'joker', pro: true },
   { key: 'crackZ', face: 'crack', char: '萬' },
 ];
 
@@ -361,21 +363,26 @@ export default function SettingsSheet({
       <div className="edit-form">
         <div className="set-label">YOUR TILE</div>
         <div className="face-grid">
-          {FACE_OPTIONS.map((opt) => (
-            <button
-              key={opt.key}
-              className="face-cell"
-              data-active={isActiveFace(opt)}
-              onClick={() => pickFace(opt)}
-            >
-              <Tile
-                face={opt.face}
-                char={opt.face === 'letter' ? letter : opt.char}
-                color={opt.fixedColor ?? avatar.color}
-                size={36}
-              />
-            </button>
-          ))}
+          {FACE_OPTIONS.map((opt) => {
+            const locked = !!opt.pro && !pro;
+            return (
+              <button
+                key={opt.key}
+                className="face-cell"
+                data-active={isActiveFace(opt)}
+                data-locked={locked || undefined}
+                onClick={() => (locked ? setPaywall(true) : pickFace(opt))}
+              >
+                <Tile
+                  face={opt.face}
+                  char={opt.face === 'letter' ? letter : opt.char}
+                  color={opt.fixedColor ?? avatar.color}
+                  size={36}
+                />
+                {locked && <span className="face-lock" aria-label="VIP tile">🔒</span>}
+              </button>
+            );
+          })}
         </div>
 
         <div className="set-label">TILE COLOR</div>
