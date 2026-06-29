@@ -13,18 +13,18 @@ import type { TileAvatar } from '../lib/social';
 import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
 
 // Pick-your-tile options for sign-up (mirrors the Settings avatar set). Tile 0
-// is the bamboo monogram of the username's initial; the rest are illustrated
-// mahjong icons, tinted by their color. VIP-only tiles (joker, pink flower)
-// are not offered at sign-up.
+// is the bamboo monogram of the username's initial; the rest are hand-drawn
+// mahjong motifs shown in their original colors. VIP-only tiles (joker, star,
+// plum) are not offered at sign-up.
 const TILE_OPTIONS: { key: string; face: TileFace; char?: string; color: string }[] = [
   { key: 'letter', face: 'letter', color: '#15803D' },
-  { key: 'red_dragon_curled', face: 'icon', char: 'red_dragon_curled', color: '#C0392B' },
-  { key: 'bamboo_sprig', face: 'icon', char: 'bamboo_sprig', color: '#15803D' },
-  { key: 'character_wan', face: 'icon', char: 'character_wan', color: '#C0392B' },
-  { key: 'peony', face: 'icon', char: 'peony', color: '#DB2777' },
-  { key: 'bird', face: 'icon', char: 'bird', color: '#2E7D5B' },
-  { key: 'green_dragon', face: 'icon', char: 'green_dragon', color: '#15803D' },
-  { key: 'red_dragon', face: 'icon', char: 'red_dragon', color: '#C0392B' },
+  { key: 'crane', face: 'motif', char: 'crane', color: 'multi' },
+  { key: 'dragon', face: 'motif', char: 'dragon', color: 'multi' },
+  { key: 'peony', face: 'motif', char: 'peony', color: 'multi' },
+  { key: 'wheel_flower', face: 'motif', char: 'wheel_flower', color: 'multi' },
+  { key: 'bamboo_stalk', face: 'motif', char: 'bamboo_stalk', color: 'multi' },
+  { key: 'chung_red', face: 'motif', char: 'chung_red', color: 'multi' },
+  { key: 'wan', face: 'motif', char: 'wan', color: 'multi' },
 ];
 
 const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode; color: string }[] = [

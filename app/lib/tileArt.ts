@@ -12,7 +12,8 @@ export type TileFace =
   | 'dragon'
   | 'joker'
   | 'letter' // a lettered tile (M / A / H / J)
-  | 'icon'; // illustrated mahjong icon (key carried in `char`), see tileIcons.ts
+  | 'icon' // illustrated mahjong icon (key carried in `char`), see tileIcons.ts
+  | 'motif'; // hand-drawn motif PNG (key in `char`, color in `color`), see /tile-motifs
 
 import { BAMBOO_LETTERS } from './bambooLetters';
 import { TILE_ICONS } from './tileIcons';
@@ -224,6 +225,20 @@ function charMotif(char: string, color: string, size = 30): string {
     font-family="${color === CRACK || color === NAVY ? CJK : `var(--font-display), ${CJK}`}">${char}</text>`;
 }
 
+// The 14 hand-drawn motif tiles, recolored via pre-baked per-color PNGs.
+// `color` is a solid hex or 'multi' (the original multicolor artwork).
+const MOTIF_SOLIDS = new Set(['#15803D', '#C0392B', '#3B6FE0', '#6A3FC0', '#E0A21B', '#2E7D5B', '#14162A']);
+export function motifSrc(key: string, color?: string): string {
+  const hex = (color ?? '').toUpperCase();
+  const suffix = color && color !== 'multi' && MOTIF_SOLIDS.has(hex) ? `__${hex.slice(1)}` : '';
+  return `/tile-motifs/${key}${suffix}.png`;
+}
+function motifImage(key: string | undefined, color: string): string {
+  if (!key) return charMotif('?', color, 26);
+  // Centered in the tile body, leaving a little breathing room.
+  return `<image href="${motifSrc(key, color)}" x="7" y="7" width="34" height="50" preserveAspectRatio="xMidYMid meet"/>`;
+}
+
 function motifFor(face: TileFace, char?: string, color?: string, count?: number): string {
   switch (face) {
     case 'dot':
@@ -241,9 +256,11 @@ function motifFor(face: TileFace, char?: string, color?: string, count?: number)
     case 'dragon':
       return charMotif(char ?? '中', color ?? CRACK);
     case 'letter':
-      return letterMotif(char, color ?? BAM_DK);
+      return letterMotif(char, !color || color === 'multi' ? '#15803D' : color);
     case 'icon':
       return iconMotif(char, color ?? BAM_DK);
+    case 'motif':
+      return motifImage(char, color ?? 'multi');
   }
 }
 

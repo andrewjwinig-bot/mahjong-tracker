@@ -63,7 +63,7 @@ type Row = {
   }[];
 };
 
-const FALLBACK_AVATAR: TileAvatar = { face: 'letter', char: '?', color: '#0EAD96' };
+const FALLBACK_AVATAR: TileAvatar = { face: 'letter', char: '?', color: '#15803D' };
 
 /** User ids the caller has blocked (their posts are hidden from the feed). */
 export async function cloudListBlocked(): Promise<string[]> {

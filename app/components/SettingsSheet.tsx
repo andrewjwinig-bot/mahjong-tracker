@@ -39,23 +39,29 @@ const CameraMark = () => (
 );
 
 // The "YOUR TILE" set: tile 0 is the bamboo monogram of the name's initial;
-// tiles 1–9 are illustrated mahjong icons (tinted to the chosen tile color).
-// `pro` marks VIP-only flair (the joker + pink flower); the rest stay free.
+// tiles 1–14 are hand-drawn mahjong motifs (recolored to the chosen tile color
+// or shown in their original colors in 'multi' mode). `pro` marks VIP-only
+// flair (joker, gold star, plum blossom); the rest stay free.
 const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string; pro?: boolean }[] = [
   { key: 'letter', face: 'letter' },
-  { key: 'red_dragon_curled', face: 'icon', char: 'red_dragon_curled' },
-  { key: 'bamboo_sprig', face: 'icon', char: 'bamboo_sprig' },
-  { key: 'character_wan', face: 'icon', char: 'character_wan' },
-  { key: 'peony', face: 'icon', char: 'peony' },
-  { key: 'bird', face: 'icon', char: 'bird' },
-  { key: 'green_dragon', face: 'icon', char: 'green_dragon' },
-  { key: 'red_dragon', face: 'icon', char: 'red_dragon' },
-  { key: 'joker', face: 'icon', char: 'joker', pro: true },
-  { key: 'pink_flower', face: 'icon', char: 'pink_flower', pro: true },
+  { key: 'crane', face: 'motif', char: 'crane' },
+  { key: 'dragon', face: 'motif', char: 'dragon' },
+  { key: 'joker', face: 'motif', char: 'joker', pro: true },
+  { key: 'peony', face: 'motif', char: 'peony' },
+  { key: 'plum', face: 'motif', char: 'plum', pro: true },
+  { key: 'star', face: 'motif', char: 'star', pro: true },
+  { key: 'wheel_flower', face: 'motif', char: 'wheel_flower' },
+  { key: 'bamboo_stalk', face: 'motif', char: 'bamboo_stalk' },
+  { key: 'chung_red', face: 'motif', char: 'chung_red' },
+  { key: 'wan', face: 'motif', char: 'wan' },
+  { key: 'dot_target', face: 'motif', char: 'dot_target' },
+  { key: 'dot_nine', face: 'motif', char: 'dot_nine' },
+  { key: 'bamboo_three', face: 'motif', char: 'bamboo_three' },
+  { key: 'frame_tall', face: 'motif', char: 'frame_tall' },
 ];
 
-// Design tile-color swatches.
-const COLOR_SWATCHES = ['#15803D', '#C0392B', '#3B6FE0', '#6A3FC0', '#E0A21B', '#2E7D5B', '#14162A'];
+// Tile-color swatches: 'multi' (original artwork) + 7 solids.
+const COLOR_SWATCHES = ['multi', '#15803D', '#C0392B', '#3B6FE0', '#6A3FC0', '#E0A21B', '#2E7D5B', '#14162A'];
 
 // Deterministic, seeded scatter of decorative tiles on the right side of the
 // profile tile (kept clear of the avatar/name on the left). Computed once.
@@ -386,16 +392,20 @@ export default function SettingsSheet({
 
         <div className="set-label">TILE COLOR</div>
         <div className="swatch-row2">
-          {COLOR_SWATCHES.map((c) => (
-            <button
-              key={c}
-              className="swatch2"
-              data-active={avatar.color.toLowerCase() === c.toLowerCase()}
-              style={{ background: c, color: c }}
-              onClick={() => setAvatar((a) => ({ ...a, color: c }))}
-              aria-label={`Use ${c}`}
-            />
-          ))}
+          {COLOR_SWATCHES.map((c) => {
+            const isMulti = c === 'multi';
+            const active = avatar.color.toLowerCase() === c.toLowerCase();
+            return (
+              <button
+                key={c}
+                className={`swatch2${isMulti ? ' swatch-multi' : ''}`}
+                data-active={active}
+                style={isMulti ? undefined : { background: c, color: c }}
+                onClick={() => setAvatar((a) => ({ ...a, color: c }))}
+                aria-label={isMulti ? 'Original colors' : `Use ${c}`}
+              />
+            );
+          })}
         </div>
 
         <div className="set-label">NAME</div>

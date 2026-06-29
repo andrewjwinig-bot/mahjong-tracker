@@ -116,7 +116,7 @@ export const DEFAULT_PROFILE: Profile = {
   name: 'You',
   handle: 'you',
   bio: '',
-  avatar: { face: 'letter', char: 'Y', color: '#0EAD96' },
+  avatar: { face: 'letter', char: 'Y', color: '#15803D' },
 };
 
 const DEMO_AVATARS: Record<string, TileAvatar> = {

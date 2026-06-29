@@ -3380,11 +3380,13 @@ label.lbl {
 
 .swatch-row2 {
   display: flex;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 10px;
   margin-bottom: 24px;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 .swatch2 {
+  flex: none;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -3392,6 +3394,11 @@ label.lbl {
 }
 .swatch2[data-active="true"] {
   box-shadow: 0 0 0 3px var(--page), 0 0 0 5.5px currentColor;
+}
+/* "Original colors" multicolor swatch — conic rainbow; ring uses the brand. */
+.swatch-multi {
+  background: conic-gradient(#e0392b, #e0a21b, #15803d, #3b6fe0, #6a3fc0, #db2777, #e0392b);
+  color: var(--brand);
 }
 
 .edit-savebar {
