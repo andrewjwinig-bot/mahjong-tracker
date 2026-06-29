@@ -138,8 +138,6 @@ export default function CardTab({
     return true;
   };
 
-  const pct = Math.round((stats.cleared / card.hands.length) * 100);
-
   // Every win — whether logged from the hero or by tapping a hand row — flows
   // through the Call Mahj sheet, then here on save: persist, post, and fire the
   // right celebration + milestone posts.

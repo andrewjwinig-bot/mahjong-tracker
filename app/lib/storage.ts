@@ -41,8 +41,17 @@ function tx<T>(store: string, mode: IDBTransactionMode, fn: (s: IDBObjectStore) 
       new Promise<T>((resolve, reject) => {
         const t = db.transaction(store, mode);
         const req = fn(t.objectStore(store));
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        let result: T;
+        // Resolve on transaction COMMIT, not just request success — a write
+        // isn't durable until the transaction completes (it can still abort on
+        // quota/error after the request "succeeds"). The request result is
+        // captured for reads, which complete immediately after.
+        req.onsuccess = () => {
+          result = req.result;
+        };
+        t.oncomplete = () => resolve(result);
+        t.onabort = () => reject(t.error ?? new Error('IndexedDB transaction aborted'));
+        t.onerror = () => reject(t.error ?? req.error);
       }),
   );
 }
