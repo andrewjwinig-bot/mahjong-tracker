@@ -11,6 +11,34 @@ export interface CloudFriend {
   username: string;
   handle: string;
   avatar: TileAvatar;
+  lastSeenAt?: string | null;
+}
+
+/** An incoming request enriched with how many friends you share. */
+export interface CloudRequest extends CloudFriend {
+  mutualCount: number;
+}
+
+/** A suggested player with the trust signals the Friends screen renders. */
+export interface CloudSuggestion extends CloudFriend {
+  mutualCount: number;
+  gamesTogether: number;
+}
+
+/** ~90s TTL: derive an "online" flag + relative "last seen" from a timestamp. */
+export function presenceFromLastSeen(lastSeenAt?: string | null): { online: boolean; last?: string } {
+  if (!lastSeenAt) return { online: false };
+  const t = new Date(lastSeenAt).getTime();
+  if (Number.isNaN(t)) return { online: false };
+  const secs = (Date.now() - t) / 1000;
+  if (secs < 90) return { online: true };
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return { online: false, last: `${mins}m` };
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return { online: false, last: `${hrs}h` };
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return { online: false, last: `${days}d` };
+  return { online: false, last: `${Math.floor(days / 7)}w` };
 }
 
 async function uid(): Promise<string | null> {
@@ -81,7 +109,8 @@ export async function cloudDeclineRequest(requesterId: string): Promise<void> {
   await sb.from('friendships').delete().eq('user_id', requesterId).eq('friend_id', me);
 }
 
-/** Your accepted friends (mutual — counts rows in either direction). */
+/** Your accepted friends (mutual — counts rows in either direction). Includes
+ *  each friend's last_seen_at so the UI can show presence. */
 export async function cloudListFriends(): Promise<CloudFriend[]> {
   const sb = await getSupabase();
   const me = await uid();
@@ -90,13 +119,42 @@ export async function cloudListFriends(): Promise<CloudFriend[]> {
     .from('friendships')
     .select(
       'user_id, friend_id,' +
-        ' requester:profiles!user_id(id, username, handle, avatar),' +
-        ' recipient:profiles!friend_id(id, username, handle, avatar)',
+        ' requester:profiles!user_id(id, username, handle, avatar, last_seen_at),' +
+        ' recipient:profiles!friend_id(id, username, handle, avatar, last_seen_at)',
     )
     .eq('status', 'accepted')
     .or(`user_id.eq.${me},friend_id.eq.${me}`);
-  type Row = { user_id: string; friend_id: string; requester: CloudFriend; recipient: CloudFriend };
+  type P = { id: string; username: string; handle: string; avatar: TileAvatar; last_seen_at?: string | null };
+  type Row = { user_id: string; friend_id: string; requester: P; recipient: P };
   return ((data ?? []) as unknown as Row[])
     .map((r) => (r.user_id === me ? r.recipient : r.requester))
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((p) => ({ id: p.id, username: p.username, handle: p.handle, avatar: p.avatar, lastSeenAt: p.last_seen_at }));
+}
+
+/** Heartbeat — call on app foreground and on a throttled interval. */
+export async function cloudTouchPresence(): Promise<void> {
+  const sb = await getSupabase();
+  if (!sb) return;
+  await sb.rpc('touch_presence');
+}
+
+/** Incoming requests with mutual-friend counts (via the incoming_requests RPC). */
+export async function cloudListRequests(): Promise<CloudRequest[]> {
+  const sb = await getSupabase();
+  const me = await uid();
+  if (!sb || !me) return [];
+  const { data } = await sb.rpc('incoming_requests');
+  type R = { id: string; username: string; handle: string; avatar: TileAvatar; mutual_count: number };
+  return ((data ?? []) as R[]).map((r) => ({ id: r.id, username: r.username, handle: r.handle, avatar: r.avatar, mutualCount: r.mutual_count ?? 0 }));
+}
+
+/** Suggested players (friends-of-friends + shared-table players). */
+export async function cloudListSuggestions(limit = 12): Promise<CloudSuggestion[]> {
+  const sb = await getSupabase();
+  const me = await uid();
+  if (!sb || !me) return [];
+  const { data } = await sb.rpc('friend_suggestions', { lim: limit });
+  type S = { id: string; username: string; handle: string; avatar: TileAvatar; mutual_count: number; games_together: number };
+  return ((data ?? []) as S[]).map((s) => ({ id: s.id, username: s.username, handle: s.handle, avatar: s.avatar, mutualCount: s.mutual_count ?? 0, gamesTogether: s.games_together ?? 0 }));
 }

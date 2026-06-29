@@ -10,12 +10,17 @@ import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { useEscape } from '../lib/useEscape';
 import {
   type CloudFriend,
+  type CloudRequest,
+  type CloudSuggestion,
   cloudSearchProfiles,
   cloudSendFriendRequest,
-  cloudListIncomingRequests,
+  cloudListRequests,
   cloudListFriends,
+  cloudListSuggestions,
   cloudAcceptRequest,
   cloudDeclineRequest,
+  cloudTouchPresence,
+  presenceFromLastSeen,
 } from '../lib/cloudFriends';
 
 // Decorative mahjong-tile clusters flanking the "Friends" title.
@@ -84,25 +89,28 @@ export default function FriendsSheet({ members = [], onAdd, onRemove, onClose, h
   const [q, setQ] = useState('');
   const [results, setResults] = useState<CloudFriend[]>([]);
   const [requested, setRequested] = useState<Set<string>>(new Set());
-  const [cloudRequests, setCloudRequests] = useState<CloudFriend[]>([]);
+  const [cloudRequests, setCloudRequests] = useState<CloudRequest[]>([]);
   const [cloudFriends, setCloudFriends] = useState<CloudFriend[]>([]);
   const [declined, setDeclined] = useState<Set<string>>(new Set());
   const [accepted, setAccepted] = useState<{ id: string; name: string; avatar: TileAvatar }[]>([]);
-  const [suggested, setSuggested] = useState(() => (demo && !cloud ? DEMO_SUGGESTED : []));
+  const [suggested, setSuggested] = useState<(typeof DEMO_SUGGESTED)>(() => (demo && !cloud ? DEMO_SUGGESTED : []));
   const [adding, setAdding] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://clubmahj.com';
   const inviteText = `Come track your mahjong wins with me on Club Mahj — let's race to clear all 70 hands! 🀄`;
 
-  // Load incoming requests + accepted friends (cloud only).
+  // Load requests (with mutual counts), friends (with presence), and suggestions
+  // from the backend, and ping presence. Cloud only.
   useEffect(() => {
     if (!cloud) return;
     let live = true;
-    void Promise.all([cloudListIncomingRequests(), cloudListFriends()]).then(([reqs, fr]) => {
+    void cloudTouchPresence();
+    void Promise.all([cloudListRequests(), cloudListFriends(), cloudListSuggestions()]).then(([reqs, fr, sug]) => {
       if (!live) return;
       setCloudRequests(reqs);
       setCloudFriends(fr);
+      setSuggested(sug.map((s) => ({ id: s.id, name: s.username, avatar: s.avatar, mutualCount: s.mutualCount, gamesTogether: s.gamesTogether })));
     });
     return () => {
       live = false;
@@ -134,7 +142,7 @@ export default function FriendsSheet({ members = [], onAdd, onRemove, onClose, h
   // Incoming requests (demo seed or cloud), minus any just-handled.
   const requestRows = useMemo(() => {
     const base = cloud
-      ? cloudRequests.map((u) => ({ id: u.id, name: u.username, avatar: u.avatar, mutual: 0 }))
+      ? cloudRequests.map((u) => ({ id: u.id, name: u.username, avatar: u.avatar, mutual: u.mutualCount }))
       : demo
         ? DEMO_REQUESTS
         : [];
@@ -162,7 +170,10 @@ export default function FriendsSheet({ members = [], onAdd, onRemove, onClose, h
     });
     cloudFriends
       .filter((f) => !crewNames.has(f.username.toLowerCase()))
-      .forEach((f) => rows.push({ key: f.id, id: f.id, name: f.username, handle: `@${f.handle}`, avatar: f.avatar, online: false, last: undefined, status: 'offline', removable: false }));
+      .forEach((f) => {
+        const p = presenceFromLastSeen(f.lastSeenAt);
+        rows.push({ key: f.id, id: f.id, name: f.username, handle: `@${f.handle}`, avatar: f.avatar, online: p.online, last: p.last, status: p.online ? 'online' : 'offline', removable: false });
+      });
     accepted.forEach((a) =>
       rows.unshift({ key: a.id, id: a.id, name: a.name, handle: `@${a.name.toLowerCase()}`, avatar: a.avatar, online: true, last: undefined, status: 'new', removable: false }),
     );

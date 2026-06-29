@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Bricolage_Grotesque, Hanken_Grotesk, Space_Mono } from 'next/font/google';
 import './globals.css';
 import SWRegister from './components/SWRegister';
+import PresenceHeartbeat from './components/PresenceHeartbeat';
 
 // Type system per the design: Bricolage Grotesque for display/headlines, Hanken
 // Grotesk for body/labels, Space Mono for meta (timestamps, counts, eyebrows).
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {children}
         <SWRegister />
+        <PresenceHeartbeat />
       </body>
     </html>
   );
