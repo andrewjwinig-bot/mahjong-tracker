@@ -236,7 +236,7 @@ export function motifSrc(key: string, color?: string): string {
 function motifImage(key: string | undefined, color: string): string {
   if (!key) return charMotif('?', color, 26);
   // Centered in the tile body, leaving a little breathing room.
-  return `<image href="${motifSrc(key, color)}" x="7" y="7" width="34" height="50" preserveAspectRatio="xMidYMid meet"/>`;
+  return `<image href="${motifSrc(key, color)}" x="6" y="6.5" width="36" height="51" preserveAspectRatio="xMidYMid meet"/>`;
 }
 
 function motifFor(face: TileFace, char?: string, color?: string, count?: number): string {

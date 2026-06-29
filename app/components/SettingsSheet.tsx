@@ -378,11 +378,14 @@ export default function SettingsSheet({
                 data-locked={locked || undefined}
                 onClick={() => (locked ? setPaywall(true) : pickFace(opt))}
               >
-                <Tile
-                  face={opt.face}
-                  char={opt.face === 'letter' ? letter : opt.char}
-                  color={opt.fixedColor ?? avatar.color}
-                  size={36}
+                <span
+                  className="face-art"
+                  dangerouslySetInnerHTML={{
+                    __html: tileArtSVG(opt.face, {
+                      char: opt.face === 'letter' ? letter : opt.char,
+                      color: opt.fixedColor ?? avatar.color,
+                    }),
+                  }}
                 />
                 {locked && <span className="face-lock" aria-label="VIP tile">🔒</span>}
               </button>
