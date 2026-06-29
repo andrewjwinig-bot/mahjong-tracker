@@ -62,6 +62,17 @@ export default function CardScanGuide({
     }
   }
 
+  // Undo the most recent panel (e.g. the wrong one was uploaded first). Each
+  // panel appended its fresh rows to the end, so dropping the last panel's
+  // count removes exactly that panel's hands; then it can be re-added.
+  function undoLast() {
+    if (done === 0 || busy) return;
+    const last = panelCounts[panelCounts.length - 1] ?? 0;
+    rowsRef.current = rowsRef.current.slice(0, rowsRef.current.length - last);
+    setPanelCounts((p) => p.slice(0, -1));
+    setMsg(null);
+  }
+
   function finish() {
     const rows = rowsRef.current;
     const sections = new Set(rows.map((r) => r.category).filter(Boolean));
@@ -133,6 +144,12 @@ export default function CardScanGuide({
         {done < MAX_PANELS && (
           <button className="btn" onClick={() => inputRef.current?.click()} disabled={busy}>
             {captureLabel}
+          </button>
+        )}
+
+        {done > 0 && (
+          <button className="scan-undo" onClick={undoLast} disabled={busy}>
+            ↩ Undo panel {done}{done === MAX_PANELS ? '' : ' — re-add it'}
           </button>
         )}
 

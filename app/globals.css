@@ -5097,6 +5097,25 @@ label.lbl {
 .scan-guide .btn {
   margin-top: 14px;
 }
+/* Undo the last-scanned panel (e.g. wrong panel uploaded first). */
+.scan-undo {
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 14px;
+  font-family: var(--font-app), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--brand);
+  background: none;
+  border-radius: 9px;
+  touch-action: manipulation;
+}
+.scan-undo:active {
+  transform: scale(0.97);
+}
+.scan-undo:disabled {
+  opacity: 0.5;
+}
 @media (prefers-reduced-motion: reduce) {
   .tri-l,
   .tri-c,
