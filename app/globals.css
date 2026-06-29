@@ -2414,13 +2414,18 @@ label.lbl {
     transform: translateY(100%);
   }
 }
+/* Sheet header — the standard bold offset-shadow title (matches the Settings
+   header). Title-case, brand-colored, with a soft ink drop-shadow. */
 .sheet h2 {
-  margin: 4px 0 4px;
-  font-size: 24px;
+  margin: 2px 0 6px;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-size: 28px;
   font-weight: 800;
-  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1;
   color: var(--brand);
   text-align: center;
+  text-shadow: 2.5px 2.5px 0 rgba(20, 22, 42, 0.08);
 }
 .sheet .sheet-sub {
   margin: 0 0 14px;
@@ -2843,34 +2848,6 @@ label.lbl {
 
 .set-sheet {
   text-align: left;
-}
-
-.set-head {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin-bottom: 18px;
-}
-.set-back {
-  width: 34px;
-  height: 34px;
-  flex: none;
-  border-radius: 5px;
-  background: #fff;
-  border: 2.5px solid rgba(20, 22, 42, 0.09);
-  box-shadow: 0 2px 8px rgba(20, 22, 42, 0.12);
-  display: grid;
-  place-items: center;
-  color: var(--ink);
-}
-.set-title {
-  margin: 0;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  line-height: 0.95;
-  color: var(--title-color, var(--ink));
 }
 
 /* Settings header (main view): big brand title + close button. */
@@ -3961,10 +3938,12 @@ label.lbl {
   padding: 8px 0 2px;
 }
 .detail-title {
-  font-size: 21px;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-size: 22px;
   font-weight: 800;
-  text-transform: uppercase;
+  letter-spacing: -0.5px;
   color: var(--brand);
+  text-shadow: 2px 2px 0 rgba(20, 22, 42, 0.08);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
