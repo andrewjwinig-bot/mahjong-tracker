@@ -42,22 +42,24 @@ const CameraMark = () => (
 // tiles 1–14 are hand-drawn mahjong motifs (recolored to the chosen tile color
 // or shown in their original colors in 'multi' mode). `pro` marks VIP-only
 // flair (joker, gold star, plum blossom); the rest stay free.
+// Ordered so the three VIP tiles (joker, star, plum) land in the far-right
+// column of the 5-wide grid: positions 5, 10, 15 (indices 4, 9, 14).
 const FACE_OPTIONS: { key: string; face: TileFace; char?: string; fixedColor?: string; pro?: boolean }[] = [
   { key: 'letter', face: 'letter' },
   { key: 'crane', face: 'motif', char: 'crane' },
   { key: 'dragon', face: 'motif', char: 'dragon' },
-  { key: 'joker', face: 'motif', char: 'joker', pro: true },
   { key: 'peony', face: 'motif', char: 'peony' },
-  { key: 'plum', face: 'motif', char: 'plum', pro: true },
-  { key: 'star', face: 'motif', char: 'star', pro: true },
+  { key: 'joker', face: 'motif', char: 'joker', pro: true },
   { key: 'wheel_flower', face: 'motif', char: 'wheel_flower' },
   { key: 'bamboo_stalk', face: 'motif', char: 'bamboo_stalk' },
   { key: 'chung_red', face: 'motif', char: 'chung_red' },
   { key: 'wan', face: 'motif', char: 'wan' },
+  { key: 'star', face: 'motif', char: 'star', pro: true },
   { key: 'dot_target', face: 'motif', char: 'dot_target' },
   { key: 'dot_nine', face: 'motif', char: 'dot_nine' },
   { key: 'bamboo_three', face: 'motif', char: 'bamboo_three' },
   { key: 'frame_tall', face: 'motif', char: 'frame_tall' },
+  { key: 'plum', face: 'motif', char: 'plum', pro: true },
 ];
 
 // Tile-color swatches: 'multi' (original artwork) + 7 solids.
@@ -192,7 +194,7 @@ export default function SettingsSheet({
         <span className="tcard-art" aria-hidden />
         <span className="tcard-scrim" aria-hidden />
         <span className="tcard-name">{t.name}</span>
-        {locked && <span className="tcard-pro" aria-label="Pro theme">🔒 PRO</span>}
+        {locked && <span className="tcard-pro" aria-label="VIP theme">🔒 VIP</span>}
       </button>
     );
   }
@@ -387,7 +389,7 @@ export default function SettingsSheet({
                     }),
                   }}
                 />
-                {locked && <span className="face-lock" aria-label="VIP tile">🔒</span>}
+                {locked && <span className="tcard-pro face-vip" aria-label="VIP tile">🔒 VIP</span>}
               </button>
             );
           })}
