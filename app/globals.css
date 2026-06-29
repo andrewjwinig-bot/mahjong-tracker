@@ -3076,21 +3076,18 @@ label.lbl {
 }
 /* One gold VIP frame around the four VIP theme cards (a border-only ring so the
    cards show through at full size), with a single VIP pill tab on top. */
+/* The four VIP themes grouped on a dark gold VIP felt, matching the modal. */
 .theme-vip-group {
   position: relative;
-  margin: 4px 0 24px;
+  margin: 6px 0 24px;
+  padding: 13px;
+  border-radius: 18px;
+  background: linear-gradient(158deg, #241d13 0%, #15110b 100%);
+  border: 2px solid var(--pro-gold);
+  box-shadow: 0 0 0 0.5px rgba(90, 61, 8, 0.2), 0 12px 28px -12px rgba(245, 165, 36, 0.55);
 }
 .theme-vip-group .theme-grid2 {
   margin: 0;
-}
-.theme-vip-group::before {
-  content: '';
-  position: absolute;
-  inset: -9px -7px;
-  border: 2px solid var(--pro-gold);
-  border-radius: 17px;
-  box-shadow: 0 0 0 0.5px rgba(90, 61, 8, 0.2), 0 12px 28px -12px rgba(245, 165, 36, 0.55);
-  pointer-events: none;
 }
 .theme-vip-group .vip-tab {
   top: -12px;
@@ -3374,6 +3371,7 @@ label.lbl {
 }
 .face-cell {
   position: relative;
+  z-index: 1; /* read on top of the VIP felt frame */
   aspect-ratio: 52 / 64;
   border-radius: 10px;
   background: linear-gradient(180deg, #fffefb, #f1ebdd);
@@ -3398,19 +3396,20 @@ label.lbl {
   position: relative;
 }
 /* One VIP frame around the whole far-right tile column (5-col grid,
-   9px gap → 4 gaps = 36px). Gold + warm glow to match the Club Mahj VIP
-   modal; border-only so the tiles show through. */
+   9px gap → 4 gaps = 36px). Dark gold felt fill + gold border + warm glow to
+   match the Club Mahj VIP modal; sits behind the tiles. */
 .vip-col-frame {
   position: absolute;
-  top: -6px;
-  bottom: -6px;
-  right: -6px;
-  width: calc((100% - 36px) / 5 + 12px);
+  top: -7px;
+  bottom: -7px;
+  right: -7px;
+  width: calc((100% - 36px) / 5 + 14px);
+  background: linear-gradient(158deg, #241d13 0%, #15110b 100%);
   border: 2px solid var(--pro-gold);
-  border-radius: 13px;
+  border-radius: 14px;
   box-shadow: 0 0 0 0.5px rgba(90, 61, 8, 0.2), 0 10px 24px -10px rgba(245, 165, 36, 0.55);
   pointer-events: none;
-  z-index: 2;
+  z-index: 0;
 }
 /* The VIP pill tab — same gold gradient + ink as the VIP modal's buttons. */
 .vip-tab {
