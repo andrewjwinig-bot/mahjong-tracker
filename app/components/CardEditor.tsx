@@ -51,21 +51,28 @@ export default function CardEditor({
   }, []);
 
   // The guided trifold scan finished → adopt its merged rows (each scanned from
-  // YOUR photos, stitched on-device) into the editable review.
+  // YOUR photos, stitched on-device).
   function applyScan(scanRows: ScanRow[], _summary: ScanSummary, scanYear?: number) {
+    const mapped: HandRow[] = scanRows.map((r) => ({
+      category: r.category,
+      notation: r.notation,
+      points: r.points,
+      concealed: r.concealed,
+    }));
+    const nextYear = scanYear ?? year;
     if (scanYear) setYear(scanYear);
-    setRows(
-      scanRows.map((r) => ({
-        category: r.category,
-        notation: r.notation,
-        points: r.points,
-        concealed: r.concealed,
-      })),
-    );
+    setRows(mapped);
     setFlags(scanRows.map((r) => r.issues ?? []));
+    setGuideOpen(false);
+    // If every line looks complete there's nothing to confirm — skip the
+    // "your card is ready" step and go straight to tracking. Only stop on the
+    // review screen when some lines need a quick check.
+    if (!scanRows.some((r) => (r.issues?.length ?? 0) > 0)) {
+      commit(nextYear, mapped);
+      return;
+    }
     setScanned(true);
     setEditing(false);
-    setGuideOpen(false);
   }
 
   function update(i: number, patch: Partial<HandRow>) {
@@ -85,14 +92,18 @@ export default function CardEditor({
   const reviewCount = flags.filter((x) => x.length).length;
   const valid = rows.some((r) => r.notation.trim());
 
-  function save() {
-    const card = buildCard(year, rows);
+  function commit(committedYear: number, committedRows: HandRow[]) {
+    const card = buildCard(committedYear, committedRows);
     if (!card.hands.length) return;
     // We no longer keep a reference photo — purge any saved from older versions.
     void clearCardPhoto();
     saveCustomCard(card);
     onSave(card);
     onClose();
+  }
+
+  function save() {
+    commit(year, rows);
   }
 
   function renderRow(i: number) {
