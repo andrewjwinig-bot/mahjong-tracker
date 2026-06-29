@@ -255,18 +255,26 @@ export default function CardTab({
       </div>
 
       <button className="trophy-link" onClick={onTrophies}>
-        <span className="tl-emblem" aria-hidden>
-          <IconTrophy size={18} />
-        </span>
-        <span className="tl-text">
-          <span className="tl-title">Stats &amp; Trophies</span>
-          <span className="tl-sub">Badges · streaks · records</span>
-        </span>
+        <svg className="tl-stars" viewBox="0 0 200 60" preserveAspectRatio="xMaxYMid slice" aria-hidden>
+          <text x="158" y="44" textAnchor="middle" fontSize="50" fill="#fff">★</text>
+          <text x="116" y="26" textAnchor="middle" fontSize="26" fill="#fff">★</text>
+          <text x="190" y="20" textAnchor="middle" fontSize="18" fill="#fff">★</text>
+        </svg>
+        <svg className="tl-trophy" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M6 4h12v5a6 6 0 0 1-12 0V4z" />
+          <path d="M6 6H4v1a3 3 0 0 0 3 3" />
+          <path d="M18 6h2v1a3 3 0 0 1-3 3" />
+          <path d="M12 15v3" />
+          <path d="M8.5 21h7" />
+        </svg>
+        <span className="tl-title">Stats &amp; Trophies</span>
         <span className="tl-right">
           <span className="tl-count">
             {trophies.earned}/{trophies.total}
           </span>
-          <span className="tl-chev" aria-hidden>›</span>
+          <svg className="tl-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </span>
       </button>
 

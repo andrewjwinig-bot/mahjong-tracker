@@ -574,89 +574,67 @@ a:focus-visible,
 /* "Stats & Trophies" entry on the Card hub (opens the trophy shelf). The one
    premium GOLD surface on the hub — keeps the stat-tile border/shadow/inset
    language so it belongs, but reads as the "treasure" shortcut. */
+/* Stats & Trophies — skinny flat-gold bar (same family as the feed callouts).
+   Faint oversized stars behind white text; gold stays secondary to CALL MAHJ. */
 .trophy-link {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 11px;
   width: 100%;
   margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 13px;
-  background: linear-gradient(180deg, #fbefca 0%, #f3d98b 100%);
-  border: 2px solid rgba(176, 132, 38, 0.34);
-  box-shadow: 0 2px 8px rgba(140, 100, 20, 0.16), 0 12px 22px rgba(140, 100, 20, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -5px 9px rgba(176, 132, 38, 0.1);
-  font-family: var(--font-app), system-ui, sans-serif;
-  color: #4d340e;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #c68e20 0%, #b27c12 100%);
+  box-shadow: 0 6px 16px rgba(150, 100, 10, 0.3);
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .trophy-link:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 5px rgba(140, 100, 20, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -3px 7px rgba(176, 132, 38, 0.12);
+  box-shadow: 0 3px 9px rgba(150, 100, 10, 0.28);
 }
-/* The trophy rides its own cream mahjong-tile chip (tile vocabulary). */
-.tl-emblem {
+.tl-stars {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 175px;
+  height: 100%;
+  opacity: 0.16;
+  pointer-events: none;
+}
+.tl-trophy {
+  position: relative;
   flex: none;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 40px;
-  border-radius: 7px;
-  background: linear-gradient(180deg, #fffefb 0%, #f3ecdb 100%);
-  border: 1.5px solid rgba(20, 22, 42, 0.12);
-  box-shadow: 0 2px 5px rgba(20, 22, 42, 0.16), inset 0 -3px 5px rgba(20, 22, 42, 0.05);
-}
-.tl-emblem svg {
-  color: #c9871a;
-}
-.tl-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-  text-align: left;
 }
 .tl-title {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  text-align: left;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
   font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.2px;
-  color: #4d340e;
-}
-.tl-sub {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-weight: 400;
-  font-size: 9.5px;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: #9a7320;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+  text-shadow: 1.5px 1.5px 0 rgba(120, 80, 8, 0.35);
 }
 .tl-right {
   flex: none;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
 }
-/* Live earned/total trophy count — a small "minted" gold pill. */
 .tl-count {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-mono), 'Space Mono', monospace;
   font-weight: 700;
-  font-size: 12px;
-  color: #5a3d12;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1.5px solid rgba(176, 132, 38, 0.4);
-  border-radius: 999px;
-  padding: 3px 9px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.92);
 }
 .tl-chev {
   flex: none;
-  color: #b07b1a;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
 }
 
 /* Card action row: SCORE GAME (accent) + PRACTICE (white). */
