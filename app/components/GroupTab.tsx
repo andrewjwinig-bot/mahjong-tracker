@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Tile from './Tile';
+import FriendsSheet from './FriendsSheet';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
 import { isCloudEnabled } from '../lib/supabase';
@@ -394,17 +395,11 @@ export default function GroupTab({
       </button>
 
       {addOpen && (
-        <AddFriendSheet
+        <FriendsSheet
           members={members}
-          onAdd={(name, avatar) => {
-            onAddFriend(name, avatar);
-            setAddOpen(false);
-          }}
+          handle={profile?.handle}
+          onAdd={(name, avatar) => onAddFriend(name, avatar)}
           onRemove={onRemoveFriend}
-          onOpenMember={(m) => {
-            setAddOpen(false);
-            setDetail(m);
-          }}
           onClose={() => setAddOpen(false)}
         />
       )}

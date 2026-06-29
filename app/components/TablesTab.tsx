@@ -12,11 +12,11 @@ import { track } from '../lib/analytics';
 import Avatar from './Avatar';
 import Tile from './Tile';
 import ShareModal from './ShareModal';
-import { AddFriendSheet } from './GroupTab';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
 import Paywall from './Paywall';
 import ProUpsell from './ProUpsell';
 import NoTablesEmpty from './NoTablesEmpty';
+import FriendsSheet from './FriendsSheet';
 import { usePro } from '../lib/usePro';
 import { setPro, FREE_TABLE_LIMIT } from '../lib/pro';
 import type { TileAvatar } from '../lib/social';
@@ -133,7 +133,7 @@ export default function TablesTab({
     );
   }
 
-  return <TablesList tables={tables} profile={profile} onAddFriend={onAddFriend} onOpen={setSelectedId} onCreate={(t) => {
+  return <TablesList tables={tables} profile={profile} friends={friends} onAddFriend={onAddFriend} onOpen={setSelectedId} onCreate={(t) => {
     setTables((prev) => {
       const next = [...(prev ?? []), t];
       void saveTables(next);
@@ -148,12 +148,14 @@ export default function TablesTab({
 function TablesList({
   tables,
   profile,
+  friends = [],
   onAddFriend,
   onOpen,
   onCreate,
 }: {
   tables: Table[];
   profile: Profile;
+  friends?: TableMember[];
   onAddFriend: (name: string, avatar: TileAvatar) => void;
   onOpen: (id: string) => void;
   onCreate: (t: Table) => void;
@@ -219,11 +221,10 @@ function TablesList({
       </div>
 
       {addOpen && (
-        <AddFriendSheet
-          onAdd={(n, avatar) => {
-            onAddFriend(n, avatar);
-            setAddOpen(false);
-          }}
+        <FriendsSheet
+          members={friends}
+          handle={profile.handle}
+          onAdd={(n, avatar) => onAddFriend(n, avatar)}
           onClose={() => setAddOpen(false)}
         />
       )}
