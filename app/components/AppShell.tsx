@@ -107,6 +107,9 @@ export default function AppShell() {
   const [editorOpen, setEditorOpen] = useState(false);
   // "Scan my card" opens the editor straight into the capture flow.
   const [editorAutoScan, setEditorAutoScan] = useState(false);
+  // Set when a guided scan finishes, so My Card fires the "hands saved" toast +
+  // confetti exactly once on landing.
+  const [scanCelebration, setScanCelebration] = useState<{ count: number; year: number } | null>(null);
   const openEditor = useCallback((scan = false) => {
     setEditorAutoScan(scan);
     setEditorOpen(true);
@@ -492,6 +495,8 @@ export default function AppShell() {
                 scanEnabled={scanEnabled}
                 onAddCard={() => openEditor(false)}
                 onScanCard={() => openEditor(true)}
+                scanCelebration={scanCelebration}
+                onScanCelebrationDone={() => setScanCelebration(null)}
               />
             )}
             {tab === 'group' && socialState && (
@@ -580,6 +585,11 @@ export default function AppShell() {
           scanEnabled={scanEnabled}
           autoScan={editorAutoScan}
           onSave={(c) => setCard(c)}
+          onScanComplete={(info) => {
+            // Guided scan committed — land on My Card and celebrate once.
+            setTab('card');
+            setScanCelebration(info);
+          }}
           onClose={() => {
             setEditorOpen(false);
             setEditorAutoScan(false);

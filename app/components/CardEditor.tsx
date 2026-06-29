@@ -18,6 +18,7 @@ export default function CardEditor({
   scanEnabled = false,
   autoScan = false,
   onSave,
+  onScanComplete,
   onClose,
 }: {
   current: MahjongCard;
@@ -25,6 +26,8 @@ export default function CardEditor({
   /** Open straight into the photo/upload capture (from "Scan my card"). */
   autoScan?: boolean;
   onSave: (card: MahjongCard) => void;
+  /** Guided scan finished and committed — land on My Card with a celebration. */
+  onScanComplete?: (info: { count: number; year: number }) => void;
   onClose: () => void;
 }) {
   useEscape(onClose);
@@ -35,13 +38,9 @@ export default function CardEditor({
       : [{ category: '', notation: '', points: 25, concealed: false }],
   );
   const [guideOpen, setGuideOpen] = useState(false);
-  // Per-row validation flags from the scan (index-aligned with rows); cleared
-  // as the user fixes a line. A "review queue" so nothing dubious slips through.
+  // Per-row validation flags (index-aligned with rows); cleared as the user
+  // fixes a line. Surfaced beside a row in the manual editor.
   const [flags, setFlags] = useState<string[][]>([]);
-  // After a scan we show a calm, confident result: only the few flagged lines
-  // up front, the full list tucked behind an explicit Edit toggle.
-  const [scanned, setScanned] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   // "Scan my card" opens straight into the capture flow, skipping the manual
   // editor entirely.
@@ -51,7 +50,9 @@ export default function CardEditor({
   }, []);
 
   // The guided trifold scan finished → adopt its merged rows (each scanned from
-  // YOUR photos, stitched on-device).
+  // YOUR photos, stitched on-device) and go straight to the card. The flow
+  // confirms each panel as it's read, so there's no separate review step: Done
+  // commits and lands on My Card with the "hands saved" toast + confetti.
   function applyScan(scanRows: ScanRow[], _summary: ScanSummary, scanYear?: number) {
     const mapped: HandRow[] = scanRows.map((r) => ({
       category: r.category,
@@ -60,19 +61,14 @@ export default function CardEditor({
       concealed: r.concealed,
     }));
     const nextYear = scanYear ?? year;
-    if (scanYear) setYear(scanYear);
-    setRows(mapped);
-    setFlags(scanRows.map((r) => r.issues ?? []));
     setGuideOpen(false);
-    // If every line looks complete there's nothing to confirm — skip the
-    // "your card is ready" step and go straight to tracking. Only stop on the
-    // review screen when some lines need a quick check.
-    if (!scanRows.some((r) => (r.issues?.length ?? 0) > 0)) {
-      commit(nextYear, mapped);
-      return;
-    }
-    setScanned(true);
-    setEditing(false);
+    const card = buildCard(nextYear, mapped);
+    if (!card.hands.length) return; // nothing read — stay put, keep manual entry
+    void clearCardPhoto();
+    saveCustomCard(card);
+    onSave(card);
+    onScanComplete?.({ count: card.hands.length, year: card.year });
+    onClose();
   }
 
   function update(i: number, patch: Partial<HandRow>) {
@@ -89,7 +85,6 @@ export default function CardEditor({
     setFlags((f) => f.filter((_, n) => n !== i));
   }
 
-  const reviewCount = flags.filter((x) => x.length).length;
   const valid = rows.some((r) => r.notation.trim());
 
   function commit(committedYear: number, committedRows: HandRow[]) {
@@ -183,79 +178,29 @@ export default function CardEditor({
 
       {guideOpen && <CardScanGuide onComplete={applyScan} onCancel={() => setGuideOpen(false)} />}
 
-      {scanned ? (
+      {scanEnabled ? (
         <>
-          <div className="scan-done">
-            <div className="scan-done-emoji" aria-hidden>🀄</div>
-            <div className="scan-done-title">
-              Your {year} card — {rows.length} hand{rows.length === 1 ? '' : 's'}
-            </div>
-            <div className="scan-done-sub">
-              {reviewCount > 0
-                ? `${reviewCount} line${reviewCount === 1 ? '' : 's'} worth a quick look — the rest checked out.`
-                : 'Locked in for the season — every line is a complete 14-tile hand.'}
-            </div>
-          </div>
-
-          {reviewCount > 0 && (
-            <div className="quick-check">
-              <div className="quick-check-head">
-                Quick check · {reviewCount} to confirm
-              </div>
-              <p className="quick-check-hint">
-                These didn’t look like complete hands. Fix each one — or leave it and edit anytime.
-              </p>
-              {rows.map((_, i) => (flags[i]?.length ? renderRow(i) : null))}
-            </div>
-          )}
-
-          <button className="btn" style={{ marginTop: 14 }} onClick={save} disabled={!valid}>
-            {reviewCount > 0 ? 'Looks good — start tracking' : 'Start tracking'}
+          <p className="editor-note">
+            Scan your card and we’ll fill in every hand for you — fastest way to get set up.
+          </p>
+          <button className="btn empty-card-scan" onClick={() => setGuideOpen(true)}>
+            Scan my card
           </button>
-
-          <button className="btn ghost" style={{ marginTop: 10 }} onClick={() => setEditing((s) => !s)}>
-            {editing ? 'Hide hands' : 'Edit hands'}
-          </button>
-
-          {editing && (
-            <>
-              {yearField}
-              <div className="editor-rows" style={{ marginTop: 12 }}>
-                {rows.map((_, i) => renderRow(i))}
-              </div>
-              <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
-                ＋ Add hand
-              </button>
-            </>
-          )}
+          <div className="editor-or">or enter by hand</div>
         </>
       ) : (
-        <>
-          {scanEnabled ? (
-            <>
-              <p className="editor-note">
-                Scan your card and we’ll fill in every hand for you — fastest way to get set up.
-              </p>
-              <button className="btn empty-card-scan" onClick={() => setGuideOpen(true)}>
-                Scan my card
-              </button>
-              <div className="editor-or">or enter by hand</div>
-            </>
-          ) : (
-            <p className="editor-note">
-              Enter the hands from your own card. Type each hand’s notation, points, and tap{' '}
-              <strong>C</strong> if it must be concealed. Group hands by giving them the same category name.
-            </p>
-          )}
-
-          {yearField}
-
-          <div className="editor-rows">{rows.map((_, i) => renderRow(i))}</div>
-          <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
-            ＋ Add hand
-          </button>
-        </>
+        <p className="editor-note">
+          Enter the hands from your own card. Type each hand’s notation, points, and tap{' '}
+          <strong>C</strong> if it must be concealed. Group hands by giving them the same category name.
+        </p>
       )}
+
+      {yearField}
+
+      <div className="editor-rows">{rows.map((_, i) => renderRow(i))}</div>
+      <button className="btn green" style={{ marginTop: 12 }} onClick={addRow}>
+        ＋ Add hand
+      </button>
 
       <p className="editor-fine">
         Entering your own card keeps it private to your device and ensures the app never ships a copy
