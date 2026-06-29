@@ -16,6 +16,7 @@ import { AddFriendSheet } from './GroupTab';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
 import Paywall from './Paywall';
 import ProUpsell from './ProUpsell';
+import NoTablesEmpty from './NoTablesEmpty';
 import { usePro } from '../lib/usePro';
 import { setPro, FREE_TABLE_LIMIT } from '../lib/pro';
 import type { TileAvatar } from '../lib/social';
@@ -242,6 +243,7 @@ function TablesList({
       )}
 
       <div style={{ marginTop: 16 }}>
+        {tables.length === 0 && <NoTablesEmpty onStart={startCreate} />}
         {tables.map((t) => {
           const last = t.messages[t.messages.length - 1];
           const unread = tableUnread(t, profile.name);
