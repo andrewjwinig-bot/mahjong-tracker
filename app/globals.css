@@ -3074,6 +3074,30 @@ label.lbl {
   gap: 12px;
   margin-bottom: 24px;
 }
+/* One gold VIP frame around the four VIP theme cards (a border-only ring so the
+   cards show through at full size), with a single VIP pill tab on top. */
+.theme-vip-group {
+  position: relative;
+  margin: 4px 0 24px;
+}
+.theme-vip-group .theme-grid2 {
+  margin: 0;
+}
+.theme-vip-group::before {
+  content: '';
+  position: absolute;
+  inset: -9px -7px;
+  border: 2px solid #e59a16;
+  border-radius: 17px;
+  pointer-events: none;
+}
+.theme-vip-group .vip-tab {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
 /* App Theme picker tile: full-bleed generated art with the name centered in a
    theme-aware color. Selected = brand-colored border (no checkmark). */
 .tcard {
@@ -3373,20 +3397,28 @@ label.lbl {
 .face-cell[data-active="true"] {
   border-color: var(--brand);
 }
-.face-cell[data-locked] .face-art {
-  opacity: 0.42;
-  filter: grayscale(0.5);
+.face-grid {
+  position: relative;
 }
-/* VIP badge on locked avatar tiles — same gold pill as the theme cards,
-   shrunk and re-positioned for the smaller tile. */
-.face-vip {
-  top: 4px;
-  right: 4px;
-  gap: 2px;
-  padding: 2px 4px;
-  border-radius: 5px;
-  font-size: 6.5px;
-  letter-spacing: 0.5px;
+/* One gold VIP frame around the whole far-right tile column (5-col grid,
+   9px gap → 4 gaps = 36px). Border-only so the tiles show through. */
+.vip-col-frame {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  right: -6px;
+  width: calc((100% - 36px) / 5 + 12px);
+  border: 2px solid #e59a16;
+  border-radius: 13px;
+  pointer-events: none;
+  z-index: 2;
+}
+/* The VIP pill tab, centered on the frame's top edge. */
+.vip-tab {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .swatch-row2 {

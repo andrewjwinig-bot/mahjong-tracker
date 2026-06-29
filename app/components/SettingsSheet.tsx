@@ -194,7 +194,6 @@ export default function SettingsSheet({
         <span className="tcard-art" aria-hidden />
         <span className="tcard-scrim" aria-hidden />
         <span className="tcard-name">{t.name}</span>
-        {locked && <span className="tcard-pro" aria-label="VIP theme">🔒 VIP</span>}
       </button>
     );
   }
@@ -248,15 +247,32 @@ export default function SettingsSheet({
         </span>
       </button>
 
-      {/* Theme picker — kept right at the top so switching is one tap away. */}
+      {/* Theme picker — kept right at the top so switching is one tap away.
+          Free themes first; the VIP themes sit together inside one VIP frame. */}
       <div className="set-label">APP THEME</div>
-      <div className="theme-grid2">
-        {[...THEMES]
-          .sort((a, b) => Number(!!a.pro) - Number(!!b.pro))
-          .map((t) => (
+      {pro ? (
+        <div className="theme-grid2">
+          {[...THEMES].sort((a, b) => Number(!!a.pro) - Number(!!b.pro)).map((t) => (
             <ThemeChip key={t.id} t={t} />
           ))}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="theme-grid2">
+            {THEMES.filter((t) => !t.pro).map((t) => (
+              <ThemeChip key={t.id} t={t} />
+            ))}
+          </div>
+          <div className="theme-vip-group">
+            <span className="tcard-pro vip-tab">🔒 VIP</span>
+            <div className="theme-grid2">
+              {THEMES.filter((t) => t.pro).map((t) => (
+                <ThemeChip key={t.id} t={t} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Pro upsell */}
       {pro ? (
@@ -377,7 +393,6 @@ export default function SettingsSheet({
                 key={opt.key}
                 className="face-cell"
                 data-active={isActiveFace(opt)}
-                data-locked={locked || undefined}
                 onClick={() => (locked ? setPaywall(true) : pickFace(opt))}
               >
                 <span
@@ -389,10 +404,15 @@ export default function SettingsSheet({
                     }),
                   }}
                 />
-                {locked && <span className="tcard-pro face-vip" aria-label="VIP tile">🔒 VIP</span>}
               </button>
             );
           })}
+          {/* One VIP frame around the whole far-right column (joker/star/plum). */}
+          {!pro && (
+            <span className="vip-col-frame" aria-hidden>
+              <span className="tcard-pro vip-tab">🔒 VIP</span>
+            </span>
+          )}
         </div>
 
         <div className="set-label">TILE COLOR</div>
