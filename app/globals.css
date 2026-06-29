@@ -4948,6 +4948,12 @@ label.lbl {
   border-radius: 999px;
   background: color-mix(in srgb, var(--brand) 10%, transparent);
 }
+/* ---- Card tab empty state (pre-scan add-your-card) ----------------------- */
+/* Named keyframes ported from the Card Page design reference (cp* = CardPage). */
+@keyframes cpShine { 0% { transform: translateX(-130%); } 55%, 100% { transform: translateX(360%); } }
+@keyframes cpScan { 0% { top: 14%; opacity: 0; } 12% { opacity: 1; } 50% { top: 80%; opacity: 1; } 88% { opacity: 1; } 100% { top: 14%; opacity: 0; } }
+@keyframes cpBracket { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+
 /* ---- Guided card scan (intro / capture / captured sheets) ---------------- */
 /* Named keyframes ported from the design reference (scy* = ScanYourCard). */
 @keyframes scySheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
