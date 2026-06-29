@@ -217,7 +217,7 @@ function CelebrationModal({ opts, onClose }: { opts: CelebrateOpts; onClose: () 
   const hype = useMemo(() => {
     if (opts.hype) return opts.hype;
     if (opts.cleared != null && opts.total != null) {
-      if (opts.cleared >= opts.total) return 'ALL 70 HANDS — LEGENDARY 👑';
+      if (opts.cleared >= opts.total) return `ALL ${opts.total} HANDS — LEGENDARY 👑`;
       if (opts.cleared > 0 && opts.cleared % 10 === 0) return `${opts.cleared} hands down! 🙌`;
     }
     return HYPE[Math.floor(Math.random() * HYPE.length)];

@@ -8,14 +8,10 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalChrome title="Terms of Service" updated="[Effective Date]">
-      <p className="legal-banner">
-        Template — review with a qualified attorney before publishing. Replace every [bracketed] value.
-      </p>
-
+    <LegalChrome title="Terms of Service" updated="June 25, 2026">
       <p>
         These Terms of Service (“Terms”) govern your access to and use of the Club Mahj mobile
-        and web application and related services (the “App”), provided by [Developer / Company Name]
+        and web application and related services (the “App”), provided by Black Pug Studios LLC
         (“we,” “us,” or “our”). By creating an account or using the App, you agree to these Terms and
         to our Privacy Policy. If you do not agree, do not use the App.
       </p>
@@ -129,10 +125,10 @@ export default function TermsPage() {
 
       <h2>14. Governing law &amp; disputes</h2>
       <p>
-        These Terms are governed by the laws of [Your State/Country], without regard to conflict-of-law
-        rules. Any disputes will be resolved in the courts located in [Venue], unless otherwise
-        required by applicable law. [Insert any arbitration / class-action-waiver clause here after
-        legal review, if desired.]
+        These Terms are governed by the laws of the Commonwealth of Pennsylvania, without regard to
+        conflict-of-law rules. Any disputes will be resolved exclusively in the state or federal courts
+        located in the Commonwealth of Pennsylvania, and you consent to their jurisdiction, unless
+        otherwise required by applicable law.
       </p>
 
       <h2>15. Changes to these Terms</h2>
@@ -144,11 +140,9 @@ export default function TermsPage() {
 
       <h2>16. Contact</h2>
       <p>
-        [Developer / Company Name]
+        Black Pug Studios LLC
         <br />
-        [Mailing Address]
-        <br />
-        [Contact Email]
+        andrewjwinig@gmail.com
       </p>
     </LegalChrome>
   );

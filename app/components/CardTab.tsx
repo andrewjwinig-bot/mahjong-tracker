@@ -162,7 +162,7 @@ export default function CardTab({
       const catDone = catHands.every((x) => x.id === h.id || countOf(x) > 0);
       const cardDone = newCleared >= total;
 
-      if (cardDone) onMilestone('card_cleared', 'Cleared the whole card!', 'All 70 hands 👑');
+      if (cardDone) onMilestone('card_cleared', 'Cleared the whole card!', `All ${total} hands 👑`);
       else if (catDone) onMilestone('section_cleared', `Cleared every ${h.category} hand`);
       if (challenge.match(h) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
         onMilestone('challenge_done', `Finished ${challenge.name}`);
@@ -171,7 +171,7 @@ export default function CardTab({
       // Only the big milestones still pop a celebration; a regular mahj logs
       // quietly (it's already saved + posted, and shows in your list).
       if (cardDone) {
-        celebrate({ title: 'You Cleared The Card!!', emoji: '👑', hype: 'ALL 70 HANDS — LEGENDARY 👑', cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
+        celebrate({ title: 'You Cleared The Card!!', emoji: '👑', hype: `ALL ${total} HANDS — LEGENDARY 👑`, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
       } else if (catDone) {
         celebrate({ title: 'Category Cleared! 🎉', emoji: '🏆', hype: `Every ${h.category} hand — done!`, handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
       }

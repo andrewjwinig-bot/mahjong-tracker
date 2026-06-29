@@ -13,6 +13,7 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+  const [deleteErr, setDeleteErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const cloud = isCloudEnabled();
 
@@ -41,11 +42,21 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
 
   async function doDelete() {
     setBusy(true);
+    setDeleteErr(null);
     if (cloud) {
+      // Apple requires in-app deletion to actually delete the account. If the
+      // server delete fails, stop and surface it — do NOT wipe only locally and
+      // report success, which would leave the cloud account and data behind.
       try {
         await cloudDeleteAccount();
-      } catch {
-        /* fall through to local wipe */
+      } catch (err) {
+        setBusy(false);
+        setDeleteErr(
+          err instanceof Error
+            ? `Couldn’t delete your account: ${err.message}. Nothing was deleted — please try again.`
+            : 'Couldn’t reach the server to delete your account. Nothing was deleted — please try again.',
+        );
+        return;
       }
     }
     await deleteAllData();
@@ -171,6 +182,11 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
                 {busy ? 'Deleting…' : 'Delete everything'}
               </button>
             </div>
+            {deleteErr && (
+              <p style={{ margin: '10px 2px 0', fontSize: 12.5, fontWeight: 700, color: 'var(--brand)' }}>
+                {deleteErr}
+              </p>
+            )}
           </div>
         )}
 

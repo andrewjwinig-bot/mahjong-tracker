@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SAMPLE_CARD } from '../lib/cardData';
 import type { Win, MahjongCard } from '../lib/types';
 import { loadCustomCard, saveCustomCard, purgeLegacyCardPhoto } from '../lib/customCard';
@@ -136,8 +136,20 @@ export default function AppShell() {
     const [counts, w] = await Promise.all([db.loadHandCounts(), db.loadWins()]);
     const merged = await syncGameplay({ handCounts: counts, wins: w });
     if (merged) {
-      setHandCounts(merged.handCounts);
-      setWins(merged.wins);
+      // The merge ran against a snapshot taken before this await; the UI was
+      // already interactive, so fold the cloud result INTO the latest state
+      // (max for counts, union by id for wins) instead of replacing it — a bump
+      // or new mahj made during the sync window must not be clobbered.
+      setHandCounts((prev) => {
+        const next = { ...merged.handCounts };
+        for (const [h, c] of Object.entries(prev)) next[h] = Math.max(next[h] ?? 0, c);
+        return next;
+      });
+      setWins((prev) => {
+        const byId = new Map(merged.wins.map((win) => [win.id, win]));
+        for (const win of prev) if (!byId.has(win.id)) byId.set(win.id, win);
+        return [...byId.values()].sort((a, b) => b.createdAt - a.createdAt);
+      });
       // Persist the merged view locally so it survives the next cold start.
       await Promise.all(Object.entries(merged.handCounts).map(([h, c]) => db.setHandCount(h, c)));
       await Promise.all(merged.wins.map((win) => db.saveWin(win)));
@@ -170,18 +182,23 @@ export default function AppShell() {
     const sd = recordPlay();
     setBestStreak(sd.best);
     (async () => {
-      const [counts, notes, w, s] = await Promise.all([
-        db.loadHandCounts(),
-        db.loadHandNotes(),
-        db.loadWins(),
-        social.loadSocial(),
-      ]);
-      if (!alive) return;
-      setHandCounts(counts);
-      setHandNotes(notes);
-      setWins(w);
-      setSocialState(s);
-      setLoaded(true);
+      try {
+        const [counts, notes, w, s] = await Promise.all([
+          db.loadHandCounts(),
+          db.loadHandNotes(),
+          db.loadWins(),
+          social.loadSocial(),
+        ]);
+        if (!alive) return;
+        setHandCounts(counts);
+        setHandNotes(notes);
+        setWins(w);
+        setSocialState(s);
+      } finally {
+        // Always dismiss the splash, even if a loader rejects — a failed load
+        // should fall back to empty state, never a permanent loading screen.
+        if (alive) setLoaded(true);
+      }
       // Background reconcile with the cloud once the local-first UI is up.
       void reconcileCloud();
       // One-time cleanup of the no-longer-used card reference photo.
@@ -238,11 +255,25 @@ export default function AppShell() {
     mirrorWin(win);
   }, []);
 
-  const removeWin = useCallback((id: string) => {
-    setWins((prev) => prev.filter((w) => w.id !== id));
-    void db.deleteWin(id);
-    mirrorRemoveWin(id);
-  }, []);
+  // Mirror of `wins` for synchronous lookups (e.g. resolving a removed win's
+  // hand before its row is filtered out).
+  const winsRef = useRef<Win[]>([]);
+  useEffect(() => {
+    winsRef.current = wins;
+  }, [wins]);
+
+  const removeWin = useCallback(
+    (id: string) => {
+      // Deleting a logged mahj must also un-count its hand — otherwise the row
+      // disappears but the hand stays "cleared" and the stats stay inflated.
+      const removed = winsRef.current.find((w) => w.id === id);
+      setWins((prev) => prev.filter((w) => w.id !== id));
+      if (removed?.handId) bumpHand(removed.handId, -1);
+      void db.deleteWin(id);
+      mirrorRemoveWin(id);
+    },
+    [bumpHand],
+  );
 
   // Sharing a mahj drops it into the chat of the table you play with (the crew
   // behind your group), so it lands where your friends actually talk — not in a

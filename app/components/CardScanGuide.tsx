@@ -79,6 +79,12 @@ export default function CardScanGuide({
       if (res.year && !yearRef.current) yearRef.current = res.year;
       const seen = new Set(rowsRef.current.map(rowKey));
       const fresh = res.rows.filter((r) => !seen.has(rowKey(r)));
+      // No new hands on this panel (blank/duplicate shot) — don't advance into a
+      // "0 hands captured" dead-end; keep the user on capture so they can retry.
+      if (fresh.length === 0) {
+        setError('We didn’t find any new hands on that panel. Make sure it’s a different panel, well-lit and filling the frame.');
+        return;
+      }
       rowsRef.current = [...rowsRef.current, ...fresh];
       setPanelCounts((p) => p.map((n, i) => (i === panel - 1 ? fresh.length : n)));
       setCaptured((c) => c.map((v, i) => (i === panel - 1 ? true : v)));
