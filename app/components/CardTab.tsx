@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MahjongCard, Hand, Win } from '../lib/types';
 import type { FeedPost } from '../lib/social';
 import { YOU_ID } from '../lib/social';
@@ -40,6 +40,9 @@ interface Props {
   scanEnabled: boolean;
   onAddCard: () => void;
   onScanCard: () => void;
+  /** Just landed here from a guided card scan → fire the toast + confetti once. */
+  scanCelebration?: { count: number; year: number } | null;
+  onScanCelebrationDone?: () => void;
 }
 
 export default function CardTab({
@@ -60,6 +63,8 @@ export default function CardTab({
   scanEnabled,
   onAddCard,
   onScanCard,
+  scanCelebration,
+  onScanCelebrationDone,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
   const [shareWin, setShareWin] = useState<Win | null>(null);
@@ -73,6 +78,30 @@ export default function CardTab({
     setLogHandId(handId ?? null);
     setLogOpen(true);
   }
+
+  // One-shot "hands saved" confetti — 26 felt/red/gold/blue/pink pieces that
+  // rain once when you land here straight from a guided scan. Deterministic so
+  // it renders identically on the server and client (no hydration mismatch).
+  const confettiPieces = useMemo(() => {
+    if (!scanCelebration) return [];
+    const colors = ['#C0392B', '#2E7D43', '#E0A82E', '#2E78C8', '#D8607A'];
+    return Array.from({ length: 26 }).map((_, i) => ({
+      left: (i * 37 + 11) % 100,
+      delay: ((i % 7) * 0.07).toFixed(2),
+      dur: (1.5 + ((i * 13) % 9) / 10).toFixed(2),
+      w: 6 + ((i * 5) % 6),
+      h: 9 + ((i * 7) % 8),
+      rot: (i % 2 ? 1 : -1) * (360 + ((i * 53) % 360)),
+      color: colors[i % colors.length],
+    }));
+  }, [scanCelebration]);
+
+  // The toast + confetti show once, then clear themselves after they've played.
+  useEffect(() => {
+    if (!scanCelebration || !onScanCelebrationDone) return;
+    const t = setTimeout(onScanCelebrationDone, 5200);
+    return () => clearTimeout(t);
+  }, [scanCelebration, onScanCelebrationDone]);
 
   const challenge = useMemo(() => activeChallenge(), []);
   const chProg = useMemo(
@@ -206,10 +235,53 @@ export default function CardTab({
 
   return (
     <div className="screen">
+      {scanCelebration && (
+        <div className="scy-conf-layer" aria-hidden>
+          {confettiPieces.map((p, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top: -16,
+                left: `${p.left}%`,
+                width: p.w,
+                height: p.h,
+                background: p.color,
+                borderRadius: 2,
+                opacity: 0,
+                ['--r' as string]: `${p.rot}deg`,
+                animation: `scyConf ${p.dur}s cubic-bezier(.25,.6,.5,1) ${p.delay}s forwards`,
+              } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      )}
+
       <header className="app-header card-header">
         <CardTitle />
         <p className="sub">Track every hand on this year’s card.</p>
       </header>
+
+      {scanCelebration && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 9,
+            background: '#DDEBDD',
+            border: '1.5px solid rgba(46,125,67,0.30)',
+            borderRadius: 12,
+            padding: '11px 14px',
+            margin: '4px 0 14px',
+            animation: 'scyPop .45s ease both',
+          }}
+        >
+          <span style={{ display: 'inline-flex', flex: 'none', width: 20, height: 20, borderRadius: '50%', background: '#2E7D43', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12 }}>✓</span>
+          <span style={{ fontFamily: "var(--font-app), 'Hanken Grotesk', sans-serif", fontWeight: 700, fontSize: 12.5, color: '#256037' }}>
+            {scanCelebration.count} hands saved — your {scanCelebration.year} card is locked in for the season
+          </span>
+        </div>
+      )}
 
       {/* A scanned (custom) card reads as confident and done for the year. In a
           demo build the sample is shown plainly as the card — no prompt, no
