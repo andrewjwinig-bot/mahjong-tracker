@@ -41,7 +41,11 @@ live in the sibling docs:
 
 ## 2. Native wrapper — see `capacitor.md`
 
-- [ ] `npm install` Capacitor; `npx cap init`; add iOS/Android.
+> **Scaffolded in-repo:** `capacitor.config.ts` is committed (hosted-URL,
+> appId `com.clubmahj.app`, splash + push configured), so `cap init` is done.
+
+- [ ] On a Mac with Xcode: install the Capacitor deps listed at the top of
+      `capacitor.config.ts`, set `CAP_SERVER_URL`, then `npx cap add ios` (+ android).
 - [ ] Choose hosted-URL (fast content updates) vs. static-export (offline-first).
 - [ ] Generate app icons + splash from a 1024×1024 source (current PWA icons are
       in `public/icons/`, regenerated via `npm run icons`).
@@ -50,12 +54,18 @@ live in the sibling docs:
 
 ## 3. Monetization / IAP — see `monetization.md`
 
-- [ ] Create products (monthly/annual subscriptions + lifetime non-consumable)
-      matching `PLANS` ids in `app/lib/pro.ts`; finalize prices.
-- [ ] Swap the mock unlock + `restorePurchases()` in `pro.ts` for real billing
-      (RevenueCat or StoreKit 2 / Play Billing). Keep the local flag as the
-      cached entitlement.
-- [ ] Verify **Restore purchases** on a fresh install (Apple requires it).
+> **Scaffolded in-repo:** `app/lib/billing.ts` is the provider abstraction
+> (mock on web, RevenueCat on native — auto-selected). The Paywall CTA and the
+> Settings "Restore purchases" row already call it; `pro.ts` stays the cached
+> entitlement. Wiring real money is now just steps 1–2 below.
+
+- [ ] Create products in App Store Connect / Play Console matching `PRODUCT_IDS`
+      in `billing.ts` (`mahj.pro.monthly/annual/lifetime`); finalize prices to
+      match `PLANS` in `pro.ts`.
+- [ ] In RevenueCat: add the products to the default offering + a `pro`
+      entitlement; `npm i @revenuecat/purchases-capacitor`; set
+      `NEXT_PUBLIC_REVENUECAT_KEY`. (No UI changes — billing.ts picks it up.)
+- [ ] Verify **Restore purchases** (Paywall + Settings) on a fresh install.
 - [ ] Confirm zero third-party ad/tracking SDKs.
 
 ## 4. Privacy & compliance (gates review)

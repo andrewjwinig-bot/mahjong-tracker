@@ -31,13 +31,19 @@ export function subscribePro(listener: Listener): () => void {
 }
 
 /**
- * Restore previous purchases. Stub for now — at native-wrap time this calls
- * StoreKit / Play Billing's restore and flips the flag if an entitlement is
- * found. Returns whether Pro is active afterward.
+ * Buy a plan / restore purchases. These delegate to the billing provider —
+ * mock on web/demo (flips the local flag), RevenueCat/StoreKit on native — so
+ * the paywall UI is identical in both worlds. Both resolve to whether Pro is
+ * active afterward. (Dynamic import avoids a pro.ts ⇄ billing.ts cycle.)
  */
+export async function purchasePlan(planId: Plan['id']): Promise<boolean> {
+  const { getBilling } = await import('./billing');
+  return getBilling().purchase(planId);
+}
+
 export async function restorePurchases(): Promise<boolean> {
-  // No store connected yet; nothing to restore.
-  return isPro();
+  const { getBilling } = await import('./billing');
+  return getBilling().restore();
 }
 
 // ---- Pricing (display-only until native IAP is wired) ---------------------

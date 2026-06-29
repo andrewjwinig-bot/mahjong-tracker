@@ -13,7 +13,7 @@ import { isDemoMode, setDemoData } from '../lib/demo';
 import AboutSheet from './AboutSheet';
 import Paywall from './Paywall';
 import { ProBanner, ProCrown } from './ProUpsell';
-import { setPro } from '../lib/pro';
+import { setPro, restorePurchases } from '../lib/pro';
 import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
@@ -332,6 +332,13 @@ export default function SettingsSheet({
 
       <div className="set-label">ACCOUNT</div>
       <div className="set-list">
+        <ValueRow
+          label="Restore purchases"
+          onClick={async () => {
+            const ok = await restorePurchases();
+            alert(ok ? 'Purchases restored — VIP is active.' : 'No previous purchase found for this account.');
+          }}
+        />
         <ValueRow label="Change password" value="Soon" />
         <ValueRow label="Help & rules" onClick={() => setAboutOpen(true)} />
         <ValueRow label="Privacy & terms" onClick={() => setAboutOpen(true)} last />

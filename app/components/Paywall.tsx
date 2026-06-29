@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ReactNode } from 'react';
 import { IconPalette, IconCard, IconUsers, IconCloud, IconBell, IconHeart } from './uiIcons';
-import { PLANS, planPriceLabel, restorePurchases, type Plan } from '../lib/pro';
+import { PLANS, planPriceLabel, purchasePlan, restorePurchases, type Plan } from '../lib/pro';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { ProCrown } from './ProUpsell';
@@ -42,13 +42,23 @@ export default function Paywall({
     else setRestoreMsg('No previous purchase found on this device.');
   }
 
-  // CTA → the success moment doubles as the close: celebrate, then (in the real
-  // app, on IAP success) set the Pro entitlement and dismiss the modal.
-  function goPro() {
+  // CTA → run the purchase (mock flips the flag instantly on web; native opens
+  // the store sheet). On success the celebration plays, then we unlock + close.
+  async function goPro() {
     if (firedRef.current) return;
     firedRef.current = true;
-    setCelebrating(true);
-    setTimeout(() => onUnlock(), 2300);
+    try {
+      const ok = await purchasePlan(planId);
+      if (ok) {
+        setCelebrating(true);
+        setTimeout(() => onUnlock(), 2300);
+        return;
+      }
+    } catch {
+      /* user cancelled or the purchase failed */
+    }
+    firedRef.current = false;
+    setRestoreMsg('Purchase didn’t complete. Please try again.');
   }
 
   return (
