@@ -264,7 +264,7 @@ export default function SettingsSheet({
             ))}
           </div>
           <div className="theme-vip-group">
-            <span className="tcard-pro vip-tab">🔒 VIP</span>
+            <span className="vip-tab">VIP</span>
             <div className="theme-grid2">
               {THEMES.filter((t) => t.pro).map((t) => (
                 <ThemeChip key={t.id} t={t} />
@@ -410,7 +410,7 @@ export default function SettingsSheet({
           {/* One VIP frame around the whole far-right column (joker/star/plum). */}
           {!pro && (
             <span className="vip-col-frame" aria-hidden>
-              <span className="tcard-pro vip-tab">🔒 VIP</span>
+              <span className="vip-tab">VIP</span>
             </span>
           )}
         </div>
