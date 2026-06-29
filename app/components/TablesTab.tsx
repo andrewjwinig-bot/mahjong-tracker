@@ -163,7 +163,6 @@ function TablesList({
   const [iconIdx, setIconIdx] = useState(0);
   const [paywall, setPaywall] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
-  const [inviteOpen, setInviteOpen] = useState(false);
   const pro = usePro();
   const atLimit = !pro && tables.length >= FREE_TABLE_LIMIT;
 
@@ -212,13 +211,10 @@ function TablesList({
         </p>
       )}
 
-      {/* People: add friends to your leaderboard + invite your crew to the app. */}
+      {/* People: one entry to find friends + invite your crew (combined page TBD). */}
       <div className="feed-actions" style={{ marginTop: 12 }}>
         <button className="feed-btn primary" onClick={() => setAddOpen(true)}>
-          <IconPlus size={16} /> ADD FRIEND
-        </button>
-        <button className="feed-btn pine" onClick={() => setInviteOpen(true)}>
-          <IconShare size={16} /> INVITE
+          <IconUsers size={16} /> FRIENDS
         </button>
       </div>
 
@@ -229,16 +225,6 @@ function TablesList({
             setAddOpen(false);
           }}
           onClose={() => setAddOpen(false)}
-        />
-      )}
-      {inviteOpen && (
-        <ShareModal
-          payload={{
-            title: 'Invite Your Crew 👯',
-            text: `Come track your mahjong wins with me on Club Mahj — let's race to clear all 70 hands! 🀄`,
-            url: typeof window !== 'undefined' ? window.location.origin : '',
-          }}
-          onClose={() => setInviteOpen(false)}
         />
       )}
 
