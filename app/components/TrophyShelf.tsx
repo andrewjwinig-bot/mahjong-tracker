@@ -182,8 +182,14 @@ export default function TrophyShelf({
 
         <div className="set-section">Trophies</div>
         <div className="trophy-grid">
-          {badges.map((b) => (
-            <div className="trophy" data-earned={b.earned} key={b.id} title={b.desc}>
+          {badges.map((b, idx) => (
+            <div
+              className="trophy"
+              data-earned={b.earned}
+              key={b.id}
+              title={b.desc}
+              style={{ ['--i' as string]: idx } as React.CSSProperties}
+            >
               <span className="trophy-emoji-wrap">
                 <span className="trophy-emoji">{b.emoji}</span>
                 {!b.earned && (

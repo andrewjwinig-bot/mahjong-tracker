@@ -97,12 +97,16 @@ export function SeasonsSheet({
         <h2>Challenge Seasons</h2>
         <p className="sheet-sub">A new themed goal every season.</p>
 
-        {CHALLENGES.map((c) => {
+        {CHALLENGES.map((c, idx) => {
           const { done, total } = challengeProgress(c, card, handCounts);
           const pct = total ? Math.round((done / total) * 100) : 0;
           const isActive = c.id === active.id;
           return (
-            <div key={c.id} className={`season-row${isActive ? ' active' : ''}`}>
+            <div
+              key={c.id}
+              className={`season-row${isActive ? ' active' : ''}`}
+              style={{ ['--i' as string]: idx } as React.CSSProperties}
+            >
               <span className="ch-emoji">{c.emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="ch-name" style={{ fontSize: 15 }}>

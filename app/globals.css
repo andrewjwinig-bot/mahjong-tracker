@@ -2173,7 +2173,11 @@ label.lbl {
   background: none;
   padding: 0;
   cursor: pointer;
+  transform-origin: 70% 30%;
+  animation: chSun 5s ease-in-out infinite;
 }
+@keyframes chSun { 0%,100% { opacity: 0.15; transform: rotate(0deg) scale(1); } 50% { opacity: 0.26; transform: rotate(14deg) scale(1.05); } }
+.ch-sun:active { opacity: 0.32; }
 .ch-sun svg {
   display: block;
   width: 100%;
@@ -2243,14 +2247,22 @@ label.lbl {
   gap: 12px;
   padding: 12px;
   border-radius: 16px;
-  background: var(--card);
+  background: linear-gradient(165deg, var(--card), #FCF7EC);
+  border: 1.5px solid var(--hairline);
   box-shadow: var(--shadow-sm);
+  animation: prDeal 0.34s ease both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
 }
 .season-row + .season-row {
   margin-top: 10px;
 }
 .season-row.active {
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
   box-shadow: 0 0 0 2px var(--brand), var(--shadow-sm);
+}
+.season-row .ch-emoji {
+  flex: none; width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+  font-size: 24px; background: var(--tint); box-shadow: inset 0 1px 3px rgba(20,30,22,0.06);
 }
 .season-now {
   margin-left: 8px;
@@ -4384,14 +4396,17 @@ label.lbl {
   gap: 3px;
   text-align: center;
   padding: 12px 8px;
-  border-radius: 9px;
+  border-radius: 12px;
   background: rgba(20, 22, 42, 0.035);
   border: 2px solid rgba(20, 22, 42, 0.06);
+  animation: trophyPop 0.4s cubic-bezier(0.2,0.8,0.3,1) both;
+  animation-delay: calc(var(--i, 0) * 0.04s);
 }
+@keyframes trophyPop { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .trophy[data-earned="true"] {
-  background: #fff;
+  background: linear-gradient(165deg, #fff, #FFF8EC);
   border: 2.5px solid var(--brand);
-  box-shadow: 0 4px 14px rgba(20, 22, 42, 0.1);
+  box-shadow: 0 5px 16px rgba(192,57,43,0.16);
 }
 /* Wrap holds the emblem + a corner lock chip; only the emblem dims when
    locked, so the lock chip stays crisp (parent opacity would composite both). */
