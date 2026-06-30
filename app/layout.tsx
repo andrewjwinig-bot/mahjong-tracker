@@ -30,7 +30,7 @@ const mono = Space_Mono({
 export const metadata: Metadata = {
   title: 'Club Mahj — The Original Mahj Social Network',
   description:
-    'The original mahj social network. Track your American Mahjong wins, clear all 70 hands, score live games, and play along with your table.',
+    'The original mahj social network. Track your American Mahjong wins, clear the card, score live games, follow friends, and play along with your table.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,

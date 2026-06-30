@@ -444,7 +444,7 @@ export default function SettingsSheet({
         <input className="field2" value={name} maxLength={24} placeholder="Your name" onChange={(e) => setName(e.target.value)} />
 
         <div className="set-label">BIO</div>
-        <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing all 70." value={bio} onChange={(e) => setBio(e.target.value)} />
+        <textarea className="field2 bio" rows={2} maxLength={120} placeholder="Mahjong addict. Chasing the whole card." value={bio} onChange={(e) => setBio(e.target.value)} />
       </div>
 
       {/* Save bar */}

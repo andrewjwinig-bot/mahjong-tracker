@@ -193,8 +193,8 @@ async function seedIfNeeded(): Promise<void> {
     },
     {
       id: 'f8', memberId: 'm_lois', memberName: 'Matthew', avatar: DEMO_AVATARS.m_lois,
-      kind: 'card_cleared', title: 'Card cleared!', eyebrow: '♛ CARD CLEARED', progress: '70/70', handLabel: null,
-      note: 'All 70 hands. Legendary. 👑', photo: null,
+      kind: 'card_cleared', title: 'Card cleared!', eyebrow: '♛ CARD CLEARED', progress: '65/65', handLabel: null,
+      note: 'Every hand on the card. Legendary. 👑', photo: null,
       createdAt: now - 4 * DAY, likes: 23, likedByMe: false, comments: [
         { id: 'c8', author: 'Lily', avatar: DEMO_AVATARS.m_sandra, text: 'ICON behavior 👑', createdAt: now - 4 * DAY + 1 * HOUR },
       ],

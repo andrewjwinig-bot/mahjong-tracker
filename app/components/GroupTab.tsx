@@ -97,6 +97,7 @@ function BannerMotif({ kind }: { kind: FeedKind }) {
 import { SAMPLE_CARD, TOTAL_HANDS } from '../lib/cardData';
 import { colorNotation } from '../lib/theme';
 import { track } from '../lib/analytics';
+import { inviteText } from '../lib/share';
 import { loadTables, nextGame, type NextGame } from '../lib/tables';
 import Avatar from './Avatar';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
@@ -978,7 +979,7 @@ interface NavWithContacts extends Navigator {
 async function inviteContacts() {
   void track('invite_contacts_opened');
   const url = typeof window !== 'undefined' ? window.location.origin : '';
-  const text = `Come track mahjong with me on Club Mahj — let's clear all 70 hands! 🀄 ${url}`;
+  const text = inviteText(url);
   const nav = navigator as NavWithContacts;
   // Android Chrome: real contact picker → prefill an SMS invite.
   if (nav.contacts?.select) {

@@ -77,7 +77,7 @@ export function computeBadges(
     { id: 'pts1000', name: 'Point Shark', emoji: '🦈', desc: 'Bank 1,000 points.', cond: s.points >= 1000 },
     { id: 'cat1', name: 'Category Clear', emoji: '🏅', desc: 'Clear a full category.', cond: s.categoriesCleared >= 1 },
     { id: 'cat5', name: 'Category Master', emoji: '🎖️', desc: 'Clear 5 categories.', cond: s.categoriesCleared >= 5 },
-    { id: 'card', name: 'Card Cleared', emoji: '👑', desc: 'Clear all 70 hands.', cond: s.cleared >= s.total },
+    { id: 'card', name: 'Card Cleared', emoji: '👑', desc: 'Clear every hand on the card.', cond: s.cleared >= s.total },
     { id: 'scholar', name: 'Mahjong Scholar', emoji: '🎓', desc: 'Finish every lesson in Learn.', cond: loadCompleted().length >= LESSONS.length },
     { id: 'streak3', name: 'Warmed Up', emoji: '🔥', desc: '3-day streak.', cond: bestStreak >= 3 },
     { id: 'streak7', name: 'Dedicated', emoji: '🔥', desc: '7-day streak.', cond: bestStreak >= 7 },

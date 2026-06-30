@@ -2,7 +2,7 @@
   "name": "mahjong-tracker",
   "version": "1.0.0",
   "private": true,
-  "description": "Track your American Mahjong wins and clear all 70 hands this year.",
+  "description": "Track your American Mahjong wins and clear the card this year.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

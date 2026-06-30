@@ -141,4 +141,4 @@ function build(): MahjongCard {
 }
 
 export const SAMPLE_CARD: MahjongCard = build();
-export const TOTAL_HANDS = SAMPLE_CARD.hands.length; // 70
+export const TOTAL_HANDS = SAMPLE_CARD.hands.length; // 65 on the 2026 sample card

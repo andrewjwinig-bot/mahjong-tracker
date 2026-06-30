@@ -150,7 +150,7 @@ const SECTIONS: Section[] = [
     body: (
       <>
         <p>The yearlong challenge: win <strong>every hand on the card at least once</strong> before next April’s new card drops. It’s the “collect them all” of mahjong.</p>
-        <p>The <strong>Card</strong> tab shows how many of the ~70 you’ve cleared, your total wins, and your points. Use the <strong>To Go</strong> filter to see what’s left to hunt.</p>
+        <p>The <strong>Card</strong> tab shows how many hands you’ve cleared, your total wins, and your points. Use the <strong>To Go</strong> filter to see what’s left to hunt.</p>
       </>
     ),
   },

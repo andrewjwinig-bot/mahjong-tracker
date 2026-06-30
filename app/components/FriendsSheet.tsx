@@ -8,6 +8,7 @@ import { isCloudEnabled } from '../lib/supabase';
 import { isDemoMode } from '../lib/demo';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { useEscape } from '../lib/useEscape';
+import { inviteText as inviteCopy } from '../lib/share';
 import {
   type CloudFriend,
   type CloudRequest,
@@ -98,7 +99,7 @@ export default function FriendsSheet({ members = [], onAdd, onRemove, onClose, h
   const [copied, setCopied] = useState(false);
 
   const inviteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://clubmahj.com';
-  const inviteText = `Come track your mahjong wins with me on Club Mahj — let's race to clear all 70 hands! 🀄`;
+  const inviteText = inviteCopy();
 
   // Load requests (with mutual counts), friends (with presence), and suggestions
   // from the backend, and ping presence. Cloud only.

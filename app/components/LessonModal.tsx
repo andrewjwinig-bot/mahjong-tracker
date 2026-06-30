@@ -272,31 +272,205 @@ function Decode({ groups }: { groups: DecodeGroup[] }) {
 
 /* ── meld building blocks ──────────────────────────────────────────────────── */
 
-const MELDS = [
-  { n: 2, name: 'Pair', note: 'Two matching tiles.' },
-  { n: 3, name: 'Pung', note: 'Three of a kind.' },
-  { n: 4, name: 'Kong', note: 'Four of a kind.' },
-  { n: 5, name: 'Quint', note: 'Five — jokers help here.' },
+type MeldTile = { face: TileSpec['face']; char?: string; color?: string; count?: number; joker?: boolean };
+
+const MELDS: { n: number; name: string; note: string; callable: boolean; tile: MeldTile; jokerAt?: number }[] = [
+  { n: 2, name: 'Pair', note: 'Two matching tiles. Can’t be called — must come from your own hand.', callable: false, tile: { face: 'dot', count: 5, color: '#2E86D4' } },
+  { n: 3, name: 'Pung', note: 'Three of a kind. You may call a discard to complete it.', callable: true, tile: { face: 'bam', count: 3 } },
+  { n: 4, name: 'Kong', note: 'Four of a kind. Callable — and worth more.', callable: true, tile: { face: 'crack', count: 7 }, jokerAt: 3 },
+  { n: 5, name: 'Quint', note: 'Five of a kind. Only possible with jokers.', callable: true, tile: { face: 'dragon', char: '中', color: '#E8455F' }, jokerAt: 3 },
 ];
 
 function Melds() {
+  const [sel, setSel] = useState(1); // start on Pung
+  const [tick, setTick] = useState(0);
+  const m = MELDS[sel];
   return (
-    <div className="ls-melds">
-      {MELDS.map((m) => (
-        <div className="ls-meld-row" key={m.name}>
-          <div className="ls-meld-tiles">
-            {Array.from({ length: m.n }).map((_, i) => (
-              <span key={i} className="ls-meld-tile" style={{ ['--i' as string]: i } as React.CSSProperties}>
-                <Tile face="crack" size={30} />
-              </span>
-            ))}
-          </div>
-          <div className="ls-meld-text">
-            <span className="ls-meld-name">{m.name} <em>· {m.n}</em></span>
-            <span className="ls-meld-note">{m.note}</span>
-          </div>
+    <div className="ls-meldlab">
+      <div className="ls-meld-chips">
+        {MELDS.map((x, i) => (
+          <button
+            key={x.name}
+            className="ls-meld-chip"
+            data-active={i === sel}
+            onClick={() => { setSel(i); setTick((t) => t + 1); }}
+          >
+            {x.name}<span>{x.n}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="ls-meld-stage" key={`${sel}-${tick}`}>
+        {Array.from({ length: m.n }).map((_, i) => {
+          const isJoker = m.jokerAt != null && i >= m.jokerAt;
+          return (
+            <span key={i} className="ls-meld-tile" style={{ ['--i' as string]: i } as React.CSSProperties}>
+              {isJoker
+                ? <Tile face="joker" size={42} />
+                : <Tile face={m.tile.face} char={m.tile.char} color={m.tile.color} count={m.tile.count} size={42} />}
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="ls-meld-caption">
+        <div className="ls-meld-cap-top">
+          <strong>{m.name}</strong>
+          <span className="ls-meld-n">{m.n} tiles</span>
+          <span className={`ls-meld-call ${m.callable ? 'yes' : 'no'}`}>
+            {m.callable ? 'Callable ✓' : 'Not callable'}
+          </span>
         </div>
-      ))}
+        <span className="ls-meld-note">{m.note}</span>
+        {m.jokerAt != null && <span className="ls-meld-joker-hint">★ Jokers (the star tiles) can fill in here.</span>}
+      </div>
+    </div>
+  );
+}
+
+/* ── choosing a hand: tiles-away comparison ────────────────────────────────── */
+
+type RackTile = { face: TileSpec['face']; char?: string; color?: string; count?: number };
+
+// "Your tiles" — a fixed sample rack used by the Targets widget.
+const YOUR_RACK: RackTile[] = [
+  { face: 'bam', count: 3 }, { face: 'bam', count: 3 }, { face: 'bam', count: 3 },
+  { face: 'dot', count: 6, color: '#2E86D4' }, { face: 'dot', count: 6, color: '#2E86D4' },
+  { face: 'flower' }, { face: 'flower' },
+  { face: 'crack', count: 9 }, { face: 'joker' },
+];
+
+const TARGETS = [
+  {
+    id: 'a', label: 'FFFF 3333 666 99', points: 25, away: 2,
+    verdict: 'Closest — you already hold the flowers, the 3 Bams, and a joker. Two tiles and it’s done.',
+    best: true,
+  },
+  {
+    id: 'b', label: '111 333 5555 7777', points: 50, away: 6,
+    verdict: 'Flashier and worth double — but you share almost nothing with it. Six tiles is a long road.',
+    best: false,
+  },
+];
+
+function Targets() {
+  const [pick, setPick] = useState<string | null>(null);
+  return (
+    <div className="ls-targets">
+      <div className="ls-rack-label">YOUR TILES</div>
+      <div className="ls-rack">
+        {YOUR_RACK.map((t, i) => (
+          <span key={i} className="ls-rack-tile" style={{ ['--i' as string]: i } as React.CSSProperties}>
+            <Tile face={t.face} char={t.char} color={t.color} count={t.count} size={26} />
+          </span>
+        ))}
+      </div>
+
+      <div className="ls-target-list">
+        {TARGETS.map((t) => {
+          const picked = pick === t.id;
+          const meter = Math.max(8, 100 - t.away * 15);
+          return (
+            <button
+              key={t.id}
+              className="ls-target"
+              data-picked={picked}
+              data-best={pick != null && t.best}
+              onClick={() => setPick(t.id)}
+            >
+              <div className="ls-target-top">
+                <span className="ls-target-note">{colorize(t.label)}</span>
+                <span className="ls-target-pts">{t.points}</span>
+              </div>
+              <div className="ls-away">
+                <div className="ls-away-bar"><span style={{ width: pick ? `${meter}%` : '0%' }} /></div>
+                <span className="ls-away-txt">{t.away} away</span>
+              </div>
+              {picked && <div className="ls-target-verdict">{t.verdict}</div>}
+            </button>
+          );
+        })}
+      </div>
+      {pick && (
+        <div className="ls-target-tip" data-ok={pick === 'a'}>
+          {pick === 'a'
+            ? '✓ Smart — the closer hand wins games. Speed beats points.'
+            : 'Tempting, but you’re 6 tiles out. The 25-point hand is 2 away — take the sure thing.'}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Tint the digits of a hand notation by their (illustrative) suit so the racks
+// and the card notation feel like the same language.
+function colorize(text: string): React.ReactNode {
+  return text.split(' ').map((grp, i) => (
+    <span key={i} style={{ marginRight: 6, color: GROUP_HEX(grp) }}>{grp}</span>
+  ));
+}
+function GROUP_HEX(grp: string): string {
+  if (/^F+$/.test(grp)) return '#C0392B';
+  if (/^D+$/.test(grp)) return '#1A1410';
+  const sum = [...grp].reduce((s, c) => s + c.charCodeAt(0), 0);
+  return [DECODE_HEX.green, DECODE_HEX.blue, DECODE_HEX.gold][sum % 3];
+}
+
+/* ── defensive play: safe-vs-dangerous discard picker ──────────────────────── */
+
+// The opponent across has these three exposed (a clear 2468-ish hand forming).
+const EXPOSED: RackTile[] = [
+  { face: 'dot', count: 4, color: '#2E86D4' }, { face: 'dot', count: 4, color: '#2E86D4' }, { face: 'dot', count: 4, color: '#2E86D4' },
+];
+
+const HAND_CHOICES: { id: string; tile: RackTile; safe: boolean; why: string }[] = [
+  { id: 'd4', tile: { face: 'dot', count: 4, color: '#2E86D4' }, safe: true, why: 'Already exposed on the table — it can’t start a new group. Safest throw.' },
+  { id: 'b8', tile: { face: 'bam', count: 8 }, safe: false, why: 'An 8 fits a 2-4-6-8 hand. With three 4-Dots down, even-number tiles are live.' },
+  { id: 'c1', tile: { face: 'crack', count: 1 }, safe: true, why: 'A lone 1 rarely fits their even-number exposure. Low risk.' },
+  { id: 'd6', tile: { face: 'dot', count: 6, color: '#2E86D4' }, safe: false, why: 'A 6-Dot is exactly what a 2468 Dots hand is hungry for. Don’t feed it.' },
+];
+
+function SafeDiscard() {
+  const [seen, setSeen] = useState<Set<string>>(new Set());
+  const [open, setOpen] = useState<string | null>(null);
+  const cur = HAND_CHOICES.find((c) => c.id === open) ?? null;
+  return (
+    <div className="ls-safe">
+      <div className="ls-safe-exposed">
+        <div className="ls-rack-label">ACROSS · EXPOSED</div>
+        <div className="ls-rack ls-rack-exposed">
+          {EXPOSED.map((t, i) => (
+            <span key={i} className="ls-rack-tile"><Tile face={t.face} char={t.char} color={t.color} count={t.count} size={28} /></span>
+          ))}
+        </div>
+      </div>
+
+      <div className="ls-rack-label">YOUR HAND — TAP ONE TO THROW</div>
+      <div className="ls-safe-hand">
+        {HAND_CHOICES.map((c) => (
+          <button
+            key={c.id}
+            className="ls-safe-tile"
+            data-seen={seen.has(c.id)}
+            data-safe={seen.has(c.id) ? c.safe : undefined}
+            data-active={open === c.id}
+            onClick={() => { setOpen(c.id); setSeen((s) => new Set(s).add(c.id)); }}
+          >
+            <Tile face={c.tile.face} char={c.tile.char} color={c.tile.color} count={c.tile.count} size={34} />
+            {seen.has(c.id) && <span className="ls-safe-flag" aria-hidden>{c.safe ? '✓' : '!'}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="ls-safe-readout" key={open ?? -1} data-tone={cur ? (cur.safe ? 'safe' : 'risk') : 'idle'}>
+        {cur ? (
+          <>
+            <strong>{cur.safe ? 'Safe to throw' : 'Dangerous — a gift'}</strong> {cur.why}
+          </>
+        ) : (
+          <span className="ls-explain-hint">Tap a tile from your hand to test it.</span>
+        )}
+      </div>
     </div>
   );
 }
@@ -487,6 +661,22 @@ function StepView({ step, onAnswered }: { step: Step; onAnswered: () => void }) 
           <h2 className="ls-title">{step.title}</h2>
           {step.body && <p className="ls-text">{step.body}</p>}
           <Melds />
+        </div>
+      );
+    case 'targets':
+      return (
+        <div className="ls-slide">
+          <h2 className="ls-title">{step.title}</h2>
+          {step.body && <p className="ls-text">{step.body}</p>}
+          <Targets />
+        </div>
+      );
+    case 'safety':
+      return (
+        <div className="ls-slide">
+          <h2 className="ls-title">{step.title}</h2>
+          {step.body && <p className="ls-text">{step.body}</p>}
+          <SafeDiscard />
         </div>
       );
     case 'quiz':

@@ -37,6 +37,8 @@ export type Step =
   | { k: 'wind'; title: string; body?: string }
   | { k: 'decode'; title: string; body?: string; groups: DecodeGroup[] }
   | { k: 'meld'; title: string; body?: string }
+  | { k: 'targets'; title: string; body?: string }
+  | { k: 'safety'; title: string; body?: string }
   | { k: 'note'; title: string; body: string; bullets?: string[]; hero?: HeroKind }
   | { k: 'quiz'; q: string; options: string[]; answer: number; explain: string }
   | { k: 'recap'; title: string; points: string[] };
@@ -230,7 +232,7 @@ export const LESSONS: Lesson[] = [
       {
         k: 'meld',
         title: 'The building blocks',
-        body: 'Identical tiles, grouped. The bigger the group, the more it’s usually worth.',
+        body: 'Identical tiles, grouped. Tap each one to deal it out — the bigger the group, the more it’s usually worth.',
       },
       {
         k: 'note',
@@ -274,6 +276,11 @@ export const LESSONS: Lesson[] = [
         body: 'You can’t chase every hand on the card. The real skill is committing to the right one — and not too early.',
       },
       {
+        k: 'targets',
+        title: 'Which hand is closer?',
+        body: 'Here are your tiles and two hands you could chase. Tap each to see how many tiles away it is — then pick.',
+      },
+      {
         k: 'note',
         title: 'Stay flexible, then commit',
         body: 'Through the Charleston, keep your options open. Commit only once your tiles clearly point one way.',
@@ -314,6 +321,11 @@ export const LESSONS: Lesson[] = [
         hero: 'table',
         title: 'When you can’t win',
         body: 'Some hands die. When yours does, switch to defense — your new job is to not hand anyone else the win.',
+      },
+      {
+        k: 'safety',
+        title: 'Pick a safe discard',
+        body: 'The player across has these tiles exposed. Tap each tile in your hand to see if it’s safe to throw — or a gift.',
       },
       {
         k: 'note',
