@@ -11,6 +11,7 @@ import PageTitle from './PageTitle';
 import { track } from '../lib/analytics';
 import Avatar from './Avatar';
 import TableIcon, { TABLE_MOTIFS } from './TableIcon';
+import PhotosEmpty from './PhotosEmpty';
 import ShareModal from './ShareModal';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
 import Paywall from './Paywall';
@@ -840,10 +841,7 @@ function PhotosView({
       </button>
 
       {table.photos.length === 0 ? (
-        <div className="empty">
-          <div className="big">📷</div>
-          No photos yet. Snap your prettiest hands &amp; wins!
-        </div>
+        <PhotosEmpty />
       ) : (
         <div className="photo-grid">
           {table.photos.map((p) => (

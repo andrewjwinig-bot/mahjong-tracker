@@ -9583,3 +9583,199 @@ label.lbl {
   text-align: center; font-size: 13px; font-weight: 700; line-height: 1.4;
   color: var(--title-color, #3E5447); opacity: 0.82; margin: 9px auto 18px; max-width: 300px;
 }
+
+/* ════ Photos empty state (table Photos tab) ════ */
+.photos-empty {
+  margin-top: 14px;
+  background: linear-gradient(180deg, #EAF4ED, #E2EFE6);
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 26px 24px;
+}
+.pe-panel {
+  position: relative;
+  background: #ffffff;
+  border: 2.5px solid rgba(20, 22, 42, 0.09);
+  border-radius: 16px;
+  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.12);
+  padding: 28px 22px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+.pe-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 70px;
+  background: linear-gradient(180deg, rgba(26, 164, 92, 0.06), transparent);
+  pointer-events: none;
+}
+.pe-cluster-region {
+  position: relative;
+  width: 100%;
+  height: 158px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.pe-glow {
+  position: absolute;
+  width: 230px;
+  height: 170px;
+  background: radial-gradient(closest-side, rgba(26, 164, 92, 0.3), transparent);
+  animation: peGlow 3.8s ease-in-out infinite;
+}
+.pe-cluster {
+  position: relative;
+  width: 200px;
+  height: 176px;
+  transform: scale(1.28);
+}
+
+/* Polaroid wrappers: float → rotate → deal-in → frame → photo window */
+.pe-float { position: absolute; }
+.pe-float-a { left: 28px; top: 44px; z-index: 1; animation: peFloat 3s ease-in-out 0.9s infinite; }
+.pe-float-b { left: 104px; top: 44px; z-index: 1; animation: peFloat 3.3s ease-in-out 1.1s infinite; }
+.pe-float-c { left: 66px; top: 54px; z-index: 5; animation: peFloat 3.6s ease-in-out 1.3s infinite; }
+.pe-rot-a { transform: rotate(-12deg); }
+.pe-rot-b { transform: rotate(12deg); }
+.pe-rot-c { transform: rotate(-3deg); }
+.pe-deal { animation: peDeal 0.55s cubic-bezier(0.2, 0.72, 0.3, 1.06) both; }
+.pe-deal-a { animation-delay: 0s; }
+.pe-deal-b { animation-delay: 0.12s; }
+.pe-deal-c { animation-delay: 0.26s; }
+.pe-frame {
+  background: #ffffff;
+  border-radius: 5px;
+  padding: 6px 6px 15px;
+}
+.pe-frame-a,
+.pe-frame-b { box-shadow: 0 7px 16px rgba(7, 24, 13, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+.pe-frame-c { position: relative; box-shadow: 0 9px 20px rgba(7, 24, 13, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+.pe-photo {
+  position: relative;
+  width: 50px;
+  height: 40px;
+  box-sizing: content-box;
+  border-radius: 3px;
+  background: radial-gradient(circle at 50% 38%, #2fa060 0%, #1c7a40 66%, #155f32 100%);
+  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.2), inset 0 -7px 14px rgba(7, 24, 13, 0.4);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A — two-tile fan logo */
+.pe-fan { position: relative; width: 42px; height: 30px; }
+.pe-fan-tile {
+  position: absolute;
+  top: 2px;
+  width: 19px;
+  height: 25px;
+  border-radius: 4px;
+  border: 1px solid rgba(20, 22, 42, 0.16);
+  background: linear-gradient(157deg, #ffffff 0%, #fbf7ec 50%, #ebe2ce 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pe-fan-l { left: 2px; transform: rotate(-11deg); box-shadow: 0 3px 6px rgba(0, 0, 0, 0.32); z-index: 1; }
+.pe-fan-r { right: 2px; transform: rotate(9deg); box-shadow: 0 3px 7px rgba(0, 0, 0, 0.36); z-index: 2; }
+.pe-fan-l img { width: 14px; height: 19px; object-fit: contain; }
+
+/* B — winning dragon hand (R / G + white-dragon soap) */
+.pe-hand { display: flex; gap: 2px; align-items: center; justify-content: center; }
+.pe-mini {
+  width: 11px;
+  height: 15px;
+  border-radius: 2.5px;
+  border: 0.5px solid rgba(20, 22, 42, 0.14);
+  background: linear-gradient(178deg, #fffefb, #efe9da);
+  box-shadow: 0 1.5px 0 #e2d9c2, 0 2px 4px rgba(7, 24, 13, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 9px;
+  line-height: 1;
+}
+.pe-soap { width: 6px; height: 8px; border: 1px solid #3b6fe0; border-radius: 1px; }
+
+/* C — Club Mahj wordmark + camera glint */
+.pe-mark { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.pe-mark-club {
+  font-family: var(--font-app), 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 6px;
+  letter-spacing: 2.5px;
+  color: #f5d58a;
+  padding-left: 2.5px;
+}
+.pe-mark-word {
+  font-family: var(--font-display), 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: -0.8px;
+  color: #ffffff;
+  text-shadow: 1.5px 1.5px 0 #0c3325;
+  line-height: 0.8;
+}
+.pe-glint {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 72% 22%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 22%, transparent 46%);
+  animation: peGlint 4.6s ease-in-out 1.6s infinite;
+}
+
+/* Heading + subtitle */
+.pe-title {
+  margin: 0 0 6px;
+  font-family: var(--font-display), 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.3px;
+  color: #15402c;
+  line-height: 1.05;
+}
+.pe-sub {
+  margin: 0;
+  max-width: 236px;
+  font-family: var(--font-app), 'Hanken Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6a7a70;
+}
+.pe-sub b { font-weight: 700; color: #15803d; }
+
+@keyframes peDeal {
+  from { transform: translateY(13px) scale(0.8); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes peFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes peGlow {
+  0%, 100% { opacity: 0.28; transform: scale(0.9); }
+  50% { opacity: 0.46; transform: scale(1.06); }
+}
+@keyframes peGlint {
+  0% { opacity: 0; }
+  4% { opacity: 0.92; }
+  8% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pe-float, .pe-glow, .pe-glint, .pe-deal { animation: none !important; }
+}
