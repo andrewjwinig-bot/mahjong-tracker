@@ -12,6 +12,7 @@ import {
 } from '../lib/handMatch';
 import Tile from './Tile';
 import Paywall from './Paywall';
+import { colorNotation } from '../lib/theme';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 import { usePro } from '../lib/usePro';
@@ -94,9 +95,16 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
         style={swipe.style}
       >
         <div className="grab" />
-        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <IconTarget size={20} /> Practice
-        </h2>
+        <div className="pr-hero">
+          <span className="pr-medal" aria-hidden>
+            <span className="pr-ring" />
+            <IconTarget size={26} />
+          </span>
+          <div>
+            <div className="pr-kicker">PRACTICE · STUDY THE CARD</div>
+            <h2 className="pr-title">What can I make?</h2>
+          </div>
+        </div>
         <p className="sheet-sub">
           Build a rack and see which hands you’re closest to. For studying the card — not for live play.
         </p>
@@ -160,15 +168,27 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
         {results && (
           <>
             <div className="set-section">You’re closest to</div>
-            {results.slice(0, 6).map((m) => (
-              <div className="match-row" key={m.hand.id}>
+            {results.slice(0, 6).map((m, idx) => {
+              const away = Math.max(0, m.total - m.matched);
+              return (
+              <div
+                className="match-row"
+                key={m.hand.id}
+                data-close={away <= 2 ? 'true' : undefined}
+                style={{ ['--i' as string]: idx } as React.CSSProperties}
+              >
                 <div className="match-head">
-                  <span className="match-notation">{m.hand.notation}</span>
-                  <span className="match-pct">{m.matched}/{m.total}</span>
+                  <span className="match-rank">{idx + 1}</span>
+                  <span className="match-notation">
+                    {colorNotation(m.hand.notation).map((g, j) => (
+                      <span key={j} className={g.cls}>{g.text} </span>
+                    ))}
+                  </span>
+                  <span className="match-away" data-done={away === 0 ? 'true' : undefined}>
+                    {away === 0 ? 'Complete!' : `${away} away`}
+                  </span>
                 </div>
-                <div className="progress" style={{ height: 7, marginTop: 0 }}>
-                  <span style={{ width: `${m.pct}%` }} />
-                </div>
+                <div className="pr-bar"><span style={{ width: `${m.pct}%` }} /></div>
                 <div className="match-meta">
                   <span style={{ color: 'var(--muted)' }}>
                     {m.hand.category} · {m.hand.points} pts
@@ -187,7 +207,8 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </>
         )}
 
