@@ -3898,18 +3898,30 @@ label.lbl {
 /* ---- Tables: list -------------------------------------------------------- */
 
 .table-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 14px;
-  border: 2.5px solid var(--hairline);
-  border-radius: 8px;
-  background: var(--card);
-  box-shadow: 0 10px 26px rgba(20, 22, 42, 0.13);
+  padding: 14px 14px 14px 17px;
+  border: 2px solid var(--hairline);
+  border-radius: 16px;
+  background: linear-gradient(165deg, var(--card), #FCF7EC);
+  box-shadow: 0 8px 22px rgba(20, 22, 42, 0.11);
+  overflow: hidden;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+/* a felt-green spine down the left edge, turning red + pulsing when unread */
+.table-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, #3FB069, #1F7D43);
 }
 .table-row + .table-row {
   margin-top: 10px;
+}
+.table-row .table-icon-wrap {
+  width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center;
+  background: var(--tint); box-shadow: inset 0 1px 3px rgba(20,30,22,0.06);
 }
 /* Unread badge on a table's icon (multiple tables → see which has new chat). */
 .table-icon-wrap {
@@ -3935,10 +3947,15 @@ label.lbl {
   border: 2px solid var(--card);
   box-shadow: 0 1px 3px rgba(20, 22, 42, 0.3);
 }
-/* A table with unread chat gets a subtly stronger border. */
+/* A table with unread chat gets a red, gently pulsing spine + stronger border. */
 .table-row[data-unread="true"] {
   border-color: color-mix(in srgb, #e8473e 35%, var(--hairline));
 }
+.table-row[data-unread="true"]::before {
+  background: linear-gradient(180deg, #F0584E, #C0392B);
+  animation: tableSpine 1.8s ease-in-out infinite;
+}
+@keyframes tableSpine { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
 .table-row:active {
   transform: scale(0.99);
 }
@@ -6452,7 +6469,12 @@ label.lbl {
   display: flex;
   align-items: center;
   gap: 11px;
+  animation: seatDeal 0.34s ease both;
 }
+.seat-row:nth-child(2) { animation-delay: 0.06s; }
+.seat-row:nth-child(3) { animation-delay: 0.12s; }
+.seat-row:nth-child(4) { animation-delay: 0.18s; }
+@keyframes seatDeal { from { transform: translateX(-10px); opacity: 0; } to { transform: none; opacity: 1; } }
 .seat-av {
   flex: none;
   width: 48px;
@@ -6591,10 +6613,11 @@ label.lbl {
   transition: background 0.15s ease;
 }
 .len-seg-btn[data-active="true"] {
-  background: var(--brand);
+  background: linear-gradient(165deg, var(--brand), #9E2D22);
   color: #fff;
   text-shadow: 1px 1px 0 var(--brand-deep);
-  box-shadow: 0 4px 12px rgba(20, 22, 42, 0.18);
+  box-shadow: 0 5px 14px rgba(192,57,43,0.32);
+  transform: translateY(-1px);
 }
 .len-hint {
   margin: 8px 2px 0;

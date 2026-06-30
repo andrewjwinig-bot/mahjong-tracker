@@ -109,7 +109,7 @@ function DotGlyph() {
   );
 }
 
-// Red 中 dragon tile glyph (END GAME button, right) — framed CJK glyph.
+// Red "R" dragon tile glyph (END GAME button, right) — framed letter tile.
 function DragonGlyph() {
   const px = 15;
   return (
@@ -131,7 +131,7 @@ function DragonGlyph() {
         lineHeight: 1,
       }}
     >
-      中
+      R
     </span>
   );
 }
@@ -381,7 +381,7 @@ export default function GameScorer({
     document.body.appendChild(layer);
     const W = window.innerWidth;
     const H = window.innerHeight;
-    const glyphs = ['中', '發', '東', '南', '西', '北', '花'];
+    const glyphs = ['R', 'G', 'N', 'E', 'W', 'S', 'F'];
     for (let i = 0; i < 26; i++) {
       const w = 15 + Math.round(Math.random() * 10);
       const h = Math.round(w * 1.34);
@@ -426,7 +426,7 @@ export default function GameScorer({
     if (!root) return;
     const W = root.clientWidth;
     const H = root.clientHeight;
-    const glyphs = ['中', '發', '東', '南', '西', '北', '花'];
+    const glyphs = ['R', 'G', 'N', 'E', 'W', 'S', 'F'];
     const cols = ['#C0392B', '#2E86D4', '#1F8A5B', '#E2568F', '#F5A524'];
     for (let i = 0; i < 34; i++) {
       const tile = Math.random() < 0.5;
@@ -708,7 +708,7 @@ export default function GameScorer({
               <span className="score-cta-shine" aria-hidden />
               <span className="score-cta-tile cta-tile-l" style={{ color: '#C0392B' }}>萬</span>
               <span className="score-cta-label">START GAME</span>
-              <span className="score-cta-tile cta-tile-r" style={{ color: '#15803D' }}>發</span>
+              <span className="score-cta-tile cta-tile-r" style={{ color: '#15803D' }}>G</span>
             </button>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={onClose}>
               Cancel
