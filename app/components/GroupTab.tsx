@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Tile from './Tile';
+import TableIcon from './TableIcon';
 import FriendsSheet from './FriendsSheet';
 import type { Comment, FeedKind, FeedPost, GroupMember, Profile, TileAvatar } from '../lib/social';
 import { YOU_ID } from '../lib/social';
@@ -373,7 +374,7 @@ export default function GroupTab({
                   } as unknown as CSSProperties
                 }
               >
-                <Tile face={nextG.icon.face} char={nextG.icon.char} color={nextG.icon.color} size={t.w} />
+                <TableIcon motif={nextG.icon} size={t.w} />
               </span>
             ))}
           </span>

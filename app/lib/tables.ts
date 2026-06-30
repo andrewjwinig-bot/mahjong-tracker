@@ -47,7 +47,8 @@ export interface TablePhoto {
 export interface Table {
   id: string;
   name: string;
-  icon: TileAvatar;
+  /** Motif key string (see TableIcon's TABLE_MOTIFS). Stable across screens. */
+  icon: string;
   inviteCode: string;
   members: TableMember[];
   messages: ChatMsg[];
@@ -59,10 +60,28 @@ const K_TABLES = 'tables.v7'; // bump: demo people now use motif-tile avatars
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
-const A = (face: TileAvatar['face'], color: string, char?: string): TileAvatar => ({ face, color, char });
 // A hand-drawn motif tile (the avatar-picker art) keyed by name, so demo people
 // match the avatars users can actually choose.
 const M = (char: string): TileAvatar => ({ face: 'motif', char, color: 'multi' });
+
+// Coerce a stored icon to a motif-key string. Tables used to store the icon as
+// a TileAvatar object ({face,color,char}); map any legacy object onto the new
+// table-motif set so existing/created tables keep a sensible icon.
+function coerceIcon(icon: unknown): string {
+  if (typeof icon === 'string') return icon;
+  if (icon && typeof icon === 'object') {
+    const a = icon as { face?: string; char?: string };
+    const byChar: Record<string, string> = { '中': 'dragon', '發': 'fa_green', '萬': 'wan', '東': 'crane_fit' };
+    if (a.char && byChar[a.char]) return byChar[a.char];
+    const byFace: Record<string, string> = {
+      crack: 'wan', bam: 'bamboo_stalk', dot: 'dot_target', flower: 'flower_peony',
+      dragon: 'dragon', wind: 'crane_fit', joker: 'star',
+    };
+    if (a.face === 'motif' && a.char) return a.char;
+    if (a.face && byFace[a.face]) return byFace[a.face];
+  }
+  return 'crane_fit';
+}
 const PERSON: Record<string, TileAvatar> = {
   Lily: M('peony'),
   Nicole: M('crane'),
@@ -84,7 +103,7 @@ function seed(): Table[] {
     {
       id: 't_tuesday',
       name: 'Tuesday Game',
-      icon: A('crack', '#D23B4E'),
+      icon: 'wan',
       inviteCode: 'MAHJ-2026',
       members: [
         { name: 'Lily', avatar: PERSON.Lily },
@@ -110,7 +129,7 @@ function seed(): Table[] {
     {
       id: 't_moms',
       name: 'Mahjong Moms',
-      icon: A('flower', '#E84C8A'),
+      icon: 'flower_peony',
       inviteCode: 'MOMS-7788',
       members: [
         { name: 'Greg', avatar: PERSON.Greg },
@@ -136,7 +155,9 @@ function seed(): Table[] {
 const SEED_IDS = new Set(['t_tuesday', 't_moms']);
 
 export async function loadTables(): Promise<Table[]> {
-  const existing = await getMeta<Table[] | null>(K_TABLES, null);
+  const stored = await getMeta<Table[] | null>(K_TABLES, null);
+  // Migrate any legacy object icons → motif-key strings.
+  const existing = stored ? stored.map((t) => ({ ...t, icon: coerceIcon(t.icon) })) : null;
   // Real app: never seed; hide the built-in demo tables, but keep any table you
   // actually made/joined.
   if (!isDemoMode()) {
@@ -218,7 +239,7 @@ export function unreadCount(tables: Table[], youName: string): number {
 export interface NextGame {
   tableId: string;
   tableName: string;
-  icon: TileAvatar;
+  icon: string;
   date: string;
   time?: string;
   votes: number;

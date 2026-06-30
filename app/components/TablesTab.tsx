@@ -10,7 +10,7 @@ import { downscaleImage } from '../lib/image';
 import PageTitle from './PageTitle';
 import { track } from '../lib/analytics';
 import Avatar from './Avatar';
-import Tile from './Tile';
+import TableIcon, { TABLE_MOTIFS } from './TableIcon';
 import ShareModal from './ShareModal';
 import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
 import Paywall from './Paywall';
@@ -20,21 +20,8 @@ import FriendsSheet from './FriendsSheet';
 import { usePro } from '../lib/usePro';
 import { setPro, FREE_TABLE_LIMIT } from '../lib/pro';
 import type { TileAvatar } from '../lib/social';
-import type { TileFace } from '../lib/tileArt';
 
 type View = 'chat' | 'dates' | 'photos';
-
-// Custom tile icons a table can pick from.
-const TABLE_ICONS: TileAvatar[] = [
-  { face: 'crack' as TileFace, color: '#D23B4E' },
-  { face: 'bam', color: '#2E9E50' },
-  { face: 'dot', color: '#1E73C4' },
-  { face: 'flower', color: '#E84C8A' },
-  { face: 'dragon', char: '中', color: '#D23B4E' },
-  { face: 'dragon', char: '發', color: '#1FA85B' },
-  { face: 'wind', char: '東', color: '#2C3A57' },
-  { face: 'joker', color: '#7C5CE0' },
-];
 
 export default function TablesTab({
   profile,
@@ -162,7 +149,7 @@ function TablesList({
 }) {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
-  const [iconIdx, setIconIdx] = useState(0);
+  const [motif, setMotif] = useState<string>(TABLE_MOTIFS[0]);
   const [paywall, setPaywall] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const pro = usePro();
@@ -180,7 +167,7 @@ function TablesList({
     onCreate({
       id: `t_${Date.now()}`,
       name: n,
-      icon: TABLE_ICONS[iconIdx],
+      icon: motif,
       inviteCode: code,
       members: [{ name: profile.name, avatar: profile.avatar }],
       messages: [],
@@ -190,7 +177,7 @@ function TablesList({
     void track('table_created');
     setCreating(false);
     setName('');
-    setIconIdx(0);
+    setMotif(TABLE_MOTIFS[0]);
   }
 
   return (
@@ -237,7 +224,7 @@ function TablesList({
           return (
             <button key={t.id} className="table-row" data-unread={unread > 0} onClick={() => onOpen(t.id)}>
               <span className="table-icon-wrap">
-                <Tile face={t.icon.face} char={t.icon.char} color={t.icon.color} size={54} />
+                <TableIcon motif={t.icon} size={50} />
                 {unread > 0 && <span className="table-unread">{unread > 9 ? '9+' : unread}</span>}
               </span>
               <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
@@ -296,19 +283,17 @@ function TablesList({
                 onKeyDown={(e) => e.key === 'Enter' && create()}
               />
 
-              <label className="lbl" style={{ marginTop: 14 }}>
-                Table icon
-              </label>
-              <div className="avatar-grid">
-                {TABLE_ICONS.map((t, i) => (
+              <div className="tbicon-label">TABLE ICON</div>
+              <div className="tbicon-grid">
+                {TABLE_MOTIFS.map((m) => (
                   <button
-                    key={i}
-                    className="avatar-opt"
-                    data-active={iconIdx === i}
-                    onClick={() => setIconIdx(i)}
+                    key={m}
+                    className="tbicon-btn"
+                    aria-label={m}
+                    aria-pressed={motif === m}
+                    onClick={() => setMotif(m)}
                   >
-                    <Tile face={t.face} char={t.char} color={t.color} size={42} />
-                    {iconIdx === i && <span className="avatar-check" aria-hidden>✓</span>}
+                    <TableIcon motif={m} selected={motif === m} />
                   </button>
                 ))}
               </div>
@@ -359,7 +344,7 @@ function TableDetail({
         <button className="icon-btn" onClick={onBack} aria-label="Back to tables">
           ‹
         </button>
-        <Tile face={table.icon.face} char={table.icon.char} color={table.icon.color} size={38} />
+        <TableIcon motif={table.icon} size={38} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="detail-title">{table.name}</div>
           <div className="detail-sub">{table.members.length + 1} players</div>
