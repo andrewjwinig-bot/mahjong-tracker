@@ -134,7 +134,7 @@ function TableDiagram({ players }: { players: 3 | 2 }) {
             <span key={p} className={`rg-seat rg-seat-${p}${label === 'You' ? ' is-you' : ''}`}>{label.trim()}</span>
           );
         })}
-        <span className="rg-felt-mark">中</span>
+        <span className="rg-felt-mark" aria-hidden><b>CLUB</b><i>Mahj</i></span>
       </div>
       <div className="rg-passes">
         {passes.map((p) => (

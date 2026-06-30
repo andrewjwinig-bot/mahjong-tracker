@@ -18,7 +18,7 @@ function HeroArt({ kind }: { kind: HeroKind }) {
           {['top', 'right', 'bottom', 'left'].map((p) => (
             <span key={p} className={`ls-seat ls-seat-${p}`} />
           ))}
-          <span className="ls-felt-mark">中</span>
+          <span className="ls-felt-mark" aria-hidden><b>CLUB</b><i>Mahj</i></span>
         </div>
       </div>
     );
@@ -119,7 +119,7 @@ function Charleston() {
             <i /><i /><i />
           </span>
         )}
-        <span className="ls-felt-mark">中</span>
+        <span className="ls-felt-mark" aria-hidden><b>CLUB</b><i>Mahj</i></span>
       </div>
 
       <div className="ls-charleston-label">
