@@ -27,10 +27,15 @@ const mono = Space_Mono({
   display: 'swap',
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app';
+const APP_TITLE = 'Club Mahj — The Original Mahj Social Network';
+const APP_DESC =
+  'The original mahj social network. Track your American Mahjong wins, clear the card, score live games, follow friends, and play along with your table.';
+
 export const metadata: Metadata = {
-  title: 'Club Mahj — The Original Mahj Social Network',
-  description:
-    'The original mahj social network. Track your American Mahjong wins, clear the card, score live games, follow friends, and play along with your table.',
+  metadataBase: new URL(SITE_URL),
+  title: APP_TITLE,
+  description: APP_DESC,
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
@@ -40,6 +45,19 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icons/icon-192.png',
     apple: '/icons/apple-touch-icon.png',
+  },
+  // og:image / twitter:image are supplied by app/opengraph-image.tsx + twitter-image.tsx.
+  openGraph: {
+    type: 'website',
+    siteName: 'Club Mahj',
+    title: APP_TITLE,
+    description: APP_DESC,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: APP_TITLE,
+    description: APP_DESC,
   },
 };
 

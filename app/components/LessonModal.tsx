@@ -700,6 +700,7 @@ function StepView({ step, onAnswered }: { step: Step; onAnswered: () => void }) 
               </li>
             ))}
           </ul>
+          <div className="ls-recap-brand" aria-hidden><b>CLUB</b><i>Mahj</i></div>
         </div>
       );
   }

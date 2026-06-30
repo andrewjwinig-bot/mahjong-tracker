@@ -49,15 +49,25 @@ export async function buildShareCard(win: Win, handLabel: string | null): Promis
     ctx.stroke();
   }
   ctx.restore();
+  // Club Mahj wordmark lockup: "CLUB" letterspaced over a big "Mahj", with a
+  // "2026 SEASON" tag beneath — the same brand lockup used across the app.
+  const lctx = ctx as CanvasRenderingContext2D & { letterSpacing: string };
   ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  ctx.font = `800 34px ${RND}`;
-  ctx.fillText('LET’S MAHJ', 64, 92);
-  ctx.font = `800 66px ${RND}`;
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  ctx.font = `800 30px ${RND}`;
+  lctx.letterSpacing = '7px';
+  ctx.fillText('CLUB', 66, 70);
+  lctx.letterSpacing = '0px';
+  ctx.font = `900 76px ${RND}`;
   ctx.fillStyle = SC_BRAND_DEEP;
-  ctx.fillText('2026 Season', 69, 165);
+  ctx.fillText('Mahj', 68, 150);
   ctx.fillStyle = '#fff';
-  ctx.fillText('2026 Season', 64, 160);
+  ctx.fillText('Mahj', 64, 146);
+  ctx.font = `800 24px ${RND}`;
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  lctx.letterSpacing = '5px';
+  ctx.fillText('2026 SEASON', 66, 188);
+  lctx.letterSpacing = '0px';
 
   // A 中 paper tile on the right of the band (design frame 7).
   drawTile(ctx, W - 176, 40, 110, 138, -6, '中', SC_BRAND, 56);
@@ -192,7 +202,7 @@ export async function buildTrophyCard(d: TrophyCardData): Promise<Blob> {
 
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
   ctx.font = '800 40px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('🀄  MY MAHJONG STATS', 64, 110);
+  ctx.fillText('🀄  MY CLUB MAHJ STATS', 64, 110);
 
   const cardX = 56;
   const cardY = 160;
@@ -242,7 +252,7 @@ export async function buildTrophyCard(d: TrophyCardData): Promise<Blob> {
 
   ctx.fillStyle = COLORS.muted;
   ctx.font = '700 30px ui-rounded, "SF Pro Rounded", system-ui, sans-serif';
-  ctx.fillText('Tracked with Mahjong Tracker', cardX + pad, cardY + cardH - 48);
+  ctx.fillText('Tracked with Club Mahj · clubmahj.com', cardX + pad, cardY + cardH - 48);
 
   return await new Promise<Blob>((resolve) =>
     canvas.toBlob((b) => resolve(b ?? new Blob()), 'image/png'),

@@ -9407,6 +9407,9 @@ label.lbl {
 .ls-recap-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 340px; }
 .ls-recap-list li { display: flex; align-items: flex-start; gap: 9px; text-align: left; font-size: 13.5px; font-weight: 600; line-height: 1.35; color: #14402A; background: #fff; border: 1.5px solid var(--hairline); border-radius: 12px; padding: 11px 13px; animation: lsSlide 0.3s ease both; animation-delay: calc(var(--i) * 0.08s + 0.1s); }
 .ls-recap-list li svg { flex: none; color: #2E7D43; margin-top: 1px; }
+.ls-recap-brand { display: flex; flex-direction: column; align-items: center; line-height: 0.9; margin-top: 22px; opacity: 0.5; }
+.ls-recap-brand b { font-family: var(--font-mono), monospace; font-weight: 700; font-size: 8px; letter-spacing: 3px; margin-left: 3px; color: #2E7D43; }
+.ls-recap-brand i { font-family: var(--font-display), 'Bricolage Grotesque', system-ui, sans-serif; font-style: normal; font-weight: 800; font-size: 19px; letter-spacing: -0.4px; color: #14402A; }
 
 /* ── Onboarding 3-step wizard (account → experience → tile) ── */
 .onboard-steps { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }

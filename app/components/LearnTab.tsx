@@ -372,7 +372,7 @@ export default function LearnTab({
             <span className="learn-grad-shine" />
           </div>
           <div className="learn-grad-text">
-            <div className="learn-grad-kicker">TROPHY UNLOCKED</div>
+            <div className="learn-grad-kicker">CLUB MAHJ · TROPHY UNLOCKED</div>
             <div className="learn-grad-title">Mahjong Scholar</div>
             <p>You finished every lesson. The trophy’s on your shelf — now go clear the card. 🀄</p>
           </div>
