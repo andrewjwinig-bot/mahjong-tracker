@@ -9133,7 +9133,7 @@ label.lbl {
 
 /* reference-section visuals (felt diagrams + clear board) — match lesson art */
 .rg-table { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 4px 0 14px; }
-.rg-felt { position: relative; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #4FA86A, #2E7D43 70%); box-shadow: inset 0 2px 8px rgba(255,255,255,0.25), 0 8px 18px rgba(31,125,67,0.28); display: grid; place-items: center; }
+.rg-felt { position: relative; width: 110px; height: 110px; border-radius: 20px; background: radial-gradient(circle at 50% 40%, #4FA86A, #2E7D43 70%); box-shadow: inset 0 2px 8px rgba(255,255,255,0.25), 0 8px 18px rgba(31,125,67,0.28); display: grid; place-items: center; }
 .rg-felt-mark { font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 24px; color: rgba(255,255,255,0.5); }
 .rg-seat { position: absolute; width: 26px; height: 18px; border-radius: 5px; background: linear-gradient(180deg,#FFFEFB,#F1EBDD); box-shadow: 0 2px 5px rgba(20,30,22,0.3); display: grid; place-items: center; font-family: var(--font-mono), monospace; font-size: 8px; font-weight: 700; color: #6E7E72; }
 .rg-seat.is-you { background: var(--brand); color: #fff; width: 32px; }
@@ -9229,7 +9229,7 @@ label.lbl {
 .ls-hero-fan { gap: 0; }
 .ls-fan-tile { display: inline-block; margin: 0 -6px; transform: rotate(calc((var(--i) - 1.5) * 9deg)) translateY(calc(var(--i) * -1px)); animation: lsBob 3s ease-in-out infinite; animation-delay: calc(var(--i) * 0.18s); filter: drop-shadow(0 6px 10px rgba(20,22,42,0.18)); }
 @keyframes lsBob { 0%,100% { translate: 0 0; } 50% { translate: 0 -5px; } }
-.ls-felt { position: relative; width: 116px; height: 116px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #4FA86A, #2E7D43 70%); box-shadow: inset 0 2px 8px rgba(255,255,255,0.25), 0 8px 18px rgba(31,125,67,0.3); display: grid; place-items: center; }
+.ls-felt { position: relative; width: 116px; height: 116px; border-radius: 22px; background: radial-gradient(circle at 50% 40%, #4FA86A, #2E7D43 70%); box-shadow: inset 0 2px 8px rgba(255,255,255,0.25), 0 8px 18px rgba(31,125,67,0.3); display: grid; place-items: center; }
 .ls-felt-mark { font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 26px; color: rgba(255,255,255,0.5); }
 .ls-seat { position: absolute; width: 26px; height: 18px; border-radius: 5px; background: linear-gradient(180deg,#FFFEFB,#F1EBDD); box-shadow: 0 2px 5px rgba(20,30,22,0.3); display: grid; place-items: center; font-family: var(--font-mono), monospace; font-size: 8px; font-weight: 700; color: #6E7E72; }
 .ls-seat-top { top: -8px; left: 50%; transform: translateX(-50%); }
