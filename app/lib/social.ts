@@ -96,7 +96,7 @@ export interface SocialState {
 // Bumped v5 → v6 to re-seed the demo feed with the corrected milestone
 // banners (short one-line titles, eyebrows, progress fractions, place badge).
 // Existing installs re-seed; the profile key is unversioned so it's preserved.
-const K_SEEDED = 'social.seeded.v6';
+const K_SEEDED = 'social.seeded.v7'; // bump: demo people now use motif-tile avatars
 const K_GROUP = 'social.group';
 const K_MEMBERS = 'social.members';
 const K_FEED = 'social.feed.v6';
@@ -119,11 +119,13 @@ export const DEFAULT_PROFILE: Profile = {
   avatar: { face: 'letter', char: 'Y', color: '#15803D' },
 };
 
+// Demo people use the same hand-drawn motif tiles the avatar picker offers, so
+// the seeded friends showcase real, selectable avatars (not procedural faces).
 const DEMO_AVATARS: Record<string, TileAvatar> = {
-  m_sandra: { face: 'flower', color: '#E8455F' },
-  m_bev: { face: 'dragon', char: '發', color: '#1FA85B' },
-  m_marsha: { face: 'bam', color: '#1FA85B' },
-  m_lois: { face: 'dot', color: '#2F80ED' },
+  m_sandra: { face: 'motif', char: 'peony', color: 'multi' },
+  m_bev: { face: 'motif', char: 'crane', color: 'multi' },
+  m_marsha: { face: 'motif', char: 'bamboo_stalk', color: 'multi' },
+  m_lois: { face: 'motif', char: 'dot_target', color: 'multi' },
 };
 
 async function seedIfNeeded(): Promise<void> {

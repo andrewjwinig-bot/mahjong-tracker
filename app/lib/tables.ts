@@ -55,11 +55,23 @@ export interface Table {
   photos: TablePhoto[];
 }
 
-const K_TABLES = 'tables.v6';
+const K_TABLES = 'tables.v7'; // bump: demo people now use motif-tile avatars
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
 const A = (face: TileAvatar['face'], color: string, char?: string): TileAvatar => ({ face, color, char });
+// A hand-drawn motif tile (the avatar-picker art) keyed by name, so demo people
+// match the avatars users can actually choose.
+const M = (char: string): TileAvatar => ({ face: 'motif', char, color: 'multi' });
+const PERSON: Record<string, TileAvatar> = {
+  Lily: M('peony'),
+  Nicole: M('crane'),
+  Alison: M('bamboo_stalk'),
+  Matthew: M('dot_target'),
+  Greg: M('wan'),
+  Hailey: M('wheel_flower'),
+  Avery: M('bamboo_three'),
+};
 
 function isoInDays(days: number): string {
   const d = new Date(Date.now() + days * DAY);
@@ -75,15 +87,15 @@ function seed(): Table[] {
       icon: A('crack', '#D23B4E'),
       inviteCode: 'MAHJ-2026',
       members: [
-        { name: 'Lily', avatar: A('flower', '#E8455F') },
-        { name: 'Nicole', avatar: A('dragon', '#1FA85B', '發') },
-        { name: 'Alison', avatar: A('bam', '#1FA85B') },
-        { name: 'Matthew', avatar: A('dot', '#2F80ED') },
+        { name: 'Lily', avatar: PERSON.Lily },
+        { name: 'Nicole', avatar: PERSON.Nicole },
+        { name: 'Alison', avatar: PERSON.Alison },
+        { name: 'Matthew', avatar: PERSON.Matthew },
       ],
       messages: [
-        { id: 'm1', author: 'Lily', avatar: A('flower', '#E8455F'), text: 'Who’s in for this week?? 🀄', createdAt: now - 5 * HOUR },
-        { id: 'm2', author: 'Nicole', avatar: A('dragon', '#1FA85B', '發'), text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR, reactions: { '❤️': ['Lily', 'Matthew'], '🍪': ['Alison'] } },
-        { id: 'm3', author: 'Matthew', avatar: A('dot', '#2F80ED'), text: 'Vote on a date below!', createdAt: now - 4 * HOUR, reactions: { '👍': ['Lily'] } },
+        { id: 'm1', author: 'Lily', avatar: PERSON.Lily, text: 'Who’s in for this week?? 🀄', createdAt: now - 5 * HOUR },
+        { id: 'm2', author: 'Nicole', avatar: PERSON.Nicole, text: 'Me! Bringing snacks 🍪', createdAt: now - 4.5 * HOUR, reactions: { '❤️': ['Lily', 'Matthew'], '🍪': ['Alison'] } },
+        { id: 'm3', author: 'Matthew', avatar: PERSON.Matthew, text: 'Vote on a date below!', createdAt: now - 4 * HOUR, reactions: { '👍': ['Lily'] } },
       ],
       poll: {
         question: 'When should we play next?',
@@ -101,12 +113,12 @@ function seed(): Table[] {
       icon: A('flower', '#E84C8A'),
       inviteCode: 'MOMS-7788',
       members: [
-        { name: 'Greg', avatar: A('crack', '#E8455F') },
-        { name: 'Hailey', avatar: A('joker', '#7C5CE0') },
-        { name: 'Avery', avatar: A('wind', '#2C3A57', '東') },
+        { name: 'Greg', avatar: PERSON.Greg },
+        { name: 'Hailey', avatar: PERSON.Hailey },
+        { name: 'Avery', avatar: PERSON.Avery },
       ],
       messages: [
-        { id: 'm4', author: 'Hailey', avatar: A('joker', '#7C5CE0'), text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
+        { id: 'm4', author: 'Hailey', avatar: PERSON.Hailey, text: 'Brunch + mahjong this weekend? 🥂', createdAt: now - 1 * DAY },
       ],
       poll: {
         question: 'When works for everyone?',
