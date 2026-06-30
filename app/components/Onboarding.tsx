@@ -7,10 +7,8 @@ import TileStrip from './TileStrip';
 import Tile from './Tile';
 import OfficialCardCallout from './OfficialCardCallout';
 import { TileFan } from './BrandMark';
-import type { ReactNode } from 'react';
 import type { TileFace } from '../lib/tileArt';
 import type { TileAvatar } from '../lib/social';
-import { IconLeaf, IconTarget, IconCrown } from './uiIcons';
 
 // Pick-your-tile options for sign-up (mirrors the Settings avatar set). Tile 0
 // is the bamboo monogram of the username's initial; the rest are hand-drawn
@@ -27,10 +25,31 @@ const TILE_OPTIONS: { key: string; face: TileFace; char?: string; color: string 
   { key: 'wan', face: 'motif', char: 'wan', color: 'multi' },
 ];
 
-const LEVELS: { id: Experience; label: string; blurb: string; icon: ReactNode; color: string }[] = [
-  { id: 'beginner', label: 'Beginner', blurb: 'New to the tiles — show me the ropes.', icon: <IconLeaf size={20} />, color: '#C0392B' },
-  { id: 'intermediate', label: 'Intermediate', blurb: 'I know the basics and want to improve.', icon: <IconTarget size={20} />, color: '#2E86D4' },
-  { id: 'expert', label: 'Expert', blurb: 'Seasoned — give me the deep cuts.', icon: <IconCrown size={20} />, color: '#F5A524' },
+const LEVELS: { id: Experience; label: string; blurb: string; detail: string; dots: number; color: string }[] = [
+  {
+    id: 'beginner',
+    label: 'New to the game',
+    blurb: 'I’ve never played. Start me from the very basics.',
+    detail: 'We’ll open with the Learn Mahjong lessons.',
+    dots: 1,
+    color: '#C0392B',
+  },
+  {
+    id: 'intermediate',
+    label: 'Played a few times',
+    blurb: 'I’ve sat at a table but I’m still learning the card.',
+    detail: 'Rules stay one tap away; tips get tactical.',
+    dots: 2,
+    color: '#2E86D4',
+  },
+  {
+    id: 'expert',
+    label: 'Regular player',
+    blurb: 'I play often and know the rules cold.',
+    detail: 'Skip the basics — strategy & defense up front.',
+    dots: 3,
+    color: '#F5A524',
+  },
 ];
 
 // Tap-to-select tile "wobble" (design frame 01 — the level icon shimmies).
@@ -217,7 +236,7 @@ export default function Onboarding({
         {!signingIn && (
           <>
             <label className="lbl" style={{ marginTop: 16 }}>
-              Experience level
+              How well do you know the game?
             </label>
             <div className="level-list">
               {LEVELS.map((l) => (
@@ -225,23 +244,25 @@ export default function Onboarding({
                   key={l.id}
                   className="level-opt"
                   data-active={experience === l.id}
+                  style={{ ['--lv' as string]: l.color } as React.CSSProperties}
                   onClick={(e) => {
                     setExperience(l.id);
                     wobbleTile(e.currentTarget.querySelector('.level-tile'));
                   }}
                 >
-                  <span className="level-tile" style={{ color: l.color }} aria-hidden>
-                    {l.icon}
+                  <span className="level-tile" aria-hidden>
+                    <Tile face="dot" count={l.dots} size={32} />
                   </span>
                   <span style={{ flex: 1, textAlign: 'left' }}>
                     <span className="level-name">{l.label}</span>
                     <span className="level-blurb">{l.blurb}</span>
+                    <span className="level-detail">{l.detail}</span>
                   </span>
                   <span className="level-check" aria-hidden />
                 </button>
               ))}
             </div>
-            <p className="onboard-note">We’ll tailor the rules &amp; tips to your level.</p>
+            <p className="onboard-note">This just tailors your rules &amp; tips — you can change it anytime in Settings.</p>
 
             <label className="lbl" style={{ marginTop: 16 }}>
               Your tile

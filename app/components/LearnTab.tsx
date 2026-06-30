@@ -1,11 +1,20 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import OfficialCardCallout from './OfficialCardCallout';
 import PageTitle from './PageTitle';
 import Tile from './Tile';
+import LessonModal from './LessonModal';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
+import {
+  LESSONS,
+  loadCompleted,
+  markCompleted,
+  isUnlocked,
+  type IconKey,
+  type Lesson,
+} from '../lib/lessons';
 import {
   IconTarget,
   IconShuffle,
@@ -16,17 +25,33 @@ import {
   IconHelp,
   IconCheck,
   IconStar,
+  IconLock,
+  IconBook,
 } from './uiIcons';
+
+const LESSON_ICON: Record<IconKey, (s: number) => ReactNode> = {
+  card: (s) => <IconCard size={s} />,
+  shuffle: (s) => <IconShuffle size={s} />,
+  target: (s) => <IconTarget size={s} />,
+  meld: (s) => <IconUsers size={s} />,
+  compass: (s) => <IconStar size={s} />,
+  shield: (s) => <IconShield size={s} />,
+};
+
+// Two tracks, in our voice. Indices map into LESSONS in order.
+const TRACKS: { name: string; tag: string; ids: string[] }[] = [
+  { name: 'The basics', tag: 'START HERE', ids: ['tiles', 'charleston', 'card', 'melds'] },
+  { name: 'Playing to win', tag: 'STRATEGY', ids: ['choose', 'defense'] },
+];
 
 interface Section {
   icon: ReactNode;
   title: string;
   body: React.ReactNode;
-  /** Which experience levels see this section (undefined = everyone). */
   levels?: Experience[];
 }
 
-/* ---- Visual tile guide ---------------------------------------------------- */
+/* ---- Visual tile guide (reference) ---------------------------------------- */
 
 function TileRow({
   tiles,
@@ -55,21 +80,9 @@ function TileRow({
 function TileGuide() {
   return (
     <div className="tile-guide">
-      <TileRow
-        tiles={[{ face: 'bam' }]}
-        name="Bams (Bamboo) · 1–9"
-        desc="One of the three suits. The “1 Bam” is traditionally drawn as a little bird."
-      />
-      <TileRow
-        tiles={[{ face: 'crack' }]}
-        name="Cracks (Characters) · 1–9"
-        desc="The 萬 (“wan”) suit, 1 through 9 — the top symbol is the number."
-      />
-      <TileRow
-        tiles={[{ face: 'dot' }]}
-        name="Dots (Circles) · 1–9"
-        desc="Circles, 1 through 9. Also called “bings.” Three suits total: bams, cracks, dots."
-      />
+      <TileRow tiles={[{ face: 'bam' }]} name="Bams (Bamboo) · 1–9" desc="One of the three suits. The “1 Bam” is traditionally drawn as a little bird." />
+      <TileRow tiles={[{ face: 'crack' }]} name="Cracks (Characters) · 1–9" desc="The 萬 (“wan”) suit, 1 through 9 — the top symbol is the number." />
+      <TileRow tiles={[{ face: 'dot' }]} name="Dots (Circles) · 1–9" desc="Circles, 1 through 9. Also called “bings.” Three suits total: bams, cracks, dots." />
       <TileRow
         tiles={[
           { face: 'wind', char: '東' },
@@ -89,117 +102,25 @@ function TileGuide() {
         name="Dragons · Red · Green · White"
         desc="Three dragons — Red 中, Green 發, and White (the “soap”). Each pairs with a suit."
       />
-      <TileRow
-        tiles={[{ face: 'flower' }]}
-        name="Flowers & Seasons"
-        desc="Eight bonus tiles. Often interchangeable on the card and shown as “F.”"
-      />
-      <TileRow
-        tiles={[{ face: 'joker' }]}
-        name="Jokers"
-        desc="Wild! Jokers stand in for any tile inside a pung, kong, or quint — never in a pair or single."
-      />
+      <TileRow tiles={[{ face: 'flower' }]} name="Flowers & Seasons" desc="Eight bonus tiles. Often interchangeable on the card and shown as “F.”" />
+      <TileRow tiles={[{ face: 'joker' }]} name="Jokers" desc="Wild! Jokers stand in for any tile inside a pung, kong, or quint — never in a pair or single." />
     </div>
   );
 }
 
-/* ---- Charleston ----------------------------------------------------------- */
-
-function Step({ n, dir, children }: { n: number; dir: string; children: React.ReactNode }) {
-  return (
-    <div className="charleston-step">
-      <span className="cs-num">{n}</span>
-      <span>
-        <span className="cs-dir">{dir} — </span>
-        {children}
-      </span>
-    </div>
-  );
-}
-
-function Charleston() {
-  return (
-    <>
-      <p>
-        The <strong>Charleston</strong> is the opening tile-swap. Everyone passes 3 tiles at a time,
-        blind, to trade away what they don’t need and chase a hand on the card.
-      </p>
-      <p style={{ fontWeight: 800, margin: '12px 0 6px', color: 'var(--brand)' }}>First Charleston (required)</p>
-      <Step n={1} dir="Right">
-        Pass 3 tiles to the player on your right.
-      </Step>
-      <Step n={2} dir="Across">
-        Pass 3 tiles across the table.
-      </Step>
-      <Step n={3} dir="Left">
-        Pass 3 to your left. This pass may be <em>blind</em> — you can forward tiles you just got.
-      </Step>
-      <p style={{ fontWeight: 800, margin: '12px 0 6px', color: 'var(--brand)' }}>
-        Second Charleston (optional — table agrees)
-      </p>
-      <Step n={4} dir="Left">
-        Pass 3 tiles left.
-      </Step>
-      <Step n={5} dir="Across">
-        Pass 3 tiles across (blind allowed).
-      </Step>
-      <Step n={6} dir="Right">
-        Pass 3 tiles right.
-      </Step>
-      <p style={{ margin: '12px 0 0' }}>
-        <strong>Courtesy pass:</strong> finally, the players across from each other may swap{' '}
-        <strong>0–3</strong> tiles by mutual agreement. Then play begins with East.
-      </p>
-    </>
-  );
-}
-
-/* ---- Sections ------------------------------------------------------------- */
+/* ---- Reference sections (the old deep-dive content, kept for lookups) ------ */
 
 const SECTIONS: Section[] = [
-  {
-    icon: <IconTarget size={18} />,
-    title: 'How to play (the 60-second version)',
-    body: (
-      <>
-        <p>
-          American Mahjong is played by four people with 152 tiles. Each year the National Mah Jongg
-          League publishes a <strong>card</strong> of ~70 winning hands grouped into categories.
-        </p>
-        <p>
-          You start with 13 tiles and take turns drawing and discarding, racing to build one of the
-          hands on the card. Call <em>“Mahjong!”</em> when your 14 tiles match a hand exactly — that
-          hand’s point value is yours.
-        </p>
-        <p>This app is your scorecard: tap a hand each time you win it and watch your card fill in.</p>
-      </>
-    ),
-  },
-  {
-    icon: <IconCard size={18} />,
-    title: 'Understanding the tiles',
-    body: <TileGuide />,
-  },
-  {
-    icon: <IconShuffle size={18} />,
-    title: 'The Charleston (step-by-step)',
-    body: <Charleston />,
-  },
+  { icon: <IconCard size={18} />, title: 'Tile reference', body: <TileGuide /> },
   {
     icon: <IconUsers size={18} />,
     title: 'Playing with 3 players',
     body: (
       <>
-        <p>
-          The card is built for four, but three works great with a couple of house tweaks (most
-          casual tables play it this way):
-        </p>
+        <p>The card is built for four, but three works great with a couple of house tweaks (most casual tables play it this way):</p>
         <ul>
           <li>Deal as normal — each player still gets 13 tiles.</li>
-          <li>
-            In the Charleston, <strong>skip the “across” passes</strong> (there’s no one across) —
-            just do the right and left passes.
-          </li>
+          <li>In the Charleston, <strong>skip the “across” passes</strong> (there’s no one across) — just do the right and left passes.</li>
           <li>Everything else is identical: draw, discard, call, and aim for a hand on the card.</li>
           <li>Hands tend to go faster and the wall lasts longer, so you’ll see more tiles.</li>
         </ul>
@@ -214,16 +135,11 @@ const SECTIONS: Section[] = [
         <p>Two-player mahjong is a quick, punchy version — perfect for practice:</p>
         <ul>
           <li>Each player draws 13 tiles.</li>
-          <li>
-            Charleston is reduced to a single <strong>pass right, then pass left</strong> (or skip it
-            entirely).
-          </li>
+          <li>Charleston is reduced to a single <strong>pass right, then pass left</strong> (or skip it entirely).</li>
           <li>Take turns drawing and discarding; you can call the other player’s discards as usual.</li>
           <li>Same card, same jokers, same goal — just faster and more tactical.</li>
         </ul>
-        <p style={{ color: 'var(--muted)', fontWeight: 700 }}>
-          (2- and 3-player rules are common house variations, not official NMJL tournament rules.)
-        </p>
+        <p style={{ color: 'var(--muted)', fontWeight: 700 }}>(2- and 3-player rules are common house variations, not official NMJL tournament rules.)</p>
       </>
     ),
   },
@@ -232,44 +148,8 @@ const SECTIONS: Section[] = [
     title: 'What does “clearing the card” mean?',
     body: (
       <>
-        <p>
-          The yearlong challenge: win <strong>every hand on the card at least once</strong> before
-          next April’s new card drops. It’s the “collect them all” of mahjong.
-        </p>
-        <p>
-          The <strong>Card</strong> tab shows how many of the ~70 you’ve cleared, your total wins,
-          and your points. Use the <strong>To Go</strong> filter to see what’s left to hunt.
-        </p>
-      </>
-    ),
-  },
-  {
-    icon: <IconStar size={18} />,
-    title: 'Strategy: reading the table',
-    levels: ['intermediate', 'expert'],
-    body: (
-      <ul>
-        <li>Stay flexible through the Charleston — commit to one hand only once your tiles point clearly one way.</li>
-        <li>Count your <strong>tiles-away</strong> every turn and chase the fastest hand, not the prettiest.</li>
-        <li>Grab jokers whenever offered — flexibility beats points early.</li>
-        <li>Read exposures: what opponents pung/kong tells you which hand they’re building.</li>
-        <li>Remember there are only 4 of each tile — if three are gone, that wait is nearly dead.</li>
-      </ul>
-    ),
-  },
-  {
-    icon: <IconShield size={18} />,
-    title: 'Defensive play',
-    levels: ['expert'],
-    body: (
-      <>
-        <ul>
-          <li>When you can’t win, switch to defense — don’t feed the table leader’s exposed hand.</li>
-          <li>Discard tiles already on the table or in others’ exposures; they’re safest.</li>
-          <li>Watch for joker-redemption: an exposed pung/kong with a joker can be swapped — plan around it.</li>
-          <li>Hold a “bait” tile to disguise your direction before the discard you actually need.</li>
-          <li>Against Singles &amp; Pairs hands (no jokers), single tiles are dangerous — hold them late.</li>
-        </ul>
+        <p>The yearlong challenge: win <strong>every hand on the card at least once</strong> before next April’s new card drops. It’s the “collect them all” of mahjong.</p>
+        <p>The <strong>Card</strong> tab shows how many of the ~70 you’ve cleared, your total wins, and your points. Use the <strong>To Go</strong> filter to see what’s left to hunt.</p>
       </>
     ),
   },
@@ -278,24 +158,10 @@ const SECTIONS: Section[] = [
     title: 'FAQ',
     body: (
       <>
-        <p>
-          <strong>Is my data private?</strong> You can use the app without an account — then your
-          data stays on your device. If you create an account, your gameplay and profile sync
-          securely to the cloud so you can use them on any device, and you can export or delete
-          everything anytime. See our{' '}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </a>
-          .
-        </p>
-        <p>
-          <strong>Is this the official NMJL card?</strong> No. This is a sample card so you can try the
-          app. Licensed/official cards are planned.
-        </p>
-        <p>
-          <strong>What happens in April?</strong> A new card comes out each spring. Future versions
-          will let you load the new year without losing your history.
-        </p>
+        <p><strong>Is my data private?</strong> You can use the app without an account — then your data stays on your device. If you create an account, your gameplay and profile sync securely to the cloud, and you can export or delete everything anytime. See our{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</p>
+        <p><strong>Is this the official NMJL card?</strong> No. This is a sample card so you can try the app. Licensed/official cards are planned.</p>
+        <p><strong>What happens in April?</strong> A new card comes out each spring. Future versions will let you load the new year without losing your history.</p>
       </>
     ),
   },
@@ -303,21 +169,49 @@ const SECTIONS: Section[] = [
 
 const SUBTITLE: Record<Experience, string> = {
   beginner: 'New to the tiles? Start here, bam-beginner. 🀐',
-  intermediate: 'Sharpen up — rules, the Charleston & strategy. 🀄',
+  intermediate: 'Sharpen up — lessons, the Charleston & strategy. 🀄',
   expert: 'Deep cuts — strategy & defense for sharks. 🐉',
 };
 
-// Split a topic title's parenthetical (e.g. "The Charleston (step-by-step)")
-// into a gray "— step-by-step" subtitle, matching the design source.
-function renderTopicTitle(title: string) {
-  const m = title.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
-  if (!m) return title;
+/* ---- Lesson path node ----------------------------------------------------- */
+
+function LessonNode({
+  lesson,
+  index,
+  state,
+  onOpen,
+}: {
+  lesson: Lesson;
+  index: number;
+  state: 'done' | 'current' | 'open' | 'locked';
+  onOpen: () => void;
+}) {
+  const locked = state === 'locked';
   return (
-    <>
-      {m[1]} <span className="acc-sub">— {m[2]}</span>
-    </>
+    <button className="lp-node" data-state={state} disabled={locked} onClick={locked ? undefined : onOpen}>
+      <span className="lp-dot" aria-hidden>
+        {state === 'done' ? <IconCheck size={20} /> : locked ? <IconLock size={16} /> : LESSON_ICON[lesson.icon](20)}
+        {state === 'current' && <span className="lp-ring" />}
+      </span>
+      <span className="lp-info">
+        <span className="lp-row1">
+          <span className="lp-num">{String(index + 1).padStart(2, '0')}</span>
+          <span className="lp-title">{lesson.title}</span>
+          {state === 'current' && <span className="lp-pill">{lessonStartedHint(lesson)}</span>}
+          {state === 'done' && <span className="lp-pill done">Done</span>}
+        </span>
+        <span className="lp-blurb">{lesson.blurb}</span>
+        <span className="lp-min">{lesson.minutes} min{locked ? ' · locked' : ''}</span>
+      </span>
+    </button>
   );
 }
+
+function lessonStartedHint(_l: Lesson) {
+  return 'Up next';
+}
+
+/* ---- Tab ------------------------------------------------------------------ */
 
 export default function LearnTab({
   experience,
@@ -326,8 +220,29 @@ export default function LearnTab({
   experience: Experience;
   onPractice: () => void;
 }) {
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(null); // reference accordion
+  const [completed, setCompleted] = useState<string[]>([]);
+  const [active, setActive] = useState<Lesson | null>(null);
+
+  useEffect(() => {
+    setCompleted(loadCompleted());
+  }, []);
+
+  const doneCount = completed.length;
+  const total = LESSONS.length;
+  const pct = Math.round((doneCount / total) * 100);
+
+  function stateFor(lesson: Lesson): 'done' | 'current' | 'open' | 'locked' {
+    const idx = LESSONS.findIndex((l) => l.id === lesson.id);
+    if (completed.includes(lesson.id)) return 'done';
+    if (!isUnlocked(idx, completed)) return 'locked';
+    // current = first unlocked, not-yet-done lesson
+    const firstOpen = LESSONS.find((l, i) => isUnlocked(i, completed) && !completed.includes(l.id));
+    return firstOpen?.id === lesson.id ? 'current' : 'open';
+  }
+
   const sections = SECTIONS.filter((s) => !s.levels || s.levels.includes(experience));
+
   return (
     <div className="screen">
       <header className="app-header">
@@ -335,22 +250,65 @@ export default function LearnTab({
         <p className="sub">{SUBTITLE[experience]}</p>
       </header>
 
+      {/* ── Learn Mahjong curriculum ── */}
+      <div className="learn-hero">
+        <div className="learn-hero-top">
+          <span className="learn-hero-ic" aria-hidden><IconBook size={20} /></span>
+          <div>
+            <div className="learn-hero-kicker">FREE · TAP-THROUGH LESSONS</div>
+            <div className="learn-hero-title">Learn Mahjong</div>
+          </div>
+        </div>
+        <p className="learn-hero-sub">
+          From your first tile to your first win — short interactive lessons walk you through every step.
+        </p>
+        <div className="learn-prog">
+          <div className="learn-prog-bar"><span style={{ width: `${pct}%` }} /></div>
+          <span className="learn-prog-txt">{doneCount} of {total} complete</span>
+        </div>
+      </div>
+
+      {TRACKS.map((track) => {
+        const lessons = track.ids.map((id) => LESSONS.find((l) => l.id === id)).filter(Boolean) as Lesson[];
+        const trackDone = lessons.filter((l) => completed.includes(l.id)).length;
+        return (
+          <div className="lp-track" key={track.name}>
+            <div className="lp-track-head">
+              <span className="lp-track-name">{track.name}</span>
+              <span className="lp-track-tag">{track.tag}</span>
+              <span className="lp-track-count">{trackDone}/{lessons.length}</span>
+            </div>
+            <div className="lp-line">
+              {lessons.map((lesson) => (
+                <LessonNode
+                  key={lesson.id}
+                  lesson={lesson}
+                  index={LESSONS.findIndex((l) => l.id === lesson.id)}
+                  state={stateFor(lesson)}
+                  onOpen={() => setActive(lesson)}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
       <button
         className="btn"
-        style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+        style={{ marginTop: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         onClick={onPractice}
       >
         <IconTarget size={18} /> Practice: what can I make?
       </button>
 
-      <div style={{ marginTop: 18 }}>
+      {/* ── Full reference (the old deep content) ── */}
+      <div className="learn-ref-head">Full reference</div>
+      <div>
         {sections.map((s, i) => (
           <div className="acc" key={i} data-open={open === i}>
             <button onClick={() => setOpen(open === i ? null : i)}>
-              <span className="acc-ico" aria-hidden>
-                {s.icon}
-              </span>
-              <span style={{ flex: 1 }}>{renderTopicTitle(s.title)}</span>
+              <span className="acc-ico" aria-hidden>{s.icon}</span>
+              <span style={{ flex: 1 }}>{s.title}</span>
               <span className="chev">▶</span>
             </button>
             {open === i && <div className="acc-body">{s.body}</div>}
@@ -361,6 +319,14 @@ export default function LearnTab({
       <div style={{ marginTop: 18 }}>
         <OfficialCardCallout blurb="These lessons use an original sample card. To play real games, use your official National Mah Jongg League card — they release a new one each year." />
       </div>
+
+      {active && (
+        <LessonModal
+          lesson={active}
+          onClose={() => setActive(null)}
+          onComplete={(id) => setCompleted(markCompleted(id))}
+        />
+      )}
     </div>
   );
 }
