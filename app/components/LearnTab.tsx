@@ -8,6 +8,7 @@ import LessonModal from './LessonModal';
 import { useConfetti } from './Confetti';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
+import { TOTAL_HANDS } from '../lib/cardData';
 import {
   LESSONS,
   loadCompleted,
@@ -109,6 +110,58 @@ function TileGuide() {
   );
 }
 
+/* ---- Small reference visuals (match the lesson look without modal flows) --- */
+
+// A felt table showing who sits where + which Charleston passes are legal, for
+// the 3- and 2-player house variations. Empty seats are ghosted so the missing
+// "across" pass reads at a glance.
+function TableDiagram({ players }: { players: 3 | 2 }) {
+  const filled =
+    players === 3
+      ? { bottom: 'You', left: ' ', right: ' ', top: null }
+      : { bottom: 'You', top: 'Them', left: null, right: null };
+  const passes =
+    players === 3
+      ? [{ d: 'Right', ok: true }, { d: 'Across', ok: false }, { d: 'Left', ok: true }]
+      : [{ d: 'Right', ok: true }, { d: 'Left', ok: true }];
+  return (
+    <div className="rg-table">
+      <div className="rg-felt">
+        {(['top', 'left', 'right', 'bottom'] as const).map((p) => {
+          const label = filled[p];
+          if (label === null) return <span key={p} className={`rg-seat rg-seat-${p} ghost`} aria-hidden />;
+          return (
+            <span key={p} className={`rg-seat rg-seat-${p}${label === 'You' ? ' is-you' : ''}`}>{label.trim()}</span>
+          );
+        })}
+        <span className="rg-felt-mark">中</span>
+      </div>
+      <div className="rg-passes">
+        {passes.map((p) => (
+          <span key={p.d} className={`rg-pass ${p.ok ? 'ok' : 'no'}`}>{p.d} {p.ok ? '✓' : '✕'}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// A mini "collect them all" board: light up every cell to clear the card.
+function ClearBoard() {
+  const cleared = Math.round(TOTAL_HANDS * 0.62); // illustrative fill, not live progress
+  return (
+    <div className="rg-board">
+      <div className="rg-board-grid">
+        {Array.from({ length: TOTAL_HANDS }).map((_, i) => (
+          <span key={i} className="rg-cell" data-on={i < cleared} />
+        ))}
+      </div>
+      <div className="rg-board-cap">
+        <span aria-hidden>👑</span> Light up all {TOTAL_HANDS} hands before next year’s card.
+      </div>
+    </div>
+  );
+}
+
 /* ---- Reference sections (the old deep-dive content, kept for lookups) ------ */
 
 const SECTIONS: Section[] = [
@@ -118,6 +171,7 @@ const SECTIONS: Section[] = [
     title: 'Playing with 3 players',
     body: (
       <>
+        <TableDiagram players={3} />
         <p>The card is built for four, but three works great with a couple of house tweaks (most casual tables play it this way):</p>
         <ul>
           <li>Deal as normal — each player still gets 13 tiles.</li>
@@ -133,6 +187,7 @@ const SECTIONS: Section[] = [
     title: 'Playing with 2 players',
     body: (
       <>
+        <TableDiagram players={2} />
         <p>Two-player mahjong is a quick, punchy version — perfect for practice:</p>
         <ul>
           <li>Each player draws 13 tiles.</li>
@@ -149,6 +204,7 @@ const SECTIONS: Section[] = [
     title: 'What does “clearing the card” mean?',
     body: (
       <>
+        <ClearBoard />
         <p>The yearlong challenge: win <strong>every hand on the card at least once</strong> before next April’s new card drops. It’s the “collect them all” of mahjong.</p>
         <p>The <strong>Card</strong> tab shows how many hands you’ve cleared, your total wins, and your points. Use the <strong>To Go</strong> filter to see what’s left to hunt.</p>
       </>
