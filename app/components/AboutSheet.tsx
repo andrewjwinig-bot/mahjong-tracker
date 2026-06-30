@@ -86,8 +86,11 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
         style={swipe.style}
       >
         <div className="grab" />
-        <h2>About &amp; Legal</h2>
-        <p className="sheet-sub">Club Mahj · v1.0</p>
+        <div className="about-hero" aria-hidden>
+          <span className="about-felt"><span className="about-lockup"><b>CLUB</b><i>Mahj</i></span></span>
+        </div>
+        <h2 style={{ textAlign: 'center' }}>About &amp; Legal</h2>
+        <p className="sheet-sub" style={{ textAlign: 'center' }}>Club Mahj · v1.0 · The Original Mahj Social Network</p>
 
         <div className="legal">
           <p>

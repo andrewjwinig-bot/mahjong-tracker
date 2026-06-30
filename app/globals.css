@@ -2840,6 +2840,18 @@ label.lbl {
   text-align: left;
 }
 
+/* About sheet — branded felt hero */
+.about-hero { display: flex; justify-content: center; margin: 4px 0 14px; }
+.about-felt {
+  width: 116px; height: 92px; border-radius: 20px;
+  background: radial-gradient(circle at 50% 36%, #4FA86A, #14402A);
+  box-shadow: inset 0 2px 8px rgba(255,255,255,0.22), 0 10px 22px rgba(20,40,28,0.28);
+  display: grid; place-items: center;
+}
+.about-lockup { display: flex; flex-direction: column; align-items: center; line-height: 0.92; color: #FBF7EC; }
+.about-lockup b { font-family: var(--font-mono), monospace; font-weight: 700; font-size: 9px; letter-spacing: 3px; margin-left: 3px; opacity: 0.82; }
+.about-lockup i { font-family: var(--font-display), 'Bricolage Grotesque', system-ui, sans-serif; font-style: normal; font-weight: 800; font-size: 30px; letter-spacing: -0.5px; }
+
 /* Settings header (main view): big brand title + close button. */
 .set-head-main {
   display: flex;
@@ -3044,11 +3056,19 @@ label.lbl {
 }
 
 .set-label {
-  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
   font-size: 10px;
   letter-spacing: 2px;
-  color: #8c8c96;
+  color: var(--brand);
   margin-bottom: 11px;
+}
+.set-label::before {
+  content: ''; width: 14px; height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--brand), #2E7D43);
 }
 .set-hint {
   margin: 8px 2px 0;
@@ -3148,10 +3168,10 @@ label.lbl {
 }
 
 .set-list {
-  background: #fff;
-  border: 2.5px solid rgba(20, 22, 42, 0.09);
-  border-radius: 8px;
-  box-shadow: 0 7px 20px rgba(20, 22, 42, 0.11);
+  background: linear-gradient(180deg, #fff, #FCF8F0);
+  border: 2px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(20, 22, 42, 0.09);
   overflow: hidden;
   margin-bottom: 24px;
 }
