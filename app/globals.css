@@ -9131,6 +9131,33 @@ label.lbl {
   font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
 }
 
+/* collapsed lesson path (shown once all lessons are complete) */
+.lp-review { margin-top: 16px; }
+.lp-review-bar {
+  width: 100%; display: flex; align-items: center; gap: 11px;
+  background: var(--card); border: 2px solid var(--hairline); border-radius: 15px;
+  padding: 13px 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(20,30,22,0.05);
+  transition: border-color 0.15s ease, transform 0.12s ease;
+}
+.lp-review-bar:active { transform: translateY(1px); }
+.lp-review-bar[data-open='true'] { border-color: color-mix(in srgb, #2E7D43 45%, transparent); }
+.lp-review-ic {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; background: linear-gradient(160deg,#3FB069,#1F7D43);
+  box-shadow: 0 3px 7px rgba(31,125,67,0.3);
+}
+.lp-review-txt { font-family: var(--font-display), system-ui, sans-serif; font-weight: 800; font-size: 14.5px; color: var(--ink); }
+.lp-review-act { margin-left: auto; font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 700; color: var(--brand); }
+.lp-review-bar .chev { font-size: 9px; color: var(--muted); transition: transform 0.2s ease; }
+.lp-review-bar[data-open='true'] .chev { transform: rotate(90deg); }
+.lp-review-body { animation: lsSlide 0.25s ease; }
+
+/* practice CTA — full-width, sits at the bottom of the tab */
+.learn-practice {
+  margin-top: 22px; width: 100%;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+
 /* ════ Lesson player modal ════ */
 .ls-scrim {
   position: fixed; inset: 0; z-index: 400; background: rgba(20,24,20,0.5);

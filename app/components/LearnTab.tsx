@@ -224,6 +224,7 @@ export default function LearnTab({
   const [open, setOpen] = useState<number | null>(null); // reference accordion
   const [completed, setCompleted] = useState<string[]>([]);
   const [active, setActive] = useState<Lesson | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false); // expand finished lessons to replay
   const { storm } = useConfetti();
   const wasGraduated = useRef(false);
 
@@ -257,6 +258,31 @@ export default function LearnTab({
   }
 
   const sections = SECTIONS.filter((s) => !s.levels || s.levels.includes(experience));
+
+  const tracks = TRACKS.map((track) => {
+    const lessons = track.ids.map((id) => LESSONS.find((l) => l.id === id)).filter(Boolean) as Lesson[];
+    const trackDone = lessons.filter((l) => completed.includes(l.id)).length;
+    return (
+      <div className="lp-track" key={track.name}>
+        <div className="lp-track-head">
+          <span className="lp-track-name">{track.name}</span>
+          <span className="lp-track-tag">{track.tag}</span>
+          <span className="lp-track-count">{trackDone}/{lessons.length}</span>
+        </div>
+        <div className="lp-line">
+          {lessons.map((lesson) => (
+            <LessonNode
+              key={lesson.id}
+              lesson={lesson}
+              index={LESSONS.findIndex((l) => l.id === lesson.id)}
+              state={stateFor(lesson)}
+              onOpen={() => setActive(lesson)}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  });
 
   return (
     <div className="screen">
@@ -297,38 +323,26 @@ export default function LearnTab({
         </div>
       )}
 
-      {TRACKS.map((track) => {
-        const lessons = track.ids.map((id) => LESSONS.find((l) => l.id === id)).filter(Boolean) as Lesson[];
-        const trackDone = lessons.filter((l) => completed.includes(l.id)).length;
-        return (
-          <div className="lp-track" key={track.name}>
-            <div className="lp-track-head">
-              <span className="lp-track-name">{track.name}</span>
-              <span className="lp-track-tag">{track.tag}</span>
-              <span className="lp-track-count">{trackDone}/{lessons.length}</span>
-            </div>
-            <div className="lp-line">
-              {lessons.map((lesson) => (
-                <LessonNode
-                  key={lesson.id}
-                  lesson={lesson}
-                  index={LESSONS.findIndex((l) => l.id === lesson.id)}
-                  state={stateFor(lesson)}
-                  onOpen={() => setActive(lesson)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-
-      <button
-        className="btn"
-        style={{ marginTop: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-        onClick={onPractice}
-      >
-        <IconTarget size={18} /> Practice: what can I make?
-      </button>
+      {/* Lesson path. Once every lesson is done it collapses into a slim
+          "review" bar so the finished curriculum doesn't dominate the tab. */}
+      {graduated ? (
+        <div className="lp-review">
+          <button
+            className="lp-review-bar"
+            data-open={reviewOpen}
+            onClick={() => setReviewOpen((v) => !v)}
+            aria-expanded={reviewOpen}
+          >
+            <span className="lp-review-ic" aria-hidden><IconCheck size={16} /></span>
+            <span className="lp-review-txt">All {total} lessons complete</span>
+            <span className="lp-review-act">{reviewOpen ? 'Hide' : 'Review'}</span>
+            <span className="chev" aria-hidden>▶</span>
+          </button>
+          {reviewOpen && <div className="lp-review-body">{tracks}</div>}
+        </div>
+      ) : (
+        tracks
+      )}
 
       {/* ── Full reference (the old deep content) ── */}
       <div className="learn-ref-head">Full reference</div>
@@ -344,6 +358,13 @@ export default function LearnTab({
           </div>
         ))}
       </div>
+
+      <button
+        className="btn learn-practice"
+        onClick={onPractice}
+      >
+        <IconTarget size={18} /> Practice: what can I make?
+      </button>
 
       <div style={{ marginTop: 18 }}>
         <OfficialCardCallout blurb="These lessons use an original sample card. To play real games, use your official National Mah Jongg League card — they release a new one each year." />
