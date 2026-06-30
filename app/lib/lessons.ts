@@ -94,7 +94,7 @@ export const LESSONS: Lesson[] = [
         title: 'Dragons, flowers & jokers',
         body: 'Three more tile types round out the set.',
         tiles: [
-          { face: 'dragon', char: '中', color: '#E8455F', name: 'Dragons · R G W', desc: 'Red 中, Green 發, White (the “soap”). Each dragon pairs with a suit.' },
+          { face: 'dragon', char: '中', color: '#E8455F', name: 'Dragons · R G W', desc: 'Red (R), Green (G), White (the “soap”). Each dragon pairs with a suit.' },
           { face: 'flower', name: 'Flowers', desc: 'Eight bonus tiles, written as “F.” Often interchangeable on the card.' },
           { face: 'joker', name: 'Jokers', desc: 'Wild! Stands in for any tile inside a pung, kong, or quint — never a pair or single.' },
         ],

@@ -102,7 +102,7 @@ function TileGuide() {
           { face: 'dragon', char: '白', color: '#2F80ED' },
         ]}
         name="Dragons · Red · Green · White"
-        desc="Three dragons — Red 中, Green 發, and White (the “soap”). Each pairs with a suit."
+        desc="Three dragons — Red (R), Green (G), and White (the “soap”). Each pairs with a suit."
       />
       <TileRow tiles={[{ face: 'flower' }]} name="Flowers & Seasons" desc="Eight bonus tiles. Often interchangeable on the card and shown as “F.”" />
       <TileRow tiles={[{ face: 'joker' }]} name="Jokers" desc="Wild! Jokers stand in for any tile inside a pung, kong, or quint — never in a pair or single." />

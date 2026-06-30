@@ -239,6 +239,42 @@ function motifImage(key: string | undefined, color: string): string {
   return `<image href="${motifSrc(key, color)}" x="6" y="6.5" width="36" height="51" preserveAspectRatio="xMidYMid meet"/>`;
 }
 
+// A clean Latin letter-glyph tile (winds + dragons) in the display font, so
+// N/E/W/S and R/G all read the same — the "newer" approachable style.
+function glyphLetter(letter: string, color: string): string {
+  return `<text x="24" y="31" text-anchor="middle" dominant-baseline="central"
+    font-size="30" font-weight="800" fill="${color}"
+    font-family="var(--font-display), system-ui, sans-serif">${letter}</text>`;
+}
+
+// Winds render as the Western N/E/W/S letters, translating any legacy CJK chars
+// so every call site stays consistent.
+const WIND_LETTER: Record<string, string> = {
+  '東': 'E', '南': 'S', '西': 'W', '北': 'N',
+  E: 'E', S: 'S', W: 'W', N: 'N',
+};
+function windMotif(char?: string): string {
+  const key = char ?? 'E';
+  return glyphLetter(WIND_LETTER[key] ?? key, NAVY);
+}
+
+// The classic Western "soap" — a double rounded frame — for the white dragon.
+function soapMotif(): string {
+  return `<rect x="13" y="16.5" width="22" height="29" rx="5" fill="none" stroke="${DOT}" stroke-width="3.2"/>
+    <rect x="18.5" y="22" width="11" height="18" rx="3" fill="none" stroke="${DOT}" stroke-width="2"/>`;
+}
+
+// Dragons render in the approachable Western style: a red "R", a green "G", and
+// the blue "soap" for white — no CJK glyphs. Legacy chars 中/發/白 map across
+// automatically; any other char (e.g. the year "0" in a card decode) falls back
+// to a plain glyph.
+function dragonMotif(char?: string, color?: string): string {
+  if (char === '發' || char === 'G') return glyphLetter('G', color ?? BAM);
+  if (char === '白' || char === 'P') return soapMotif();
+  if (char == null || char === '中' || char === 'R') return glyphLetter('R', color ?? CRACK);
+  return charMotif(char, color ?? CRACK);
+}
+
 function motifFor(face: TileFace, char?: string, color?: string, count?: number): string {
   switch (face) {
     case 'dot':
@@ -252,9 +288,9 @@ function motifFor(face: TileFace, char?: string, color?: string, count?: number)
     case 'crack':
       return count != null ? crakValueMotif(count) : charMotif('萬', CRACK);
     case 'wind':
-      return charMotif(char ?? '東', NAVY);
+      return windMotif(char);
     case 'dragon':
-      return charMotif(char ?? '中', color ?? CRACK);
+      return dragonMotif(char, color);
     case 'letter':
       return letterMotif(char, !color || color === 'multi' ? '#15803D' : color);
     case 'icon':
