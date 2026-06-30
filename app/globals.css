@@ -9254,3 +9254,33 @@ label.lbl {
 .ls-recap-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 340px; }
 .ls-recap-list li { display: flex; align-items: flex-start; gap: 9px; text-align: left; font-size: 13.5px; font-weight: 600; line-height: 1.35; color: #14402A; background: #fff; border: 1.5px solid var(--hairline); border-radius: 12px; padding: 11px 13px; animation: lsSlide 0.3s ease both; animation-delay: calc(var(--i) * 0.08s + 0.1s); }
 .ls-recap-list li svg { flex: none; color: #2E7D43; margin-top: 1px; }
+
+/* ── Onboarding 3-step wizard (account → experience → tile) ── */
+.onboard-steps { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.onboard-back {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 0;
+  background: rgba(20,30,22,0.07); color: var(--ink); font-size: 20px; font-weight: 700;
+  display: grid; place-items: center; cursor: pointer;
+}
+.onboard-back:disabled { opacity: 0; pointer-events: none; }
+.onboard-dots { flex: 1; display: flex; gap: 6px; justify-content: center; }
+.onboard-dot { width: 8px; height: 8px; border-radius: 999px; background: rgba(20,30,22,0.16); transition: width 0.25s ease, background 0.25s ease; }
+.onboard-dot[data-on='true'] { background: var(--brand); }
+.onboard-dot[data-cur='true'] { width: 22px; }
+.onboard-step-tag { flex: none; min-width: 34px; text-align: right; font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 700; color: var(--muted); }
+.onboard-step { animation: onbStep 0.28s cubic-bezier(0.2,0.8,0.3,1); }
+@keyframes onbStep { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.onboard-head-tight { margin-bottom: 4px; }
+/* Titles sit over the masked art header — use the same white-on-felt treatment
+   as the Card/Rules mastheads so they read cleanly above the scatter tiles. */
+.onboard-step-title {
+  font-family: var(--font-display), system-ui, sans-serif; font-weight: 800;
+  font-size: 25px; letter-spacing: -0.5px; line-height: 1.12;
+  color: var(--title-color, #14402A);
+  text-shadow: 2px 2.5px 0 var(--brand-deep, rgba(20, 40, 24, 0.28));
+  text-align: center; margin: 30px 0 0;
+}
+.onboard-step-sub {
+  text-align: center; font-size: 13px; font-weight: 700; line-height: 1.4;
+  color: var(--title-color, #3E5447); opacity: 0.82; margin: 9px auto 18px; max-width: 300px;
+}

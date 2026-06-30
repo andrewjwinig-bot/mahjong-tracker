@@ -78,6 +78,8 @@ export default function Onboarding({
   onDone: (a: Account, avatar?: TileAvatar, opts?: { isNewUser?: boolean }) => void;
 }) {
   const [step, setStep] = useState<'form' | 'card'>('form');
+  // Sign-up is a 3-step wizard: 0 = account, 1 = experience, 2 = tile avatar.
+  const [wstep, setWstep] = useState(0);
   const [account, setAccount] = useState<Account | null>(null);
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
   const [username, setUsername] = useState('');
@@ -96,6 +98,32 @@ export default function Onboarding({
   const [busy, setBusy] = useState(false);
 
   const signingIn = cloud && mode === 'signin';
+
+  // Validate just the account fields (wizard step 0) before advancing.
+  function accountError(): string | null {
+    if (!username.trim()) return 'Pick a username.';
+    if (!emailOk(email)) return 'Enter a valid email.';
+    if (password.length < 6) return 'Password must be at least 6 characters.';
+    return null;
+  }
+
+  function nextStep() {
+    if (wstep === 0) {
+      const err = accountError();
+      if (err) return setError(err);
+      setError(null);
+      setWstep(1);
+    } else if (wstep === 1) {
+      setWstep(2);
+    } else {
+      void submit();
+    }
+  }
+
+  function backStep() {
+    setError(null);
+    setWstep((w) => Math.max(0, w - 1));
+  }
 
   async function submit() {
     if (!signingIn && !username.trim()) return setError('Pick a username.');
@@ -185,127 +213,171 @@ export default function Onboarding({
     );
   }
 
-  return (
-    <div className="onboard">
-      <div className="onboard-card">
-        <div className="onboard-head">
-          <TileFan size={132} className="onboard-fan" />
-          <div className="logo onboard-logo">
-            <div className="logo-kicker">CLUB</div>
-            <div className="logo-word">Mahj</div>
+  // Returning user (cloud) — a single compact sign-in form.
+  if (signingIn) {
+    return (
+      <div className="onboard">
+        <div className="onboard-card">
+          <div className="onboard-head">
+            <TileFan size={108} className="onboard-fan" />
+            <div className="logo onboard-logo">
+              <div className="logo-kicker">CLUB</div>
+              <div className="logo-word">Mahj</div>
+            </div>
+            <p className="sub">Welcome back</p>
           </div>
-          <p className="sub">The Original Mahjong Social Network</p>
-        </div>
 
-        {!signingIn && (
-          <>
-            <label className="lbl">Username</label>
-            <input
-              className="field"
-              value={username}
-              maxLength={24}
-              placeholder="tilequeen"
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </>
-        )}
+          <label className="lbl">Email</label>
+          <input
+            className="field"
+            type="email"
+            autoCapitalize="off"
+            value={email}
+            placeholder="you@email.com"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <label className="lbl" style={{ marginTop: 12 }}>Password</label>
+          <input
+            className="field"
+            type="password"
+            value={password}
+            placeholder="Your password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <label className="lbl" style={{ marginTop: 12 }}>
-          Email
-        </label>
-        <input
-          className="field"
-          type="email"
-          autoCapitalize="off"
-          value={email}
-          placeholder="you@email.com"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          {error && <p className="onboard-error">{error}</p>}
 
-        <label className="lbl" style={{ marginTop: 12 }}>
-          Password
-        </label>
-        <input
-          className="field"
-          type="password"
-          value={password}
-          placeholder={signingIn ? 'Your password' : 'At least 6 characters'}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {!signingIn && (
-          <>
-            <label className="lbl" style={{ marginTop: 16 }}>
-              How well do you know the game?
-            </label>
-            <div className="level-list">
-              {LEVELS.map((l) => (
-                <button
-                  key={l.id}
-                  className="level-opt"
-                  data-active={experience === l.id}
-                  style={{ ['--lv' as string]: l.color } as React.CSSProperties}
-                  onClick={(e) => {
-                    setExperience(l.id);
-                    wobbleTile(e.currentTarget.querySelector('.level-tile'));
-                  }}
-                >
-                  <span className="level-tile" aria-hidden>
-                    <Tile face="dot" count={l.dots} size={32} />
-                  </span>
-                  <span style={{ flex: 1, textAlign: 'left' }}>
-                    <span className="level-name">{l.label}</span>
-                    <span className="level-blurb">{l.blurb}</span>
-                    <span className="level-detail">{l.detail}</span>
-                  </span>
-                  <span className="level-check" aria-hidden />
-                </button>
-              ))}
-            </div>
-            <p className="onboard-note">This just tailors your rules &amp; tips — you can change it anytime in Settings.</p>
-
-            <label className="lbl" style={{ marginTop: 16 }}>
-              Your tile
-            </label>
-            <div className="avatar-grid">
-              {TILE_OPTIONS.map((opt, i) => (
-                <button
-                  key={opt.key}
-                  className="avatar-opt"
-                  data-active={avatarIdx === i}
-                  onClick={() => setAvatarIdx(i)}
-                  aria-label={`Tile ${i + 1}`}
-                >
-                  <Tile
-                    face={opt.face}
-                    char={opt.face === 'letter' ? username.trim().charAt(0).toUpperCase() || 'Y' : opt.char}
-                    color={opt.color}
-                    size={34}
-                  />
-                  {avatarIdx === i && <span className="avatar-check">✓</span>}
-                </button>
-              ))}
-            </div>
-            <p className="onboard-note">This is your tile across the feed &amp; tables.</p>
-          </>
-        )}
-
-        {error && <p className="onboard-error">{error}</p>}
-
-        <button className="btn" style={{ marginTop: 14 }} onClick={submit} disabled={busy}>
-          {busy ? 'Just a sec…' : signingIn ? 'Sign In' : 'Create Account'}
-        </button>
-
-        {cloud && (
+          <button className="btn" style={{ marginTop: 14 }} onClick={() => void submit()} disabled={busy}>
+            {busy ? 'Just a sec…' : 'Sign In'}
+          </button>
           <button
             className="btn ghost"
             style={{ marginTop: 10 }}
             onClick={() => {
               setError(null);
-              setMode((m) => (m === 'signup' ? 'signin' : 'signup'));
+              setMode('signup');
             }}
           >
-            {mode === 'signup' ? 'Already have an account? Sign in' : 'New here? Create account'}
+            New here? Create account
+          </button>
+          <p className="onboard-fine">
+            Your account syncs securely to the cloud. Not affiliated with the National Mah Jongg League;
+            sample hands are original and illustrative.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // New user — a short 3-step wizard: account → experience → tile.
+  return (
+    <div className="onboard">
+      <div className="onboard-card">
+        <div className="onboard-steps">
+          <button className="onboard-back" onClick={wstep === 0 ? undefined : backStep} disabled={wstep === 0} aria-label="Back">‹</button>
+          <div className="onboard-dots" aria-hidden>
+            {[0, 1, 2].map((n) => (
+              <span key={n} className="onboard-dot" data-on={n <= wstep} data-cur={n === wstep} />
+            ))}
+          </div>
+          <span className="onboard-step-tag">{wstep + 1}/3</span>
+        </div>
+
+        <div className="onboard-step" key={wstep}>
+          {wstep === 0 && (
+            <>
+              <div className="onboard-head onboard-head-tight">
+                <TileFan size={104} className="onboard-fan" />
+                <div className="logo onboard-logo">
+                  <div className="logo-kicker">CLUB</div>
+                  <div className="logo-word">Mahj</div>
+                </div>
+                <p className="sub">The Original Mahjong Social Network</p>
+              </div>
+
+              <label className="lbl">Username</label>
+              <input className="field" value={username} maxLength={24} placeholder="tilequeen" onChange={(e) => setUsername(e.target.value)} />
+              <label className="lbl" style={{ marginTop: 12 }}>Email</label>
+              <input className="field" type="email" autoCapitalize="off" value={email} placeholder="you@email.com" onChange={(e) => setEmail(e.target.value)} />
+              <label className="lbl" style={{ marginTop: 12 }}>Password</label>
+              <input className="field" type="password" value={password} placeholder="At least 6 characters" onChange={(e) => setPassword(e.target.value)} />
+            </>
+          )}
+
+          {wstep === 1 && (
+            <>
+              <h2 className="onboard-step-title">How well do you know the game?</h2>
+              <p className="onboard-step-sub">We’ll tailor your rules &amp; tips — change it anytime in Settings.</p>
+              <div className="level-list">
+                {LEVELS.map((l) => (
+                  <button
+                    key={l.id}
+                    className="level-opt"
+                    data-active={experience === l.id}
+                    style={{ ['--lv' as string]: l.color } as React.CSSProperties}
+                    onClick={(e) => {
+                      setExperience(l.id);
+                      wobbleTile(e.currentTarget.querySelector('.level-tile'));
+                    }}
+                  >
+                    <span className="level-tile" aria-hidden>
+                      <Tile face="dot" count={l.dots} size={32} />
+                    </span>
+                    <span style={{ flex: 1, textAlign: 'left' }}>
+                      <span className="level-name">{l.label}</span>
+                      <span className="level-blurb">{l.blurb}</span>
+                      <span className="level-detail">{l.detail}</span>
+                    </span>
+                    <span className="level-check" aria-hidden />
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {wstep === 2 && (
+            <>
+              <h2 className="onboard-step-title">Pick your tile</h2>
+              <p className="onboard-step-sub">This is you across the feed &amp; tables.</p>
+              <div className="avatar-grid">
+                {TILE_OPTIONS.map((opt, i) => (
+                  <button
+                    key={opt.key}
+                    className="avatar-opt"
+                    data-active={avatarIdx === i}
+                    onClick={() => setAvatarIdx(i)}
+                    aria-label={`Tile ${i + 1}`}
+                  >
+                    <Tile
+                      face={opt.face}
+                      char={opt.face === 'letter' ? username.trim().charAt(0).toUpperCase() || 'Y' : opt.char}
+                      color={opt.color}
+                      size={36}
+                    />
+                    {avatarIdx === i && <span className="avatar-check">✓</span>}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {error && <p className="onboard-error">{error}</p>}
+
+        <button className="btn" style={{ marginTop: 16 }} onClick={nextStep} disabled={busy}>
+          {wstep < 2 ? 'Continue' : busy ? 'Just a sec…' : 'Create Account'}
+        </button>
+
+        {wstep === 0 && cloud && (
+          <button
+            className="btn ghost"
+            style={{ marginTop: 10 }}
+            onClick={() => {
+              setError(null);
+              setMode('signin');
+            }}
+          >
+            Already have an account? Sign in
           </button>
         )}
 
