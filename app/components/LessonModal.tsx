@@ -152,7 +152,71 @@ function Charleston() {
   );
 }
 
+/* ── the four winds — a tap-through NEWS compass ───────────────────────────── */
+
+const WINDS = [
+  { pos: 'n', letter: 'N', name: 'North', fact: 'The fourth seat. Play moves counter-clockwise: East → North → West → South.' },
+  { pos: 'e', letter: 'E', name: 'East', fact: 'East is the dealer — they start the game and the Charleston. The seat of honor.' },
+  { pos: 's', letter: 'S', name: 'South', fact: 'Sits to East’s right and plays second. Each round the East seat rotates.' },
+  { pos: 'w', letter: 'W', name: 'West', fact: 'The third seat. On the card, winds always show as these letters — N, E, W, S.' },
+];
+
+function WindCompass() {
+  const [open, setOpen] = useState<string>('e');
+  const cur = WINDS.find((w) => w.letter === open) ?? WINDS[1];
+  return (
+    <div className="ls-winds">
+      <div className="ls-compass">
+        <span className="ls-compass-ring" aria-hidden />
+        <span className="ls-compass-rose" aria-hidden>✦</span>
+        {WINDS.map((w) => (
+          <button
+            key={w.letter}
+            className={`ls-wind ls-wind-${w.pos}`}
+            data-active={open === w.letter}
+            onClick={() => setOpen(w.letter)}
+            aria-label={w.name}
+          >
+            <Tile face="wind" char={w.letter} size={46} />
+          </button>
+        ))}
+      </div>
+      <div className="ls-wind-card" key={open}>
+        <span className="ls-wind-letter">{cur.letter}</span>
+        <div>
+          <div className="ls-explain-label">{cur.name}</div>
+          <div className="ls-explain-text">{cur.fact}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── tap-to-decode a card hand ─────────────────────────────────────────────── */
+
+// Real tiles for a decode group, so the shorthand is mirrored as a tile rack.
+function groupTiles(g: DecodeGroup): React.ReactNode[] {
+  const hex = DECODE_HEX[g.color];
+  const out: React.ReactNode[] = [];
+  for (let n = 0; n < g.count; n++) {
+    const key = `${g.text}-${n}`;
+    if (g.tileFace === 'flower') {
+      out.push(<Tile key={key} face="flower" size={30} />);
+    } else if (g.tileFace === 'dragon') {
+      out.push(<Tile key={key} face="dragon" char={g.tileChar} color={g.tileColor} size={30} />);
+    } else {
+      // Number tile (bam/dot/crack): render the year digit, tinted to the suit.
+      // In year hands the "0" is the white dragon (the "soap"), so show that.
+      const digit = Number(g.text[n] ?? g.text[0]);
+      if (digit === 0) {
+        out.push(<Tile key={key} face="dragon" char="0" color={hex} size={30} />);
+      } else {
+        out.push(<Tile key={key} face={g.tileFace} count={digit} color={hex} size={30} />);
+      }
+    }
+  }
+  return out;
+}
 
 function Decode({ groups }: { groups: DecodeGroup[] }) {
   const [open, setOpen] = useState<number | null>(null);
@@ -195,6 +259,7 @@ function Decode({ groups }: { groups: DecodeGroup[] }) {
             <div>
               <div className="ls-explain-label">{g.label}</div>
               <div className="ls-explain-text">{g.explain}</div>
+              <div className="ls-decode-rack">{groupTiles(g)}</div>
             </div>
           </>
         ) : (
@@ -398,6 +463,14 @@ function StepView({ step, onAnswered }: { step: Step; onAnswered: () => void }) 
           <h2 className="ls-title">{step.title}</h2>
           {step.body && <p className="ls-text">{step.body}</p>}
           <Charleston />
+        </div>
+      );
+    case 'wind':
+      return (
+        <div className="ls-slide ls-center">
+          <h2 className="ls-title">{step.title}</h2>
+          {step.body && <p className="ls-text">{step.body}</p>}
+          <WindCompass />
         </div>
       );
     case 'decode':

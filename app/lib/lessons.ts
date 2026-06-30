@@ -24,12 +24,17 @@ export interface DecodeGroup {
   count: number;
   label: string;
   explain: string;
+  /** How this group renders as real tiles on the rack visual. */
+  tileFace: TileFace;
+  tileChar?: string;
+  tileColor?: string;
 }
 
 export type Step =
   | { k: 'intro'; title: string; body: string; hero: HeroKind }
   | { k: 'tiles'; title: string; body?: string; tiles: TileSpec[] }
   | { k: 'charleston'; title: string; body?: string }
+  | { k: 'wind'; title: string; body?: string }
   | { k: 'decode'; title: string; body?: string; groups: DecodeGroup[] }
   | { k: 'meld'; title: string; body?: string }
   | { k: 'note'; title: string; body: string; bullets?: string[]; hero?: HeroKind }
@@ -78,13 +83,17 @@ export const LESSONS: Lesson[] = [
         ],
       },
       {
+        k: 'wind',
+        title: 'The four winds',
+        body: 'On the card, winds are written as letters: N, E, W, S. Tap each one.',
+      },
+      {
         k: 'tiles',
-        title: 'Honors & specials',
-        body: 'Beyond the suits, these tiles show up all over the card.',
+        title: 'Dragons, flowers & jokers',
+        body: 'Three more tile types round out the set.',
         tiles: [
-          { face: 'wind', char: '東', name: 'Winds · N E W S', desc: 'East 東, South 南, West 西, North 北. Used in “NEWS” hands.' },
           { face: 'dragon', char: '中', color: '#E8455F', name: 'Dragons · R G W', desc: 'Red 中, Green 發, White (the “soap”). Each dragon pairs with a suit.' },
-          { face: 'flower', name: 'Flowers', desc: 'Eight bonus tiles, shown as “F.” Often interchangeable on the card.' },
+          { face: 'flower', name: 'Flowers', desc: 'Eight bonus tiles, written as “F.” Often interchangeable on the card.' },
           { face: 'joker', name: 'Jokers', desc: 'Wild! Stands in for any tile inside a pung, kong, or quint — never a pair or single.' },
         ],
       },
@@ -170,10 +179,10 @@ export const LESSONS: Lesson[] = [
         title: 'Tap each group',
         body: 'This is one hand. Tap each colored group to see what it means — the count should add up to 14.',
         groups: [
-          { text: 'FF', color: 'red', count: 2, label: 'Pair of Flowers', explain: 'Two Flower tiles (shown as “F”). That’s a pair — 2 tiles.' },
-          { text: '2026', color: 'green', count: 4, label: 'The year, one suit', explain: 'The digits 2-0-2-6, all in a single suit. The color tells you which suit.' },
-          { text: '2026', color: 'blue', count: 4, label: 'The year, a 2nd suit', explain: 'The year again — but a different color means a different suit.' },
-          { text: 'DDDD', color: 'ink', count: 4, label: 'Kong of Dragons', explain: 'Four matching Dragons — a “kong.” 2 + 4 + 4 + 4 = 14 tiles. ✓' },
+          { text: 'FF', color: 'red', count: 2, label: 'Pair of Flowers', explain: 'Two Flower tiles (shown as “F”). That’s a pair — 2 tiles.', tileFace: 'flower' },
+          { text: '2026', color: 'green', count: 4, label: 'The year, one suit', explain: 'The digits 2-0-2-6, all in a single suit. The color tells you which suit.', tileFace: 'bam' },
+          { text: '2026', color: 'blue', count: 4, label: 'The year, a 2nd suit', explain: 'The year again — but a different color means a different suit.', tileFace: 'dot' },
+          { text: 'DDDD', color: 'ink', count: 4, label: 'Kong of Dragons', explain: 'Four matching Dragons — a “kong.” 2 + 4 + 4 + 4 = 14 tiles. ✓', tileFace: 'dragon', tileChar: '中', tileColor: '#E8455F' },
         ],
       },
       {

@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import OfficialCardCallout from './OfficialCardCallout';
 import PageTitle from './PageTitle';
 import Tile from './Tile';
 import LessonModal from './LessonModal';
+import { useConfetti } from './Confetti';
 import type { TileFace } from '../lib/tileArt';
 import type { Experience } from '../lib/account';
 import {
@@ -85,13 +86,13 @@ function TileGuide() {
       <TileRow tiles={[{ face: 'dot' }]} name="Dots (Circles) · 1–9" desc="Circles, 1 through 9. Also called “bings.” Three suits total: bams, cracks, dots." />
       <TileRow
         tiles={[
-          { face: 'wind', char: '東' },
-          { face: 'wind', char: '南' },
-          { face: 'wind', char: '西' },
-          { face: 'wind', char: '北' },
+          { face: 'wind', char: 'N' },
+          { face: 'wind', char: 'E' },
+          { face: 'wind', char: 'W' },
+          { face: 'wind', char: 'S' },
         ]}
         name="Winds · N E W S"
-        desc="Four winds — East 東, South 南, West 西, North 北. Used in NEWS hands."
+        desc="Four winds — North, East, West, South. On the card they show as the letters N, E, W, S."
       />
       <TileRow
         tiles={[
@@ -223,14 +224,28 @@ export default function LearnTab({
   const [open, setOpen] = useState<number | null>(null); // reference accordion
   const [completed, setCompleted] = useState<string[]>([]);
   const [active, setActive] = useState<Lesson | null>(null);
+  const { storm } = useConfetti();
+  const wasGraduated = useRef(false);
 
   useEffect(() => {
-    setCompleted(loadCompleted());
+    const c = loadCompleted();
+    setCompleted(c);
+    // Mark as already-graduated on mount so revisiting the tab doesn't re-fire.
+    wasGraduated.current = c.length >= LESSONS.length;
   }, []);
 
   const doneCount = completed.length;
   const total = LESSONS.length;
   const pct = Math.round((doneCount / total) * 100);
+  const graduated = doneCount >= total;
+
+  // Celebrate the moment the final lesson is completed (once per session).
+  useEffect(() => {
+    if (graduated && !wasGraduated.current) {
+      wasGraduated.current = true;
+      storm();
+    }
+  }, [graduated, storm]);
 
   function stateFor(lesson: Lesson): 'done' | 'current' | 'open' | 'locked' {
     const idx = LESSONS.findIndex((l) => l.id === lesson.id);
@@ -267,6 +282,20 @@ export default function LearnTab({
           <span className="learn-prog-txt">{doneCount} of {total} complete</span>
         </div>
       </div>
+
+      {graduated && (
+        <div className="learn-grad" role="status">
+          <div className="learn-grad-medal" aria-hidden>
+            <span className="learn-grad-cap">🎓</span>
+            <span className="learn-grad-shine" />
+          </div>
+          <div className="learn-grad-text">
+            <div className="learn-grad-kicker">TROPHY UNLOCKED</div>
+            <div className="learn-grad-title">Mahjong Scholar</div>
+            <p>You finished every lesson. The trophy’s on your shelf — now go clear the card. 🀄</p>
+          </div>
+        </div>
+      )}
 
       {TRACKS.map((track) => {
         const lessons = track.ids.map((id) => LESSONS.find((l) => l.id === id)).filter(Boolean) as Lesson[];

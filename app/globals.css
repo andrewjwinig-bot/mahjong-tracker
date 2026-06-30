@@ -9064,6 +9064,23 @@ label.lbl {
 .learn-prog-bar > span { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--brand), #2E7D43); transition: width 0.5s cubic-bezier(0.2,0.8,0.3,1); }
 .learn-prog-txt { flex: none; font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 700; color: var(--muted); }
 
+/* ── graduation reward (all lessons complete) ── */
+.learn-grad {
+  display: flex; align-items: center; gap: 15px; margin-top: 14px;
+  background: linear-gradient(150deg, #1F7D43, #14402A);
+  border: 1.5px solid rgba(255,255,255,0.14); border-radius: 18px;
+  padding: 16px 17px; color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 12px 26px rgba(20,40,28,0.28);
+  animation: lsPop 0.5s cubic-bezier(0.2,0.8,0.3,1);
+}
+.learn-grad-medal { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 38% 32%, #F6D478, #C9871A); box-shadow: 0 6px 16px rgba(201,135,26,0.45); position: relative; }
+.learn-grad-cap { font-size: 28px; line-height: 1; }
+.learn-grad-shine { position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.65) 50%, transparent 65%); background-size: 250% 100%; animation: gradShine 2.6s ease-in-out infinite; }
+@keyframes gradShine { 0% { background-position: 140% 0; } 100% { background-position: -40% 0; } }
+.learn-grad-kicker { font-family: var(--font-mono), monospace; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; color: #F6D478; }
+.learn-grad-title { font-family: var(--font-display), system-ui, sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -0.3px; margin-top: 1px; }
+.learn-grad-text p { margin: 4px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.4; color: rgba(255,255,255,0.82); }
+
 /* ── lesson path / tracks ── */
 .lp-track { margin-top: 22px; }
 .lp-track-head { display: flex; align-items: baseline; gap: 9px; margin: 0 2px 12px; }
@@ -9219,6 +9236,31 @@ label.lbl {
 .ls-explain-label { font-family: var(--font-display), system-ui, sans-serif; font-weight: 800; font-size: 13.5px; color: #14402A; }
 .ls-explain-text { font-size: 12.5px; font-weight: 500; line-height: 1.4; color: #3E5447; margin-top: 2px; }
 .ls-explain-hint { font-size: 12.5px; font-weight: 600; color: #A9740E; text-align: center; width: 100%; }
+.ls-decode-rack { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 8px; }
+.ls-decode-rack .tile { filter: drop-shadow(0 2px 4px rgba(20,22,42,0.16)); animation: lsDeal 0.32s ease both; }
+.ls-decode-rack .tile:nth-child(2) { animation-delay: 0.05s; }
+.ls-decode-rack .tile:nth-child(3) { animation-delay: 0.1s; }
+.ls-decode-rack .tile:nth-child(4) { animation-delay: 0.15s; }
+
+/* the four winds — NEWS compass */
+.ls-winds { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 16px; width: 100%; }
+.ls-compass { position: relative; width: 210px; height: 210px; }
+.ls-compass-ring { position: absolute; inset: 26px; border-radius: 50%; border: 2px dashed rgba(46,125,67,0.32); background: radial-gradient(circle at 50% 38%, rgba(255,255,255,0.7), rgba(246,234,215,0.35)); }
+.ls-compass-rose { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font-size: 22px; color: rgba(201,135,26,0.5); }
+.ls-wind { position: absolute; border: 0; background: none; padding: 0; cursor: pointer; border-radius: 12px; transition: transform 0.16s ease; filter: drop-shadow(0 4px 8px rgba(20,22,42,0.18)); }
+.ls-wind::after { content: attr(aria-label); position: absolute; left: 50%; bottom: -16px; transform: translateX(-50%); font-family: var(--font-mono), monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); white-space: nowrap; }
+.ls-wind-n { left: 50%; top: 0; transform: translateX(-50%); }
+.ls-wind-s { left: 50%; bottom: 0; transform: translateX(-50%); }
+.ls-wind-e { right: 0; top: 50%; transform: translateY(-50%); }
+.ls-wind-w { left: 0; top: 50%; transform: translateY(-50%); }
+.ls-wind[data-active='true'] { transform: translate(var(--tx,0), var(--ty,0)) scale(1.12); filter: drop-shadow(0 7px 14px rgba(46,125,67,0.34)); }
+.ls-wind-n[data-active='true'] { --tx: -50%; }
+.ls-wind-s[data-active='true'] { --tx: -50%; }
+.ls-wind-e[data-active='true'] { --ty: -50%; }
+.ls-wind-w[data-active='true'] { --ty: -50%; }
+.ls-wind:active { opacity: 0.85; }
+.ls-wind-card { display: flex; gap: 13px; align-items: center; width: 100%; background: linear-gradient(160deg,#FBF1E4,#F6EAD7); border: 1.5px solid rgba(201,135,26,0.25); border-radius: 14px; padding: 14px; animation: lsSlide 0.25s ease; }
+.ls-wind-letter { flex: none; width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; font-family: var(--font-display), system-ui, sans-serif; font-weight: 800; font-size: 22px; color: #fff; background: linear-gradient(160deg,#3FB069,#1F7D43); box-shadow: 0 5px 12px rgba(31,125,67,0.3); }
 
 /* melds */
 .ls-melds { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
