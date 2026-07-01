@@ -76,4 +76,5 @@ Connected to Vercel; pushes to `main` deploy to production automatically.
 
 ## License
 
-[Choose a license] — © [Year] [Developer / Company Name].
+© 2026 Black Pug Studios LLC. All rights reserved. Proprietary software — not
+licensed for redistribution, modification, or reuse without written permission.

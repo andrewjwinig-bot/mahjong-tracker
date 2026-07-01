@@ -15,6 +15,34 @@ live in the sibling docs:
 
 ---
 
+## Web build hardening (code-side)
+
+**Shipped in code:**
+
+- [x] Route-level + global **error boundaries** and a branded **404** so crashes
+      and stray URLs recover gracefully (`app/error.tsx`, `global-error.tsx`,
+      `not-found.tsx`).
+- [x] Replaced blocking `alert()`s with an in-app **toast** (`showToast`).
+- [x] **Favicon** (`app/icon.png`); **robots.txt** + **sitemap.xml** routes.
+- [x] **CI** quality gate — typecheck + lint + build on every push/PR, with
+      `NEXT_PUBLIC_DEMO_MODE=0` pinned so a demo-only build never goes green
+      (`.github/workflows/ci.yml`).
+- [x] README **license/copyright** filled (Black Pug Studios LLC, proprietary).
+
+**Environment flips before the launch build (set in Vercel, then redeploy):**
+
+- [ ] `NEXT_PUBLIC_DEMO_MODE=0` — ⚠️ production currently ships with demo data
+      (fake friends/tables/feed) until this is set.
+- [ ] `NEXT_PUBLIC_SITE_URL=<production domain>` — OG/share cards + sitemap/robots
+      currently point at the Vercel preview URL.
+- [ ] Card scanning: `ANTHROPIC_API_KEY` (server secret) **and**
+      `NEXT_PUBLIC_CARD_SCAN=1` (surfaces the affordance). Request shape is
+      already correct for Opus 4.8 — no code change needed.
+- [ ] (recommended) Error/crash monitoring (e.g. Sentry); wire the analytics
+      forwarding hook to a real sink.
+
+---
+
 ## 0. Accounts & legal (do first; some have lead time)
 
 - [ ] **Apple Developer Program** ($99/yr). Individual is fine; an **LLC** gives
