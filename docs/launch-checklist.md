@@ -56,11 +56,31 @@ live in the sibling docs:
 
 ## 1. Backend activation (Supabase) — see `backend.md`
 
-- [ ] Create the Supabase project; copy Project URL + anon key.
-- [ ] Run `supabase/migrations/0001_init.sql`; create the public `photos` bucket.
-- [ ] Set `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel; redeploy.
-- [ ] Wire the gated cloud modules (auth → profile → gameplay sync → social),
-      then the **first-login migration** that uploads existing on-device data.
+> **Decision (this session): accounts + cloud sync ARE going live at launch.**
+> Code audit verdict: the integration is **~95% done in code** — auth
+> (sign-up / sign-in / returning user), two-way gameplay sync, the first-login
+> data migration, and report/block moderation are all wired and the queries
+> match the schema. **No app-code work remains** to turn it on; the steps below
+> are Supabase infrastructure only.
+> **Email confirmation: OFF** (frictionless sign-up) — chosen for launch; the
+> onboarding assumes immediate sign-in, so leave "Confirm email" disabled in
+> Supabase Auth (revisit later with custom SMTP if you want verified emails).
+
+- [x] `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` set in Vercel.
+- [ ] **Run the schema:** paste `docs/supabase-setup.sql` (all 6 migrations,
+      idempotent) into the Supabase SQL editor and Run.
+- [ ] **Create a public Storage bucket** named exactly `photos`.
+- [ ] **Deploy the account-deletion function** (Apple requires in-app deletion):
+      `supabase functions deploy delete-account` +
+      `supabase secrets set SUPABASE_SERVICE_ROLE_KEY=…`.
+- [ ] **Auth → URL Configuration:** set Site URL to the production URL; confirm
+      "Confirm email" is **off**.
+- [ ] **At launch:** set `NEXT_PUBLIC_DEMO_MODE=0` in Vercel + redeploy (this is
+      what swaps demo content for the real accounts experience).
+- [ ] **Test on a Preview deploy** with demo off: onboarding → sign-up → log a
+      win → sign out → sign in on another browser → data appears.
+- [x] ~~Wire the gated cloud modules + first-login migration~~ — already wired
+      (verified this session).
 - [ ] **Live multiplayer scorer** (cross-account real-time scorepad): add the
       `0002_live_scorer.sql` migration + realtime wiring (see `backend.md`).
       The friend-pick UI and scoreboard avatars already ship; only the transport
