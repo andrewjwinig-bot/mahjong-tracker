@@ -15,7 +15,7 @@ import CallMahjCoin from './CallMahjCoin';
 import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
-import { activeChallenge, challengeProgress } from '../lib/challenges';
+import { activeChallenge, challengeProgress, challengeHandIds } from '../lib/challenges';
 import { computeBadges } from '../lib/badges';
 import { IconTrophy } from './uiIcons';
 import EmptyCard from './EmptyCard';
@@ -105,6 +105,7 @@ export default function CardTab({
   }, [scanCelebration, onScanCelebrationDone]);
 
   const challenge = useMemo(() => activeChallenge(), []);
+  const chHands = useMemo(() => challengeHandIds(card, challenge), [card, challenge]);
   const chProg = useMemo(
     () => challengeProgress(challenge, card, handCounts),
     [challenge, card, handCounts],
@@ -135,7 +136,7 @@ export default function CardTab({
     const c = countOf(h);
     if (filter === 'won') return c > 0;
     if (filter === 'remaining') return c === 0;
-    if (filter === 'challenge') return challenge.match(h);
+    if (filter === 'challenge') return chHands.has(h.id);
     return true;
   };
 
@@ -152,7 +153,7 @@ export default function CardTab({
     setLogOpen(false);
 
     const total = card.hands.length;
-    const bonus = h && challenge.match(h) ? `${challenge.emoji} ${challenge.season} season bonus!` : undefined;
+    const bonus = h && chHands.has(h.id) ? `${challenge.emoji} ${challenge.season} season bonus!` : undefined;
 
     // First clear of a real card hand → milestone detection + big celebration.
     if (h && was === 0) {
@@ -163,7 +164,7 @@ export default function CardTab({
 
       if (cardDone) onMilestone('card_cleared', 'Cleared the whole card!', `All ${total} hands 👑`);
       else if (catDone) onMilestone('section_cleared', `Cleared every ${h.category} hand`);
-      if (challenge.match(h) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
+      if (chHands.has(h.id) && chProg.done < chProg.total && chProg.done + 1 >= chProg.total) {
         onMilestone('challenge_done', `Finished ${challenge.name}`);
       }
 
@@ -395,7 +396,7 @@ export default function CardTab({
             </div>
             {hands.map((h) => {
               const count = countOf(h);
-              const inChallenge = challenge.match(h);
+              const inChallenge = chHands.has(h.id);
               return (
                 <div
                   key={h.id}
