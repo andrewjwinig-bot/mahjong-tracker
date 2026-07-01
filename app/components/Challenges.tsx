@@ -74,7 +74,7 @@ export function ChallengeCard({
 
 // ---- Challenge Seasons modal (Redesign_17) --------------------------------
 
-type MotifName = 'flower' | 'sun' | 'leaf' | 'present' | 'firework';
+type MotifName = 'flower' | 'sun' | 'leaf' | 'snowflake' | 'firework';
 
 // Per-season art tokens: chip gradient (light→deep), chip shadow, the motif, and
 // the primary color (`chal`) that tints the featured "NOW" card + its text.
@@ -118,7 +118,7 @@ const VISUALS: Record<
     up: { pill: '#C2703A', eyebrow: '#B5763F', name: '#6E4526' },
   },
   yearsend: {
-    motif: 'present',
+    motif: 'snowflake',
     g1: '#A24B90',
     g2: '#5E2450',
     shadow: 'rgba(94,36,80,0.3)',
@@ -166,27 +166,35 @@ function Motif({ name, color, size }: { name: MotifName; color: string; size: nu
     );
   }
   if (name === 'leaf') {
+    // Nudged down so the leaf sits vertically centered in its box.
     return (
       <svg {...common} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M50 5 C71 23 71 47 50 66 C29 47 29 23 50 5 Z" />
-        <line x1="50" y1="11" x2="50" y2="71" />
-        <line x1="50" y1="26" x2="65" y2="20" />
-        <line x1="50" y1="26" x2="35" y2="20" />
-        <line x1="50" y1="40" x2="64" y2="35" />
-        <line x1="50" y1="40" x2="36" y2="35" />
-        <line x1="50" y1="53" x2="62" y2="49" />
-        <line x1="50" y1="53" x2="38" y2="49" />
+        <g transform="translate(0 9)">
+          <path d="M50 5 C71 23 71 47 50 66 C29 47 29 23 50 5 Z" />
+          <line x1="50" y1="11" x2="50" y2="71" />
+          <line x1="50" y1="26" x2="65" y2="20" />
+          <line x1="50" y1="26" x2="35" y2="20" />
+          <line x1="50" y1="40" x2="64" y2="35" />
+          <line x1="50" y1="40" x2="36" y2="35" />
+          <line x1="50" y1="53" x2="62" y2="49" />
+          <line x1="50" y1="53" x2="38" y2="49" />
+        </g>
       </svg>
     );
   }
-  if (name === 'present') {
+  if (name === 'snowflake') {
     return (
       <svg {...common} fill="none" stroke={color} strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="18" y="34" width="64" height="34" rx="6" />
-        <line x1="50" y1="34" x2="50" y2="68" />
-        <ellipse cx="39" cy="24" rx="10" ry="7" transform="rotate(-20 39 24)" />
-        <ellipse cx="61" cy="24" rx="10" ry="7" transform="rotate(20 61 24)" />
-        <circle cx="50" cy="28" r="3" fill={color} />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <g key={i} transform={`rotate(${i * 60} 50 50)`}>
+            <line x1="50" y1="50" x2="50" y2="9" />
+            <line x1="50" y1="20" x2="41" y2="11" />
+            <line x1="50" y1="20" x2="59" y2="11" />
+            <line x1="50" y1="33" x2="43" y2="26" />
+            <line x1="50" y1="33" x2="57" y2="26" />
+          </g>
+        ))}
+        <circle cx="50" cy="50" r="5" fill={color} stroke="none" />
       </svg>
     );
   }
@@ -247,7 +255,11 @@ function SeasonRow({
             } as CSSProperties
           }
         >
-          <Motif name={v.motif} color={isNow ? '#FFE08A' : '#FFFFFF'} size={isNow ? 33 : v.motif === 'leaf' ? 41 : v.motif === 'present' ? 37 : 36} />
+          <Motif
+            name={v.motif}
+            color={isNow ? '#FFE08A' : '#FFFFFF'}
+            size={isNow ? 33 : v.motif === 'leaf' ? 46 : v.motif === 'snowflake' ? 40 : 36}
+          />
         </div>
         {showSpine && <div className="ssn-spine" />}
       </div>
