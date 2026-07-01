@@ -9110,6 +9110,29 @@ label.lbl {
   font-weight: 700;
   color: #15803d;
 }
+/* "Invite your table" CTA on the empty feed — fires the native share/invite. */
+.pw-invite {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px auto 2px;
+  border: none;
+  cursor: pointer;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--brand, #c0392b);
+  color: #fff2e9;
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 6px 16px rgba(192, 57, 43, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.pw-invite:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 3px 10px rgba(192, 57, 43, 0.26);
+}
 
 @keyframes pwGlow {
   0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }

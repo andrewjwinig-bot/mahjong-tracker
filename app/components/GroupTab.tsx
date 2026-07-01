@@ -515,7 +515,7 @@ export default function GroupTab({
       </div>
 
       {feed.length === 0 ? (
-        <EmptyFeed />
+        <EmptyFeed onInvite={inviteContacts} />
       ) : (
         feed.map((p) => {
           const isMine = p.memberId === YOU_ID || p.memberName === profile.name;

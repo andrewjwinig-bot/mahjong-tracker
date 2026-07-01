@@ -8,6 +8,7 @@
 // the dice re-roll on tap), so it isn't missed playing off-screen.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { IconShare } from './uiIcons';
 
 type Wall = { x: number; y: number; w: number; h: number; fx: number; fy: number };
 
@@ -21,7 +22,7 @@ function buildWalls(): Wall[] {
   return w;
 }
 
-export default function EmptyFeed() {
+export default function EmptyFeed({ onInvite }: { onInvite?: () => void }) {
   const tiles = useMemo(buildWalls, []);
   const cardRef = useRef<HTMLDivElement>(null);
   // `playKey` bumps each time the card (re)enters the viewport, which remounts
@@ -122,9 +123,14 @@ export default function EmptyFeed() {
       </div>
       <div className="pw-title pw-title-feed">No mahjs called yet</div>
       <div className="pw-body pw-body-feed">
-        The feed is live — posts are from you and friends you’ve added. Call <b>Mahj</b> on your Card
-        and it’ll land right here for your crew.
+        Your feed fills with Mahjs from you and the friends you play with. Invite your table so
+        you’re not calling <b>Mahj</b> into an empty room.
       </div>
+      {onInvite && (
+        <button className="pw-invite" onClick={onInvite}>
+          <IconShare size={16} /> Invite your table
+        </button>
+      )}
     </div>
   );
 }
