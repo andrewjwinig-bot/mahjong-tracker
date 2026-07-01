@@ -33,7 +33,7 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: 'summer',
-    name: 'Summer Sun',
+    name: 'Summer Breeze',
     emoji: '☀️',
     season: 'Summer',
     blurb: 'Summer breezes — the wind hands (N·E·W·S) and a sunny spread from the card.',

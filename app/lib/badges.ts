@@ -82,11 +82,11 @@ export function computeBadges(
     { id: 'streak3', name: 'Warmed Up', emoji: '🔥', desc: '3-day streak.', cond: bestStreak >= 3 },
     { id: 'streak7', name: 'Dedicated', emoji: '🔥', desc: '7-day streak.', cond: bestStreak >= 7 },
     { id: 'streak30', name: 'Obsessed', emoji: '🔥', desc: '30-day streak.', cond: bestStreak >= 30 },
-    { id: 's_year', name: 'The Year & Evens', emoji: '🎆', desc: 'Finish the Year & Evens season.', cond: seasonDone('year') },
-    { id: 's_runs', name: 'Runs & Fives', emoji: '🃏', desc: 'Finish the Runs & Fives season.', cond: seasonDone('runs') },
-    { id: 's_odds', name: 'All the Odds', emoji: '🎲', desc: 'Finish the All the Odds season.', cond: seasonDone('odds') },
-    { id: 's_honors', name: 'Winds & Dragons', emoji: '🐉', desc: 'Finish the Winds & Dragons season.', cond: seasonDone('honors') },
-    { id: 's_homestretch', name: 'Home Stretch', emoji: '🏆', desc: 'Finish the Home Stretch season.', cond: seasonDone('homestretch') },
+    { id: 's_newyear', name: 'New Year, New Card', emoji: '🎆', desc: 'Finish the Winter season.', cond: seasonDone('newyear') },
+    { id: 's_spring', name: 'Spring Bloom', emoji: '🌸', desc: 'Finish the Spring season.', cond: seasonDone('spring') },
+    { id: 's_summer', name: 'Summer Breeze', emoji: '☀️', desc: 'Finish the Summer season.', cond: seasonDone('summer') },
+    { id: 's_autumn', name: 'Autumn Dragons', emoji: '🐉', desc: 'Finish the Autumn season.', cond: seasonDone('autumn') },
+    { id: 's_yearsend', name: 'Year’s End', emoji: '🎁', desc: 'Finish the Holidays season.', cond: seasonDone('yearsend') },
   ];
 
   return list.map(({ cond, ...b }) => ({ ...b, earned: cond }));
