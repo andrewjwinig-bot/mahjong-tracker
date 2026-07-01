@@ -10,8 +10,12 @@
 //  • Runtime: a Settings toggle writes localStorage so you can flip between the
 //    empty and populated states in the running app to preview both.
 //
-// Default (nothing set): demo ON — handy while building. Flip it off in
-// Settings (or set the env var to '0') to see the real, empty app.
+// Default (nothing set): demo OFF — real users get the honest app (no seeded
+// friends/tables/feed; a real account + sync, an empty card to scan). Toggle
+// demo ON *per device* in Settings to preview the seeded content while refining.
+// NEXT_PUBLIC_DEMO_MODE still force-overrides globally when set ('1' = on
+// everywhere, '0' = off everywhere) — leave it UNSET so the per-device toggle
+// wins and every real user defaults to the real experience.
 
 const RUNTIME_KEY = 'mahj.demoData';
 
@@ -25,7 +29,7 @@ export function isDemoMode(): boolean {
   } catch {
     /* SSR / no storage — fall through to default */
   }
-  return true;
+  return false;
 }
 
 /** Persist the runtime demo toggle. Reload the app after calling to re-seed. */

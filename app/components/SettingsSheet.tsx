@@ -327,8 +327,9 @@ export default function SettingsSheet({
         />
       </div>
       <p className="set-hint">
-        On = the app is filled with sample content to preview. Off = the real,
-        empty app. Turn this off before launch.
+        On = fills the app with sample tables, friends &amp; feed so you can preview
+        the UI. Off (the default) = the real app your players see. This only
+        affects this device — real users are never shown the demo.
       </p>
 
       <div className="set-label">ACCOUNT</div>
