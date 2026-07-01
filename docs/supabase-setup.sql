@@ -204,52 +204,89 @@ alter table public.hand_progress enable row level security;
 alter table public.wins          enable row level security;
 alter table public.custom_cards  enable row level security;
 
+-- Re-runnable: every policy is dropped before it's (re)created, so this whole
+-- file is safe to paste into the SQL editor more than once. (CREATE POLICY has
+-- no IF NOT EXISTS, so the drop-first is required.)
+
 -- Profiles: anyone authenticated can read (to find friends); you manage your own.
+drop policy if exists profiles_read on public.profiles;
 create policy profiles_read on public.profiles for select to authenticated using (true);
+drop policy if exists profiles_upsert on public.profiles;
 create policy profiles_upsert on public.profiles for insert to authenticated with check (id = auth.uid());
+drop policy if exists profiles_update on public.profiles;
 create policy profiles_update on public.profiles for update to authenticated using (id = auth.uid());
 
 -- Friendships: see + manage rows that involve you.
+drop policy if exists friends_read on public.friendships;
 create policy friends_read on public.friendships for select to authenticated
   using (user_id = auth.uid() or friend_id = auth.uid());
+drop policy if exists friends_write on public.friendships;
 create policy friends_write on public.friendships for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists friends_delete on public.friendships;
 create policy friends_delete on public.friendships for delete to authenticated using (user_id = auth.uid());
 
 -- Tables + membership: members can read; creator inserts; you join/leave yourself.
+drop policy if exists tables_read on public.tables;
 create policy tables_read on public.tables for select to authenticated using (public.is_table_member(id));
+drop policy if exists tables_insert on public.tables;
 create policy tables_insert on public.tables for insert to authenticated with check (created_by = auth.uid());
+drop policy if exists members_read on public.table_members;
 create policy members_read on public.table_members for select to authenticated using (public.is_table_member(table_id));
+drop policy if exists members_self on public.table_members;
 create policy members_self on public.table_members for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists members_leave on public.table_members;
 create policy members_leave on public.table_members for delete to authenticated using (user_id = auth.uid());
 
 -- Table content: readable + writable by members.
+drop policy if exists msg_read on public.messages;
 create policy msg_read on public.messages for select to authenticated using (public.is_table_member(table_id));
+drop policy if exists msg_write on public.messages;
 create policy msg_write on public.messages for insert to authenticated with check (public.is_table_member(table_id) and user_id = auth.uid());
+drop policy if exists popt_read on public.poll_options;
 create policy popt_read on public.poll_options for select to authenticated using (public.is_table_member(table_id));
+drop policy if exists popt_write on public.poll_options;
 create policy popt_write on public.poll_options for insert to authenticated with check (public.is_table_member(table_id));
+drop policy if exists pvote_read on public.poll_votes;
 create policy pvote_read on public.poll_votes for select to authenticated
   using (exists (select 1 from public.poll_options o where o.id = option_id and public.is_table_member(o.table_id)));
+drop policy if exists pvote_write on public.poll_votes;
 create policy pvote_write on public.poll_votes for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists pvote_delete on public.poll_votes;
 create policy pvote_delete on public.poll_votes for delete to authenticated using (user_id = auth.uid());
+drop policy if exists tphoto_read on public.table_photos;
 create policy tphoto_read on public.table_photos for select to authenticated using (public.is_table_member(table_id));
+drop policy if exists tphoto_write on public.table_photos;
 create policy tphoto_write on public.table_photos for insert to authenticated with check (public.is_table_member(table_id) and user_id = auth.uid());
 
 -- Feed: posts/likes/comments readable by all authenticated; you write your own.
+-- (posts_read is superseded by the friends-only policy in 0004.)
+drop policy if exists posts_read on public.posts;
 create policy posts_read on public.posts for select to authenticated using (true);
+drop policy if exists posts_write on public.posts;
 create policy posts_write on public.posts for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists posts_delete on public.posts;
 create policy posts_delete on public.posts for delete to authenticated using (user_id = auth.uid());
+drop policy if exists likes_read on public.post_likes;
 create policy likes_read on public.post_likes for select to authenticated using (true);
+drop policy if exists likes_write on public.post_likes;
 create policy likes_write on public.post_likes for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists likes_delete on public.post_likes;
 create policy likes_delete on public.post_likes for delete to authenticated using (user_id = auth.uid());
+drop policy if exists comments_read on public.comments;
 create policy comments_read on public.comments for select to authenticated using (true);
+drop policy if exists comments_write on public.comments;
 create policy comments_write on public.comments for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists comments_delete on public.comments;
 create policy comments_delete on public.comments for delete to authenticated using (user_id = auth.uid());
 
 -- Gameplay: strictly your own rows.
+drop policy if exists progress_all on public.hand_progress;
 create policy progress_all on public.hand_progress for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+drop policy if exists wins_all on public.wins;
 create policy wins_all on public.wins for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+drop policy if exists cards_all on public.custom_cards;
 create policy cards_all on public.custom_cards for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
 
