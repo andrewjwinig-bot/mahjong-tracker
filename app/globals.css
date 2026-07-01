@@ -902,9 +902,18 @@ a:focus-visible,
 }
 /* Hands in the active seasonal challenge are tinted with the challenge box's
    pine + a matching left accent — no per-row icon. */
+/* Challenge hands read as part of the active season: tinted in the challenge
+   teal (matching the banner) with the sun motif bleeding in from the right. */
 .hand[data-challenge="true"] {
-  background: color-mix(in srgb, var(--green) 9%, #fff);
-  box-shadow: inset 4px 0 0 var(--green), 0 7px 20px rgba(20, 22, 42, 0.11);
+  --chal: #10b39a;
+  background-image:
+    url('/challenge-sun.svg'),
+    radial-gradient(150px 90px at 100% 50%, color-mix(in srgb, var(--chal) 26%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--chal) 15%, #fff), color-mix(in srgb, var(--chal) 9%, #fff));
+  background-repeat: no-repeat;
+  background-position: right -18px center, right center, center;
+  background-size: 78px 78px, auto, auto;
+  box-shadow: inset 4px 0 0 var(--chal), 0 7px 20px rgba(20, 22, 42, 0.11);
 }
 .hand .notation,
 .line-row .notation {
