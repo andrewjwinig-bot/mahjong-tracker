@@ -17,6 +17,7 @@ import { setPro, restorePurchases } from '../lib/pro';
 import { usePro } from '../lib/usePro';
 import { useEscape } from '../lib/useEscape';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
+import { showToast } from './Toast';
 
 interface Props {
   profile: Profile;
@@ -336,7 +337,10 @@ export default function SettingsSheet({
           label="Restore purchases"
           onClick={async () => {
             const ok = await restorePurchases();
-            alert(ok ? 'Purchases restored — VIP is active.' : 'No previous purchase found for this account.');
+            showToast(
+              ok ? 'Purchases restored — VIP is active.' : 'No previous purchase found for this account.',
+              { tone: ok ? 'success' : 'info' },
+            );
           }}
         />
         <ValueRow label="Change password" value="Soon" />

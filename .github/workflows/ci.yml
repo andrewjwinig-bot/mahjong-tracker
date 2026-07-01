@@ -1,0 +1,38 @@
+name: CI
+
+# Quality gate for Club Mahj: typecheck, lint, and a production build on every
+# push and PR. Vercel auto-deploys main, so this is the signal that a push is
+# safe before (or right after) it ships.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          # Launch guard: the production build must ship with demo data OFF.
+          # Locally/preview this defaults to on; here we pin it off so a build
+          # that only passes with demo mode never gets a green check.
+          NEXT_PUBLIC_DEMO_MODE: '0'

@@ -15,6 +15,7 @@ import TableIcon from './TableIcon';
 import { loadTables } from '../lib/tables';
 import { IconShare, IconTrash, IconCamera, IconRotate } from './uiIcons';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
+import { showToast } from './Toast';
 
 interface Props {
   card: MahjongCard;
@@ -286,7 +287,7 @@ export function LogWinSheet({
       if (preview) URL.revokeObjectURL(preview);
       setPreview(URL.createObjectURL(rotated));
     } catch {
-      alert('Sorry, that photo couldn’t be rotated. Try a different one.');
+      showToast('Sorry, that photo couldn’t be rotated. Try a different one.', { tone: 'error' });
     } finally {
       setBusy(false);
     }
@@ -318,7 +319,9 @@ export function LogWinSheet({
     } catch {
       // Some formats (e.g. HEIC on unsupported browsers) can't be decoded —
       // skip rather than crash, and let the user pick a different photo.
-      alert('Sorry, that photo couldn’t be added. Try a different one (JPEG or PNG).');
+      showToast('Sorry, that photo couldn’t be added. Try a different one (JPEG or PNG).', {
+        tone: 'error',
+      });
     } finally {
       setBusy(false);
       // Allow re-picking the same file after a failure.

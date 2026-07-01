@@ -45,6 +45,7 @@ import PracticeSheet from './PracticeSheet';
 import TipPopup from './TipPopup';
 import { IconSettings } from './uiIcons';
 import { ConfettiProvider } from './Confetti';
+import { ToastHost } from './Toast';
 import { applyTheme, getStoredTheme, setTheme as persistTheme, type ThemeId } from '../lib/themePrefs';
 import {
   getAccount,
@@ -484,6 +485,7 @@ export default function AppShell() {
 
   return (
     <ConfettiProvider>
+      <ToastHost />
       {/* Cold-launch splash overlays both onboarding and the app, so it always
           plays once on a fresh load regardless of auth state. */}
       {!splashDone && <Splash ready={loaded} onDone={() => setSplashDone(true)} />}
