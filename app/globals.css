@@ -908,12 +908,12 @@ a:focus-visible,
   --chal: #10b39a;
   background-image:
     url('/challenge-sun.svg'),
-    radial-gradient(150px 90px at 100% 50%, color-mix(in srgb, var(--chal) 26%, transparent), transparent 72%),
-    linear-gradient(180deg, color-mix(in srgb, var(--chal) 15%, #fff), color-mix(in srgb, var(--chal) 9%, #fff));
+    radial-gradient(150px 90px at 100% 50%, color-mix(in srgb, var(--chal) 12%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--chal) 14%, #fff), color-mix(in srgb, var(--chal) 8%, #fff));
   background-repeat: no-repeat;
-  background-position: right -18px center, right center, center;
-  background-size: 78px 78px, auto, auto;
-  box-shadow: inset 4px 0 0 var(--chal), 0 7px 20px rgba(20, 22, 42, 0.11);
+  background-position: right -24px center, right center, center;
+  background-size: 68px 68px, auto, auto;
+  border-color: color-mix(in srgb, var(--chal) 32%, var(--hairline));
 }
 .hand .notation,
 .line-row .notation {
