@@ -11,25 +11,23 @@ export interface Challenge {
   blurb: string;
 }
 
-// Five seasons, themed to the calendar (with a year-end 5th). Each season has a
-// thematic CORE (its signature hands — the year, flowers, winds, dragons,
-// concealed) and is then filled evenly to ~13, so seasons stay balanced, spread
-// across many sections, and clearing all five clears the card. `SIGNATURE`
-// order matches CHALLENGES and sets the assignment priority.
+// The card year starts in April (the new NMJL card drops each April), so the
+// seasons cycle April → March rather than Jan → Dec. Change this one constant if
+// the card ever drops in a different month (0 = January … 3 = April).
+const CARD_YEAR_START_MONTH = 3;
+
+// Five seasons, in the order they go active across the card year (April → March),
+// so each window lands in its real-world season. Each has a thematic CORE (its
+// signature hands — flowers, winds, dragons, concealed, the year) and is then
+// filled evenly to ~13, so seasons stay balanced, spread across many sections,
+// and clearing all five clears the card.
 export const CHALLENGES: Challenge[] = [
-  {
-    id: 'newyear',
-    name: 'New Year, New Card',
-    emoji: '🎆',
-    season: 'Winter',
-    blurb: 'Ring in the year — the 2026 hands lead, with a spread more from across the card.',
-  },
   {
     id: 'spring',
     name: 'Spring Bloom',
     emoji: '🌸',
     season: 'Spring',
-    blurb: 'Bloom season — built around the flower (F) hands, plus a fresh spread more.',
+    blurb: 'A fresh card blooms — built around the flower (F) hands, plus a spread from across the card.',
   },
   {
     id: 'summer',
@@ -52,21 +50,35 @@ export const CHALLENGES: Challenge[] = [
     season: 'Holidays',
     blurb: 'Close out the year with the tricky concealed hands, plus a final spread.',
   },
+  {
+    id: 'newyear',
+    name: 'New Year, New Card',
+    emoji: '🎆',
+    season: 'Winter',
+    blurb: 'Ring in the year — the 2026 hands lead, with a spread from across the card.',
+  },
 ];
 
-// A season's signature "core" test, in the same order as CHALLENGES (this is the
-// assignment priority when a hand matches more than one).
-const SIGNATURE: ((h: Hand) => boolean)[] = [
-  (h) => /2026/.test(h.notation), // the year
-  (h) => /F/.test(h.notation), // flowers
-  (h) => /(NN|EE|WW|SS|NEWS)/.test(h.notation), // winds
-  (h) => /D/.test(h.notation), // dragons
-  (h) => !!h.concealed, // concealed
-];
+// A season's signature "core" test, keyed by challenge id. `priority` breaks ties
+// when a hand matches more than one core (lower = claimed first) — kept separate
+// from the window order above so, e.g., New Year still claims the year hands even
+// though its window comes last.
+const CORE: Record<string, { test: (h: Hand) => boolean; priority: number }> = {
+  newyear: { test: (h) => /2026/.test(h.notation), priority: 0 }, // the year
+  spring: { test: (h) => /F/.test(h.notation), priority: 1 }, // flowers
+  summer: { test: (h) => /(NN|EE|WW|SS|NEWS)/.test(h.notation), priority: 2 }, // winds
+  autumn: { test: (h) => /D/.test(h.notation), priority: 3 }, // dragons
+  yearsend: { test: (h) => !!h.concealed, priority: 4 }, // concealed
+};
+
+// Season indices sorted by core priority (not window order).
+const PRIORITY_ORDER = CHALLENGES.map((_, i) => i).sort(
+  (a, b) => CORE[CHALLENGES[a].id].priority - CORE[CHALLENGES[b].id].priority,
+);
 
 // Assign every hand to exactly one season: first fill each season's signature
-// core (capped so seasons stay even), then deal the remainder to the emptiest
-// season. Deterministic per card, cached so it's computed once.
+// core (capped so seasons stay even, in priority order), then deal the remainder
+// to the emptiest season. Deterministic per card, cached so it's computed once.
 const assignCache = new WeakMap<MahjongCard, Map<string, number>>();
 function assignmentFor(card: MahjongCard): Map<string, number> {
   const cached = assignCache.get(card);
@@ -75,10 +87,10 @@ function assignmentFor(card: MahjongCard): Map<string, number> {
   const cap = Math.ceil(card.hands.length / n);
   const seatCount = new Array<number>(n).fill(0);
   const map = new Map<string, number>();
-  // Pass 1 — signature cores (priority = CHALLENGES order), capped at `cap`.
+  // Pass 1 — signature cores (in priority order), capped at `cap`.
   for (const h of card.hands) {
-    for (let s = 0; s < n; s++) {
-      if (SIGNATURE[s](h) && seatCount[s] < cap) {
+    for (const s of PRIORITY_ORDER) {
+      if (CORE[CHALLENGES[s].id].test(h) && seatCount[s] < cap) {
         map.set(h.id, s);
         seatCount[s] += 1;
         break;
@@ -106,11 +118,17 @@ export function challengeHandIds(card: MahjongCard, ch: Challenge): Set<string> 
   return ids;
 }
 
-// Five equal ~73-day windows across the year (from Jan 1), independent of the
-// calendar seasons — one season is "active" at a time.
+// The start of the card year (April 1) on or before `date`.
+function cardYearStart(date: Date): Date {
+  const y = date.getMonth() < CARD_YEAR_START_MONTH ? date.getFullYear() - 1 : date.getFullYear();
+  return new Date(y, CARD_YEAR_START_MONTH, 1);
+}
+
+// Five equal ~73-day windows across the card year (from April 1), so each season
+// is active in its real-world stretch — one season is "active" at a time.
 export function activeChallenge(date = new Date()): Challenge {
   const n = CHALLENGES.length;
-  const start = new Date(date.getFullYear(), 0, 1).getTime();
+  const start = cardYearStart(date).getTime();
   const dayOfYear = Math.floor((date.getTime() - start) / 86_400_000);
   const idx = Math.min(n - 1, Math.max(0, Math.floor((dayOfYear / 365) * n)));
   return CHALLENGES[idx];
@@ -133,14 +151,17 @@ export function challengeProgress(
   return { done, total };
 }
 
-/** The active-window date range for a season, e.g. "Jan 1 – Mar 14". */
+/** The active-window date range for a season, e.g. "Apr 1 – Jun 12". */
 export function seasonWindow(ch: Challenge): string {
   const n = CHALLENGES.length;
   const i = Math.max(0, CHALLENGES.indexOf(ch));
-  const y = new Date().getFullYear();
+  const base = cardYearStart(new Date());
   const startDay = Math.round((i / n) * 365);
   const endDay = Math.round(((i + 1) / n) * 365) - 1;
   const fmt = (day: number) =>
-    new Date(y, 0, 1 + day).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    new Date(base.getFullYear(), base.getMonth(), base.getDate() + day).toLocaleDateString(
+      undefined,
+      { month: 'short', day: 'numeric' },
+    );
   return `${fmt(startDay)} – ${fmt(endDay)}`;
 }
