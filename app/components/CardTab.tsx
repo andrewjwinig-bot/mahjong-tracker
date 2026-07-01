@@ -493,7 +493,15 @@ export default function CardTab({
       )}
 
       {seasonsOpen && (
-        <SeasonsSheet card={card} handCounts={handCounts} onClose={() => setSeasonsOpen(false)} />
+        <SeasonsSheet
+          card={card}
+          handCounts={handCounts}
+          onClose={() => setSeasonsOpen(false)}
+          onFocus={() => {
+            setFilter('challenge');
+            setSeasonsOpen(false);
+          }}
+        />
       )}
 
       {logOpen && (

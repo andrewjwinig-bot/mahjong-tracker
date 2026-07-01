@@ -54,7 +54,7 @@ export const CHALLENGES: Challenge[] = [
     id: 'finale',
     name: 'Home Stretch',
     emoji: '🏁',
-    season: 'Winter',
+    season: 'Finale',
     blurb: 'The card’s last leg — cap off the year (2026) hands before April’s new card drops.',
   },
 ];
@@ -126,12 +126,20 @@ function cardYearStart(date: Date): Date {
 
 // Five equal ~73-day windows across the card year (from April 1), so each season
 // is active in its real-world stretch — one season is "active" at a time.
-export function activeChallenge(date = new Date()): Challenge {
+export function activeChallengeIndex(date = new Date()): number {
   const n = CHALLENGES.length;
   const start = cardYearStart(date).getTime();
   const dayOfYear = Math.floor((date.getTime() - start) / 86_400_000);
-  const idx = Math.min(n - 1, Math.max(0, Math.floor((dayOfYear / 365) * n)));
-  return CHALLENGES[idx];
+  return Math.min(n - 1, Math.max(0, Math.floor((dayOfYear / 365) * n)));
+}
+
+export function activeChallenge(date = new Date()): Challenge {
+  return CHALLENGES[activeChallengeIndex(date)];
+}
+
+/** The card's year (the April→March cycle the date falls in), e.g. 2026. */
+export function cardYearLabel(date = new Date()): number {
+  return cardYearStart(date).getFullYear();
 }
 
 export function challengeProgress(

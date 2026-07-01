@@ -82,7 +82,7 @@ export function computeBadges(
     { id: 'streak3', name: 'Warmed Up', emoji: '🔥', desc: '3-day streak.', cond: bestStreak >= 3 },
     { id: 'streak7', name: 'Dedicated', emoji: '🔥', desc: '7-day streak.', cond: bestStreak >= 7 },
     { id: 'streak30', name: 'Obsessed', emoji: '🔥', desc: '30-day streak.', cond: bestStreak >= 30 },
-    { id: 's_finale', name: 'Home Stretch', emoji: '🏁', desc: 'Finish the Winter season.', cond: seasonDone('finale') },
+    { id: 's_finale', name: 'Home Stretch', emoji: '🏁', desc: 'Finish the season finale.', cond: seasonDone('finale') },
     { id: 's_spring', name: 'Spring Bloom', emoji: '🌸', desc: 'Finish the Spring season.', cond: seasonDone('spring') },
     { id: 's_summer', name: 'Summer Breeze', emoji: '☀️', desc: 'Finish the Summer season.', cond: seasonDone('summer') },
     { id: 's_autumn', name: 'Autumn Dragons', emoji: '🐉', desc: 'Finish the Autumn season.', cond: seasonDone('autumn') },
