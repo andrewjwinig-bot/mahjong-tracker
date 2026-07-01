@@ -27,7 +27,10 @@ const mono = Space_Mono({
   display: 'swap',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app';
+// Tolerate a trailing slash in the env value so URLs never end up with `//`.
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app'
+).replace(/\/+$/, '');
 const APP_TITLE = 'Club Mahj — The Original Mahj Social Network';
 const APP_DESC =
   'The original mahj social network. Track your American Mahjong wins, clear the card, score live games, follow friends, and play along with your table.';

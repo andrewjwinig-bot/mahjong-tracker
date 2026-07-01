@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app';
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app'
+).replace(/\/+$/, '');
 
 // The app is a single-page PWA; only the marketing/legal routes are worth
 // indexing. The in-app tabs live under / and aren't separately routable.
