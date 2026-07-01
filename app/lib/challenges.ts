@@ -51,11 +51,11 @@ export const CHALLENGES: Challenge[] = [
     blurb: 'Close out the year with the tricky concealed hands.',
   },
   {
-    id: 'newyear',
-    name: 'New Year, New Card',
-    emoji: '🎆',
+    id: 'finale',
+    name: 'Home Stretch',
+    emoji: '🏁',
     season: 'Winter',
-    blurb: 'Ring in the year with the 2026 hands leading the way.',
+    blurb: 'The card’s last leg — cap off the year (2026) hands before April’s new card drops.',
   },
 ];
 
@@ -64,7 +64,7 @@ export const CHALLENGES: Challenge[] = [
 // from the window order above so, e.g., New Year still claims the year hands even
 // though its window comes last.
 const CORE: Record<string, { test: (h: Hand) => boolean; priority: number }> = {
-  newyear: { test: (h) => /2026/.test(h.notation), priority: 0 }, // the year
+  finale: { test: (h) => /2026/.test(h.notation), priority: 0 }, // the year
   spring: { test: (h) => /F/.test(h.notation), priority: 1 }, // flowers
   summer: { test: (h) => /(NN|EE|WW|SS|NEWS)/.test(h.notation), priority: 2 }, // winds
   autumn: { test: (h) => /D/.test(h.notation), priority: 3 }, // dragons
