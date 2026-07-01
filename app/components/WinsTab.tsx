@@ -11,6 +11,8 @@ import ShareModal from './ShareModal';
 import { useConfetti } from './Confetti';
 import { colorNotation } from '../lib/theme';
 import Tile from './Tile';
+import TableIcon from './TableIcon';
+import { loadTables } from '../lib/tables';
 import { IconShare, IconTrash, IconCamera, IconRotate } from './uiIcons';
 import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
@@ -233,6 +235,18 @@ export function LogWinSheet({
   const [shareToGroup, setShareToGroup] = useState(true);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Show the target table's real icon on the "Share to …" row (matched by name).
+  const [groupMotif, setGroupMotif] = useState<string>('crane_fit');
+  useEffect(() => {
+    let alive = true;
+    void loadTables().then((tables) => {
+      const t = tables.find((x) => x.name === groupName);
+      if (alive && t) setGroupMotif(t.icon);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [groupName]);
   const frameRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ y: number; pos: number } | null>(null);
 
@@ -522,7 +536,7 @@ export function LogWinSheet({
             data-on={shareToGroup}
             onClick={() => setShareToGroup((v) => !v)}
           >
-            <Tile face="flower" size={34} />
+            <TableIcon motif={groupMotif} size={32} />
             <span style={{ flex: 1, textAlign: 'left' }}>
               <span className="share-row-title">Share to {groupName}</span>
               <span className="share-row-sub">PLAYERS WILL SEE IT</span>
