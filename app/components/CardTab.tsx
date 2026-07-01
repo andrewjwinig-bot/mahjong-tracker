@@ -11,6 +11,7 @@ import { useConfetti } from './Confetti';
 import CardTitle from './CardTitle';
 import CountUp from './CountUp';
 import Tile from './Tile';
+import CallMahjCoin from './CallMahjCoin';
 import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
@@ -186,16 +187,22 @@ export default function CardTab({
         <EmptyCard scanEnabled={scanEnabled} onScan={onScanCard} onManual={onAddCard} />
 
         {/* You can log a mahj even without a card — type the hand by hand.
-            Scanning your card adds the tap-to-track hand list on top. */}
-        <div className="no-card-mahj">
-          <span className="ncm-or">or</span>
-          <p className="ncm-text">Already won a hand? Log it now — no card needed.</p>
-          <button className="mahj-hero" onClick={() => openLog()}>
-            <span className="mahj-hero-shine" aria-hidden />
-            <Tile face="crack" size={32} className="mahj-hero-tile" />
-            <span className="mahj-hero-label">CALL MAHJ!</span>
-          </button>
-        </div>
+            Scanning your card adds the tap-to-track hand list on top.
+            First-run (no mahjs yet): the gold coin is the Call-Mahj button;
+            once you've logged one, it reverts to the standard button + list. */}
+        {wins.length === 0 ? (
+          <CallMahjCoin onCall={() => openLog()} />
+        ) : (
+          <div className="no-card-mahj">
+            <span className="ncm-or">or</span>
+            <p className="ncm-text">Log another — no card needed.</p>
+            <button className="mahj-hero" onClick={() => openLog()}>
+              <span className="mahj-hero-shine" aria-hidden />
+              <Tile face="crack" size={32} className="mahj-hero-tile" />
+              <span className="mahj-hero-label">CALL MAHJ!</span>
+            </button>
+          </div>
+        )}
 
         {wins.length > 0 && (
           <section style={{ marginTop: 22 }}>
