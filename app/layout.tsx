@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     icon: '/icons/icon-192.png',
     apple: '/icons/apple-touch-icon.png',
   },
-  // og:image / twitter:image are supplied by app/opengraph-image.tsx + twitter-image.tsx.
+  // og:image is supplied by app/opengraph-image.tsx; X/Twitter fall back to it.
   openGraph: {
     type: 'website',
     siteName: 'Club Mahj',
