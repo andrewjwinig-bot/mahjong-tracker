@@ -1,57 +1,71 @@
-# Store Listing Copy — Club Mahj
+# Store Listing Copy — Club Mahj  (FINAL draft)
 
-Draft marketing copy for the App Store and Google Play. All original. Replace
-[bracketed] values and do a final pass before submission. **Do not** use the
-"National Mah Jongg League" / "NMJL" trademark in the name, subtitle, or
-keywords; keep the non-affiliation disclaimer in the description (it mirrors the
-in-app AboutSheet wording).
+Ready-to-paste copy for the App Store & Google Play. All original. Character
+counts noted against each platform limit.
 
-**Brand tagline:** _The Original Mahj Social Network_ — the positioning hook for
-the subtitle, promo text, and the top of the long description.
+**Rules of the road**
+- **Never** use "National Mah Jongg League" / "NMJL" in the name, subtitle, or
+  keywords (trademark). Keep the non-affiliation disclaimer in the description.
+- Every feature named below is **shipped today** — don't add planned-but-unbuilt
+  features (deep win insights, CSV export, push) until they exist, or Apple can
+  reject for unavailable functionality.
+- **Category: Social Networking** (secondary: Lifestyle). Not Games.
 
 **Identifiers:** app name **Club Mahj** · bundle id `com.clubmahj.app` ·
 domain `clubmahj.com`.
 
 ---
 
-## App name (≤ 30 chars)
-- **Club Mahj**  _(9 chars)_
-- Alt: `Club Mahj: Cards & Wins`
+## App name  (Apple ≤30 · Google Play ≤30)
+**Recommended:** `Club Mahj: Mahjong Card`  _(23)_
+- The daily job is your card, and "Mahjong Card" is a real search term — brand +
+  keyword in one.
 
-## Subtitle (Apple, ≤ 30 chars)
-- **The mahj social network**  _(23 chars)_
-- Alts: `Track wins, play your table` (27), `Your American mahjong card` (26)
-- _Note: "The original mahj social network" is 32 chars — too long for the
-  subtitle; keep that full phrase for the promo text / description instead._
+**Alternatives:**
+- `Club Mahj: Mahjong & Friends`  _(28)_ — leans social
+- `Club Mahj`  _(9)_ — cleanest, weakest for search (nobody searches the brand yet)
 
-## Promotional text (Apple, ≤ 170 chars — editable anytime)
-> Tap a tile every time you call Mahj, chase a new seasonal challenge, and brag
-> to your table. Your whole American mahjong year, in one playful app.
+## Subtitle  (Apple ≤30 — indexed for search)
+**Recommended:** `American mahjong & friends`  _(26)_
+- Adds the high-value "American mahjong" term the name doesn't carry.
 
-## Keywords (Apple, ≤ 100 chars, comma-separated, no spaces)
+**Alternatives:**
+- `Track wins with your table`  _(26)_
+- `Your card, your wins, your crew`  _(31 — trim)_ → `Your card, wins & crew`  _(22)_
+
+## Google Play — short description  (≤80)
+`The mahj social network — track wins, clear your card, play with friends.`  _(72)_
+
+## Keywords  (Apple ≤100, comma-separated, NO spaces, no words already in name/subtitle)
 ```
-american mahjong,mahjongg,mahjong card,tile tracker,scorecard,hands,wins,tiles,board game,friends
+mahjongg,scorecard,tile,hands,wins,tracker,score,points,social,group,seasonal,trophies,learn,chat
 ```
+_(97 chars. Deliberately omits mahjong/american/card/friends — already covered by
+the name + subtitle — and avoids "league" to stay clear of the NMJL mark.)_
 
-## Promo / What's New (first release)
-> Welcome to Club Mahj — the original mahj social network! Track your wins,
-> learn the tiles, chase seasonal challenges, earn trophies, and play along with
-> your table. Tap a hand each time you win it and watch your card fill in.
+## Promotional text  (Apple ≤170 — editable anytime without review)
+> Tap a tile every time you call Mahj, chase a new seasonal challenge, and keep
+> up with your table. Your whole American mahjong year, in one playful app.  _(148)_
+
+## What's New — first release  (≤4000)
+> Welcome to Club Mahj — the original mahj social network! Track your wins, learn
+> the tiles, chase seasonal challenges, earn trophies, and play along with your
+> table. Tap a hand each time you win it and watch your card fill in.
 
 ---
 
-## Description (App Store / Google Play)
+## Description  (Apple ≤4000 · Google Play full description ≤4000)
 
 **Club Mahj — the original mahj social network.**
 
 The playful way to track every hand you win, learn the tiles, score your games,
-and keep your table connected. Tap a hand each time you call “Mahj!” and watch
+and keep your table connected. Tap a hand each time you call "Mahj!" and watch
 your card fill in with a celebration of tumbling tiles.
 
 **🀄 Track your card**
 - Tap to log a win on any hand and watch your progress climb.
-- See hands cleared, total wins (“mahjs”), and points at a glance.
-- Filter to what’s left “To Go” to pick your next target.
+- See hands cleared, total wins ("mahjs"), and points at a glance.
+- Filter to what's left "To Go" to pick your next target.
 
 **🎉 Celebrate every win**
 - A full-screen tile celebration (with an optional chime + haptics) every time
@@ -59,17 +73,25 @@ your card fill in with a celebration of tumbling tiles.
 - Earn trophies for milestones, category clears, streaks, and seasons.
 
 **🗓️ Seasonal challenges**
-- A new themed challenge every quarter — flowers in spring, dragons in autumn —
+- A new themed challenge each season — flowers in spring, dragons in autumn —
   that keeps you playing across your whole card.
 
+**🧮 Score live games**
+- A live scorepad for your table — add players and tally every hand as you play.
+- Save your games, rematch a past one, and share a scorecard.
+
 **👯 Find your crew**
-- Add friends, see who’s online, and discover suggested players you’ve shared a
-  table with or who are friends of friends.
-- Share wins to a feed; like and comment on your friends’ hands.
+- Add friends, see who's around, and discover suggested players from your tables
+  and friends-of-friends.
+- Share wins to a feed; like and comment on your friends' hands.
 
 **🪑 Your tables**
 - Create private Tables to chat, share photos, and run date polls to pick your
   next game — one tap adds it to your calendar.
+
+**📸 Bring your own card**
+- Snap a photo of your card to import the hands in seconds — or type them in
+  yourself — so everything stays accurate to the card you actually play.
 
 **🎨 Make it yours**
 - Choose a tile-suit color theme with hand-drawn mahjong backgrounds.
@@ -77,16 +99,14 @@ your card fill in with a celebration of tumbling tiles.
   a crane, and more, in any color.
 - Tailored rules and tips from beginner to expert.
 
-**🃏 Bring your own card**
-- Enter the hands from your own card so it’s always accurate.
-
 **👑 Club Mahj VIP (optional)**
-- Unlock every theme and avatar pack, unlimited tables, full win history &
-  insights, cloud sync across devices, and a supporter badge. No ads, ever.
+- Unlimited private tables and bigger groups, extra themes and the full
+  avatar/tile packs, unlimited saved game history with rematch and shareable
+  scorecards, cloud sync across your devices, and a supporter badge. No ads, ever.
 
-Club Mahj is an independent scorecard and learning tool. It is not affiliated
-with, endorsed by, or sponsored by the National Mah Jongg League, and the sample
-hands included are original and illustrative.
+Club Mahj is an independent scorecard and social app. It is not affiliated with,
+endorsed by, or sponsored by the National Mah Jongg League, and the sample hands
+included are original and illustrative.
 
 Optional accounts add cloud sync and social features; without an account your
 data stays on your device.
@@ -94,34 +114,26 @@ data stays on your device.
 ---
 
 ## Store metadata
-- **Primary category:** Social Networking — Club Mahj is a companion + social
-  app (feed, friends, tables/groups, chat), NOT a playable game. Do **not** file
-  under Games; it's misleading, hurts discovery, and invites unfair comparison
-  to actual mahjong games.
+- **Primary category:** Social Networking (companion + social app: feed, friends,
+  tables/groups, chat — NOT a playable game).
 - **Secondary category:** Lifestyle (alt: Entertainment)
-- **Age rating:** 12+ once the chat/feed (user-generated content) is live; 4+ for
-  a tracker-only build. Confirm in the questionnaire.
-- **In-app purchases:** Club Mahj VIP — Monthly / Annual (auto-renewing) +
-  Lifetime (non-consumable). Product ids in `app/lib/billing.ts`.
-- **Support URL:** [https://clubmahj.com/support]
-- **Marketing URL:** [https://clubmahj.com]
-- **Privacy Policy URL:** https://clubmahj.com/privacy (hosted at /privacy)
+- **Age rating:** likely **12+** with the feed/chat (user-generated content) live.
+  UGC needs a report + block flow — both are shipped. Confirm in the questionnaire.
+- **In-app purchases:** Club Mahj VIP — Monthly ($2.99) / Annual ($14.99,
+  auto-renewing) + Lifetime ($24.99, non-consumable). Mirror `PLANS` in
+  `app/lib/pro.ts` exactly in App Store Connect / Play.
+- **Support URL:** https://clubmahj.com/support  _(needs a page)_
+- **Marketing URL:** https://clubmahj.com
+- **Privacy Policy URL:** https://clubmahj.com/privacy  (hosted at /privacy)
 
-## Screenshot plan (6–8, capture from the live app on a 6.7" device)
-Use a consistent device frame + one short caption each. Capture in a couple of
-different themes to show variety.
+## Screenshots
+Handled separately (Claude Design). Captured references live in
+`docs/store-assets/`. Suggested captions: Card — "Track your whole card." · Feed
+— "See what your table's up to." · Tables — "A private group for every table." ·
+(add) Scorer — "Score live games." · Trophies — "Earn every trophy."
 
-1. **Card tab** mid-progress with the gold **Stats & Trophies** bar + a seasonal
-   challenge — _“Track your whole card.”_
-2. The **CALL MAHJ!** celebration (tiles raining) — _“Celebrate every win.”_
-3. **Find Friends** screen (presence dots + suggested players) — _“Find your crew.”_
-4. The **Feed** with a win, likes & comments — _“Brag to your table.”_
-5. A **Table’s** chat + date poll — _“Plan your next game.”_
-6. **Edit Profile** tile-avatar picker (the 15 tiles + colors) — _“Make your tile.”_
-7. **App Theme** picker (felt backgrounds) — _“Pick your felt.”_
-8. _(optional)_ **Club Mahj VIP** modal — _“Go VIP.”_
-
-## Notes
-- Keep the name/subtitle/keywords free of “NMJL” / “National Mah Jongg League”.
-  The disclaimer paragraph above is required in the description.
-- Mirror the exact `PLANS` prices (`pro.ts`) in App Store Connect before submit.
+## Final pre-submit checks
+- Name/subtitle/keywords free of "NMJL"/"National Mah Jongg League".
+- Disclaimer paragraph present in the description.
+- IAP prices in App Store Connect match `PLANS` in `pro.ts`.
+- Every described feature is live in the shipped build.
