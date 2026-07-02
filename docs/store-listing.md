@@ -94,8 +94,11 @@ data stays on your device.
 ---
 
 ## Store metadata
-- **Primary category:** Games › Board (alt: Lifestyle)
-- **Secondary category:** Lifestyle
+- **Primary category:** Social Networking — Club Mahj is a companion + social
+  app (feed, friends, tables/groups, chat), NOT a playable game. Do **not** file
+  under Games; it's misleading, hurts discovery, and invites unfair comparison
+  to actual mahjong games.
+- **Secondary category:** Lifestyle (alt: Entertainment)
 - **Age rating:** 12+ once the chat/feed (user-generated content) is live; 4+ for
   a tracker-only build. Confirm in the questionnaire.
 - **In-app purchases:** Club Mahj VIP — Monthly / Annual (auto-renewing) +
