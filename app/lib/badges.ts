@@ -40,7 +40,13 @@ export function saveSeenBadges(ids: string[]): void {
   }
 }
 
-export function computeStats(card: MahjongCard, handCounts: Record<string, number>): Stats {
+export function computeStats(
+  card: MahjongCard,
+  handCounts: Record<string, number>,
+  // Extra banked points from outside the card (e.g. scored-game wins) so the
+  // "Points" number here matches the headline score everywhere it's shown.
+  gamePoints = 0,
+): Stats {
   let cleared = 0;
   let mahjs = 0;
   let points = 0;
@@ -53,15 +59,16 @@ export function computeStats(card: MahjongCard, handCounts: Record<string, numbe
   const categoriesCleared = card.categories.filter((cat) =>
     card.hands.filter((h) => h.category === cat).every((h) => (handCounts[h.id] ?? 0) > 0),
   ).length;
-  return { cleared, total: card.hands.length, mahjs, points, categoriesCleared };
+  return { cleared, total: card.hands.length, mahjs, points: points + gamePoints, categoriesCleared };
 }
 
 export function computeBadges(
   card: MahjongCard,
   handCounts: Record<string, number>,
   bestStreak: number,
+  gamePoints = 0,
 ): Badge[] {
-  const s = computeStats(card, handCounts);
+  const s = computeStats(card, handCounts, gamePoints);
   const seasonDone = (id: string) => {
     const ch = CHALLENGES.find((c) => c.id === id);
     if (!ch) return false;

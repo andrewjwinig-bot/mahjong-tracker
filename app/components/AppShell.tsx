@@ -501,7 +501,14 @@ export default function AppShell() {
 
         {/* Mount only after the initial load so the "already earned" baseline is
             captured with real data — otherwise prior trophies re-toast on login. */}
-        {loaded && <BadgeWatcher card={card} handCounts={handCounts} bestStreak={bestStreak} />}
+        {loaded && (
+          <BadgeWatcher
+            card={card}
+            handCounts={handCounts}
+            bestStreak={bestStreak}
+            profileName={socialState?.profile.name}
+          />
+        )}
 
         {!loaded || !minElapsed ? (
           <div className="screen" style={{ display: 'grid', placeItems: 'center' }}>
@@ -524,6 +531,7 @@ export default function AppShell() {
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
                 onTrophies={() => setTrophyOpen(true)}
+                profileName={socialState?.profile.name}
                 needsCard={needsCard}
                 scanEnabled={scanEnabled}
                 onAddCard={() => openEditor(false)}
