@@ -5,6 +5,7 @@ import type { MahjongCard, Win } from '../lib/types';
 import type { Profile } from '../lib/social';
 import { computeStats, computeBadges } from '../lib/badges';
 import { computeInsights } from '../lib/insights';
+import { computeXp, gameWinPoints, levelState } from '../lib/levels';
 import { loadResults, gameWins } from '../lib/gameScorer';
 import { usePro } from '../lib/usePro';
 import { buildTrophyCard } from '../lib/shareCard';
@@ -36,13 +37,17 @@ export default function TrophyShelf({
   const swipe = useSwipeDismiss(onClose);
   const pro = usePro();
   const [shareOpen, setShareOpen] = useState(false);
-  const s = computeStats(card, handCounts);
-  const badges = computeBadges(card, handCounts, bestStreak);
+  const gameXp = gameWinPoints(profile.name);
+  const s = computeStats(card, handCounts, gameXp);
+  const badges = computeBadges(card, handCounts, bestStreak, gameXp);
   const earned = badges.filter((b) => b.earned);
   const ins = computeInsights(card, handCounts, wins);
   const topCats = ins.categories.filter((c) => c.total > 0).slice(0, 5);
   const gamesPlayed = loadResults().length;
   const myGameWins = gameWins(profile.name);
+
+  const xp = computeXp({ card, handCounts, profileName: profile.name, trophiesEarned: earned.length });
+  const level = levelState(xp.total);
 
   const since = memberSince
     ? new Date(memberSince).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
@@ -96,6 +101,32 @@ export default function TrophyShelf({
                 <div className="sm-lab" style={{ color: st.color }}>{st.label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Level + rank, driven by total XP (banked points + trophy bonus). */}
+          <div className="lv-card">
+            <div className="lv-card-top">
+              <span className="lv-badge lv-badge-lg">
+                <span className="lv-emoji" aria-hidden>{level.rank.emoji}</span>
+                <span className="lv-num">{level.level}</span>
+              </span>
+              <div className="lv-card-head">
+                <div className="lv-card-rank">{level.rank.name}</div>
+                <div className="lv-card-xp">
+                  {level.ceil > level.floor
+                    ? `${level.intoLevel} / ${level.span} XP · ${level.toNext} to Level ${level.level + 1}`
+                    : `${xp.total} XP · top level reached`}
+                </div>
+              </div>
+            </div>
+            <span className="lv-track">
+              <span className="lv-fill" style={{ width: `${Math.round(level.progress * 100)}%` }} />
+            </span>
+            <div className="lv-parts">
+              <span className="lv-part"><b>{xp.cardXp}</b> from hands</span>
+              <span className="lv-part"><b>{xp.gameXp}</b> from games</span>
+              <span className="lv-part"><b>{xp.trophyXp}</b> from trophies</span>
+            </div>
           </div>
 
           {(s.mahjs > 0 || gamesPlayed > 0) && (

@@ -17,6 +17,9 @@ import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress, challengeHandIds } from '../lib/challenges';
 import { computeBadges } from '../lib/badges';
+import { handRarity, rarityBlurb } from '../lib/rarity';
+import { computeXp, gameWinPoints, levelState } from '../lib/levels';
+import { showToast } from './Toast';
 import { IconTrophy } from './uiIcons';
 import EmptyCard from './EmptyCard';
 
@@ -36,6 +39,8 @@ interface Props {
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
   onTrophies: () => void;
+  /** Profile display name — used to credit scored-game wins toward your score. */
+  profileName?: string;
   /** No card set up yet → show the setup prompt instead of the tracker. */
   needsCard: boolean;
   scanEnabled: boolean;
@@ -60,6 +65,7 @@ export default function CardTab({
   onPostToGroup,
   onMilestone,
   onTrophies,
+  profileName,
   needsCard,
   scanEnabled,
   onAddCard,
@@ -113,24 +119,35 @@ export default function CardTab({
 
   const countOf = (h: Hand) => handCounts[h.id] ?? 0;
 
-  // Live trophy progress for the Stats & Trophies shortcut.
+  // Points banked from scored-game wins (credited to your profile name). Reads
+  // localStorage; the Card tab remounts when you return from the scorer, so this
+  // recomputes with any new wins then.
+  const gameXp = useMemo(() => gameWinPoints(profileName), [profileName]);
+
+  // Live trophy progress for the Stats & Trophies shortcut. Game points feed in
+  // so the points milestones agree with the headline score.
   const trophies = useMemo(() => {
-    const badges = computeBadges(card, handCounts, bestStreak);
+    const badges = computeBadges(card, handCounts, bestStreak, gameXp);
     return { earned: badges.filter((b) => b.earned).length, total: badges.length };
-  }, [card, handCounts, bestStreak]);
+  }, [card, handCounts, bestStreak, gameXp]);
+
+  // Your level + rank: XP = banked points (card + games) + a trophy bonus.
+  const xp = useMemo(
+    () => computeXp({ card, handCounts, profileName, trophiesEarned: trophies.earned }),
+    [card, handCounts, profileName, trophies.earned],
+  );
+  const level = useMemo(() => levelState(xp.total), [xp.total]);
 
   const stats = useMemo(() => {
     let cleared = 0;
     let totalWins = 0;
-    let totalPoints = 0;
     for (const h of card.hands) {
       const c = handCounts[h.id] ?? 0;
       if (c > 0) cleared += 1;
       totalWins += c;
-      totalPoints += c * h.points;
     }
-    return { cleared, totalWins, totalPoints };
-  }, [card, handCounts]);
+    return { cleared, totalWins, totalPoints: xp.points };
+  }, [card, handCounts, xp.points]);
 
   const visible = (h: Hand) => {
     const c = countOf(h);
@@ -169,11 +186,15 @@ export default function CardTab({
       }
 
       // Only the big milestones still pop a celebration; a regular mahj logs
-      // quietly (it's already saved + posted, and shows in your list).
+      // quietly (it's already saved + posted, and shows in your list). A first
+      // clear of a standout hand still earns a little rarity shout via a toast.
       if (cardDone) {
         celebrate({ title: 'You Cleared The Card!!', emoji: '👑', hype: `ALL ${total} HANDS — LEGENDARY 👑`, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
       } else if (catDone) {
         celebrate({ title: 'Category Cleared! 🎉', emoji: '🏆', hype: `Every ${h.category} hand — done!`, handLabel: win.handLabel ?? h.notation, points: h.points, cleared: newCleared, total, posted: opts.shareToGroup, big: true, bonus, onShare: () => setShareWin(win) });
+      } else {
+        const r = handRarity(h);
+        if (r.notable) showToast(`${r.label} hand cleared — ${rarityBlurb(r.tier)}`, { tone: 'success' });
       }
     }
   }
@@ -331,6 +352,27 @@ export default function CardTab({
           </div>
         </div>
       </div>
+
+      <button className="level-bar" onClick={onTrophies} aria-label={`Level ${level.level}, ${level.rank.name}`}>
+        <span className="lv-badge">
+          <span className="lv-emoji" aria-hidden>{level.rank.emoji}</span>
+          <span className="lv-num">{level.level}</span>
+        </span>
+        <span className="lv-body">
+          <span className="lv-top">
+            <span className="lv-rank">{level.rank.name}</span>
+            <span className="lv-xp">
+              {level.ceil > level.floor ? `${level.intoLevel} / ${level.span} XP` : 'Max rank'}
+            </span>
+          </span>
+          <span className="lv-track">
+            <span className="lv-fill" style={{ width: `${Math.round(level.progress * 100)}%` }} />
+          </span>
+          <span className="lv-next">
+            {level.toNext > 0 ? `${level.toNext} XP to Level ${level.level + 1}` : 'Top level reached'}
+          </span>
+        </span>
+      </button>
 
       <button className="trophy-link" onClick={onTrophies}>
         <svg className="tl-stars" viewBox="0 0 200 60" preserveAspectRatio="xMaxYMid slice" aria-hidden>
