@@ -1,16 +1,18 @@
 'use client';
 
-export type Tab = 'card' | 'group' | 'tables' | 'learn';
+export type Tab = 'card' | 'group' | 'tables' | 'learn' | 'you';
 
-// Per the design rack: four text labels (FEED · CARD · TABLES · RULES). The
+// Per the design rack: text labels (FEED · CARD · TABLES · RULES · YOU). The
 // active tab is a raised cream "paper tile" with a brand-colored label; the
 // others are flat ink-grey labels. The rack itself carries the per-theme art.
-// Feed-first (Goodreads model): the social Feed is home, the Card is second.
+// Feed-first (Goodreads model): the social Feed is home, the Card is second;
+// "You" (profile, level, trophies, stats) anchors the far end.
 const TABS: { id: Tab; label: string }[] = [
   { id: 'group', label: 'Feed' },
   { id: 'card', label: 'Card' },
   { id: 'tables', label: 'Tables' },
   { id: 'learn', label: 'Rules' },
+  { id: 'you', label: 'You' },
 ];
 
 export default function BottomNav({

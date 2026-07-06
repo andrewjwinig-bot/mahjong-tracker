@@ -36,7 +36,7 @@ import type { ChatMsg } from '../lib/tables';
 import LearnTab from './LearnTab';
 import SettingsSheet from './SettingsSheet';
 import Onboarding from './Onboarding';
-import TrophyShelf from './TrophyShelf';
+import ProfileTab from './ProfileTab';
 import Tutorial from './Tutorial';
 import BadgeWatcher from './BadgeWatcher';
 import CardEditor from './CardEditor';
@@ -96,7 +96,6 @@ export default function AppShell() {
   // Best streak still feeds trophies/badges; the live day-streak is no longer
   // surfaced in the UI (a daily streak doesn't fit a weekly social game).
   const [bestStreak, setBestStreak] = useState(0);
-  const [trophyOpen, setTrophyOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [card, setCard] = useState<MahjongCard>(SAMPLE_CARD);
   // Demo vs. real data (sample card, friends, feed, tables). Read once on mount
@@ -530,7 +529,6 @@ export default function AppShell() {
                 onRemoveWin={removeWin}
                 onPostToGroup={postToGroup}
                 onMilestone={postMilestone}
-                onTrophies={() => setTrophyOpen(true)}
                 profileName={socialState?.profile.name}
                 needsCard={needsCard}
                 scanEnabled={scanEnabled}
@@ -595,6 +593,16 @@ export default function AppShell() {
               />
             )}
             {tab === 'learn' && <LearnTab experience={experience} onPractice={() => setPracticeOpen(true)} />}
+            {tab === 'you' && socialState && (
+              <ProfileTab
+                card={card}
+                handCounts={handCounts}
+                wins={wins}
+                bestStreak={bestStreak}
+                memberSince={account?.createdAt}
+                profile={socialState.profile}
+              />
+            )}
           </>
         )}
         <BottomNav tab={tab} onChange={setTab} badges={{ tables: tablesUnread }} />
@@ -674,18 +682,6 @@ export default function AppShell() {
       )}
 
       {practiceOpen && <PracticeSheet card={card} onClose={() => setPracticeOpen(false)} />}
-
-      {trophyOpen && socialState && (
-        <TrophyShelf
-          card={card}
-          handCounts={handCounts}
-          wins={wins}
-          bestStreak={bestStreak}
-          memberSince={account?.createdAt}
-          profile={socialState.profile}
-          onClose={() => setTrophyOpen(false)}
-        />
-      )}
 
       {showTutorial && (
         <Tutorial

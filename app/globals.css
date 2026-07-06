@@ -576,24 +576,7 @@ a:focus-visible,
    language so it belongs, but reads as the "treasure" shortcut. */
 /* Stats & Trophies — skinny flat-gold bar (same family as the feed callouts).
    Faint oversized stars behind white text; gold stays secondary to CALL MAHJ. */
-/* ---- Level bar (Card tab) + shared level chrome ------------------------- */
-.level-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin-top: 12px;
-  padding: 11px 13px;
-  border-radius: 14px;
-  background: #fff;
-  border: 2px solid rgba(20, 22, 42, 0.09);
-  box-shadow: 0 6px 16px rgba(20, 22, 42, 0.09);
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease;
-}
-.level-bar:active {
-  transform: scale(0.99);
-}
+/* ---- Level badge/track — shared by the Card-tab level button + trophy card - */
 .lv-badge {
   flex: none;
   display: grid;
@@ -616,31 +599,6 @@ a:focus-visible,
   color: #5a3d05;
   margin-top: -2px;
 }
-.lv-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.lv-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.lv-rank {
-  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--ink);
-}
-.lv-xp {
-  flex: none;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10.5px;
-  color: var(--muted);
-}
 .lv-track {
   display: block;
   height: 8px;
@@ -654,12 +612,6 @@ a:focus-visible,
   border-radius: 999px;
   background: linear-gradient(90deg, #d79a24, #f0b846);
   transition: width 0.5s cubic-bezier(0.25, 0.6, 0.4, 1);
-}
-.lv-next {
-  font-family: var(--font-app), 'Hanken Grotesk', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
 }
 
 /* Level card in the Stats & Trophies sheet. */
@@ -716,67 +668,6 @@ a:focus-visible,
 .lv-part b {
   font-family: var(--font-mono), ui-monospace, monospace;
   color: var(--ink);
-}
-
-.trophy-link {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  width: 100%;
-  margin-top: 12px;
-  padding: 13px 16px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #c68e20 0%, #b27c12 100%);
-  box-shadow: 0 6px 16px rgba(150, 100, 10, 0.3);
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.trophy-link:active {
-  transform: translateY(1px);
-  box-shadow: 0 3px 9px rgba(150, 100, 10, 0.28);
-}
-.tl-stars {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 175px;
-  height: 100%;
-  opacity: 0.16;
-  pointer-events: none;
-}
-.tl-trophy {
-  position: relative;
-  flex: none;
-}
-.tl-title {
-  flex: 1;
-  min-width: 0;
-  position: relative;
-  text-align: left;
-  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -0.3px;
-  color: #ffffff;
-  text-shadow: 1.5px 1.5px 0 rgba(120, 80, 8, 0.35);
-}
-.tl-right {
-  flex: none;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-.tl-count {
-  font-family: var(--font-mono), 'Space Mono', monospace;
-  font-weight: 700;
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.92);
-}
-.tl-chev {
-  flex: none;
 }
 
 /* Card action row: SCORE GAME (accent) + PRACTICE (white). */
@@ -4743,6 +4634,21 @@ label.lbl {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+/* The "You" tab reuses the profile band/body as a full screen: zero the screen
+   padding so the cinnabar band bleeds edge-to-edge, and clear the status bar. */
+.profile-screen {
+  padding: 0 0 calc(var(--nav-h) + 30px);
+}
+.profile-screen::before {
+  display: none;
+}
+.profile-screen .profile-band {
+  padding-top: calc(16px + env(safe-area-inset-top));
+}
+/* Keep the SHARE button clear of the floating settings gear (fixed top-right). */
+.profile-screen .profile-band-row {
+  padding-right: 46px;
 }
 .profile-band {
   position: relative;

@@ -13,17 +13,17 @@ import { appUrl } from '../lib/share';
 import Avatar from './Avatar';
 import ShareModal from './ShareModal';
 import { IconShare, IconLock, IconStar, IconFlame, IconTarget, IconTrophy } from './uiIcons';
-import { useEscape } from '../lib/useEscape';
-import { useSwipeDismiss } from '../lib/useSwipeDismiss';
 
-export default function TrophyShelf({
+/** The "You" tab — your identity, level/rank, lifetime stats, insights, and the
+ *  full trophy shelf. A screen (not a modal); the same content the profile sheet
+ *  used to hold, now with a permanent home in the bottom nav. */
+export default function ProfileTab({
   card,
   handCounts,
   wins,
   bestStreak,
   memberSince,
   profile,
-  onClose,
 }: {
   card: MahjongCard;
   handCounts: Record<string, number>;
@@ -31,10 +31,7 @@ export default function TrophyShelf({
   bestStreak: number;
   memberSince?: number;
   profile: Profile;
-  onClose: () => void;
 }) {
-  useEscape(onClose);
-  const swipe = useSwipeDismiss(onClose);
   const pro = usePro();
   const [shareOpen, setShareOpen] = useState(false);
   const gameXp = gameWinPoints(profile.name);
@@ -61,75 +58,66 @@ export default function TrophyShelf({
   ];
 
   return (
-    <div className="modal-scrim" onClick={onClose}>
-      <div
-        className="sheet profile-sheet"
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={swipe.onTouchStart}
-        onTouchMove={swipe.onTouchMove}
-        onTouchEnd={swipe.onTouchEnd}
-        style={swipe.style}
-      >
-        {/* Cinnabar header band */}
-        <div className="profile-band">
-          <span className="md-stripe" aria-hidden />
-          <div className="grab light" />
-          <div className="profile-band-row">
-            <span className="profile-band-tile">
-              <Avatar avatar={profile.avatar} size={46} />
-            </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="profile-name">{profile.name}</div>
-              <div className="profile-handle">@{profile.handle}</div>
+    <div className="screen profile-screen">
+      {/* Cinnabar identity header */}
+      <div className="profile-band">
+        <span className="md-stripe" aria-hidden />
+        <div className="profile-band-row">
+          <span className="profile-band-tile">
+            <Avatar avatar={profile.avatar} size={46} />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="profile-name">{profile.name}</div>
+            <div className="profile-handle">@{profile.handle}</div>
+          </div>
+          <button className="profile-share" onClick={() => setShareOpen(true)}>
+            <IconShare size={15} /> SHARE
+          </button>
+        </div>
+      </div>
+
+      <div className="profile-body">
+        {profile.bio && <p className="profile-bio">{profile.bio}</p>}
+        <p className="sheet-sub" style={{ textAlign: 'left', margin: '0 2px 14px' }}>
+          {earned.length}/{badges.length} trophies · since {since}
+        </p>
+
+        <div className="stat-row">
+          {stats.map((st) => (
+            <div className="stat-mini" key={st.label}>
+              <div className="sm-num">{st.value}</div>
+              <div className="sm-lab" style={{ color: st.color }}>{st.label}</div>
             </div>
-            <button className="profile-share" onClick={() => setShareOpen(true)}>
-              <IconShare size={15} /> SHARE
-            </button>
+          ))}
+        </div>
+
+        {/* Level + rank, driven by total XP (banked points + trophy bonus). */}
+        <div className="lv-card">
+          <div className="lv-card-top">
+            <span className="lv-badge lv-badge-lg">
+              <span className="lv-emoji" aria-hidden>{level.rank.emoji}</span>
+              <span className="lv-num">{level.level}</span>
+            </span>
+            <div className="lv-card-head">
+              <div className="lv-card-rank">{level.rank.name}</div>
+              <div className="lv-card-xp">
+                {level.ceil > level.floor
+                  ? `${level.intoLevel} / ${level.span} XP · ${level.toNext} to Level ${level.level + 1}`
+                  : `${xp.total} XP · top level reached`}
+              </div>
+            </div>
+          </div>
+          <span className="lv-track">
+            <span className="lv-fill" style={{ width: `${Math.round(level.progress * 100)}%` }} />
+          </span>
+          <div className="lv-parts">
+            <span className="lv-part"><b>{xp.cardXp}</b> from hands</span>
+            <span className="lv-part"><b>{xp.gameXp}</b> from games</span>
+            <span className="lv-part"><b>{xp.trophyXp}</b> from trophies</span>
           </div>
         </div>
 
-        <div className="profile-body">
-          {profile.bio && <p className="profile-bio">{profile.bio}</p>}
-          <p className="sheet-sub" style={{ textAlign: 'left', margin: '0 2px 14px' }}>
-            {earned.length}/{badges.length} trophies · since {since}
-          </p>
-
-          <div className="stat-row">
-            {stats.map((st) => (
-              <div className="stat-mini" key={st.label}>
-                <div className="sm-num">{st.value}</div>
-                <div className="sm-lab" style={{ color: st.color }}>{st.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Level + rank, driven by total XP (banked points + trophy bonus). */}
-          <div className="lv-card">
-            <div className="lv-card-top">
-              <span className="lv-badge lv-badge-lg">
-                <span className="lv-emoji" aria-hidden>{level.rank.emoji}</span>
-                <span className="lv-num">{level.level}</span>
-              </span>
-              <div className="lv-card-head">
-                <div className="lv-card-rank">{level.rank.name}</div>
-                <div className="lv-card-xp">
-                  {level.ceil > level.floor
-                    ? `${level.intoLevel} / ${level.span} XP · ${level.toNext} to Level ${level.level + 1}`
-                    : `${xp.total} XP · top level reached`}
-                </div>
-              </div>
-            </div>
-            <span className="lv-track">
-              <span className="lv-fill" style={{ width: `${Math.round(level.progress * 100)}%` }} />
-            </span>
-            <div className="lv-parts">
-              <span className="lv-part"><b>{xp.cardXp}</b> from hands</span>
-              <span className="lv-part"><b>{xp.gameXp}</b> from games</span>
-              <span className="lv-part"><b>{xp.trophyXp}</b> from trophies</span>
-            </div>
-          </div>
-
-          {(s.mahjs > 0 || gamesPlayed > 0) && (
+        {(s.mahjs > 0 || gamesPlayed > 0) && (
           <>
             <div className="set-section">Your game</div>
             <div className="insight-list">
@@ -187,7 +175,6 @@ export default function TrophyShelf({
                 <div className="sm-lab">Best run</div>
               </div>
             </div>
-
           </>
         )}
 
@@ -233,11 +220,6 @@ export default function TrophyShelf({
               <span className="trophy-desc">{b.desc}</span>
             </div>
           ))}
-        </div>
-
-          <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
-            Done
-          </button>
         </div>
       </div>
 
