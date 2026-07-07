@@ -16,9 +16,8 @@ import ShareModal from './ShareModal';
 import { LogWinSheet, WinCard } from './WinsTab';
 import { ChallengeCard, SeasonsSheet } from './Challenges';
 import { activeChallenge, challengeProgress, challengeHandIds } from '../lib/challenges';
-import { computeBadges } from '../lib/badges';
 import { handRarity, rarityBlurb } from '../lib/rarity';
-import { computeXp, gameWinPoints, levelState } from '../lib/levels';
+import { cardPoints, gameWinPoints } from '../lib/levels';
 import { showToast } from './Toast';
 import { IconTrophy } from './uiIcons';
 import EmptyCard from './EmptyCard';
@@ -38,7 +37,6 @@ interface Props {
   onRemoveWin: (id: string) => void;
   onPostToGroup: (win: Win) => void;
   onMilestone: (kind: 'section_cleared' | 'card_cleared' | 'challenge_done', title: string, note?: string) => void;
-  onTrophies: () => void;
   /** Profile display name — used to credit scored-game wins toward your score. */
   profileName?: string;
   /** No card set up yet → show the setup prompt instead of the tracker. */
@@ -64,7 +62,6 @@ export default function CardTab({
   onRemoveWin,
   onPostToGroup,
   onMilestone,
-  onTrophies,
   profileName,
   needsCard,
   scanEnabled,
@@ -124,20 +121,6 @@ export default function CardTab({
   // recomputes with any new wins then.
   const gameXp = useMemo(() => gameWinPoints(profileName), [profileName]);
 
-  // Live trophy progress for the Stats & Trophies shortcut. Game points feed in
-  // so the points milestones agree with the headline score.
-  const trophies = useMemo(() => {
-    const badges = computeBadges(card, handCounts, bestStreak, gameXp);
-    return { earned: badges.filter((b) => b.earned).length, total: badges.length };
-  }, [card, handCounts, bestStreak, gameXp]);
-
-  // Your level + rank: XP = banked points (card + games) + a trophy bonus.
-  const xp = useMemo(
-    () => computeXp({ card, handCounts, profileName, trophiesEarned: trophies.earned }),
-    [card, handCounts, profileName, trophies.earned],
-  );
-  const level = useMemo(() => levelState(xp.total), [xp.total]);
-
   const stats = useMemo(() => {
     let cleared = 0;
     let totalWins = 0;
@@ -146,8 +129,9 @@ export default function CardTab({
       if (c > 0) cleared += 1;
       totalWins += c;
     }
-    return { cleared, totalWins, totalPoints: xp.points };
-  }, [card, handCounts, xp.points]);
+    // Points = card hands (each worth its value) + a bonus per scored game won.
+    return { cleared, totalWins, totalPoints: cardPoints(card, handCounts) + gameXp };
+  }, [card, handCounts, gameXp]);
 
   const visible = (h: Hand) => {
     const c = countOf(h);
@@ -352,51 +336,6 @@ export default function CardTab({
           </div>
         </div>
       </div>
-
-      <button className="level-bar" onClick={onTrophies} aria-label={`Level ${level.level}, ${level.rank.name}`}>
-        <span className="lv-badge">
-          <span className="lv-emoji" aria-hidden>{level.rank.emoji}</span>
-          <span className="lv-num">{level.level}</span>
-        </span>
-        <span className="lv-body">
-          <span className="lv-top">
-            <span className="lv-rank">{level.rank.name}</span>
-            <span className="lv-xp">
-              {level.ceil > level.floor ? `${level.intoLevel} / ${level.span} XP` : 'Max rank'}
-            </span>
-          </span>
-          <span className="lv-track">
-            <span className="lv-fill" style={{ width: `${Math.round(level.progress * 100)}%` }} />
-          </span>
-          <span className="lv-next">
-            {level.toNext > 0 ? `${level.toNext} XP to Level ${level.level + 1}` : 'Top level reached'}
-          </span>
-        </span>
-      </button>
-
-      <button className="trophy-link" onClick={onTrophies}>
-        <svg className="tl-stars" viewBox="0 0 200 60" preserveAspectRatio="xMaxYMid slice" aria-hidden>
-          <text x="158" y="44" textAnchor="middle" fontSize="50" fill="#fff">★</text>
-          <text x="116" y="26" textAnchor="middle" fontSize="26" fill="#fff">★</text>
-          <text x="190" y="20" textAnchor="middle" fontSize="18" fill="#fff">★</text>
-        </svg>
-        <svg className="tl-trophy" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M6 4h12v5a6 6 0 0 1-12 0V4z" />
-          <path d="M6 6H4v1a3 3 0 0 0 3 3" />
-          <path d="M18 6h2v1a3 3 0 0 1-3 3" />
-          <path d="M12 15v3" />
-          <path d="M8.5 21h7" />
-        </svg>
-        <span className="tl-title">Stats &amp; Trophies</span>
-        <span className="tl-right">
-          <span className="tl-count">
-            {trophies.earned}/{trophies.total}
-          </span>
-          <svg className="tl-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-        </span>
-      </button>
 
       <button className="mahj-hero" onClick={() => openLog()}>
         <span className="mahj-hero-shine" aria-hidden />
