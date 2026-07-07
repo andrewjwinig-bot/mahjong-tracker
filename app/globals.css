@@ -375,6 +375,16 @@ a:focus-visible,
   letter-spacing: 5px;
   color: var(--title-color, var(--ink));
   margin-bottom: 3px;
+  /* Same "printed tile" offset as the word (scaled down) so the kicker pops off
+     the busy art background instead of getting lost in it. */
+  text-shadow: 1.5px 1.8px 0 var(--brand-deep);
+}
+/* Paper themes use a dark title; drop the dark shadow so it doesn't muddy. */
+[data-theme="crak"] .logo-kicker,
+[data-theme="wind"] .logo-kicker,
+[data-theme="dot"] .logo-kicker,
+[data-theme="flower"] .logo-kicker {
+  text-shadow: none;
 }
 .logo-word {
   font-family: var(--font-display), system-ui, sans-serif;
