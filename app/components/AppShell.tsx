@@ -27,7 +27,7 @@ import {
 import * as social from '../lib/social';
 import BottomNav, { type Tab } from './BottomNav';
 import CardTab from './CardTab';
-import GroupTab from './GroupTab';
+import GroupTab, { MemberDetail, completedHandIds } from './GroupTab';
 import LoadingWall from './LoadingWall';
 import Splash from './Splash';
 import TablesTab from './TablesTab';
@@ -84,6 +84,9 @@ export default function AppShell() {
   const [wins, setWins] = useState<Win[]>([]);
   const [socialState, setSocialState] = useState<social.SocialState | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // A member's profile+stats sheet, opened by tapping someone (e.g. from a
+  // table's member list) — the same detail view the Feed uses.
+  const [profileMember, setProfileMember] = useState<social.GroupMember | null>(null);
   // Unread chat messages across your tables → a badge on the Tables nav so you
   // don't miss messages from friends. `unreadTick` bumps to force a recompute
   // after a table is opened (marked read).
@@ -583,6 +586,23 @@ export default function AppShell() {
                 friends={socialState.members
                   .filter((m) => !m.isYou)
                   .map((m) => ({ name: m.name, avatar: m.avatar }))}
+                onOpenMember={(tm) => {
+                  // Match the tapped table member to a known friend for real
+                  // stats; otherwise show a minimal profile from what we have.
+                  const gm = socialState.members.find(
+                    (m) => !m.isYou && m.name.toLowerCase() === tm.name.toLowerCase(),
+                  );
+                  setProfileMember(
+                    gm ?? {
+                      id: tm.name,
+                      name: tm.name,
+                      avatar: tm.avatar,
+                      isYou: false,
+                      handsCleared: 0,
+                      points: 0,
+                    },
+                  );
+                }}
                 onScoreTable={(members) => {
                   const others = members.filter((m) => m.name !== socialState.profile.name);
                   openScorer({
@@ -682,6 +702,20 @@ export default function AppShell() {
       )}
 
       {practiceOpen && <PracticeSheet card={card} onClose={() => setPracticeOpen(false)} />}
+
+      {profileMember && socialState && (
+        <MemberDetail
+          member={profileMember}
+          completed={completedHandIds(profileMember, handCounts)}
+          rank={Math.max(
+            1,
+            [...socialState.members]
+              .sort((a, b) => b.points - a.points || b.handsCleared - a.handsCleared)
+              .findIndex((m) => m.id === profileMember.id) + 1,
+          )}
+          onClose={() => setProfileMember(null)}
+        />
+      )}
 
       {showTutorial && (
         <Tutorial

@@ -32,6 +32,7 @@ export default function TablesTab({
   onScoreTable,
   onAddFriend,
   friends = [],
+  onOpenMember,
 }: {
   profile: Profile;
   openTableId?: string | null;
@@ -41,6 +42,8 @@ export default function TablesTab({
   onAddFriend: (name: string, avatar: TileAvatar) => void;
   /** Your in-app friends (the leaderboard crew, minus you) — offered first in the table invite. */
   friends?: TableMember[];
+  /** Open a member's profile + stats sheet (same one the Feed uses). */
+  onOpenMember?: (m: TableMember) => void;
 }) {
   const [tables, setTables] = useState<Table[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -113,6 +116,7 @@ export default function TablesTab({
         onBack={() => setSelectedId(null)}
         onUpdate={(fn) => update(selected.id, fn)}
         onScore={() => onScoreTable(selected.members)}
+        onOpenMember={onOpenMember}
         onLeave={() => {
           remove(selected.id);
           setSelectedId(null);
@@ -326,6 +330,7 @@ function TableDetail({
   onUpdate,
   onScore,
   onLeave,
+  onOpenMember,
 }: {
   table: Table;
   profile: Profile;
@@ -334,6 +339,7 @@ function TableDetail({
   onUpdate: (fn: (t: Table) => Table) => void;
   onScore: () => void;
   onLeave: () => void;
+  onOpenMember?: (m: TableMember) => void;
 }) {
   const [view, setView] = useState<View>('chat');
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -382,7 +388,7 @@ function TableDetail({
       {view === 'photos' && <PhotosView table={table} profile={profile} onUpdate={onUpdate} />}
 
       <button className="table-settings-btn" onClick={() => setSettingsOpen(true)}>
-        <IconSettings size={16} /> Table settings
+        Table settings
       </button>
 
       {settingsOpen && (
@@ -394,6 +400,7 @@ function TableDetail({
             setSettingsOpen(false);
             setInviteOpen(true);
           }}
+          onOpenMember={onOpenMember}
           onLeave={onLeave}
           onClose={() => setSettingsOpen(false)}
         />
@@ -420,6 +427,7 @@ function TableSettingsSheet({
   profile,
   onUpdate,
   onInvite,
+  onOpenMember,
   onLeave,
   onClose,
 }: {
@@ -427,6 +435,7 @@ function TableSettingsSheet({
   profile: Profile;
   onUpdate: (fn: (t: Table) => Table) => void;
   onInvite: () => void;
+  onOpenMember?: (m: TableMember) => void;
   onLeave: () => void;
   onClose: () => void;
 }) {
@@ -495,15 +504,37 @@ function TableSettingsSheet({
           </button>
         </div>
         <div className="ts-members">
-          {roster.map((m) => (
-            <div className="ts-member" key={m.name}>
-              <Avatar avatar={m.avatar} size={34} />
-              <span className="ts-member-name">
-                {m.name}
-                {m.you && <span className="ts-you"> · you</span>}
-              </span>
-            </div>
-          ))}
+          {roster.map((m) => {
+            const tappable = !m.you && !!onOpenMember;
+            const content = (
+              <>
+                <Avatar avatar={m.avatar} size={34} />
+                <span className="ts-member-name">
+                  {m.name}
+                  {m.you && <span className="ts-you"> · you</span>}
+                </span>
+                {tappable && <span className="ts-member-chev" aria-hidden>›</span>}
+              </>
+            );
+            return tappable ? (
+              <button
+                className="ts-member"
+                data-tappable
+                key={m.name}
+                onClick={() => {
+                  onOpenMember!({ name: m.name, avatar: m.avatar });
+                  onClose();
+                }}
+                aria-label={`View ${m.name}'s profile`}
+              >
+                {content}
+              </button>
+            ) : (
+              <div className="ts-member" key={m.name}>
+                {content}
+              </div>
+            );
+          })}
         </div>
 
         <button

@@ -1483,17 +1483,14 @@ label.lbl {
 /* "Table settings" entry at the bottom of a table detail (opens the sheet that
    holds rename / icon / members / invite / leave). */
 .table-settings-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
+  display: block;
   width: 100%;
   margin: 22px 0 8px;
   padding: 13px;
   border-radius: 10px;
-  background: var(--card);
+  background: transparent;
   border: 2px solid var(--hairline);
-  color: var(--ink);
+  color: var(--muted);
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
   font-size: 13px;
@@ -1501,11 +1498,11 @@ label.lbl {
   text-transform: uppercase;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .table-settings-btn:active {
-  transform: scale(0.99);
   background: var(--tint);
+  color: var(--brand);
 }
 
 /* Members list inside the Table Settings sheet. */
@@ -1536,13 +1533,32 @@ label.lbl {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 2px;
+  width: 100%;
+  padding: 6px 6px 6px 2px;
+  background: none;
+  border: 0;
+  border-radius: 10px;
+  text-align: left;
+  font: inherit;
+}
+.ts-member[data-tappable] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ts-member[data-tappable]:active {
+  background: var(--tint);
 }
 .ts-member-name {
   font-family: var(--font-app), 'Hanken Grotesk', sans-serif;
   font-weight: 700;
   font-size: 14.5px;
   color: var(--ink);
+}
+.ts-member-chev {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
 }
 .ts-you {
   color: var(--muted);
