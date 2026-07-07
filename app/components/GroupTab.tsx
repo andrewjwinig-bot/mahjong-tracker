@@ -218,7 +218,7 @@ interface Props {
 
 /** Which hand ids a member has cleared. Real for you; deterministic for demo
  *  friends so their detail view is stable + spread across categories. */
-function completedHandIds(
+export function completedHandIds(
   member: GroupMember,
   handCounts: Record<string, number>,
 ): Set<string> {
@@ -806,7 +806,7 @@ function FeedCard({
 
 /* ---- Member detail (which hands they've cleared) ------------------------- */
 
-function MemberDetail({
+export function MemberDetail({
   member,
   completed,
   rank,
