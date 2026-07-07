@@ -294,23 +294,6 @@ export default function CardTab({
         </div>
       )}
 
-      {/* A scanned (custom) card reads as confident and done for the year. In a
-          demo build the sample is shown plainly as the card — no prompt, no
-          "not scanned" mismatch. The real app never reaches here without a
-          custom card (it shows the empty "add your card" state instead). */}
-      {card.source === 'custom' && (
-        <button className="card-manage" data-done onClick={onAddCard}>
-          <span className="cm-ic" aria-hidden>✓</span>
-          <span className="cm-text">
-            <span className="cm-title">Your {card.year} card</span>
-            <span className="cm-sub">
-              {card.hands.length} hand{card.hands.length === 1 ? '' : 's'} · set for the season
-            </span>
-          </span>
-          <span className="cm-edit" aria-hidden>Edit</span>
-        </button>
-      )}
-
       <div className="stats" style={{ marginTop: 16 }}>
         <div className="stat">
           <div className="num">
@@ -459,6 +442,21 @@ export default function CardTab({
         >
           Sample card — illustrative notations, not the official NMJL card.
         </p>
+      )}
+
+      {/* Your card is set once (scan/import) and rarely changes, so its manage/
+          edit control lives quietly at the bottom rather than up top. */}
+      {card.source === 'custom' && (
+        <button className="card-manage subtle" data-done onClick={onAddCard}>
+          <span className="cm-ic" aria-hidden>✓</span>
+          <span className="cm-text">
+            <span className="cm-title">Your {card.year} card</span>
+            <span className="cm-sub">
+              {card.hands.length} hand{card.hands.length === 1 ? '' : 's'} · set for the season
+            </span>
+          </span>
+          <span className="cm-edit" aria-hidden>Edit</span>
+        </button>
       )}
 
       {shareWin && (

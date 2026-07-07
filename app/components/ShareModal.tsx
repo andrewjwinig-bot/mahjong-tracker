@@ -217,10 +217,6 @@ export default function ShareModal({ payload, groupName, onShareToGroup, onClose
             {status}
           </p>
         )}
-
-        <button className="btn ghost" style={{ marginTop: 18 }} onClick={onClose}>
-          Done
-        </button>
       </div>
     </div>
   );

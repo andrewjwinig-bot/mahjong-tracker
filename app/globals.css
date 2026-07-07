@@ -5513,6 +5513,28 @@ label.lbl {
   border-radius: 999px;
   background: color-mix(in srgb, var(--brand) 10%, transparent);
 }
+/* Understated variant for the bottom-of-page placement — it's a set-once card,
+   so it recedes: flat, muted, smaller than the top banners. */
+.card-manage.subtle {
+  margin-top: 26px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: transparent;
+  border-color: var(--hairline);
+  box-shadow: none;
+}
+.card-manage.subtle .cm-ic {
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+}
+.card-manage.subtle .cm-title {
+  font-size: 13px;
+}
+.card-manage.subtle .cm-sub {
+  font-size: 10.5px;
+}
 /* ---- Card tab empty state (pre-scan add-your-card) ----------------------- */
 /* Named keyframes ported from the Card Page design reference (cp* = CardPage). */
 @keyframes cpShine { 0% { transform: translateX(-130%); } 55%, 100% { transform: translateX(360%); } }

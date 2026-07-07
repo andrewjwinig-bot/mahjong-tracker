@@ -211,10 +211,6 @@ export default function PracticeSheet({ card, onClose }: { card: MahjongCard; on
             })}
           </>
         )}
-
-        <button className="btn ghost" style={{ marginTop: 16 }} onClick={onClose}>
-          Done
-        </button>
       </div>
 
       {paywall && (
