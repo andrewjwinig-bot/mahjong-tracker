@@ -593,7 +593,7 @@ export default function AppShell() {
               />
             )}
             {tab === 'learn' && <LearnTab experience={experience} onPractice={() => setPracticeOpen(true)} />}
-            {tab === 'you' && socialState && (
+            {tab === 'me' && socialState && (
               <ProfileTab
                 card={card}
                 handCounts={handCounts}
