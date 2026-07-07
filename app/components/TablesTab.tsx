@@ -13,7 +13,7 @@ import Avatar from './Avatar';
 import TableIcon, { TABLE_MOTIFS } from './TableIcon';
 import PhotosEmpty from './PhotosEmpty';
 import ShareModal from './ShareModal';
-import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers } from './uiIcons';
+import { IconChat, IconCalendar, IconCamera, IconShare, IconCheck, IconPlus, IconUsers, IconSettings } from './uiIcons';
 import Paywall from './Paywall';
 import ProUpsell from './ProUpsell';
 import NoTablesEmpty from './NoTablesEmpty';
@@ -337,7 +337,7 @@ function TableDetail({
 }) {
   const [view, setView] = useState<View>('chat');
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [confirmLeave, setConfirmLeave] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <div className="screen">
@@ -350,13 +350,6 @@ function TableDetail({
           <div className="detail-title">{table.name}</div>
           <div className="detail-sub">{table.members.length + 1} players</div>
         </div>
-        <button
-          className="btn green plain"
-          style={{ width: 'auto', padding: '9px 14px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-          onClick={() => setInviteOpen(true)}
-        >
-          <IconShare size={16} /> Invite
-        </button>
       </div>
 
       <button className="score-cta" style={{ marginTop: 14 }} onClick={onScore}>
@@ -388,14 +381,23 @@ function TableDetail({
       {view === 'dates' && <DatesView table={table} profile={profile} onUpdate={onUpdate} />}
       {view === 'photos' && <PhotosView table={table} profile={profile} onUpdate={onUpdate} />}
 
-      <button
-        className="leave-table"
-        data-confirm={confirmLeave}
-        onClick={() => (confirmLeave ? onLeave() : setConfirmLeave(true))}
-        onBlur={() => setConfirmLeave(false)}
-      >
-        {confirmLeave ? 'Tap again to leave this table' : 'Leave this table'}
+      <button className="table-settings-btn" onClick={() => setSettingsOpen(true)}>
+        <IconSettings size={16} /> Table settings
       </button>
+
+      {settingsOpen && (
+        <TableSettingsSheet
+          table={table}
+          profile={profile}
+          onUpdate={onUpdate}
+          onInvite={() => {
+            setSettingsOpen(false);
+            setInviteOpen(true);
+          }}
+          onLeave={onLeave}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {inviteOpen && (
         <InviteToTableSheet
@@ -406,6 +408,113 @@ function TableDetail({
           onClose={() => setInviteOpen(false)}
         />
       )}
+    </div>
+  );
+}
+
+/* One place to manage a table: rename, change its icon, see who's here, invite
+   more, or leave. Opened from the "Table settings" button at the bottom of the
+   detail view, replacing the old lone "Leave this table" control. */
+function TableSettingsSheet({
+  table,
+  profile,
+  onUpdate,
+  onInvite,
+  onLeave,
+  onClose,
+}: {
+  table: Table;
+  profile: Profile;
+  onUpdate: (fn: (t: Table) => Table) => void;
+  onInvite: () => void;
+  onLeave: () => void;
+  onClose: () => void;
+}) {
+  const swipe = useSwipeDismiss(onClose);
+  const [name, setName] = useState(table.name);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+
+  // The full roster: you (the host) plus everyone who's been added.
+  const roster = [
+    { name: profile.name, avatar: profile.avatar, you: true },
+    ...table.members.map((m) => ({ name: m.name, avatar: m.avatar, you: false })),
+  ];
+
+  function commitName() {
+    const next = name.trim();
+    if (next && next !== table.name) onUpdate((t) => ({ ...t, name: next }));
+    else setName(table.name);
+  }
+
+  return (
+    <div className="modal-scrim" onClick={onClose}>
+      <div
+        className="sheet"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={swipe.onTouchStart}
+        onTouchMove={swipe.onTouchMove}
+        onTouchEnd={swipe.onTouchEnd}
+        style={swipe.style}
+      >
+        <div className="grab" />
+        <h2 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <IconSettings size={20} /> Table Settings
+        </h2>
+
+        <label className="lbl" style={{ marginTop: 8 }}>Table name</label>
+        <input
+          className="field"
+          value={name}
+          maxLength={28}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={commitName}
+          onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        />
+
+        <div className="tbicon-label">TABLE ICON</div>
+        <div className="tbicon-grid">
+          {TABLE_MOTIFS.map((m) => (
+            <button
+              key={m}
+              className="tbicon-btn"
+              aria-label={m}
+              aria-pressed={table.icon === m}
+              onClick={() => onUpdate((t) => ({ ...t, icon: m }))}
+            >
+              <TableIcon motif={m} selected={table.icon === m} />
+            </button>
+          ))}
+        </div>
+
+        <div className="set-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+            <IconUsers size={16} /> Members · {roster.length}
+          </span>
+          <button className="ts-invite" onClick={onInvite}>
+            <IconShare size={14} /> Invite
+          </button>
+        </div>
+        <div className="ts-members">
+          {roster.map((m) => (
+            <div className="ts-member" key={m.name}>
+              <Avatar avatar={m.avatar} size={34} />
+              <span className="ts-member-name">
+                {m.name}
+                {m.you && <span className="ts-you"> · you</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          className="leave-table"
+          data-confirm={confirmLeave}
+          onClick={() => (confirmLeave ? onLeave() : setConfirmLeave(true))}
+          onBlur={() => setConfirmLeave(false)}
+        >
+          {confirmLeave ? 'Tap again to leave this table' : 'Leave this table'}
+        </button>
+      </div>
     </div>
   );
 }
