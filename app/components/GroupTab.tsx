@@ -861,14 +861,7 @@ export function MemberDetail({
 
         <div className="md-body">
           {noGames ? (
-            <>
-              <EmptyProfile />
-              <div className="md-foot">
-                <button className="md-done" onClick={onClose}>
-                  DONE
-                </button>
-              </div>
-            </>
+            <EmptyProfile />
           ) : (
             <>
           {/* Stat tiles */}
@@ -956,9 +949,6 @@ export function MemberDetail({
             })}
 
           <div className="md-foot">
-            <button className="md-done" onClick={onClose}>
-              DONE
-            </button>
             <button className="md-viewall" onClick={() => setShowAll((v) => !v)}>
               {showAll ? 'Hide hands' : '⚇ View all hands'}
             </button>

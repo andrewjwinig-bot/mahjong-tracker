@@ -12,17 +12,28 @@ type Opts = {
 
 /**
  * Drag-to-dismiss for bottom sheets / modals. Attach the returned handlers +
- * style to the sheet's scroll element. A downward drag closes it (only when the
- * content is scrolled to the top, so it never fights normal scrolling); with
- * `right`, a rightward drag also closes it. The sheet follows the finger and
- * springs back if released before the threshold.
+ * style to the sheet's scroll element. A downward drag closes it from anywhere
+ * on the sheet — but only once its content is scrolled to the very top, so it
+ * never fights normal scrolling. With `right`, a rightward drag also closes it.
+ * The sheet follows the finger and springs back if released before threshold.
  */
-// Height (px) of the draggable zone at the top of a sheet — covers the grab
-// handle and header band. Touches below this tap/scroll natively.
-const GRAB_ZONE = 56;
+// The scroll offset of whatever actually scrolls under the finger — the sheet
+// itself, or an inner scrolling body. A downward drag only dismisses when this
+// is 0, so it never fights a mid-scroll gesture no matter where you grab.
+function scrolledTop(target: HTMLElement | null, sheet: HTMLElement): number {
+  let n: HTMLElement | null = target;
+  while (n && n !== sheet.parentElement) {
+    if (n.scrollHeight > n.clientHeight) {
+      const oy = getComputedStyle(n).overflowY;
+      if (oy === 'auto' || oy === 'scroll') return n.scrollTop;
+    }
+    n = n.parentElement;
+  }
+  return sheet.scrollTop || 0;
+}
 
 export function useSwipeDismiss(onClose: () => void, opts: Opts = {}) {
-  const { right = false, threshold = 90 } = opts;
+  const { right = false, threshold = 72 } = opts;
   const start = useRef<{ x: number; y: number; top: number } | null>(null);
   const axis = useRef<'x' | 'y' | null>(null);
   const [off, setOff] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -39,22 +50,15 @@ export function useSwipeDismiss(onClose: () => void, opts: Opts = {}) {
         start.current = null;
         return;
       }
+      // Anywhere on the sheet can start the drag; a downward pull only dismisses
+      // once the content under the finger is scrolled to the very top (native
+      // iOS feel), so it never fights normal scrolling.
       const t = e.touches[0];
-      // Confine the downward drag-to-dismiss to the top "grab" zone of the sheet,
-      // so taps and scrolling anywhere below are pure native gestures (no stiff
-      // controls). The horizontal "back" swipe (`right`) still works anywhere.
-      if (!right) {
-        const top = e.currentTarget.getBoundingClientRect().top;
-        if (t.clientY - top > GRAB_ZONE) {
-          start.current = null;
-          return;
-        }
-      }
-      start.current = { x: t.clientX, y: t.clientY, top: e.currentTarget.scrollTop || 0 };
+      start.current = { x: t.clientX, y: t.clientY, top: scrolledTop(el, e.currentTarget) };
       axis.current = null;
       setDragging(true);
     },
-    [right],
+    [],
   );
 
   const onTouchMove = useCallback(
