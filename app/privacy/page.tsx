@@ -141,7 +141,7 @@ export default function PrivacyPage() {
           complaint with a regulator. We do not discriminate against you for exercising these rights.
         </li>
       </ul>
-      <p>To exercise any right, contact us at andrewjwinig@gmail.com.</p>
+      <p>To exercise any right, contact us at blackpugstudios@gmail.com.</p>
 
       <h2>9. Children’s privacy</h2>
       <p>
@@ -166,7 +166,7 @@ export default function PrivacyPage() {
       <p>
         Black Pug Studios LLC
         <br />
-        andrewjwinig@gmail.com
+        blackpugstudios@gmail.com
       </p>
     </LegalChrome>
   );
