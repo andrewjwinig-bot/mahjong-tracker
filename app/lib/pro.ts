@@ -5,10 +5,18 @@
 
 const K = 'mahj.pro';
 
+// Free-launch mode: while we're validating demand (no in-app purchases live on
+// the web yet), treat everyone as VIP — every feature is unlocked and all
+// upsells/paywalls hide themselves (ProUpsell renders null when Pro, and the
+// gates all check this). Defaults ON; set NEXT_PUBLIC_FREE_LAUNCH=0 to restore
+// the normal freemium behavior once payments are wired.
+export const FREE_LAUNCH = process.env.NEXT_PUBLIC_FREE_LAUNCH !== '0';
+
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
 export function isPro(): boolean {
+  if (FREE_LAUNCH) return true;
   try {
     return localStorage.getItem(K) === '1';
   } catch {
