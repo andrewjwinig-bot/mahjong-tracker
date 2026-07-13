@@ -122,7 +122,8 @@ data stays on your device.
 - **In-app purchases:** Club Mahj VIP — Monthly ($2.99) / Annual ($14.99,
   auto-renewing) + Lifetime ($24.99, non-consumable). Mirror `PLANS` in
   `app/lib/pro.ts` exactly in App Store Connect / Play.
-- **Support URL:** https://clubmahj.com/support  _(needs a page)_
+- **Support URL:** https://clubmahj.com/support  _(page built at `app/support`; also
+  reachable now at `<SITE_URL>/support`. Support email: blackpugstudios@gmail.com)_
 - **Marketing URL:** https://clubmahj.com
 - **Privacy Policy URL:** https://clubmahj.com/privacy  (hosted at /privacy)
 

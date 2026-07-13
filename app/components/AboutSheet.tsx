@@ -109,8 +109,11 @@ export default function AboutSheet({ onClose }: { onClose: () => void }) {
               ? 'Your account and game data sync securely to the cloud so you can pick up on any device. Back up a copy or delete your account anytime below.'
               : 'For now everything lives on this device — no account, nothing leaves your phone. Cloud accounts & sync arrive with the App Store release.'}
           </p>
-          <p className="legal-fine">Read our policies (they open in your browser):</p>
+          <p className="legal-fine">Get help or read our policies (they open in your browser):</p>
           <div className="row">
+            <a className="btn ghost" href="/support" target="_blank" rel="noopener noreferrer">
+              Support
+            </a>
             <a className="btn ghost" href="/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </a>

@@ -7,7 +7,7 @@ export default function LegalChrome({
   children,
 }: {
   title: string;
-  updated: string;
+  updated?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -17,7 +17,7 @@ export default function LegalChrome({
           ‹ Back to app
         </Link>
         <h1>{title}</h1>
-        <p className="legal-updated">Last updated: {updated}</p>
+        {updated && <p className="legal-updated">Last updated: {updated}</p>}
       </header>
       <div className="legal-body">{children}</div>
       <footer className="legal-foot">© {new Date().getFullYear()} Black Pug Studios LLC</footer>

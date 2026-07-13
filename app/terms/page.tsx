@@ -142,7 +142,7 @@ export default function TermsPage() {
       <p>
         Black Pug Studios LLC
         <br />
-        andrewjwinig@gmail.com
+        blackpugstudios@gmail.com
       </p>
     </LegalChrome>
   );
