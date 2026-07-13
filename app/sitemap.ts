@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://clubmahj.vercel.app'
 ).replace(/\/+$/, '');
 
 // The app is a single-page PWA; only the marketing/legal routes are worth

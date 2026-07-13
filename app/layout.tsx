@@ -29,7 +29,7 @@ const mono = Space_Mono({
 
 // Tolerate a trailing slash in the env value so URLs never end up with `//`.
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://mahjong-tracker-kappa.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://clubmahj.vercel.app'
 ).replace(/\/+$/, '');
 const APP_TITLE = 'Club Mahj — The Original Mahj Social Network';
 const APP_DESC =
