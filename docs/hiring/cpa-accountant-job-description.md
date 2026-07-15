@@ -17,7 +17,9 @@ throughout the Philadelphia region.
 
 Behind that portfolio is a group of related legal entities and a central
 management company — and a lot of accounting that has to stay accurate and
-current for the whole thing to run smoothly.
+current for the whole thing to run smoothly. We run our accounting on
+**SKYLINE**, automate accounts payable through **AvidXchange**, and live in
+**Excel** for analysis and workpapers.
 
 ## About the Role
 
@@ -107,6 +109,8 @@ the penny, and books that never fall behind, we'd like to talk to you.
 - Continuously look for ways to **improve, automate, and standardize** our
   accounting processes.
 - Adopt and help roll out new tools, integrations, and workflows.
+- Use modern tools — including **AI assistants such as Claude or ChatGPT** —
+  to work faster and reduce manual effort where it makes sense.
 - Document procedures so the close process is repeatable and resilient.
 
 ---
@@ -128,21 +132,29 @@ the penny, and books that never fall behind, we'd like to talk to you.
 - Experience preparing **workpapers and adjusting entries** and supporting
   outside tax preparers.
 - Experience with **1099 preparation and filing**.
-- **Strong technology skills** — highly proficient with accounting software and
-  spreadsheets, and comfortable learning and adopting new systems.
+- **Strong technology skills** — highly proficient in **Excel** (pivot tables,
+  lookups, large-workbook analysis) and comfortable learning and adopting new
+  systems.
+- Experience with **SKYLINE**, **Yardi**, or a comparable commercial real
+  estate accounting/property management platform, and with an AP automation tool
+  such as **AvidXchange**, is strongly preferred.
 - Exceptional attention to detail, organization, and follow-through; a person
   who keeps things current rather than letting them slide.
 
 ### Nice to Have
-- Experience with commercial real estate / property management platforms (e.g.
-  Yardi, MRI, RealPage, AppFolio, or similar).
+- Direct experience with **SKYLINE**, **Yardi**, and **AvidXchange**; otherwise
+  experience with comparable commercial real estate / AP automation platforms
+  (MRI, RealPage, Nexus, Bill.com, or similar).
+- Advanced **Excel** / spreadsheet automation skills.
 - **CAM / operating expense reconciliation** experience (office, retail, and/or
   industrial).
 - Advanced spreadsheet skills (pivot tables, lookups, data cleanup) and comfort
   with automation.
 - Familiarity with commercial lease terms and tenant recoveries.
-- Exposure to workflow automation, integrations, or AI-assisted accounting
-  tools.
+- Hands-on experience using **AI tools such as Claude, ChatGPT, or similar** to
+  work more efficiently — drafting, analysis, summarizing data, or building
+  simple automations.
+- Exposure to workflow automation and system integrations.
 
 ---
 
