@@ -179,7 +179,7 @@ the penny, and books that never fall behind, we'd like to talk to you.
 ---
 
 ## Compensation & Benefits
-- Salary: **[range TBD]**, commensurate with experience.
+- Competitive salary, **commensurate with experience and qualifications**.
 - Benefits: **[health, PTO, retirement, etc. — TBD]**.
 
 ---
