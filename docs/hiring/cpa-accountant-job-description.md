@@ -3,7 +3,7 @@
 **Company:** Korman Commercial Properties
 **Reports to:** Controller / Ownership
 **Employment type:** Full-time
-**Location:** Trevose, PA area (Philadelphia region) — [On-site / Hybrid — TBD]
+**Location:** On-site — Trevose, PA area (Philadelphia region)
 
 ---
 
