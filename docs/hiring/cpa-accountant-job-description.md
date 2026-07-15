@@ -11,15 +11,9 @@
 
 Korman Commercial Properties is a fifth-generation, family-owned real estate
 company with more than a century of history building people-first spaces across
-Pennsylvania and New Jersey. We develop, manage, and lease **commercial office
-parks, retail shopping centers, and light-industrial / warehouse properties**
-throughout the Philadelphia region.
-
-Behind that portfolio is a group of related legal entities and a central
-management company — and a lot of accounting that has to stay accurate and
-current for the whole thing to run smoothly. We run our accounting on
-**SKYLINE**, automate accounts payable through **AvidXchange**, and live in
-**Excel** for analysis and workpapers.
+the Philadelphia area. We develop, manage, and lease commercial office parks,
+retail shopping centers, and residential properties throughout the greater
+Philadelphia region.
 
 ## About the Role
 
@@ -28,15 +22,12 @@ integrity of our books across all properties and entities — keeping every set 
 books **correct, current, and closed on a regular cadence** so that year-end is a
 non-event instead of a scramble.
 
-The right person has commercial real estate and property-management accounting in
-their bones: they understand clearing accounts, tenant security deposits,
-operating accounts, inter-entity activity, tenant recoveries/CAM, and the rhythm
-of monthly close. They're also genuinely comfortable with technology — quick on
-the computer, eager to adopt better tools, and always looking for a cleaner,
-faster process rather than defending "the way it's always been done."
-
-If you take satisfaction in a tied-out balance sheet, a workpaper that ties to
-the penny, and books that never fall behind, we'd like to talk to you.
+The right person has confidence in commercial real estate and property-management
+accounting and understands clearing accounts, tenant security deposits, operating
+accounts, inter-entity activity, tenant recoveries/CAM, and the rhythm of period
+closings. They're also genuinely comfortable with and embrace technology — quick
+on the computer, eager to adopt better tools, and always looking for a cleaner,
+faster process.
 
 ---
 
@@ -55,10 +46,8 @@ the penny, and books that never fall behind, we'd like to talk to you.
   annual headaches** caused by deferred reconciliations and analysis.
 
 ### Reconciliations & Account Analysis
-- Reconcile all bank and GL accounts monthly, including:
-  - **Operating accounts**
-  - **Tenant security deposit / escrow accounts**
-  - **Clearing accounts** (and ensuring they clear to zero on schedule)
+- Reconcile all bank and GL accounts monthly, including operating accounts,
+  tenant security deposit / escrow accounts, and clearing accounts.
 - Analyze and roll forward key balance sheet accounts, including **prepaid
   expenses**, accruals, real estate tax and insurance escrows, and other
   assets/liabilities.
@@ -74,24 +63,34 @@ the penny, and books that never fall behind, we'd like to talk to you.
 - Record **straight-line rent** and tenant improvement allowances where
   applicable.
 
+### Fund & Partnership Accounting
+- Maintain accounting for **properties held in investment funds / partnerships**
+  at both the property and fund level.
+- Track **partners' / members' capital** — capital contributions, distributions,
+  and equity roll-forwards by investor.
+- Support **allocations of income/loss and distributions** to investors,
+  including preferred returns where applicable.
+- Provide fund-level schedules and reporting to support **investor reporting and
+  audits**.
+
 ### Inter-Entity Accounting
 - Record and reconcile **inter-entity / intercompany transactions** between
-  properties and the management company.
+  properties, funds, and the management company.
 - Keep due-to / due-from accounts in balance across the entity structure and
   eliminate/settle balances on a regular basis.
 
 ### Fixed Assets, Leases & Capitalization
 - Maintain fixed asset registers and calculate/post **depreciation**.
-- Track and amortize **capitalized lease costs**, leasehold improvements, and
-  tenant improvements.
+- Track and amortize **capitalized lease costs, leasing commissions, and tenant
+  improvements**.
 - Apply capitalization policies consistently and support the treatment with
   supporting schedules.
 
 ### Workpapers & Tax Support
 - Prepare a complete set of **year-end workpapers** for submission to our
   outside tax accountants, with **a supporting schedule for each balance sheet
-  account** (excluding fixed assets) that **ties to external documentation**
-  (bank statements, loan statements, invoices, amortization schedules, etc.).
+  account** (except fixed assets) that **ties to external documentation** (bank
+  statements, loan statements, invoices, amortization schedules, etc.).
 - Prepare and post **adjusting journal entries** identified through workpaper
   preparation and tax review.
 - Serve as the primary point of contact for the tax accountants, responding to
@@ -102,16 +101,6 @@ the penny, and books that never fall behind, we'd like to talk to you.
   errors, and correct them before statements go out.
 - Prepare and file **1099s** (and related information reporting) accurately and
   on time.
-- Produce clean, reliable financial statements and supporting reporting for
-  ownership and management.
-
-### Process & Technology
-- Continuously look for ways to **improve, automate, and standardize** our
-  accounting processes.
-- Adopt and help roll out new tools, integrations, and workflows.
-- Use modern tools — including **AI assistants such as Claude or ChatGPT** —
-  to work faster and reduce manual effort where it makes sense.
-- Document procedures so the close process is repeatable and resilient.
 
 ---
 
@@ -119,9 +108,12 @@ the penny, and books that never fall behind, we'd like to talk to you.
 
 ### Required
 - **CPA** (or CPA candidate / actively pursuing) with a bachelor's degree in
-  Accounting or Finance.
+  accounting or finance.
 - **Commercial real estate and/or property management accounting experience**,
   including working across **multiple properties and multiple legal entities**.
+- **Fund accounting experience** — accounting for real estate held in funds /
+  partnerships, including partners' capital, contributions and distributions,
+  and investor allocations.
 - Strong command of the **full-cycle GL and month-end close**, including
   journal entries, reclasses, and recurring entries.
 - Hands-on experience with **bank/account reconciliations**, including
@@ -132,25 +124,20 @@ the penny, and books that never fall behind, we'd like to talk to you.
 - Experience preparing **workpapers and adjusting entries** and supporting
   outside tax preparers.
 - Experience with **1099 preparation and filing**.
-- **Strong technology skills** — highly proficient in **Excel** (pivot tables,
-  lookups, large-workbook analysis) and comfortable learning and adopting new
-  systems.
-- Experience with **SKYLINE**, **Yardi**, or a comparable commercial real
-  estate accounting/property management platform, and with an AP automation tool
-  such as **AvidXchange**, is strongly preferred.
+- **Strong technology skills** — highly proficient in Excel and comfortable
+  learning and adopting new systems.
+- Experience with **SKYLINE, Yardi**, or a comparable commercial real estate
+  accounting/property management platform, and with an AP automation tool such
+  as **AvidXchange**, is strongly preferred.
 - Exceptional attention to detail, organization, and follow-through; a person
   who keeps things current rather than letting them slide.
 
 ### Nice to Have
-- Direct experience with **SKYLINE**, **Yardi**, and **AvidXchange**; otherwise
-  experience with comparable commercial real estate / AP automation platforms
-  (MRI, RealPage, Nexus, Bill.com, or similar).
-- Advanced **Excel** / spreadsheet automation skills.
-- **CAM / operating expense reconciliation** experience (office, retail, and/or
-  industrial).
-- Advanced spreadsheet skills (pivot tables, lookups, data cleanup) and comfort
-  with automation.
+- **CAM / operating expense reconciliation** experience (office, retail).
+- Advanced spreadsheet skills and comfort with automation.
 - Familiarity with commercial lease terms and tenant recoveries.
+- Fund-level reporting, waterfall/preferred-return calculations, or investor
+  reporting experience.
 - Hands-on experience using **AI tools such as Claude, ChatGPT, or similar** to
   work more efficiently — drafting, analysis, summarizing data, or building
   simple automations.
@@ -170,14 +157,6 @@ the penny, and books that never fall behind, we'd like to talk to you.
 
 ---
 
-## Why Korman
-- A stable, respected, family-owned company with **100+ years** in business.
-- A meaningful, high-ownership role where your work directly keeps the portfolio
-  running clean.
-- Room to modernize processes and bring new ideas to how we do accounting.
-
----
-
 ## Compensation & Benefits
 - Competitive salary, **commensurate with experience and qualifications**.
 - Benefits: **[health, PTO, retirement, etc. — TBD]**.
@@ -185,4 +164,4 @@ the penny, and books that never fall behind, we'd like to talk to you.
 ---
 
 *To apply, send your resume and a brief note about your commercial real estate
-accounting experience to [contact email].*
+and fund accounting experience to [contact email].*
