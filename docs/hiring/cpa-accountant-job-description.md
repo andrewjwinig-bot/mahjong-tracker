@@ -1,26 +1,37 @@
-# Staff / Senior Accountant (CPA) — Real Estate & Property Management
+# Staff / Senior Accountant (CPA) — Commercial Real Estate
 
-**Reports to:** Controller / Owner
+**Company:** Korman Commercial Properties
+**Reports to:** Controller / Ownership
 **Employment type:** Full-time
-**Location:** [On-site / Hybrid / Remote — TBD]
+**Location:** Trevose, PA area (Philadelphia region) — [On-site / Hybrid — TBD]
 
 ---
 
+## About Korman Commercial Properties
+
+Korman Commercial Properties is a fifth-generation, family-owned real estate
+company with more than a century of history building people-first spaces across
+Pennsylvania and New Jersey. We develop, manage, and lease **commercial office
+parks, retail shopping centers, and light-industrial / warehouse properties**
+throughout the Philadelphia region.
+
+Behind that portfolio is a group of related legal entities and a central
+management company — and a lot of accounting that has to stay accurate and
+current for the whole thing to run smoothly.
+
 ## About the Role
 
-We own and manage a portfolio of real estate properties through a group of
-related entities and a central management company. We're looking for an
-experienced, detail-driven accountant to own the day-to-day integrity of our
-books across all properties and entities — keeping every set of books
-**correct, current, and closed on a regular cadence** so that year-end is a
+We're looking for an experienced, detail-driven accountant to own the day-to-day
+integrity of our books across all properties and entities — keeping every set of
+books **correct, current, and closed on a regular cadence** so that year-end is a
 non-event instead of a scramble.
 
-The right person has real estate and property-management accounting in their
-bones: they understand clearing accounts, security deposit trusts, operating
-accounts, inter-entity activity, and the rhythm of monthly close. They're also
-genuinely comfortable with technology — quick on the computer, eager to adopt
-better tools, and always looking for a cleaner, faster process rather than
-defending "the way it's always been done."
+The right person has commercial real estate and property-management accounting in
+their bones: they understand clearing accounts, tenant security deposits,
+operating accounts, inter-entity activity, tenant recoveries/CAM, and the rhythm
+of monthly close. They're also genuinely comfortable with technology — quick on
+the computer, eager to adopt better tools, and always looking for a cleaner,
+faster process rather than defending "the way it's always been done."
 
 If you take satisfaction in a tied-out balance sheet, a workpaper that ties to
 the penny, and books that never fall behind, we'd like to talk to you.
@@ -44,12 +55,22 @@ the penny, and books that never fall behind, we'd like to talk to you.
 ### Reconciliations & Account Analysis
 - Reconcile all bank and GL accounts monthly, including:
   - **Operating accounts**
-  - **Security deposit / trust accounts**
+  - **Tenant security deposit / escrow accounts**
   - **Clearing accounts** (and ensuring they clear to zero on schedule)
 - Analyze and roll forward key balance sheet accounts, including **prepaid
-  expenses**, accruals, and other assets/liabilities.
+  expenses**, accruals, real estate tax and insurance escrows, and other
+  assets/liabilities.
 - Investigate and resolve reconciling items promptly rather than letting them
   age.
+
+### Commercial Lease & Tenant Accounting
+- Maintain accurate tenant ledgers: base rent, **percentage rent** (retail),
+  and other charges.
+- Prepare and reconcile **CAM / operating expense, real estate tax, and
+  insurance recoveries** (tenant reimbursements), including annual
+  reconciliations and true-ups.
+- Record **straight-line rent** and tenant improvement allowances where
+  applicable.
 
 ### Inter-Entity Accounting
 - Record and reconcile **inter-entity / intercompany transactions** between
@@ -59,7 +80,8 @@ the penny, and books that never fall behind, we'd like to talk to you.
 
 ### Fixed Assets, Leases & Capitalization
 - Maintain fixed asset registers and calculate/post **depreciation**.
-- Track and amortize **capitalized lease costs** and leasehold improvements.
+- Track and amortize **capitalized lease costs**, leasehold improvements, and
+  tenant improvements.
 - Apply capitalization policies consistently and support the treatment with
   supporting schedules.
 
@@ -94,12 +116,12 @@ the penny, and books that never fall behind, we'd like to talk to you.
 ### Required
 - **CPA** (or CPA candidate / actively pursuing) with a bachelor's degree in
   Accounting or Finance.
-- **Real estate and/or property management accounting experience**, including
-  working across **multiple properties and multiple legal entities**.
+- **Commercial real estate and/or property management accounting experience**,
+  including working across **multiple properties and multiple legal entities**.
 - Strong command of the **full-cycle GL and month-end close**, including
   journal entries, reclasses, and recurring entries.
 - Hands-on experience with **bank/account reconciliations**, including
-  operating, security deposit, and clearing accounts.
+  operating, tenant security deposit/escrow, and clearing accounts.
 - Experience with **inter-entity/intercompany accounting**.
 - Working knowledge of **prepaid expenses, fixed asset depreciation, and lease
   capitalization**.
@@ -112,11 +134,13 @@ the penny, and books that never fall behind, we'd like to talk to you.
   who keeps things current rather than letting them slide.
 
 ### Nice to Have
-- Experience with property management / real estate accounting platforms (e.g.
-  Yardi, AppFolio, RealPage, MRI, Buildium, or similar).
+- Experience with commercial real estate / property management platforms (e.g.
+  Yardi, MRI, RealPage, AppFolio, or similar).
+- **CAM / operating expense reconciliation** experience (office, retail, and/or
+  industrial).
 - Advanced spreadsheet skills (pivot tables, lookups, data cleanup) and comfort
   with automation.
-- Familiarity with trust accounting rules for security deposits.
+- Familiarity with commercial lease terms and tenant recoveries.
 - Exposure to workflow automation, integrations, or AI-assisted accounting
   tools.
 
@@ -134,11 +158,19 @@ the penny, and books that never fall behind, we'd like to talk to you.
 
 ---
 
+## Why Korman
+- A stable, respected, family-owned company with **100+ years** in business.
+- A meaningful, high-ownership role where your work directly keeps the portfolio
+  running clean.
+- Room to modernize processes and bring new ideas to how we do accounting.
+
+---
+
 ## Compensation & Benefits
 - Salary: **[range TBD]**, commensurate with experience.
 - Benefits: **[health, PTO, retirement, etc. — TBD]**.
 
 ---
 
-*To apply, send your resume and a brief note about your real estate accounting
-experience to [contact email].*
+*To apply, send your resume and a brief note about your commercial real estate
+accounting experience to [contact email].*
