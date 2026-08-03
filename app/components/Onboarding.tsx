@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { saveAccount, type Account, type Experience } from '../lib/account';
-import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../lib/cloudAuth';
+import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile, authErrorMessage } from '../lib/cloudAuth';
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import OfficialCardCallout from './OfficialCardCallout';
@@ -96,6 +96,8 @@ export default function Onboarding({
   };
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Set when sign-up needs email confirmation (Supabase "Confirm email" on).
+  const [confirmSent, setConfirmSent] = useState(false);
 
   const signingIn = cloud && mode === 'signin';
 
@@ -141,7 +143,14 @@ export default function Onboarding({
     setBusy(true);
     try {
       if (mode === 'signup') {
-        await cloudSignUp(email.trim(), password, username.trim(), experience);
+        const res = await cloudSignUp(email.trim(), password, username.trim(), experience);
+        if (res.needsConfirmation) {
+          // "Confirm email" is enabled: the account was created but there's no
+          // session yet. Don't drop into the app — tell them to confirm, then
+          // sign in. (Otherwise sign-in later fails with no explanation.)
+          setConfirmSent(true);
+          return;
+        }
         finish({ username: username.trim(), email, experience });
       } else {
         await cloudSignIn(email.trim(), password);
@@ -157,7 +166,7 @@ export default function Onboarding({
         );
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      setError(authErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -208,6 +217,39 @@ export default function Onboarding({
           >
             I already have my card
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Sign-up succeeded but the project requires email confirmation — the user
+  // has to click the emailed link before their first sign-in will work.
+  if (confirmSent) {
+    return (
+      <div className="onboard">
+        <div className="onboard-card">
+          <div className="onboard-head">
+            <TileFan size={104} className="onboard-fan" />
+            <h1>Check your email</h1>
+            <p className="sub">
+              We sent a confirmation link to <strong>{email.trim()}</strong>. Tap it to activate your
+              account, then come back and sign in.
+            </p>
+          </div>
+          <button
+            className="btn"
+            style={{ marginTop: 16 }}
+            onClick={() => {
+              setError(null);
+              setConfirmSent(false);
+              setMode('signin');
+            }}
+          >
+            I’ve confirmed — Sign in
+          </button>
+          <p className="onboard-fine">
+            Didn’t get it? Check your spam folder, or wait a moment and try again.
+          </p>
         </div>
       </div>
     );

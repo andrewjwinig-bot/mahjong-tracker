@@ -10,6 +10,40 @@ export const CLOUD_DISABLED = 'CLOUD_DISABLED';
 export interface CloudUser {
   id: string;
   email: string | null;
+  /**
+   * True when sign-up created the account but no session was returned — i.e.
+   * the Supabase project has "Confirm email" enabled and the user must click
+   * the link in their inbox before they can sign in. Callers must NOT treat
+   * this as a completed login.
+   */
+  needsConfirmation?: boolean;
+}
+
+/**
+ * Turn a Supabase auth error (or anything thrown) into a short, actionable,
+ * never-empty message. Supabase surfaces terse codes/messages like
+ * "Invalid login credentials"; we map the common ones to plain guidance so the
+ * user is never left staring at a blank or cryptic failure.
+ */
+export function authErrorMessage(e: unknown): string {
+  const raw =
+    (e as { message?: string; code?: string; error_description?: string } | null)?.message ||
+    (e as { error_description?: string } | null)?.error_description ||
+    '';
+  const code = (e as { code?: string } | null)?.code || '';
+  const m = `${code} ${raw}`.toLowerCase();
+
+  if (m.includes('email not confirmed') || m.includes('email_not_confirmed'))
+    return 'Please confirm your email first — check your inbox for the confirmation link, then sign in.';
+  if (m.includes('invalid login') || m.includes('invalid_credentials'))
+    return 'That email and password don’t match. Double-check them, or create a new account.';
+  if (m.includes('already registered') || m.includes('user_already_exists'))
+    return 'An account with this email already exists. Try signing in instead.';
+  if (m.includes('rate limit') || m.includes('too many'))
+    return 'Too many attempts. Wait a minute and try again.';
+  if (m.includes('failed to fetch') || m.includes('network'))
+    return 'Can’t reach the server. Check your connection and try again.';
+  return raw || 'Something went wrong. Please try again.';
 }
 
 export interface CloudProfile {
@@ -42,7 +76,10 @@ export async function cloudSignUp(
   });
   if (error) throw error;
   const u = data.user;
-  return { id: u?.id ?? '', email: u?.email ?? null };
+  // No session means "Confirm email" is on: the account exists but can't be
+  // used until the emailed link is clicked. Signal that up so the UI doesn't
+  // pretend the user is logged in.
+  return { id: u?.id ?? '', email: u?.email ?? null, needsConfirmation: !data.session };
 }
 
 export async function cloudSignIn(email: string, password: string): Promise<CloudUser> {
