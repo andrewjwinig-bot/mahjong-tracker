@@ -41,8 +41,16 @@ export function authErrorMessage(e: unknown): string {
     return 'An account with this email already exists. Try signing in instead.';
   if (m.includes('rate limit') || m.includes('too many'))
     return 'Too many attempts. Wait a minute and try again.';
-  if (m.includes('failed to fetch') || m.includes('network'))
-    return 'Can’t reach the server. Check your connection and try again.';
+  // "Failed to fetch" (Chrome), "Load failed" (Safari/WebKit & iOS), and
+  // "NetworkError" (Firefox) all mean the request never reached the server —
+  // no connection, a paused/misconfigured backend, or a blocked origin.
+  if (
+    m.includes('failed to fetch') ||
+    m.includes('load failed') ||
+    m.includes('networkerror') ||
+    m.includes('network')
+  )
+    return 'Can’t reach the server. Check your connection and try again in a moment.';
   return raw || 'Something went wrong. Please try again.';
 }
 
