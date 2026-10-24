@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { saveAccount, type Account, type Experience } from '../lib/account';
-import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile } from '../lib/cloudAuth';
+import { isCloudEnabled, cloudSignUp, cloudSignIn, cloudGetProfile, authErrorMessage } from '../lib/cloudAuth';
 import TileStrip from './TileStrip';
 import Tile from './Tile';
 import OfficialCardCallout from './OfficialCardCallout';
@@ -157,7 +157,7 @@ export default function Onboarding({
         );
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      setError(authErrorMessage(e, mode === 'signup' ? 'signup' : 'signin'));
     } finally {
       setBusy(false);
     }
