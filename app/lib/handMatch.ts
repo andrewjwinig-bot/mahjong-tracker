@@ -102,10 +102,14 @@ function runs(token: string): string[] {
 }
 
 export function parseHand(notation: string): Group[] {
-  const cached = parseCache.get(notation);
+  // A hand may print two acceptable forms separated by "or"; for matching and
+  // tile-counting we use the first (primary) form — both are the same 14-tile
+  // hand, and the raw "or" token isn't a tile.
+  const primary = notation.split(/\s+-?or-?\s+/i)[0] ?? notation;
+  const cached = parseCache.get(primary);
   if (cached) return cached;
   const groups: Group[] = [];
-  for (const token of notation.trim().split(/\s+/)) {
+  for (const token of primary.trim().split(/\s+/)) {
     if (!token) continue;
     const isDigits = /^[0-9]+$/.test(token);
     const allSame = token.split('').every((c) => c === token[0]);
@@ -134,7 +138,7 @@ export function parseHand(notation: string): Group[] {
       else groups.push({ kind: 'dragon', size, jokerOk }); // unknown honor → treat as dragon
     }
   }
-  parseCache.set(notation, groups);
+  parseCache.set(primary, groups);
   return groups;
 }
 
