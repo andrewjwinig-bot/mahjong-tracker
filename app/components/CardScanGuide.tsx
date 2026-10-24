@@ -14,7 +14,7 @@ const F_MONO = "var(--font-mono), 'Space Mono', monospace";
 
 const rowKey = (r: ScanRow) => `${r.category}|${r.notation}`.toLowerCase();
 
-type Step = 'intro' | 'capture' | 'captured';
+type Step = 'intro' | 'capture' | 'captured' | 'review';
 
 // Diagonal hatch overlay shared by every primary action button.
 const HATCH = 'repeating-linear-gradient(-45deg,#fff 0,#fff 2px,transparent 2px,transparent 11px)';
@@ -110,7 +110,8 @@ export default function CardScanGuide({
 
   function onNext() {
     if (isLast) {
-      finish();
+      // Last panel done → a count check against the card before committing.
+      setStep('review');
       return;
     }
     setPanel((p) => p + 1);
@@ -392,12 +393,59 @@ export default function CardScanGuide({
               <button className="scy-btn" onClick={onNext} style={{ position: 'relative', overflow: 'hidden', background: isLast ? '#2E78C8' : '#C0392B', border: '2.5px solid rgba(20,22,42,0.10)', borderRadius: 14, padding: 17, textAlign: 'center', cursor: 'pointer', boxShadow: `0 8px 20px ${isLast ? 'rgba(46,120,200,0.30)' : 'rgba(192,57,43,0.28)'}` }}>
                 <div style={{ position: 'absolute', inset: 0, opacity: 0.14, background: HATCH }} />
                 <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: '38%', background: 'linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent)', transform: 'translateX(-130%)', animation: 'scyShine 4.5s ease-in-out infinite' }} />
-                <span style={{ position: 'relative', fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 0.5, color: '#fff', textShadow: '1.5px 1.5px 0 rgba(120,20,12,0.5)' }}>{isLast ? `DONE — USE THESE ${total} HANDS` : `NEXT — SCAN PANEL ${panel + 1}`}</span>
+                <span style={{ position: 'relative', fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 0.5, color: '#fff', textShadow: '1.5px 1.5px 0 rgba(120,20,12,0.5)' }}>{isLast ? `NEXT — CHECK THE COUNTS` : `NEXT — SCAN PANEL ${panel + 1}`}</span>
               </button>
               <button onClick={onRetake} style={{ background: '#EDDFD2', border: 0, borderRadius: 14, padding: 14, textAlign: 'center', cursor: 'pointer', fontFamily: F_BODY, fontWeight: 800, fontSize: 14.5, letterSpacing: 0.3, color: '#C0392B' }}>Retake panel {panel}</button>
             </div>
           </div>
         )}
+
+        {/* ── REVIEW (per-section count check against the card) ── */}
+        {step === 'review' && (() => {
+          const rows = rowsRef.current;
+          const order: string[] = [];
+          const counts: Record<string, number> = {};
+          for (const r of rows) {
+            const c = (r.category || '').trim() || 'Uncategorized';
+            if (!(c in counts)) { counts[c] = 0; order.push(c); }
+            counts[c] += 1;
+          }
+          return (
+            <div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 23, letterSpacing: -0.4, color: '#14402A' }}>Check the counts</div>
+                <div style={{ fontSize: 13.5, color: '#3E6450', marginTop: 6, lineHeight: 1.45, padding: '0 4px' }}>
+                  Compare each section to your card. If a number is off, a line was likely missed, split, or doubled — go back and retake that panel.
+                </div>
+              </div>
+
+              <div style={{ marginTop: 16, border: '1.5px solid #ECE6DC', borderRadius: 14, overflow: 'hidden' }}>
+                {order.map((c, i) => (
+                  <div key={c} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '11px 14px', background: i % 2 ? '#FBFAF6' : '#fff', borderTop: i ? '1px solid #F1ECE2' : 'none' }}>
+                    <span style={{ fontFamily: F_BODY, fontWeight: 700, fontSize: 14, color: '#2C3A2E' }}>{c}</span>
+                    <span style={{ fontFamily: F_MONO, fontWeight: 700, fontSize: 13.5, color: '#C0392B', whiteSpace: 'nowrap' }}>{counts[c]} {counts[c] === 1 ? 'hand' : 'hands'}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: '#F3F7F2', borderTop: '2px solid #E2EADF' }}>
+                  <span style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 14.5, color: '#14402A' }}>Total</span>
+                  <span style={{ fontFamily: F_MONO, fontWeight: 800, fontSize: 15, color: '#14402A' }}>{rows.length} hands</span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 11 }}>
+                <button className="scy-btn" onClick={finish} style={{ position: 'relative', overflow: 'hidden', background: '#2E7D43', border: '2.5px solid rgba(20,22,42,0.10)', borderRadius: 14, padding: 17, textAlign: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(46,125,67,0.28)' }}>
+                  <div style={{ position: 'absolute', inset: 0, opacity: 0.14, background: HATCH }} />
+                  <span style={{ position: 'relative', fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 0.5, color: '#fff', textShadow: '1.5px 1.5px 0 rgba(16,70,36,0.5)' }}>LOOKS RIGHT — ADD {rows.length} HANDS</span>
+                </button>
+                <button onClick={() => { setPanel(MAX_PANELS); setStep('captured'); }} style={{ background: '#EDDFD2', border: 0, borderRadius: 14, padding: 14, textAlign: 'center', cursor: 'pointer', fontFamily: F_BODY, fontWeight: 800, fontSize: 14.5, letterSpacing: 0.3, color: '#C0392B' }}>A count is off — go back</button>
+              </div>
+
+              <p style={{ fontSize: 11, color: '#7B9184', textAlign: 'center', lineHeight: 1.5, margin: '16px 4px 0' }}>
+                You can also add, edit, or remove any hand later from your card.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* NMJL disclaimer — kept on the entry screen of the flow. */}
         {step === 'intro' && (
