@@ -40,17 +40,25 @@ export function authErrorMessage(e: unknown, mode: 'signup' | 'signin'): string 
   const code = (err.code ?? '').toLowerCase();
   const name = (err.name ?? '').toLowerCase();
 
-  // Backend unreachable: paused project, offline, DNS/TLS failure, 429, or 5xx.
+  // Too many attempts in a short window — honest, actionable, and distinct from
+  // a true connection failure (which the next branch handles).
+  if (err.status === 429 || code.includes('over_request_rate_limit') || msg.includes('rate limit')) {
+    return 'Too many tries in a row. Wait a minute, then try again.';
+  }
+
+  // Backend unreachable from this device: paused project, offline, a Wi‑Fi/DNS
+  // hiccup, iOS Private Relay, a content blocker, or a 5xx gateway. WebKit
+  // (Safari/iOS) reports a failed fetch as "Load failed"; Chrome as "Failed to
+  // fetch"; Firefox as "NetworkError".
   const networkish =
     name.includes('retryable') ||
     err.status === 0 ||
-    err.status === 429 ||
     (typeof err.status === 'number' && err.status >= 500) ||
     /failed to fetch|load failed|networkerror|network request failed|fetch failed|timed? ?out|econn|enotfound|dns|unreachable|offline/.test(
       msg,
     );
   if (networkish) {
-    return "Can’t reach our servers right now. Check your connection and try again in a moment.";
+    return 'Can’t reach our servers. Check your connection — try switching between Wi‑Fi and cellular — then try again.';
   }
 
   if (mode === 'signin') {
@@ -71,7 +79,13 @@ export function authErrorMessage(e: unknown, mode: 'signup' | 'signin'): string 
     if (msg.includes('password') && /least|weak|short|6 char/.test(msg)) {
       return 'Please choose a password with at least 6 characters.';
     }
-    if (code.includes('email_address_invalid') || msg.includes('valid email') || msg.includes('invalid email')) {
+    if (
+      code.includes('email_address_invalid') ||
+      msg.includes('valid email') ||
+      msg.includes('validate email') ||
+      msg.includes('invalid email') ||
+      msg.includes('invalid format')
+    ) {
       return 'That email doesn’t look right — double-check it and try again.';
     }
   }
