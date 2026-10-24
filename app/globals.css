@@ -986,6 +986,15 @@ a:focus-visible,
 .nc3 {
   color: var(--n3);
 }
+/* "or" separator between the two acceptable forms of one hand — a quiet, lower-
+   case divider so the two forms read as alternatives, not as more tile groups. */
+.nc-or {
+  color: var(--muted, #A98E98);
+  font-style: italic;
+  font-weight: 600;
+  opacity: 0.85;
+  padding: 0 2px;
+}
 
 /* Points: a small suit-dot + the value in mono. */
 .pts {

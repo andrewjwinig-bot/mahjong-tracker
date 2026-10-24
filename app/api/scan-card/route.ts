@@ -51,7 +51,10 @@ HOW THESE CARDS ARE LAID OUT
 - The card is divided into sections, each with a heading. Section HEADINGS are short descriptors (e.g. a year, even-number or odd-number groupings, consecutive runs, winds & dragons, 369, quints, singles & pairs) and are typically CENTERED. The hand rows under them are LEFT-justified. Use that difference to tell a heading apart from a hand row, and don't mistake a heading for a hand.
 - Read sections top-to-bottom; within a section read each line top-to-bottom; work left column then right column.
 - Each line is one hand: a sequence of tile groups, then its point value at the right edge, sometimes with a concealed marker.
-- Store ONLY the single, clean 14-tile sequence — it must read exactly like the printed hand: just tile groups separated by spaces, with NO parentheses and NO "or". If the line shows an alternate form — separated by "or" / "-or-", OR printed in PARENTHESES (alternates, substitutions, or notes) — drop it entirely: transcribe only the first/main 14-tile form and ignore everything from the "or" onward and everything inside ( ). Never include a parenthesis character or the word "or" in the notation.
+- ONE PRINTED LINE = ONE HAND. Transcribe every printed hand line as exactly one row. Never split a single line into two rows, and never merge two lines into one.
+- ALTERNATE FORMS WITH "or": some hands print two acceptable forms on the same line separated by "or" (or "-or-") — e.g. "FF 2025 2025 DDDD or FF 222 55 555 DDDD". This is still ONE hand (same value, two ways to build it). Transcribe BOTH forms, joined by a single lowercase " or ", exactly as printed. Do NOT split it into two hands, and do NOT drop the second form. Each form on its own must be a complete 14-tile hand.
+- PARENTHESES: substitutions or notes printed in ( ) are not tiles — omit the parenthetical and transcribe just the tile sequence. Never put a "(" or ")" character in the notation.
+- Apart from "or" between two forms, the notation is only tile groups separated by single spaces.
 
 THE TILE VOCABULARY (use these symbols)
 - Numbers: the digits 1-9 (each digit is one number tile).
@@ -61,7 +64,7 @@ THE TILE VOCABULARY (use these symbols)
 - Numbers print as PLAIN DIGITS; their suit (crak / bam / dot) is shown only by the digit's COLOUR, never by a letter. Transcribe number groups as just the digits exactly as printed (e.g. "111 222 333"), groups separated by single spaces. Do NOT append or insert any letter or mark that is not physically printed on the tiles — in particular NEVER add a suit letter such as C, B, or D to a number group. The only letters that belong in a hand are ones actually printed on tiles: F (flower), D (a dragon tile), and N/E/W/S (winds). A space between groups is just a space — never a letter.
 
 RULES YOU MUST APPLY (they catch your own mistakes)
-- Every hand totals EXACTLY 14 tiles. Count the tiles you transcribed for each line. A pair = 2, a pung = 3, a kong = 4, a quint = 5, a sextet = 6, "FF" = 2 flowers, "NEWS" = 4, "DDDD" = 4, "2025" = 4 number tiles, and so on. Put that total in tileCount. If it is not 14, re-examine the line before moving on.
+- Every hand totals EXACTLY 14 tiles. Count the tiles you transcribed for each line. A pair = 2, a pung = 3, a kong = 4, a quint = 5, a sextet = 6, "FF" = 2 flowers, "NEWS" = 4, "DDDD" = 4, "2025" = 4 number tiles, and so on. Put that total in tileCount. If it is not 14, re-examine the line before moving on. For an "or" line (two forms), count ONE form only — each form is 14, so tileCount is 14, NOT 28. Verify both forms are 14 before moving on.
 - Point values are multiples of 5, normally between 25 and 75; 25 is the usual minimum. If you read something outside that, look again.
 - Set concealed=true only if the line is marked concealed-only (an "X" or "C" beside it, or it sits under a concealed heading); otherwise false.
 - Set confidence to "low" for any line that is blurry, glare-washed, cut off, or that you had to guess at; "medium" if mostly clear; "high" only if you are certain.
@@ -103,10 +106,14 @@ function validate(h: RawHand): ValidatedHand {
   const confidence = h.confidence === 'high' || h.confidence === 'low' ? h.confidence : 'medium';
   const issues: string[] = [];
 
+  // An "or" line holds two acceptable 14-tile forms of the SAME hand, so a
+  // combined count of 28 is correct — don't flag it as a misread.
+  const hasAlt = /\bor\b/i.test(notation);
+
   if (notation.length < 2) {
     issues.push('This line looks empty or too short — check it against your card.');
   }
-  if (tileCount !== 14) {
+  if (tileCount !== 14 && !(hasAlt && tileCount === 28)) {
     issues.push(
       `Reads as ${tileCount || '?'} tiles — every hand is 14, so a group was likely misread or dropped.`,
     );

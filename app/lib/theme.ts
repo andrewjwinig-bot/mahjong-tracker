@@ -40,8 +40,24 @@ export function themeForCategory(categories: string[], category: string): Catego
  * Decorative per-group coloring for a notation string. Splits on whitespace and
  * cycles a theme-aware color *class* (nc0–nc3) by group position. Positional /
  * decorative only — not suit-accurate, carries no game meaning.
+ *
+ * A hand may print two acceptable forms separated by "or" (e.g.
+ * "FF 2025 2025 DDDD or FF 222 55 555 DDDD"). We keep both — rendering "or" as a
+ * muted separator (class "nc-or") and restarting the color cycle after it so the
+ * second form reads as its own sequence.
  */
 export function colorNotation(notation: string): { text: string; cls: string }[] {
-  const groups = notation.trim().split(/\s+/);
-  return groups.map((text, i) => ({ text, cls: `nc${i % 4}` }));
+  let i = 0;
+  return notation
+    .trim()
+    .split(/\s+/)
+    .map((text) => {
+      if (/^-?or-?$/i.test(text)) {
+        i = 0;
+        return { text: 'or', cls: 'nc-or' };
+      }
+      const out = { text, cls: `nc${i % 4}` };
+      i += 1;
+      return out;
+    });
 }
