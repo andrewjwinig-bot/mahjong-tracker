@@ -52,6 +52,41 @@ export type ScanResult =
   | { ok: true; year?: number; rows: ScanRow[]; summary?: ScanSummary }
   | { ok: false; error: string };
 
+// Expected hand counts per section — how many hands the user's own card has in
+// each section. Stored ON-DEVICE, keyed by card year, so the scan's count-check
+// can auto-flag a section that reads a different number than it should. The app
+// never ships these: they come from the user's own card, exactly like the hands.
+const EXPECTED_KEY = 'mahj.expectedCounts';
+export type ExpectedCounts = Record<string, number>;
+
+export function loadExpectedCounts(year: number | undefined): ExpectedCounts {
+  if (year == null) return {};
+  try {
+    const raw = localStorage.getItem(`${EXPECTED_KEY}.${year}`);
+    if (!raw) return {};
+    const obj = JSON.parse(raw) as Record<string, unknown>;
+    const out: ExpectedCounts = {};
+    if (obj && typeof obj === 'object') {
+      for (const [k, v] of Object.entries(obj)) {
+        if (typeof v === 'number' && Number.isFinite(v) && v >= 0) out[k] = Math.round(v);
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+export function saveExpectedCounts(year: number | undefined, map: ExpectedCounts): void {
+  if (year == null) return;
+  try {
+    if (Object.keys(map).length) localStorage.setItem(`${EXPECTED_KEY}.${year}`, JSON.stringify(map));
+    else localStorage.removeItem(`${EXPECTED_KEY}.${year}`);
+  } catch {
+    /* ignore */
+  }
+}
+
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
