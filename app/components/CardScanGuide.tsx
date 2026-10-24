@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { downscaleImage } from '../lib/image';
-import { scanCardImage, type ScanRow, type ScanSummary } from '../lib/cardScan';
+import { scanCardImage, loadExpectedCounts, saveExpectedCounts, type ScanRow, type ScanSummary } from '../lib/cardScan';
 import { useEscape } from '../lib/useEscape';
 
 const MAX_PANELS = 3;
@@ -53,6 +53,10 @@ export default function CardScanGuide({
   const [panelCounts, setPanelCounts] = useState<number[]>([0, 0, 0]); // hands read per panel
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Expected hand count per section, as the user knows their own card. Kept as
+  // strings for the inputs; '' means "not set". Prefilled from what they saved
+  // on a previous scan so mismatches flag automatically.
+  const [expected, setExpected] = useState<Record<string, string>>({});
 
   const rowsRef = useRef<ScanRow[]>([]);
   const yearRef = useRef<number | undefined>(undefined);
@@ -111,6 +115,10 @@ export default function CardScanGuide({
   function onNext() {
     if (isLast) {
       // Last panel done → a count check against the card before committing.
+      // Prefill the "should be" counts the user saved on an earlier scan so any
+      // mismatch flags right away.
+      const stored = loadExpectedCounts(yearRef.current);
+      setExpected(Object.fromEntries(Object.entries(stored).map(([k, v]) => [k, String(v)])));
       setStep('review');
       return;
     }
@@ -131,6 +139,14 @@ export default function CardScanGuide({
 
   function finish() {
     const rows = rowsRef.current;
+    // Persist the expected per-section counts the user entered, so next year's
+    // (or a re-run's) scan auto-flags any section that comes in wrong.
+    const map: Record<string, number> = {};
+    for (const [k, v] of Object.entries(expected)) {
+      const n = Number(v);
+      if (v.trim() !== '' && Number.isFinite(n) && n >= 0) map[k] = Math.round(n);
+    }
+    saveExpectedCounts(yearRef.current, map);
     const sections = new Set(rows.map((r) => r.category).filter(Boolean));
     const summary: ScanSummary = {
       handCount: rows.length,
@@ -410,38 +426,81 @@ export default function CardScanGuide({
             if (!(c in counts)) { counts[c] = 0; order.push(c); }
             counts[c] += 1;
           }
+          const expN = (c: string) => {
+            const e = (expected[c] ?? '').trim();
+            return e === '' ? null : Number(e);
+          };
+          const isMismatch = (c: string) => {
+            const n = expN(c);
+            return n != null && Number.isFinite(n) && n !== counts[c];
+          };
+          const mismatches = order.filter(isMismatch).length;
+          const expTotal = order.reduce((s, c) => {
+            const n = expN(c);
+            return n != null && Number.isFinite(n) ? s + n : s;
+          }, 0);
+          const anyExpected = order.some((c) => expN(c) != null);
+
           return (
             <div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 23, letterSpacing: -0.4, color: '#14402A' }}>Check the counts</div>
-                <div style={{ fontSize: 13.5, color: '#3E6450', marginTop: 6, lineHeight: 1.45, padding: '0 4px' }}>
-                  Compare each section to your card. If a number is off, a line was likely missed, split, or doubled — go back and retake that panel.
+                <div style={{ fontSize: 13, color: '#3E6450', marginTop: 6, lineHeight: 1.45, padding: '0 4px' }}>
+                  Type how many hands your card has in each section — we’ll flag any that don’t match and remember them for next time.
                 </div>
               </div>
 
               <div style={{ marginTop: 16, border: '1.5px solid #ECE6DC', borderRadius: 14, overflow: 'hidden' }}>
-                {order.map((c, i) => (
-                  <div key={c} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '11px 14px', background: i % 2 ? '#FBFAF6' : '#fff', borderTop: i ? '1px solid #F1ECE2' : 'none' }}>
-                    <span style={{ fontFamily: F_BODY, fontWeight: 700, fontSize: 14, color: '#2C3A2E' }}>{c}</span>
-                    <span style={{ fontFamily: F_MONO, fontWeight: 700, fontSize: 13.5, color: '#C0392B', whiteSpace: 'nowrap' }}>{counts[c]} {counts[c] === 1 ? 'hand' : 'hands'}</span>
-                  </div>
-                ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: '#F3F7F2', borderTop: '2px solid #E2EADF' }}>
-                  <span style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 14.5, color: '#14402A' }}>Total</span>
-                  <span style={{ fontFamily: F_MONO, fontWeight: 800, fontSize: 15, color: '#14402A' }}>{rows.length} hands</span>
+                {/* column headers */}
+                <div style={{ display: 'flex', alignItems: 'center', padding: '7px 14px', background: '#F7F4EE', borderBottom: '1px solid #ECE6DC' }}>
+                  <span style={{ flex: 1, fontFamily: F_MONO, fontSize: 10, letterSpacing: 0.6, color: '#9A9488', fontWeight: 700 }}>SECTION</span>
+                  <span style={{ width: 52, textAlign: 'center', fontFamily: F_MONO, fontSize: 10, letterSpacing: 0.6, color: '#9A9488', fontWeight: 700 }}>READ</span>
+                  <span style={{ width: 58, textAlign: 'center', fontFamily: F_MONO, fontSize: 10, letterSpacing: 0.6, color: '#9A9488', fontWeight: 700 }}>SHOULD</span>
+                </div>
+                {order.map((c, i) => {
+                  const mis = isMismatch(c);
+                  return (
+                    <div key={c} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', background: mis ? '#FDEBEA' : i % 2 ? '#FBFAF6' : '#fff', borderTop: '1px solid #F1ECE2' }}>
+                      <span style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, fontFamily: F_BODY, fontWeight: 700, fontSize: 13.5, color: '#2C3A2E' }}>
+                        {mis && <span aria-hidden>⚠️</span>}{c}
+                      </span>
+                      <span style={{ width: 52, textAlign: 'center', fontFamily: F_MONO, fontWeight: 700, fontSize: 14, color: mis ? '#C0392B' : '#2E7D43' }}>{counts[c]}</span>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        value={expected[c] ?? ''}
+                        placeholder="?"
+                        aria-label={`Hands your card has in ${c}`}
+                        onChange={(e) => setExpected((p) => ({ ...p, [c]: e.target.value }))}
+                        style={{ width: 52, textAlign: 'center', fontFamily: F_MONO, fontWeight: 700, fontSize: 14, padding: '6px 2px', borderRadius: 8, border: `1.5px solid ${mis ? '#E0776B' : '#DCD6CA'}`, color: '#2C3A2E', background: '#fff' }}
+                      />
+                    </div>
+                  );
+                })}
+                <div style={{ display: 'flex', alignItems: 'center', padding: '11px 14px', background: '#F3F7F2', borderTop: '2px solid #E2EADF' }}>
+                  <span style={{ flex: 1, fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 14.5, color: '#14402A' }}>Total</span>
+                  <span style={{ width: 52, textAlign: 'center', fontFamily: F_MONO, fontWeight: 800, fontSize: 15, color: '#14402A' }}>{rows.length}</span>
+                  <span style={{ width: 52, textAlign: 'center', fontFamily: F_MONO, fontWeight: 800, fontSize: 15, color: anyExpected && expTotal !== rows.length ? '#C0392B' : '#14402A' }}>{anyExpected ? expTotal : '—'}</span>
                 </div>
               </div>
 
-              <div style={{ marginTop: 22, display: 'flex', flexDirection: 'column', gap: 11 }}>
-                <button className="scy-btn" onClick={finish} style={{ position: 'relative', overflow: 'hidden', background: '#2E7D43', border: '2.5px solid rgba(20,22,42,0.10)', borderRadius: 14, padding: 17, textAlign: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(46,125,67,0.28)' }}>
+              {mismatches > 0 && (
+                <div style={{ marginTop: 12, fontSize: 12.5, color: '#C0392B', textAlign: 'center', lineHeight: 1.4, fontWeight: 700 }}>
+                  {mismatches} {mismatches === 1 ? 'section doesn’t' : 'sections don’t'} match your card — a line was likely missed, split, or doubled. Go back to retake, or add and fix it on your card.
+                </div>
+              )}
+
+              <div style={{ marginTop: mismatches > 0 ? 14 : 22, display: 'flex', flexDirection: 'column', gap: 11 }}>
+                <button className="scy-btn" onClick={finish} style={{ position: 'relative', overflow: 'hidden', background: mismatches > 0 ? '#D98A16' : '#2E7D43', border: '2.5px solid rgba(20,22,42,0.10)', borderRadius: 14, padding: 17, textAlign: 'center', cursor: 'pointer', boxShadow: `0 8px 20px ${mismatches > 0 ? 'rgba(217,138,22,0.30)' : 'rgba(46,125,67,0.28)'}` }}>
                   <div style={{ position: 'absolute', inset: 0, opacity: 0.14, background: HATCH }} />
-                  <span style={{ position: 'relative', fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 0.5, color: '#fff', textShadow: '1.5px 1.5px 0 rgba(16,70,36,0.5)' }}>LOOKS RIGHT — ADD {rows.length} HANDS</span>
+                  <span style={{ position: 'relative', fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 16, letterSpacing: 0.5, color: '#fff', textShadow: '1.5px 1.5px 0 rgba(16,70,36,0.5)' }}>{mismatches > 0 ? `ADD ANYWAY — ${rows.length} HANDS` : `LOOKS RIGHT — ADD ${rows.length} HANDS`}</span>
                 </button>
-                <button onClick={() => { setPanel(MAX_PANELS); setStep('captured'); }} style={{ background: '#EDDFD2', border: 0, borderRadius: 14, padding: 14, textAlign: 'center', cursor: 'pointer', fontFamily: F_BODY, fontWeight: 800, fontSize: 14.5, letterSpacing: 0.3, color: '#C0392B' }}>A count is off — go back</button>
+                <button onClick={() => { setPanel(MAX_PANELS); setStep('captured'); }} style={{ background: '#EDDFD2', border: 0, borderRadius: 14, padding: 14, textAlign: 'center', cursor: 'pointer', fontFamily: F_BODY, fontWeight: 800, fontSize: 14.5, letterSpacing: 0.3, color: '#C0392B' }}>Go back &amp; retake a panel</button>
               </div>
 
               <p style={{ fontSize: 11, color: '#7B9184', textAlign: 'center', lineHeight: 1.5, margin: '16px 4px 0' }}>
-                You can also add, edit, or remove any hand later from your card.
+                Leave a box blank to skip it. You can also add, edit, or remove any hand later from your card.
               </p>
             </div>
           );
