@@ -2,7 +2,10 @@
 // App shell is cached; navigations fall back to the cached shell when offline.
 // All user data lives in IndexedDB (handled by the app), not here.
 
-const CACHE = 'mahjong-v122';
+// Bumping this cache name forces every returning device to drop its old cached
+// bundle on the next visit and pull a clean build — the fix for a phone stuck
+// on a stale copy of the app.
+const CACHE = 'mahjong-v123';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
