@@ -5,7 +5,7 @@
 // Bumping this cache name forces every returning device to drop its old cached
 // bundle on the next visit and pull a clean build — the fix for a phone stuck
 // on a stale copy of the app.
-const CACHE = 'mahjong-v123';
+const CACHE = 'mahjong-v124';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -31,6 +31,11 @@ self.addEventListener('message', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
+
+  // Backend proxy (/sb/* → Supabase): never cache or intercept. These must
+  // always hit the network fresh (auth tokens, live data), and serving a stale
+  // cached API response would be wrong.
+  if (new URL(req.url).pathname.startsWith('/sb/')) return;
 
   // Navigations: network-first, fall back to cached shell (offline support).
   if (req.mode === 'navigate') {
